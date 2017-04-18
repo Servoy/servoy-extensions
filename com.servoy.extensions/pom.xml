@@ -8,7 +8,12 @@
 	 <repository>
 	    <id>terracotta-releases</id>
 	    <url>http://www.terracotta.org/download/reflector/releases/</url>
-	  </repository>
+	 </repository>
+	 <repository>
+      <id>developer_repo</id>
+      <name>developer_repo</name>
+      <url>http://developer.servoy.com/mvn_repository/</url>
+    </repository>
   </repositories>
 	
   <build>
@@ -62,7 +67,7 @@
 								<arg value="-O" />
 								<arg value="${project.build.directory}/plugins_beans/@{type}/@{jarname}.jar" />
 							</exec>   
-						    <signjar keystore="${project.basedir}/../../build/eclipse_build/keystore" 
+						    <signjar keystore="${jarsigner.keystore}" 
 							         jar="${project.build.directory}/plugins_beans/@{type}/@{jarname}.jar" 
 							         alias="ServoyClient" 
 							         storepass="${jarsigner.storepass}" 
@@ -267,11 +272,9 @@
 	  <version>1.3.0</version>
 	</dependency>
 	<dependency>
-		<groupId>wicket</groupId>
+		<groupId>com.servoy</groupId>
 		<artifactId>wicket</artifactId>
-		<version>4</version>
-		<scope>system</scope>
-		<systemPath>${basedir}/../../servoy-client/servoy_shared/lib/wicket.jar</systemPath>
+		<version>1.4</version>
 	</dependency> 
 	<dependency>
 		<groupId>openid</groupId>
