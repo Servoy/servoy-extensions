@@ -91,6 +91,7 @@
                  	<parallel>
                  	<makejar srcdir="agent"/>
                  	<makejar srcdir="amortization"/>
+                 	<makejar srcdir="broadcaster"/>
                  	<makejar srcdir="clientmanager"/>
                  	<makejar srcdir="converters"/>
                  	<makejar srcdir="validators" jarname="default_validators"/>
@@ -185,6 +186,31 @@
              </execution>
            </executions>
          </plugin>
+          <plugin>
+         <groupId>org.apache.maven.plugins</groupId>
+         <artifactId>maven-dependency-plugin</artifactId>
+         <version>3.0.0</version>
+         <executions>
+           <execution>
+             <id>copy_libs</id>
+             <phase>prepare-package</phase>
+             <goals>
+               <goal>copy</goal>
+             </goals>
+             <configuration>
+               <artifactItems>
+                 <artifactItem>
+                    <groupId>com.rabbitmq</groupId>
+				    <artifactId>amqp-client</artifactId>
+				    <version>4.1.0</version>
+                   <overWrite>true</overWrite>
+                   <outputDirectory>${project.build.directory}/plugins_beans/plugins/broadcaster</outputDirectory>
+                 </artifactItem>
+				</artifactItems>
+				</configuration>
+			</execution>
+		  </executions>
+   	  	 </plugin>
          <plugin>
 	        <groupId>org.apache.maven.plugins</groupId>
 	        <artifactId>maven-jar-plugin</artifactId>
@@ -276,6 +302,11 @@
 		<artifactId>wicket</artifactId>
 		<version>1.4</version>
 	</dependency> 
+	<dependency>
+	    <groupId>com.rabbitmq</groupId>
+	    <artifactId>amqp-client</artifactId>
+	    <version>4.1.0</version>
+	</dependency>
 	<dependency>
 		<groupId>openid</groupId>
 		<artifactId>openid</artifactId>
