@@ -34,6 +34,7 @@
 	<classpathentry kind="lib" path="/eclipse_target/compile_target/install/plugins/javax.servlet_3.1.0.v201410161800.jar"/>
 	<classpathentry kind="lib" path="/eclipse_target/ship_plugins/plugins/org.slf4j.api_1.7.2.v20121108-1250.jar"/>
 	<classpathentry kind="lib" path="/eclipse_target/ship_plugins/plugins/jabsorb_1.3.3.jar" sourcepath="/eclipse_target/ship_plugins/plugins/jabsorb.source_1.3.3.jar"/>
+	<classpathentry kind="lib" path="lib/amqp-client-4.1.0.jar" sourcepath="C:/Users/jcomp/.m2/repository/com/rabbitmq/amqp-client/4.1.0/amqp-client-4.1.0-sources.jar"/>
 	<classpathentry kind="con" path="org.eclipse.m2e.MAVEN2_CLASSPATH_CONTAINER">
 		<attributes>
 			<attribute name="maven.pomderived" value="true"/>
