@@ -1,371 +1,420 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>com.servoy</groupId>
-  <artifactId>com.servoy.extensions</artifactId>
-  <version>8.1.3.3032</version>
-  
-  <repositories>
-	 <repository>
-	    <id>terracotta-releases</id>
-	    <url>http://www.terracotta.org/download/reflector/releases/</url>
-	 </repository>
-	 <repository>
-      <id>developer_repo</id>
-      <name>developer_repo</name>
-      <url>http://developer.servoy.com/mvn_repository/</url>
-    </repository>
-  </repositories>
-  
-   <properties>
-  	<servoy-version>8.1.3.3032</servoy-version>
-  </properties>
-	
-  <build>
-    <sourceDirectory>src</sourceDirectory>
-    <resources>
-      <resource>
-        <directory>src</directory>
-        <excludes>
-          <exclude>**/*.java</exclude>
-        </excludes>
-      </resource>
-    </resources>
-    <plugins>
-      <plugin>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.5.1</version>
-        <configuration>
-          <source>1.7</source>
-          <target>1.7</target>
-        </configuration>
-      </plugin>
-      <plugin>
-     	<artifactId>maven-antrun-plugin</artifactId>
-           <version>1.8</version>
-           <executions>
-             <execution>
-             	<id>build runtime jars</id>
-               <phase>prepare-package</phase>
-               <goals>
-                 <goal>run</goal>
-               </goals>
-               <configuration>
-                 <target>
-                 	<macrodef name="makejar">
-						<attribute name="srcdir" />
-						<attribute name="jarname" default="@{srcdir}"/>
-						<attribute name="includes" default=""/>
-						<attribute name="manifest" default="${project.basedir}/resources/MANIFEST.MF"/>
-						<attribute name="type" default="plugins"/>
-						<sequential>
-							<jar destfile="${project.build.directory}/plugins_beans/@{type}/@{jarname}.jar"
-						       basedir="${project.build.directory}/classes"
-						       includes="com/servoy/extensions//@{type}/@{srcdir}/** @{includes}"
-						       manifest="@{manifest}"
-						       excludes="**/servoy-extension.html,**/servoy-extension.warnings.txt,">
-						       
-						    </jar>
-						    <exec dir="${project.build.directory}/plugins_beans/@{type}/" executable="pack200" output="${project.build.directory}/@{jarname}_repack200b.txt" failonerror="true">
-								<arg value="-J-Xmx512m" />
-								<arg value="-r" />
-								<arg value="-O" />
-								<arg value="${project.build.directory}/plugins_beans/@{type}/@{jarname}.jar" />
-							</exec>   
-						    <signjar keystore="${jarsigner.keystore}" 
-							         jar="${project.build.directory}/plugins_beans/@{type}/@{jarname}.jar" 
-							         alias="ServoyClient" 
-							         storepass="${jarsigner.storepass}" 
-							         tsaurl="http://sha256timestamp.ws.symantec.com/sha256/timestamp"
-							         sigalg="SHA256withRSA" 
-							         digestalg="SHA-256" />
-					    </sequential>
-					</macrodef>
-					
-                 	<delete dir="${project.build.directory}/plugins_beans"/>
-                 	<mkdir dir="${project.build.directory}/plugins_beans/plugins"/>
-                 	<mkdir dir="${project.build.directory}/plugins_beans/beans"/>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.servoy</groupId>
+	<artifactId>com.servoy.extensions</artifactId>
+	<version>8.1.3.3032</version>
 
-					<copy overwrite="true" todir="${project.build.directory}/classes/META-INF/services/">
-						<fileset file="${project.basedir}/resources/mail/com.servoy.j2db.plugins.IPlugin"/>
-					</copy>
-					<copy overwrite="true" todir="${project.build.directory}/classes/META-INF/services/">
-						<fileset file="${project.basedir}/resources/pdf_output/javax.print.StreamPrintServiceFactory"/>
-					</copy>
+	<repositories>
+		<repository>
+			<id>terracotta-releases</id>
+			<url>http://www.terracotta.org/download/reflector/releases/</url>
+		</repository>
+		<repository>
+			<id>developer_repo</id>
+			<name>developer_repo</name>
+			<url>http://developer.servoy.com/mvn_repository/</url>
+		</repository>
+	</repositories>
 
-                 	<parallel>
-                 	<makejar srcdir="agent"/>
-                 	<makejar srcdir="amortization"/>
-                 	<makejar srcdir="broadcaster"/>
-                 	<makejar srcdir="clientmanager"/>
-                 	<makejar srcdir="converters"/>
-                 	<makejar srcdir="validators" jarname="default_validators"/>
-                 	<makejar srcdir="dialog"/>
-                 	<makejar srcdir="excelxport"/>
-					<copy overwrite="true" todir="${project.build.directory}/plugins_beans/plugins/">
-						<fileset file="${project.basedir}/resources/excelxport/excelxport.jar.jnlp"/>
-					</copy>
-					<copy overwrite="true" todir="${project.build.directory}/plugins_beans/plugins/jakarta-poi">
-						<fileset file="${project.basedir}/lib/jakarta-poi.jar"/>
-					</copy>
-                 	<makejar srcdir="file"/>
-                 	<makejar srcdir="headlessclient"/>
-                 	<makejar srcdir="http"/>
-					<copy overwrite="true" todir="${project.build.directory}/plugins_beans/plugins/">
-						<fileset file="${project.basedir}/resources/http/http.jar.jnlp"/>
-					</copy>
-					<copy overwrite="true" todir="${project.build.directory}/plugins_beans/plugins/images">
-						<fileset file="${project.basedir}/lib/jai_imageio.jar"/>
-						<fileset file="${project.basedir}/lib/metadataextractor.jar"/>
-					</copy>
-					
-					<makejar srcdir="images"/>
-					<copy overwrite="true" todir="${project.build.directory}/plugins_beans/plugins/">
-						<fileset file="${project.basedir}/resources/images/images.jar.jnlp"/>
-					</copy>
-					<makejar srcdir="mail" includes=",META-INF/services/com.servoy.j2db.plugins.IPlugin"/>
-                 	<makejar srcdir="openid"/>
-					<copy overwrite="true" todir="${project.build.directory}/plugins_beans/plugins/openid">
-						<fileset file="${project.basedir}/lib/openid4java.jar"/>
-						<fileset file="${project.basedir}/lib/guice-2.0.jar"/>
-					</copy>
-					<makejar srcdir="pdf_forms"/>
-					<copy overwrite="true" todir="${project.build.directory}/plugins_beans/plugins/adobe_pdf_forms">
-						<fileset file="${project.basedir}/lib/jFdfTk.jar"/>
-					</copy>
-					
-					<makejar srcdir="pdf_output" includes=",META-INF/services/javax.print.StreamPrintServiceFactory"/>
-					<copy overwrite="true" todir="${project.build.directory}/plugins_beans/plugins/">
-						<fileset file="${project.basedir}/resources/pdf_output/pdf_output.jar.jnlp"/>
-					</copy>
-					<copy overwrite="true" todir="${project.build.directory}/plugins_beans/plugins/pdf_output">
-						<fileset file="${project.basedir}/lib/itext.jar"/>
-						<fileset file="${project.basedir}/lib/bcmail.jar"/>
-						<fileset file="${project.basedir}/lib/bcprov.jar"/>
-					</copy>
-					<makejar srcdir="rawSQL"/>
-					<makejar srcdir="rest_ws"/>
-					<makejar srcdir="scheduler" includes=",quartz.properties"/>
-					<copy overwrite="true" todir="${project.build.directory}/plugins_beans/plugins/">
-						<fileset file="${project.basedir}/resources/scheduler/scheduler.jar.jnlp"/>
-					</copy>
-					<copy overwrite="true" todir="${project.build.directory}/plugins_beans/plugins/scheduler">
-						<fileset file="${project.basedir}/lib/quartz.jar"/>
-					</copy>
-					<makejar srcdir="serialize"/>
-					<copy overwrite="true" todir="${project.build.directory}/plugins_beans/plugins/">
-						<fileset file="${project.basedir}/resources/serialize/serialize.jar.jnlp"/>
-					</copy>
-					<makejar srcdir="spellcheck"/>
-					<copy overwrite="true" todir="${project.build.directory}/plugins_beans/plugins/spellcheck">
-						<fileset file="${project.basedir}/lib/RapidSpell*.jar"/>
-					</copy>
-					<copy overwrite="true" todir="${project.build.directory}/plugins_beans/plugins/spellcheck">
-						<fileset file="${project.basedir}/resources/spellcheck/*.dict"/>
-					</copy>
-					<makejar srcdir="tabxport"/>
-					<makejar srcdir="udp"/>
-					<makejar srcdir="window"/>
-					<makejar srcdir="xmlreader"/>
-					
-					<makejar srcdir="dbtreeview" manifest="${project.basedir}/resources/dbtreeview/MANIFEST.MF" type="beans"/>
-					<makejar srcdir="jfxpanel" manifest="${project.basedir}/resources/jfxpanel/MANIFEST.MF" type="beans"/>
-					
-					<copy overwrite="true" todir="${project.build.directory}/plugins_beans/beans/">
-						<fileset file="${project.basedir}/lib/inmethod-grid.jar"/>
-					</copy>
-					
-					<unzip src="${project.basedir}/lib/inmethod-grid.jar" dest="${project.build.directory}/classes">
-						 <patternset>
-					        <exclude name="META-INF/**"/>
-					    </patternset>
-					</unzip>
-						<unzip src="${project.basedir}/lib/quartz.jar" dest="${project.build.directory}/classes">
-						 <patternset>
-					        <exclude name="META-INF/**"/>
-					    </patternset>
-					</unzip>
-					</parallel>
-                 </target>
-               </configuration>
-             </execution>
-           </executions>
-         </plugin>
-          <plugin>
-         <groupId>org.apache.maven.plugins</groupId>
-         <artifactId>maven-dependency-plugin</artifactId>
-         <version>3.0.0</version>
-         <executions>
-           <execution>
-             <id>copy_libs</id>
-             <phase>prepare-package</phase>
-             <goals>
-               <goal>copy</goal>
-             </goals>
-             <configuration>
-               <artifactItems>
-                 <artifactItem>
-                    <groupId>com.rabbitmq</groupId>
-				    <artifactId>amqp-client</artifactId>
-				    <version>4.1.0</version>
-                   <overWrite>true</overWrite>
-                   <outputDirectory>${project.build.directory}/plugins_beans/plugins/broadcaster</outputDirectory>
-                 </artifactItem>
-				</artifactItems>
+	<properties>
+		<servoy-version>8.1.3.3032</servoy-version>
+	</properties>
+
+	<build>
+		<sourceDirectory>src</sourceDirectory>
+		<resources>
+			<resource>
+				<directory>src</directory>
+				<excludes>
+					<exclude>**/*.java</exclude>
+				</excludes>
+			</resource>
+		</resources>
+		<plugins>
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.5.1</version>
+				<configuration>
+					<source>1.7</source>
+					<target>1.7</target>
 				</configuration>
-			</execution>
-		  </executions>
-   	  	 </plugin>
-         <plugin>
-	        <groupId>org.apache.maven.plugins</groupId>
-	        <artifactId>maven-jar-plugin</artifactId>
-	        <version>3.0.2</version>
-	        <executions>
-	          <execution>
-	          	<id>plugins_beans</id>
-	            <phase>package</phase>
-	            <goals>
-	              <goal>jar</goal>
-	            </goals>
-	            <configuration>
-	              <classifier>plugins_beans</classifier>
-	              <classesDirectory>${project.build.directory}/plugins_beans/</classesDirectory>
-	            </configuration>
-	          </execution>
-	        </executions>
-	      </plugin>
-    </plugins>
-  </build>
-  <dependencies>
-  	<dependency>
-  		<groupId>com.servoy</groupId>
-		<artifactId>servoy_shared</artifactId>
-  		<version>${servoy-version}</version>
-  	</dependency>
-  	<dependency>
-  		<groupId>com.servoy</groupId>
-  		<artifactId>servoy_base</artifactId>
-  		<version>${servoy-version}</version>
-  	</dependency>
-   	<dependency>
-  		<groupId>com.servoy</groupId>
-  		<artifactId>org.eclipse.dltk.javascript.rhino</artifactId>
-  		<version>${servoy-version}</version>
-  	</dependency>
- 	<dependency>
-  		<groupId>com.servoy</groupId>
-  		<artifactId>servoy_headless_client</artifactId>
-  		<version>${servoy-version}</version>
-  	</dependency>
- 	<dependency>
-  		<groupId>com.servoy</groupId>
-  		<artifactId>servoy_smart_client</artifactId>
-  		<version>${servoy-version}</version>
-  	</dependency>
-	<dependency>
-		<groupId>javax.servlet</groupId>
-	    <artifactId>javax.servlet-api</artifactId>
-	    <version>3.1.0</version>
-   	</dependency>
-	<dependency>
-	    <groupId>org.apache.httpcomponents</groupId>
-	    <artifactId>httpclient</artifactId>
-	    <version>4.3.6</version>
-	</dependency>
-	<dependency>
-	    <groupId>org.apache.httpcomponents</groupId>
-	    <artifactId>httpcore</artifactId>
-	    <version>4.3.3</version>
-	</dependency>
-	<dependency>
-	    <groupId>org.apache.httpcomponents</groupId>
-	    <artifactId>httpmime</artifactId>
-	    <version>4.3.6</version>
-	</dependency>
-	<dependency>
-	    <groupId>javax.mail</groupId>
-	    <artifactId>mail</artifactId>
-	    <version>1.4.7</version>
-	</dependency>
-	<dependency>
-	    <groupId>commons-pool</groupId>
-	    <artifactId>commons-pool</artifactId>
-	    <version>1.5.5</version>
-	</dependency>
-	<dependency>
-	    <groupId>org.jabsorb</groupId>
-	    <artifactId>jabsorb</artifactId>
-	    <version>1.3.2</version>
-	</dependency>
- 	<dependency>
-	  <groupId>org.terracotta.api</groupId>
-	  <artifactId>tim-api</artifactId>
-	  <version>1.3.0</version>
-	</dependency>
-	<dependency>
-		<groupId>com.servoy</groupId>
-		<artifactId>wicket</artifactId>
-		<version>1.4</version>
-	</dependency> 
-	<dependency>
-	    <groupId>com.rabbitmq</groupId>
-	    <artifactId>amqp-client</artifactId>
-	    <version>4.1.0</version>
-	</dependency>
-	<dependency>
-		<groupId>openid</groupId>
-		<artifactId>openid</artifactId>
-		<version>4</version>
-		<scope>system</scope>
-		<systemPath>${basedir}/lib/openid4java.jar</systemPath>
-	</dependency> 
-	<dependency>
-		<groupId>metadataextractor</groupId>
-		<artifactId>metadataextractor</artifactId>
-		<version>1</version>
-		<scope>system</scope>
-		<systemPath>${basedir}/lib/metadataextractor.jar</systemPath>
-	</dependency> 
-	<dependency>
-		<groupId>itext</groupId>
-		<artifactId>itext</artifactId>
-		<version>1</version>
-		<scope>system</scope>
-		<systemPath>${basedir}/lib/itext.jar</systemPath>
-	</dependency> 
-	<dependency>
-		<groupId>jakarta-poi</groupId>
-		<artifactId>jakarta-poi</artifactId>
-		<version>1</version>
-		<scope>system</scope>
-		<systemPath>${basedir}/lib/jakarta-poi.jar</systemPath>
-	</dependency> 
-	<dependency>
-		<groupId>quartz</groupId>
-		<artifactId>quartz</artifactId>
-		<version>1</version>
-		<scope>system</scope>
-		<systemPath>${basedir}/lib/quartz.jar</systemPath>
-	</dependency> 
-	<dependency>
-		<groupId>inmethod-grid</groupId>
-		<artifactId>inmethod-grid</artifactId>
-		<version>1</version>
-		<scope>system</scope>
-		<systemPath>${basedir}/lib/inmethod-grid.jar</systemPath>
-	</dependency> 
-	<dependency>
-		<groupId>jFdfTk</groupId>
-		<artifactId>jFdfTk</artifactId>
-		<version>1</version>
-		<scope>system</scope>
-		<systemPath>${basedir}/lib/jFdfTk.jar</systemPath>
-	</dependency> 
-	<dependency>
-		<groupId>RapidSpell</groupId>
-		<artifactId>RapidSpell</artifactId>
-		<version>1</version>
-		<scope>system</scope>
-		<systemPath>${basedir}/lib/RapidSpell.jar</systemPath>
-	</dependency> 
-   </dependencies>
+			</plugin>
+			<plugin>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<version>1.8</version>
+				<executions>
+					<execution>
+						<id>build runtime jars</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<configuration>
+							<target>
+								<macrodef name="makejar">
+									<attribute name="srcdir" />
+									<attribute name="jarname" default="@{srcdir}" />
+									<attribute name="includes" default="" />
+									<attribute name="manifest"
+										default="${project.basedir}/resources/MANIFEST.MF" />
+									<attribute name="type" default="plugins" />
+									<sequential>
+										<jar
+											destfile="${project.build.directory}/plugins_beans/@{type}/@{jarname}.jar"
+											basedir="${project.build.directory}/classes"
+											includes="com/servoy/extensions//@{type}/@{srcdir}/** @{includes}"
+											manifest="@{manifest}"
+											excludes="**/servoy-extension.html,**/servoy-extension.warnings.txt,">
+
+										</jar>
+										<exec dir="${project.build.directory}/plugins_beans/@{type}/"
+											executable="pack200"
+											output="${project.build.directory}/@{jarname}_repack200b.txt"
+											failonerror="true">
+											<arg value="-J-Xmx512m" />
+											<arg value="-r" />
+											<arg value="-O" />
+											<arg
+												value="${project.build.directory}/plugins_beans/@{type}/@{jarname}.jar" />
+										</exec>
+										<signjar keystore="${jarsigner.keystore}"
+											jar="${project.build.directory}/plugins_beans/@{type}/@{jarname}.jar"
+											alias="ServoyClient" storepass="${jarsigner.storepass}"
+											tsaurl="http://sha256timestamp.ws.symantec.com/sha256/timestamp"
+											sigalg="SHA256withRSA" digestalg="SHA-256" />
+									</sequential>
+								</macrodef>
+
+								<delete dir="${project.build.directory}/plugins_beans" />
+								<mkdir dir="${project.build.directory}/plugins_beans/plugins" />
+								<mkdir dir="${project.build.directory}/plugins_beans/beans" />
+
+								<copy overwrite="true"
+									todir="${project.build.directory}/classes/META-INF/services/">
+									<fileset
+										file="${project.basedir}/resources/mail/com.servoy.j2db.plugins.IPlugin" />
+								</copy>
+								<copy overwrite="true"
+									todir="${project.build.directory}/classes/META-INF/services/">
+									<fileset
+										file="${project.basedir}/resources/pdf_output/javax.print.StreamPrintServiceFactory" />
+								</copy>
+
+								<parallel>
+									<makejar srcdir="agent" />
+									<makejar srcdir="amortization" />
+									<makejar srcdir="broadcaster" />
+									<makejar srcdir="clientmanager" />
+									<makejar srcdir="converters" />
+									<makejar srcdir="validators" jarname="default_validators" />
+									<makejar srcdir="dialog" />
+									<makejar srcdir="excelxport" />
+									<copy overwrite="true"
+										todir="${project.build.directory}/plugins_beans/plugins/">
+										<fileset
+											file="${project.basedir}/resources/excelxport/excelxport.jar.jnlp" />
+									</copy>
+									<copy overwrite="true"
+										todir="${project.build.directory}/plugins_beans/plugins/jakarta-poi">
+										<fileset file="${project.basedir}/lib/jakarta-poi.jar" />
+									</copy>
+									<makejar srcdir="file" />
+									<makejar srcdir="headlessclient" />
+									<makejar srcdir="http" />
+									<copy overwrite="true"
+										todir="${project.build.directory}/plugins_beans/plugins/">
+										<fileset file="${project.basedir}/resources/http/http.jar.jnlp" />
+									</copy>
+									<copy overwrite="true"
+										todir="${project.build.directory}/plugins_beans/plugins/images">
+										<fileset file="${project.basedir}/lib/jai_imageio.jar" />
+										<fileset file="${project.basedir}/lib/metadataextractor.jar" />
+									</copy>
+
+									<makejar srcdir="images" />
+									<copy overwrite="true"
+										todir="${project.build.directory}/plugins_beans/plugins/">
+										<fileset file="${project.basedir}/resources/images/images.jar.jnlp" />
+									</copy>
+									<makejar srcdir="mail"
+										includes=",META-INF/services/com.servoy.j2db.plugins.IPlugin" />
+									<makejar srcdir="openid" />
+									<copy overwrite="true"
+										todir="${project.build.directory}/plugins_beans/plugins/openid">
+										<fileset file="${project.basedir}/lib/openid4java.jar" />
+										<fileset file="${project.basedir}/lib/guice-2.0.jar" />
+									</copy>
+									<makejar srcdir="pdf_forms" />
+									<copy overwrite="true"
+										todir="${project.build.directory}/plugins_beans/plugins/adobe_pdf_forms">
+										<fileset file="${project.basedir}/lib/jFdfTk.jar" />
+									</copy>
+
+									<makejar srcdir="pdf_output"
+										includes=",META-INF/services/javax.print.StreamPrintServiceFactory" />
+									<copy overwrite="true"
+										todir="${project.build.directory}/plugins_beans/plugins/">
+										<fileset
+											file="${project.basedir}/resources/pdf_output/pdf_output.jar.jnlp" />
+									</copy>
+									<copy overwrite="true"
+										todir="${project.build.directory}/plugins_beans/plugins/pdf_output">
+										<fileset file="${project.basedir}/lib/itext.jar" />
+										<fileset file="${project.basedir}/lib/bcmail.jar" />
+										<fileset file="${project.basedir}/lib/bcprov.jar" />
+									</copy>
+									<makejar srcdir="rawSQL" />
+									<makejar srcdir="rest_ws" />
+									<makejar srcdir="scheduler" includes=",quartz.properties" />
+									<copy overwrite="true"
+										todir="${project.build.directory}/plugins_beans/plugins/">
+										<fileset
+											file="${project.basedir}/resources/scheduler/scheduler.jar.jnlp" />
+									</copy>
+									<copy overwrite="true"
+										todir="${project.build.directory}/plugins_beans/plugins/scheduler">
+										<fileset file="${project.basedir}/lib/quartz.jar" />
+									</copy>
+									<makejar srcdir="serialize" />
+									<copy overwrite="true"
+										todir="${project.build.directory}/plugins_beans/plugins/">
+										<fileset
+											file="${project.basedir}/resources/serialize/serialize.jar.jnlp" />
+									</copy>
+									<makejar srcdir="spellcheck" />
+									<copy overwrite="true"
+										todir="${project.build.directory}/plugins_beans/plugins/spellcheck">
+										<fileset file="${project.basedir}/lib/RapidSpell*.jar" />
+									</copy>
+									<copy overwrite="true"
+										todir="${project.build.directory}/plugins_beans/plugins/spellcheck">
+										<fileset file="${project.basedir}/resources/spellcheck/*.dict" />
+									</copy>
+									<makejar srcdir="tabxport" />
+									<makejar srcdir="udp" />
+									<makejar srcdir="window" />
+									<makejar srcdir="xmlreader" />
+
+									<makejar srcdir="dbtreeview"
+										manifest="${project.basedir}/resources/dbtreeview/MANIFEST.MF"
+										type="beans" />
+									<makejar srcdir="jfxpanel"
+										manifest="${project.basedir}/resources/jfxpanel/MANIFEST.MF"
+										type="beans" />
+
+									<copy overwrite="true"
+										todir="${project.build.directory}/plugins_beans/beans/">
+										<fileset file="${project.basedir}/lib/inmethod-grid.jar" />
+									</copy>
+
+									<unzip src="${project.basedir}/lib/inmethod-grid.jar"
+										dest="${project.build.directory}/classes">
+										<patternset>
+											<exclude name="META-INF/**" />
+										</patternset>
+									</unzip>
+									<unzip src="${project.basedir}/lib/quartz.jar" dest="${project.build.directory}/classes">
+										<patternset>
+											<exclude name="META-INF/**" />
+										</patternset>
+									</unzip>
+								</parallel>
+							</target>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<version>3.0.0</version>
+				<executions>
+					<execution>
+						<id>copy_libs</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>copy</goal>
+						</goals>
+						<configuration>
+							<artifactItems>
+								<artifactItem>
+									<groupId>com.rabbitmq</groupId>
+									<artifactId>amqp-client</artifactId>
+									<version>4.1.0</version>
+									<overWrite>true</overWrite>
+									<outputDirectory>${project.build.directory}/plugins_beans/plugins/broadcaster</outputDirectory>
+								</artifactItem>
+							</artifactItems>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>3.0.2</version>
+				<executions>
+					<execution>
+						<id>plugins_beans</id>
+						<phase>package</phase>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+						<configuration>
+							<classifier>plugins_beans</classifier>
+							<classesDirectory>${project.build.directory}/plugins_beans/</classesDirectory>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jarsigner-plugin</artifactId>
+				<version>1.4</version>
+				<executions>
+					<execution>
+						<id>sign</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>sign</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+	<dependencies>
+		<dependency>
+			<groupId>com.servoy</groupId>
+			<artifactId>servoy_shared</artifactId>
+			<version>${servoy-version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.servoy</groupId>
+			<artifactId>servoy_base</artifactId>
+			<version>${servoy-version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.servoy</groupId>
+			<artifactId>org.eclipse.dltk.javascript.rhino</artifactId>
+			<version>${servoy-version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.servoy</groupId>
+			<artifactId>servoy_headless_client</artifactId>
+			<version>${servoy-version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.servoy</groupId>
+			<artifactId>servoy_smart_client</artifactId>
+			<version>${servoy-version}</version>
+		</dependency>
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>javax.servlet-api</artifactId>
+			<version>3.1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>4.3.6</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpcore</artifactId>
+			<version>4.3.3</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpmime</artifactId>
+			<version>4.3.6</version>
+		</dependency>
+		<dependency>
+			<groupId>javax.mail</groupId>
+			<artifactId>mail</artifactId>
+			<version>1.4.7</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-pool</groupId>
+			<artifactId>commons-pool</artifactId>
+			<version>1.5.5</version>
+		</dependency>
+		<dependency>
+			<groupId>org.jabsorb</groupId>
+			<artifactId>jabsorb</artifactId>
+			<version>1.3.2</version>
+		</dependency>
+		<dependency>
+			<groupId>org.terracotta.api</groupId>
+			<artifactId>tim-api</artifactId>
+			<version>1.3.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.servoy</groupId>
+			<artifactId>wicket</artifactId>
+			<version>1.4</version>
+		</dependency>
+		<dependency>
+			<groupId>com.rabbitmq</groupId>
+			<artifactId>amqp-client</artifactId>
+			<version>4.1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>openid</groupId>
+			<artifactId>openid</artifactId>
+			<version>4</version>
+			<scope>system</scope>
+			<systemPath>${basedir}/lib/openid4java.jar</systemPath>
+		</dependency>
+		<dependency>
+			<groupId>metadataextractor</groupId>
+			<artifactId>metadataextractor</artifactId>
+			<version>1</version>
+			<scope>system</scope>
+			<systemPath>${basedir}/lib/metadataextractor.jar</systemPath>
+		</dependency>
+		<dependency>
+			<groupId>itext</groupId>
+			<artifactId>itext</artifactId>
+			<version>1</version>
+			<scope>system</scope>
+			<systemPath>${basedir}/lib/itext.jar</systemPath>
+		</dependency>
+		<dependency>
+			<groupId>jakarta-poi</groupId>
+			<artifactId>jakarta-poi</artifactId>
+			<version>1</version>
+			<scope>system</scope>
+			<systemPath>${basedir}/lib/jakarta-poi.jar</systemPath>
+		</dependency>
+		<dependency>
+			<groupId>quartz</groupId>
+			<artifactId>quartz</artifactId>
+			<version>1</version>
+			<scope>system</scope>
+			<systemPath>${basedir}/lib/quartz.jar</systemPath>
+		</dependency>
+		<dependency>
+			<groupId>inmethod-grid</groupId>
+			<artifactId>inmethod-grid</artifactId>
+			<version>1</version>
+			<scope>system</scope>
+			<systemPath>${basedir}/lib/inmethod-grid.jar</systemPath>
+		</dependency>
+		<dependency>
+			<groupId>jFdfTk</groupId>
+			<artifactId>jFdfTk</artifactId>
+			<version>1</version>
+			<scope>system</scope>
+			<systemPath>${basedir}/lib/jFdfTk.jar</systemPath>
+		</dependency>
+		<dependency>
+			<groupId>RapidSpell</groupId>
+			<artifactId>RapidSpell</artifactId>
+			<version>1</version>
+			<scope>system</scope>
+			<systemPath>${basedir}/lib/RapidSpell.jar</systemPath>
+		</dependency>
+	</dependencies>
 </project>
