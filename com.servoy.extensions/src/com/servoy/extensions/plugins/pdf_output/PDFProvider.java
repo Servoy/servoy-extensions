@@ -772,14 +772,14 @@ public class PDFProvider implements IScriptable
 	 * }
 	 *
 	 * @param data the PDF
-	 * @param image the path of an image to use
+	 * @param image the path of an image to use or array of bytes containing actual image
 	 *
 	 * @return the PDF with added watermak
 	 *
 	 * @throws Exception
 	 */
 	@ServoyClientSupport(ng = true, wc = true, sc = true)
-	public byte[] js_watermark(byte[] data, String image) throws Exception
+	public byte[] js_watermark(byte[] data, Object image) throws Exception
 	{
 		return js_watermark(data, image, 200, 400, false, null);
 	}
@@ -793,7 +793,7 @@ public class PDFProvider implements IScriptable
 	 * @sampleas js_watermark(byte[], String)
 	 *
 	 * @param data the PDF
-	 * @param image the path of an image to use
+	 * @param image the path of an image to use or array of bytes containing actual image
 	 * @param locationX the x location of the image
 	 * @param locationY the y location of the image
 	 * @param isOver whether to put over the content
@@ -803,7 +803,7 @@ public class PDFProvider implements IScriptable
 	 * @throws Exception
 	 */
 	@ServoyClientSupport(ng = true, wc = true, sc = true)
-	public byte[] js_watermark(byte[] data, String image, int locationX, int locationY, boolean isOver) throws Exception
+	public byte[] js_watermark(byte[] data, Object image, int locationX, int locationY, boolean isOver) throws Exception
 	{
 		return js_watermark(data, image, locationX, locationY, isOver, null);
 	}
@@ -817,7 +817,7 @@ public class PDFProvider implements IScriptable
 	 * @sampleas js_watermark(byte[], String)
 	 *
 	 * @param data the PDF
-	 * @param image the path of an image to use
+	 * @param image the path of an image to use or array of bytes containing actual image
 	 * @param locationX the x location of the image
 	 * @param locationY the y location of the image
 	 * @param isOver whether to put over the content
@@ -828,12 +828,23 @@ public class PDFProvider implements IScriptable
 	 * @throws Exception
 	 */
 	@ServoyClientSupport(ng = true, wc = true, sc = true)
-	public byte[] js_watermark(byte[] data, String image, int locationX, int locationY, boolean isOver, String[] pages) throws Exception
+	public byte[] js_watermark(byte[] data, Object image, int locationX, int locationY, boolean isOver, String[] pages) throws Exception
 	{
 		if (data == null) throw new IllegalArgumentException("Missing argument"); //$NON-NLS-1$
 
-		Image watermark = Image.getInstance(image);
-
+		Image watermark = null;
+		if (image instanceof String)
+		{
+			watermark = Image.getInstance((String)image);
+		}
+		else if (image instanceof byte[])
+		{
+			watermark = Image.getInstance((byte[])image);
+		}
+		else
+		{
+			throw new IllegalArgumentException("Image must be a path or array of bytes: " + image); //$NON-NLS-1$
+		}
 		ByteArrayInputStream bais = new ByteArrayInputStream(data);
 		return ITextTools.watermarkPDF(bais, watermark, locationX, locationY, isOver, pages);
 	}
