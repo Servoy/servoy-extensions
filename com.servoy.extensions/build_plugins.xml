@@ -155,7 +155,7 @@
 	/>
 	
 	<target	name="_all_common_plugins"
-			    depends="agent.jar,clientmanager.jar,dialog.jar,http.jar,mail.jar,tabxport.jar,excelxport.jar,pdf_output.jar,file.jar,scheduler.jar,
+			    depends="agent.jar,broadcaster.jar,clientmanager.jar,dialog.jar,http.jar,mail.jar,tabxport.jar,excelxport.jar,pdf_output.jar,file.jar,scheduler.jar,
 			 	   pdf_forms.jar,dbtreeview.jar,jfxpanel.jar,amortization.jar,spellcheck.jar,images.jar,window.jar,udp.jar,rawSQL.jar,openid.jar,
 			 	   xmlreader.jar,serialize.jar,default_validators.jar,converters.jar,rest_ws.jar,headlessclient.jar"
 	>
@@ -1250,6 +1250,28 @@
 				duplicate="fail"
 		/>
 		<delete dir="${tempForJar.dir}"/>
+	</target>
+	
+	<target name="broadcaster.jar" depends="compile">
+			<delete dir="${tempForJar.dir}"/>
+			<mkdir dir="${tempForJar.dir}"/>
+			<delete file="${plugins.dir}/broadcaster.jar" quiet="true"/>
+			<copy overwrite="true" todir="${tempForJar.dir}/com/servoy/extensions/plugins/broadcaster">
+				<fileset dir="${src_plugins.dir}/broadcaster">
+					<patternset refid="gif.sources"/>
+					<include name="**/servoy-*.xml"/>
+				</fileset>
+			</copy>
+			<copy overwrite="true" todir="${tempForJar.dir}/com/servoy/extensions/plugins/broadcaster">
+				<fileset dir="${bin_plugins.dir}/broadcaster">
+					<filename name="**/*.class"/>
+				</fileset>
+			</copy>
+			<jar	destfile="${plugins.dir}/broadcaster.jar"
+					basedir="${tempForJar.dir}"
+					duplicate="fail"
+			/>
+			<delete dir="${tempForJar.dir}"/>
 	</target>
 	
 	<target name="udp.jar" depends="compile">
