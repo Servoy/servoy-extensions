@@ -1271,6 +1271,9 @@
 					basedir="${tempForJar.dir}"
 					duplicate="fail"
 			/>
+			<copy overwrite="true" todir="${plugins.dir}/broadcaster">
+					<fileset file="lib/amqp-client-4.1.0.jar"/>
+			</copy>
 			<delete dir="${tempForJar.dir}"/>
 	</target>
 	
