@@ -62,8 +62,8 @@ public class DataNotifyBroadCaster implements IServerPlugin
 	{
 		try
 		{
-			channel.close();
-			connection.close();
+			if (channel != null) channel.close();
+			if (connection != null) connection.close();
 		}
 		catch (Exception e)
 		{
