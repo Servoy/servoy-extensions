@@ -1124,7 +1124,15 @@ public class RestWSServlet extends HttpServlet
 			}
 			else
 			{
-				json = plugin.getJSONSerializer().toJSON(result);
+				try
+				{
+					json = plugin.getJSONSerializer().toJSON(result);
+				}
+				catch (Exception e)
+				{
+					Debug.error("Failed to convert " + result + " to a json sturucture", e);
+					throw e;
+				}
 			}
 
 			String content;
