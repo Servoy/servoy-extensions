@@ -908,7 +908,7 @@ public class RestWSServlet extends HttpServlet
 					if (name.startsWith(WS_USER_PROPERTIES_COOKIE_PREFIX))
 					{
 						String value = cookie.getValue();
-						map.put(name.substring(WS_USER_PROPERTIES_COOKIE_PREFIX.length()), value);
+						map.put(name.substring(WS_USER_PROPERTIES_COOKIE_PREFIX.length()), Utils.decodeCookieValue(value));
 					}
 				}
 				client.setUserProperties(map);
@@ -947,7 +947,7 @@ public class RestWSServlet extends HttpServlet
 			//set cookie
 			for (String propName : map.keySet())
 			{
-				Cookie cookie = new Cookie(WS_USER_PROPERTIES_COOKIE_PREFIX + propName, map.get(propName));
+				Cookie cookie = new Cookie(WS_USER_PROPERTIES_COOKIE_PREFIX + propName, Utils.encodeCookieValue(map.get(propName)));
 				String ctxPath = request.getContextPath();
 				if (ctxPath == null || ctxPath.equals("/") || ctxPath.length() < 1) ctxPath = "";
 				cookie.setPath(ctxPath + request.getServletPath() + "/" + RestWSPlugin.WEBSERVICE_NAME + "/" + client.getSolutionName());
