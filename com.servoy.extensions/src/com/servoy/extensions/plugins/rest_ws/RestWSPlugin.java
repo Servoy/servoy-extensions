@@ -23,9 +23,12 @@ import java.util.Properties;
 
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.pool.BaseKeyedPoolableObjectFactory;
-import org.apache.commons.pool.KeyedObjectPool;
-import org.apache.commons.pool.impl.GenericKeyedObjectPool;
+import org.apache.commons.pool2.BaseKeyedPooledObjectFactory;
+import org.apache.commons.pool2.KeyedObjectPool;
+import org.apache.commons.pool2.PooledObject;
+import org.apache.commons.pool2.impl.DefaultPooledObject;
+import org.apache.commons.pool2.impl.GenericKeyedObjectPool;
+import org.apache.commons.pool2.impl.GenericKeyedObjectPoolConfig;
 import org.mozilla.javascript.JavaScriptException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,7 +54,7 @@ import com.servoy.j2db.util.serialize.JSONSerializerWrapper;
  * <li>rest_ws_plugin_client_pool_size, default 5
  * <li>rest_ws_plugin_client_pool_exhausted_action [block/fail/grow], default block
  * </ul>
- * 
+ *
  * @see RestWSServlet
  * @author rgansevles
  */
@@ -75,7 +78,7 @@ public class RestWSPlugin implements IServerPlugin
 	public final Logger log = LoggerFactory.getLogger(RestWSPlugin.class);
 
 	private JSONSerializerWrapper serializerWrapper;
-	private GenericKeyedObjectPool clientPool = null;
+	private GenericKeyedObjectPool<String, IHeadlessClient> clientPool = null;
 	private Boolean shouldReloadSolutionAfterRequest;
 	private IServerAccess application;
 
@@ -96,16 +99,16 @@ public class RestWSPlugin implements IServerPlugin
 		Map<String, String> req = new HashMap<String, String>();
 		req.put(CLIENT_POOL_SIZE_PROPERTY, "Max number of clients used (this defines the number of concurrent requests and licences used), default = " +
 			CLIENT_POOL_SIZE_DEFAULT + ", when running in developer this setting is ignored, pool size will always be 1");
-		req.put(CLIENT_POOL_EXCHAUSTED_ACTION_PROPERTY, "The following values are supported for this property:\n" +
-			//
-			ACTION_BLOCK +
-			" (default): requests will wait untill a client becomes available, when running in developer this value will be used\n" +
-			//
-			ACTION_FAIL + ": the request will fail. The API will generate a SERVICE_UNAVAILABLE response (HTTP " + HttpServletResponse.SC_SERVICE_UNAVAILABLE +
-			")\n" +
-			//
-			ACTION_GROW +
-			": allows the pool to temporarily grow, by starting additional clients. These will be automatically removed when not required anymore.");
+		req.put(CLIENT_POOL_EXCHAUSTED_ACTION_PROPERTY,
+			"The following values are supported for this property:\n" +
+				//
+				ACTION_BLOCK + " (default): requests will wait untill a client becomes available, when running in developer this value will be used\n" +
+				//
+				ACTION_FAIL + ": the request will fail. The API will generate a SERVICE_UNAVAILABLE response (HTTP " +
+				HttpServletResponse.SC_SERVICE_UNAVAILABLE + ")\n" +
+				//
+				ACTION_GROW +
+				": allows the pool to temporarily grow, by starting additional clients. These will be automatically removed when not required anymore.");
 		req.put(AUTHORIZED_GROUPS_PROPERTY,
 			"Only authenticated users in the listed groups (comma-separated) have access, when left empty unauthorised access is allowed");
 
@@ -159,7 +162,7 @@ public class RestWSPlugin implements IServerPlugin
 
 	/*
 	 * This is potentially dangerous, only reuse clients with loaded solution if you are very sure the client did not keep state!
-	 * 
+	 *
 	 * USE AT OWN RISK
 	 */
 	public boolean shouldReloadSolutionAfterRequest()
@@ -174,20 +177,19 @@ public class RestWSPlugin implements IServerPlugin
 		return shouldReloadSolutionAfterRequest.booleanValue();
 	}
 
-	synchronized KeyedObjectPool getClientPool()
+	synchronized KeyedObjectPool<String, IHeadlessClient> getClientPool()
 	{
 		if (clientPool == null)
 		{
-			byte exchaustedAction;
-			int poolSize;
-			if (ApplicationServerRegistry.get().isDeveloperStartup())
+			GenericKeyedObjectPoolConfig config = new GenericKeyedObjectPoolConfig();
+
+			// in developer multiple clients do not work well with debugger
+			config.setBlockWhenExhausted(true);
+			config.setMaxTotal(1);
+
+			if (!ApplicationServerRegistry.get().isDeveloperStartup())
 			{
-				// in developer multiple clients do not work well with debugger
-				poolSize = 1;
-				exchaustedAction = GenericKeyedObjectPool.WHEN_EXHAUSTED_BLOCK;
-			}
-			else
-			{
+				int poolSize;
 				try
 				{
 					poolSize = Integer.parseInt(application.getSettings().getProperty(CLIENT_POOL_SIZE_PROPERTY, "" + CLIENT_POOL_SIZE_DEFAULT).trim());
@@ -196,32 +198,36 @@ public class RestWSPlugin implements IServerPlugin
 				{
 					poolSize = CLIENT_POOL_SIZE_DEFAULT;
 				}
+				config.setMaxTotal(poolSize);
+
 				String exchaustedActionCode = application.getSettings().getProperty(CLIENT_POOL_EXCHAUSTED_ACTION_PROPERTY);
 				if (exchaustedActionCode != null) exchaustedActionCode = exchaustedActionCode.trim();
 				if (ACTION_FAIL.equalsIgnoreCase(exchaustedActionCode))
 				{
-					exchaustedAction = GenericKeyedObjectPool.WHEN_EXHAUSTED_FAIL;
+					config.setBlockWhenExhausted(false);
 					if (log.isDebugEnabled()) log.debug("Client pool, exchaustedAction=" + ACTION_FAIL);
 				}
 				else if (ACTION_GROW.equalsIgnoreCase(exchaustedActionCode))
 				{
-					exchaustedAction = GenericKeyedObjectPool.WHEN_EXHAUSTED_GROW;
+					config.setMaxTotal(-1);
 					if (log.isDebugEnabled()) log.debug("Client pool, exchaustedAction=" + ACTION_GROW);
 				}
 				else
 				{
-					exchaustedAction = GenericKeyedObjectPool.WHEN_EXHAUSTED_BLOCK;
+					// defaults apply
 					if (log.isDebugEnabled()) log.debug("Client pool, exchaustedAction=" + ACTION_BLOCK);
 				}
 			}
-			if (log.isDebugEnabled()) log.debug("Creating client pool, maxSize=" + poolSize);
-			clientPool = new GenericKeyedObjectPool(new BaseKeyedPoolableObjectFactory()
+
+			if (log.isDebugEnabled()) log.debug("Creating client pool, maxSize=" + config.getMaxTotal());
+
+			clientPool = new GenericKeyedObjectPool<>(new BaseKeyedPooledObjectFactory<String, IHeadlessClient>()
 			{
 				@Override
-				public Object makeObject(Object key) throws Exception
+				public IHeadlessClient create(String key) throws Exception
 				{
 					if (log.isDebugEnabled()) log.debug("creating new session client for solution '" + key + '\'');
-					String solutionName = (String)key;
+					String solutionName = key;
 					String[] solOpenArgs = SOLUTION_OPEN_METHOD_ARGS;
 
 					String[] arr = solutionName.split(":");
@@ -234,15 +240,21 @@ public class RestWSPlugin implements IServerPlugin
 				}
 
 				@Override
-				public boolean validateObject(Object key, Object obj)
+				public PooledObject<IHeadlessClient> wrap(IHeadlessClient value)
 				{
-					IHeadlessClient client = ((IHeadlessClient)obj);
+					return new DefaultPooledObject<>(value);
+				}
+
+				@Override
+				public boolean validateObject(String key, PooledObject<IHeadlessClient> pooledObject)
+				{
+					IHeadlessClient client = pooledObject.getObject();
 					if (client.getPluginAccess().isInDeveloper())
 					{
-						String solutionName = (String)key;
+						String solutionName = key;
 						if (solutionName.contains(":")) solutionName = solutionName.split(":")[0];
 
-						if (!solutionName.equals(((IHeadlessClient)obj).getPluginAccess().getSolutionName()))
+						if (!solutionName.equals(client.getPluginAccess().getSolutionName()))
 						{
 							try
 							{
@@ -261,10 +273,10 @@ public class RestWSPlugin implements IServerPlugin
 				}
 
 				@Override
-				public void destroyObject(Object key, Object obj) throws Exception
+				public void destroyObject(String key, PooledObject<IHeadlessClient> pooledObject) throws Exception
 				{
 					if (log.isDebugEnabled()) log.debug("Destroying session client for solution '" + key + "'");
-					IHeadlessClient client = ((IHeadlessClient)obj);
+					IHeadlessClient client = pooledObject.getObject();
 					try
 					{
 						client.shutDown(true);
@@ -274,10 +286,9 @@ public class RestWSPlugin implements IServerPlugin
 						Debug.error(e);
 					}
 				}
-			}, poolSize);
+			});
+			clientPool.setConfig(config);
 			clientPool.setTestOnBorrow(true);
-			clientPool.setWhenExhaustedAction(exchaustedAction);
-			clientPool.setMaxIdle(poolSize); // destroy objects when pool has grown
 		}
 		return clientPool;
 	}
@@ -286,7 +297,7 @@ public class RestWSPlugin implements IServerPlugin
 	{
 		try
 		{
-			return (IHeadlessClient)getClientPool().borrowObject(solutionName);
+			return getClientPool().borrowObject(solutionName);
 		}
 		catch (NoSuchElementException e)
 		{
