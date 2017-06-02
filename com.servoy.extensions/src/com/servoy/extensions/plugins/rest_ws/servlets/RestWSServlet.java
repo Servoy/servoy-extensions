@@ -786,6 +786,11 @@ public class RestWSServlet extends HttpServlet
 			{
 				return CONTENT_JSON;
 			}
+			if (header.indexOf("vnd.openxmlformats-officedocument") >= 0)
+			{
+				//  note: this content type contains 'xml' but is not XML.
+				return CONTENT_BINARY;
+			}
 			if (header.indexOf("xml") >= 0)
 			{
 				return CONTENT_XML;
