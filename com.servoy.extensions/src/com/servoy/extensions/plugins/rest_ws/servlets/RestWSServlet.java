@@ -734,6 +734,11 @@ public class RestWSServlet extends HttpServlet
 			{
 				return CONTENT_JSON;
 			}
+			if (header.indexOf("vnd.openxmlformats-officedocument") >= 0)
+			{
+				//  note: this content type contains 'xml' but is not XML.
+				return CONTENT_BINARY;
+			}
 			if (header.indexOf("xml") >= 0)
 			{
 				return CONTENT_XML;
@@ -1192,8 +1197,10 @@ public class RestWSServlet extends HttpServlet
 			if (c1 == '<')
 			{
 				if (c2 == '!' ||
-					((c2 == 'h' && (c3 == 't' && c4 == 'm' && c5 == 'l' || c3 == 'e' && c4 == 'a' && c5 == 'd') || (c2 == 'b' && c3 == 'o' && c4 == 'd' && c5 == 'y'))) ||
-					((c2 == 'H' && (c3 == 'T' && c4 == 'M' && c5 == 'L' || c3 == 'E' && c4 == 'A' && c5 == 'D') || (c2 == 'B' && c3 == 'O' && c4 == 'D' && c5 == 'Y'))))
+					((c2 == 'h' && (c3 == 't' && c4 == 'm' && c5 == 'l' || c3 == 'e' && c4 == 'a' && c5 == 'd') ||
+						(c2 == 'b' && c3 == 'o' && c4 == 'd' && c5 == 'y'))) ||
+					((c2 == 'H' && (c3 == 'T' && c4 == 'M' && c5 == 'L' || c3 == 'E' && c4 == 'A' && c5 == 'D') ||
+						(c2 == 'B' && c3 == 'O' && c4 == 'D' && c5 == 'Y'))))
 				{
 					return "text/html";
 				}
