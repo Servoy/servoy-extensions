@@ -270,7 +270,7 @@ public class RestWSServlet extends HttpServlet
 			{
 				Object[] throwval = (Object[])((Wrapper)((JavaScriptException)e).getValue()).unwrap();
 				errorCode = Utils.getAsInteger(throwval[0]);
-				errorResponse = (String)throwval[1];
+				errorResponse = throwval[1] != null ? throwval[1].toString() : null;
 			}
 			else
 			{
