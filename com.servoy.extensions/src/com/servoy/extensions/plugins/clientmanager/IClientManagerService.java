@@ -23,4 +23,6 @@ public interface IClientManagerService extends Remote
 
 	void registerChannelListener(BroadcastInfo info) throws RemoteException;
 
+	boolean isInMaintenanceMode() throws RemoteException;
+
 }

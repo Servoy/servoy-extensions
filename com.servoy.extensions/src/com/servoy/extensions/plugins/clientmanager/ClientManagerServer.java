@@ -70,6 +70,12 @@ public class ClientManagerServer implements IServerPlugin, IClientManagerService
 	}
 
 	@Override
+	public boolean isInMaintenanceMode() throws RemoteException
+	{
+		return application.isInMaintenanceMode();
+	}
+
+	@Override
 	public IClientInformation[] getConnectedClients()
 	{
 		return application.getConnectedClients();
