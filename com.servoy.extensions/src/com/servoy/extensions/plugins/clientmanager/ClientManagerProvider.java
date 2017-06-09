@@ -1,5 +1,7 @@
 package com.servoy.extensions.plugins.clientmanager;
 
+import java.rmi.RemoteException;
+
 import org.mozilla.javascript.Function;
 
 import com.servoy.j2db.documentation.ServoyDocumented;
@@ -30,6 +32,29 @@ public class ClientManagerProvider implements IScriptable, IReturnedTypesProvide
 	public Class< ? >[] getAllReturnedTypes()
 	{
 		return new Class[] { Broadcaster.class, JSClientInformation.class };
+	}
+
+	/**
+	 * Returns true if the server is in maintenance mode, false otherwise.
+	 *
+	 * @sample
+	 * //Returns true if the server is in maintenance mode, false otherwise.
+	 * if (plugins.maintenance.isInMaintenanceMode())
+	 * 	application.output("Server is in maintenance mode.");
+	 * else
+	 * 	application.output("Server is not in maintenance mode.");
+	 */
+	public boolean js_isInMaintenanceMode()
+	{
+		try
+		{
+			return plugin.getClientService().isInMaintenanceMode();
+		}
+		catch (RemoteException e)
+		{
+			Debug.error("Exception while reading maintenance mode status.", e); //$NON-NLS-1$
+			return false;
+		}
 	}
 
 
