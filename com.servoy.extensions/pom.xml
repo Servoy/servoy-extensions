@@ -21,6 +21,43 @@
 		<servoy-version>8.2.0.3100</servoy-version>
 	</properties>
 
+	<profiles>
+		<profile>
+			<id>not_dev</id>
+			<activation>
+				<property> <!-- this will automatically be enabled when not using m2e/eclipse -->
+					<name>!m2e.version</name>
+				</property>
+			</activation>
+			<dependencies>
+				<dependency>
+					<groupId>com.servoy</groupId>
+					<artifactId>servoy_shared</artifactId>
+					<version>${servoy-version}</version>
+				</dependency>
+				<dependency>
+					<groupId>com.servoy</groupId>
+					<artifactId>servoy_base</artifactId>
+					<version>${servoy-version}</version>
+				</dependency>
+				<dependency>
+					<groupId>com.servoy</groupId>
+					<artifactId>org.eclipse.dltk.javascript.rhino</artifactId>
+					<version>${servoy-version}</version>
+				</dependency>
+				<dependency>
+					<groupId>com.servoy</groupId>
+					<artifactId>servoy_headless_client</artifactId>
+					<version>${servoy-version}</version>
+				</dependency>
+				<dependency>
+					<groupId>com.servoy</groupId>
+					<artifactId>servoy_smart_client</artifactId>
+					<version>${servoy-version}</version>
+				</dependency>
+			</dependencies>
+		</profile>
+	</profiles>
 	<build>
 		<sourceDirectory>src</sourceDirectory>
 		<resources>
@@ -285,31 +322,6 @@
 		</plugins>
 	</build>
 	<dependencies>
-		<dependency>
-			<groupId>com.servoy</groupId>
-			<artifactId>servoy_shared</artifactId>
-			<version>${servoy-version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.servoy</groupId>
-			<artifactId>servoy_base</artifactId>
-			<version>${servoy-version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.servoy</groupId>
-			<artifactId>org.eclipse.dltk.javascript.rhino</artifactId>
-			<version>${servoy-version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.servoy</groupId>
-			<artifactId>servoy_headless_client</artifactId>
-			<version>${servoy-version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.servoy</groupId>
-			<artifactId>servoy_smart_client</artifactId>
-			<version>${servoy-version}</version>
-		</dependency>
 		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>javax.servlet-api</artifactId>
