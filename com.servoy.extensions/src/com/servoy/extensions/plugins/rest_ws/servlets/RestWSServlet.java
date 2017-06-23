@@ -22,11 +22,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.mail.BodyPart;
+import javax.mail.MessagingException;
 import javax.mail.internet.MimeMultipart;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
@@ -35,6 +39,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.http.NameValuePair;
+import org.apache.http.client.utils.URLEncodedUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -111,6 +117,7 @@ public class RestWSServlet extends HttpServlet
 	private static final int CONTENT_BINARY = 3;
 	private static final int CONTENT_MULTIPART = 4;
 	private static final int CONTENT_TEXT = 5;
+	private static final int CONTENT_FORMPOST = 6;
 
 	private static final int CONTENT_DEFAULT = CONTENT_JSON;
 	private static final String CHARSET_DEFAULT = "UTF-8";
@@ -263,7 +270,7 @@ public class RestWSServlet extends HttpServlet
 			{
 				Object[] throwval = (Object[])((Wrapper)((JavaScriptException)e).getValue()).unwrap();
 				errorCode = Utils.getAsInteger(throwval[0]);
-				errorResponse = (String)throwval[1];
+				errorResponse = throwval[1] != null ? throwval[1].toString() : null;
 			}
 			else
 			{
@@ -786,6 +793,11 @@ public class RestWSServlet extends HttpServlet
 			{
 				return CONTENT_JSON;
 			}
+			if (header.indexOf("vnd.openxmlformats-officedocument") >= 0)
+			{
+				//  note: this content type contains 'xml' but is not XML.
+				return CONTENT_BINARY;
+			}
 			if (header.indexOf("xml") >= 0)
 			{
 				return CONTENT_XML;
@@ -800,7 +812,7 @@ public class RestWSServlet extends HttpServlet
 			}
 			if (header.indexOf("application/x-www-form-urlencoded") >= 0)
 			{
-				return CONTENT_OTHER;
+				return CONTENT_FORMPOST;
 			}
 			if (header.indexOf("octet-stream") >= 0 || header.indexOf("application") >= 0)
 			{
@@ -908,7 +920,7 @@ public class RestWSServlet extends HttpServlet
 					if (name.startsWith(WS_USER_PROPERTIES_COOKIE_PREFIX))
 					{
 						String value = cookie.getValue();
-						map.put(name.substring(WS_USER_PROPERTIES_COOKIE_PREFIX.length()), value);
+						map.put(name.substring(WS_USER_PROPERTIES_COOKIE_PREFIX.length()), Utils.decodeCookieValue(value));
 					}
 				}
 				client.setUserProperties(map);
@@ -947,7 +959,7 @@ public class RestWSServlet extends HttpServlet
 			//set cookie
 			for (String propName : map.keySet())
 			{
-				Cookie cookie = new Cookie(WS_USER_PROPERTIES_COOKIE_PREFIX + propName, map.get(propName));
+				Cookie cookie = new Cookie(WS_USER_PROPERTIES_COOKIE_PREFIX + propName, Utils.encodeCookieValue(map.get(propName)));
 				String ctxPath = request.getContextPath();
 				if (ctxPath == null || ctxPath.equals("/") || ctxPath.length() < 1) ctxPath = "";
 				cookie.setPath(ctxPath + request.getServletPath() + "/" + RestWSPlugin.WEBSERVICE_NAME + "/" + client.getSolutionName());
@@ -968,68 +980,104 @@ public class RestWSServlet extends HttpServlet
 				return plugin.getJSONSerializer().fromJSON(XML.toJSONObject(new String(contents, charset)));
 
 			case CONTENT_MULTIPART :
-				javax.mail.internet.MimeMultipart m = new MimeMultipart(new ServletMultipartDataSource(new ByteArrayInputStream(contents), contentTypeStr));
-				Object[] partArray = new Object[m.getCount()];
-				for (int i = 0; i < m.getCount(); i++)
-				{
-					BodyPart bodyPart = m.getBodyPart(i);
-					JSMap<String, Object> partObj = new JSMap<String, Object>();
-					//filename
-					if (bodyPart.getFileName() != null) partObj.put("fileName", bodyPart.getFileName());
-					String partContentType = "";
-					//charset
-					if (bodyPart.getContentType() != null) partContentType = bodyPart.getContentType();
+				return getMultipartContent(contentTypeStr, contents);
 
-					String _charset = getHeaderKey(partContentType, "charset", "");
-					partContentType = partContentType.replaceAll("(.*?);\\s*\\w+=.*", "$1");
-					//contentType
-					if (partContentType.length() > 0) partObj.put("contentType", partContentType);
-					if (_charset.length() > 0) partObj.put("charset", _charset);
-					else _charset = "UTF-8"; // still use a valid default encoding in case it's not specified for reading it - it is ok that it will not be reported to JS I guess (this happens almost all the time)
-					InputStream contentStream = bodyPart.getInputStream();
-					try
-					{
-						if (contentStream.available() > 0)
-						{
-							//Get content value
-							Object decodedBodyPart = decodeContent(partContentType, getContentType(partContentType),
-								Utils.getBytesFromInputStream(contentStream), _charset);
-							contentStream.close();
-							partObj.put("value", decodedBodyPart);
-						}
-					}
-					finally
-					{
-						contentStream.close();
-					}
-
-					// Get name header
-					String nameHeader = "";
-					String[] nameHeaders = bodyPart.getHeader("Content-Disposition");
-					if (nameHeaders != null)
-					{
-						for (String bodyName : nameHeaders)
-						{
-							String name = getHeaderKey(bodyName, "name", "");
-							if (name.length() > 0) nameHeader = name;
-							break;
-						}
-					}
-					if (nameHeader.length() > 0) partObj.put("name", nameHeader);
-					partArray[i] = partObj;
-				}
-				return partArray;
+			case CONTENT_FORMPOST :
+				return parseQueryString(new String(contents, charset));
 
 			case CONTENT_BINARY :
 				return contents;
+
 			case CONTENT_TEXT :
 				return new String(contents, charset);
+
 			case CONTENT_OTHER :
 				return contents;
 		}
 
 		// should not happen, content type was checked before
 		throw new IllegalStateException();
+	}
+
+	private Object getMultipartContent(String contentTypeStr, byte[] contents) throws MessagingException, IOException, Exception
+	{
+		javax.mail.internet.MimeMultipart m = new MimeMultipart(new ServletMultipartDataSource(new ByteArrayInputStream(contents), contentTypeStr));
+		Object[] partArray = new Object[m.getCount()];
+		for (int i = 0; i < m.getCount(); i++)
+		{
+			BodyPart bodyPart = m.getBodyPart(i);
+			JSMap<String, Object> partObj = new JSMap<String, Object>();
+			//filename
+			if (bodyPart.getFileName() != null) partObj.put("fileName", bodyPart.getFileName());
+			String partContentType = "";
+			//charset
+			if (bodyPart.getContentType() != null) partContentType = bodyPart.getContentType();
+
+			String _charset = getHeaderKey(partContentType, "charset", "");
+			partContentType = partContentType.replaceAll("(.*?);\\s*\\w+=.*", "$1");
+			//contentType
+			if (partContentType.length() > 0)
+			{
+				partObj.put("contentType", partContentType);
+			}
+			if (_charset.length() > 0)
+			{
+				partObj.put("charset", _charset);
+			}
+			else
+			{
+				_charset = "UTF-8"; // still use a valid default encoding in case it's not specified for reading it - it is ok that it will not be reported to JS I guess (this happens almost all the time)
+			}
+			InputStream contentStream = bodyPart.getInputStream();
+			try
+			{
+				if (contentStream.available() > 0)
+				{
+					//Get content value
+					Object decodedBodyPart = decodeContent(partContentType, getContentType(partContentType), Utils.getBytesFromInputStream(contentStream),
+						_charset);
+					contentStream.close();
+					partObj.put("value", decodedBodyPart);
+				}
+			}
+			finally
+			{
+				contentStream.close();
+			}
+
+			// Get name header
+			String nameHeader = "";
+			String[] nameHeaders = bodyPart.getHeader("Content-Disposition");
+			if (nameHeaders != null)
+			{
+				for (String bodyName : nameHeaders)
+				{
+					String name = getHeaderKey(bodyName, "name", "");
+					if (name.length() > 0) nameHeader = name;
+					break;
+				}
+			}
+			if (nameHeader.length() > 0) partObj.put("name", nameHeader);
+			partArray[i] = partObj;
+		}
+		return partArray;
+	}
+
+	private Object parseQueryString(String queryString)
+	{
+		List<JSMap<String, Object>> args = new ArrayList<>();
+		List<NameValuePair> values = URLEncodedUtils.parse(queryString, Charset.forName("UTF-8"));
+		for (NameValuePair pair : values)
+		{
+			// create an array of objects, similar to multipart form posts
+			JSMap<String, Object> jsmap = new JSMap<String, Object>();
+			jsmap.put("value", pair.getValue());
+			jsmap.put("name", pair.getName());
+			jsmap.put("contentType", "text/plain");
+			args.add(jsmap);
+		}
+
+		return args;
 	}
 
 	private boolean getNodebugHeadderValue(HttpServletRequest request)
@@ -1124,7 +1172,15 @@ public class RestWSServlet extends HttpServlet
 			}
 			else
 			{
-				json = plugin.getJSONSerializer().toJSON(result);
+				try
+				{
+					json = plugin.getJSONSerializer().toJSON(result);
+				}
+				catch (Exception e)
+				{
+					Debug.error("Failed to convert " + result + " to a json sturucture", e);
+					throw e;
+				}
 			}
 
 			String content;

@@ -1,7 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
+	<classpathentry including="**/*.java" kind="src" output="target/classes" path="src">
+		<attributes>
+			<attribute name="optional" value="true"/>
+			<attribute name="maven.pomderived" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7">
+		<attributes>
+			<attribute name="maven.pomderived" value="true"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry combineaccessrules="false" kind="src" path="/servoy_headless_client"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/servoy_shared"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/servoy_smart_client"/>
@@ -18,12 +27,17 @@
 	<classpathentry kind="lib" path="lib/openid4java.jar" sourcepath="libsrc/openid4java-src.zip"/>
 	<classpathentry kind="lib" path="/servoy_shared/lib/tim-api.jar"/>
 	<classpathentry kind="lib" path="lib/jfxrt.jar"/>
-	<classpathentry kind="lib" path="/eclipse_target/ship_plugins/plugins/mail.jar"/>
-	<classpathentry kind="lib" path="/eclipse_target/ship_plugins/plugins/commons-pool.jar"/>
 	<classpathentry kind="lib" path="/eclipse_target/compile_target/install/plugins/org.apache.httpcomponents.httpclient_4.3.6.v201411290715.jar"/>
 	<classpathentry kind="lib" path="/eclipse_target/compile_target/install/plugins/org.apache.httpcomponents.httpcore_4.3.3.v201411290715.jar"/>
 	<classpathentry kind="lib" path="/eclipse_target/compile_target/install/plugins/javax.servlet_3.1.0.v201410161800.jar"/>
 	<classpathentry kind="lib" path="/eclipse_target/ship_plugins/plugins/slf4j-api-1.7.24.jar"/>
-	<classpathentry kind="lib" path="/eclipse_target/ship_plugins/plugins/jabsorb_1.3.0.s2.jar"/>
-	<classpathentry kind="output" path="bin"/>
+	<classpathentry kind="lib" path="/eclipse_target/ship_plugins/plugins/jabsorb_1.3.0.s2.jar" sourcepath="/eclipse_target/ship_plugins/plugins/jabsorb.source_1.3.0.s2.jar"/>
+	<classpathentry kind="lib" path="/eclipse_target/compile_target/install/plugins/org.apache.commons.logging_1.1.1.v201101211721.jar"/>
+	<classpathentry kind="lib" path="lib/amqp-client-4.1.0.jar" sourcepath="C:/Users/jcomp/.m2/repository/com/rabbitmq/amqp-client/4.1.0/amqp-client-4.1.0-sources.jar"/>
+	<classpathentry kind="con" path="org.eclipse.m2e.MAVEN2_CLASSPATH_CONTAINER">
+		<attributes>
+			<attribute name="maven.pomderived" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="output" path="target/classes"/>
 </classpath>

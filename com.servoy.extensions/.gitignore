@@ -3,3 +3,4 @@ servoy-extension.html
 servoy-extension.warnings.txt
 servoy-extension.xml
 /build
+/target/
