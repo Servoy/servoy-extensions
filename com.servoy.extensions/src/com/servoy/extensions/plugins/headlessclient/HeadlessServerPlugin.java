@@ -486,7 +486,44 @@ public class HeadlessServerPlugin implements IHeadlessServer, IServerPlugin
 
 	public void shutDown(String clientKey, boolean force)
 	{
-		serverPluginDispatcher.callOnCorrectServer(getNonNullServerId(clientKey), new ShutDownCall(clientKey, force), true);
+		MethodCall dummy = null;
+		if (!force)
+		{
+			dummy = new MethodCall(clientKey, "");
+			// if not force then wait for the current method calls.
+			// this could mean that when 1 is finished but other method calls are waiting
+			// that one of those are done first, or that this one gets it and kill the client.
+			synchronized (methodCalls) // Terracotta WRITE lock
+			{
+				while (methodCalls.containsKey(clientKey))
+				{
+					try
+					{
+						methodCalls.wait();
+						methodCalls.put(clientKey, dummy);
+					}
+					catch (InterruptedException e)
+					{
+						Debug.error(e);
+					}
+				}
+			}
+		}
+		try
+		{
+			serverPluginDispatcher.callOnCorrectServer(getNonNullServerId(clientKey), new ShutDownCall(clientKey, force), true);
+		}
+		finally
+		{
+			if (dummy != null)
+			{
+				synchronized (methodCalls) // Terracotta WRITE lock
+				{
+					methodCalls.remove(clientKey);
+					methodCalls.notifyAll();
+				}
+			}
+		}
 	}
 
 	// must be static otherwise it would have a back-reference that would make everything (try to) go into shared cluster memory
