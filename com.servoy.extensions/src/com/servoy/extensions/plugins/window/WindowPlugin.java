@@ -33,7 +33,7 @@ import com.servoy.j2db.util.Debug;
 
 /**
  * Window plugin
- * 
+ *
  * @author rgansevles
  */
 public class WindowPlugin implements IClientPlugin
@@ -107,12 +107,12 @@ public class WindowPlugin implements IClientPlugin
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see com.servoy.j2db.plugins.IClientPlugin#getImage()
 	 */
 	public Icon getImage()
 	{
-		URL iconUrl = this.getClass().getResource("images/window.gif"); //$NON-NLS-1$
+		URL iconUrl = this.getClass().getResource("images/window.png"); //$NON-NLS-1$
 		if (iconUrl != null)
 		{
 			return new ImageIcon(iconUrl);
@@ -125,7 +125,7 @@ public class WindowPlugin implements IClientPlugin
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
 	 */
 	public void propertyChange(PropertyChangeEvent evt)

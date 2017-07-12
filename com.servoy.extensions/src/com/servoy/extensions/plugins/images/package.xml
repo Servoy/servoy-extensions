@@ -22,7 +22,7 @@
     	</lib>
 	</dependencies>
 	<info>
-		<icon path="screenshots/icon.gif"/>
+		<icon path="screenshots/images.png"/>
 		<description>Plugin for handling images. It enables you to get a specified JavaScript image or resource object, on which to perform functions to return the image/resource type, the image dimensions or to resize the object.</description>
 	</info>
 	<requiresRestart/>

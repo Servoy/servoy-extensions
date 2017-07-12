@@ -21,7 +21,7 @@
     	</lib>
 	</dependencies>
 	<info>
-		<icon path="screenshots/pdf.gif"/>
+		<icon path="screenshots/pdf_output.png"/>
 		<description>Plugin for working with PDF forms.</description>
 	</info>
 	<requiresRestart/>

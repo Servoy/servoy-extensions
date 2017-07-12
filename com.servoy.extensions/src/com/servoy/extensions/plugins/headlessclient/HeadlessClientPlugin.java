@@ -49,7 +49,7 @@ public class HeadlessClientPlugin implements IClientPlugin
 
 	public Icon getImage()
 	{
-		java.net.URL iconUrl = this.getClass().getResource("images/console.gif"); //$NON-NLS-1$
+		java.net.URL iconUrl = this.getClass().getResource("images/headlessclient.png"); //$NON-NLS-1$
 		if (iconUrl != null)
 		{
 			return new ImageIcon(iconUrl);

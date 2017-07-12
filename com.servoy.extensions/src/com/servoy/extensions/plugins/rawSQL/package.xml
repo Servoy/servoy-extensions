@@ -10,7 +10,7 @@
 	    </servoy>
 	</dependencies>
 	<info>
-		<icon path="screenshots/sql.gif"/>
+		<icon path="screenshots/raw_sql.png"/>
 		<description>Plugin for executing any SQL commands (assuming that you have the required level of access), including inserts, updates, deletes. You can flush the Client database cache and you can get the exception message for a failed statement execution.</description>
 	</info>
 	<requiresRestart/>

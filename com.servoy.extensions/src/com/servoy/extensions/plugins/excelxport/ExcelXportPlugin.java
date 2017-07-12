@@ -154,12 +154,12 @@ public class ExcelXportPlugin implements IClientPlugin, ActionListener
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see com.servoy.j2db.plugins.IClientPlugin#getImage()
 	 */
 	public Icon getImage()
 	{
-		java.net.URL iconUrl = this.getClass().getResource("images/excelxport.gif"); //$NON-NLS-1$
+		java.net.URL iconUrl = this.getClass().getResource("images/excelexport.png"); //$NON-NLS-1$
 		if (iconUrl != null)
 		{
 			return new ImageIcon(iconUrl);

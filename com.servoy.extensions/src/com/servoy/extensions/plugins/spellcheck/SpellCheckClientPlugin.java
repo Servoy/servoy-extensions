@@ -240,7 +240,7 @@ public class SpellCheckClientPlugin implements IClientPlugin, ActionListener
 		try
 		{
 			String selectedLang = (optLang != null) ? optLang : SpellCheckerPreferencePanel.getDesiredLanguage();
-			if (Utils.getAsBoolean(application.getSettings().getProperty("plugin.spellcheck.googleServiceProvider"))) //$NON-NLS-1$ 
+			if (Utils.getAsBoolean(application.getSettings().getProperty("plugin.spellcheck.googleServiceProvider"))) //$NON-NLS-1$
 			{
 				String language = GoogleSpellUtils.getBasicLanguageName(selectedLang);
 				strUrl = "https://www.google.com/tbproxy/spell?lang=" + language + "&hl=" + language; //$NON-NLS-1$ //$NON-NLS-2$
@@ -368,7 +368,7 @@ public class SpellCheckClientPlugin implements IClientPlugin, ActionListener
 
 	public Icon getImage()
 	{
-		URL iconUrl = this.getClass().getResource("images/spell.gif"); //$NON-NLS-1$
+		URL iconUrl = this.getClass().getResource("images/spellcheck.png"); //$NON-NLS-1$
 		if (iconUrl != null)
 		{
 			return new ImageIcon(iconUrl);

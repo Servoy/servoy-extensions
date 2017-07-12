@@ -10,7 +10,7 @@
 	    </servoy>
 	</dependencies>
 	<info>
-		<icon path="screenshots/browse.gif"/>
+		<icon path="screenshots/http.png"/>
 		<description>Plugin which provides functions for performing HTTP operations.</description>
 	</info>
 	<requiresRestart/>

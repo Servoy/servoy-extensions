@@ -10,7 +10,7 @@
 	    </servoy>
 	</dependencies>
 	<info>
-		<icon path="screenshots/xml.gif"/>
+		<icon path="screenshots/xml_reader.png"/>
 		<description>Plugin for xml handling. It provides functionality to read an XML document from a file or string, as well as return attribute names, values, child nodes, etc.</description>
 	</info>
 	<requiresRestart/>

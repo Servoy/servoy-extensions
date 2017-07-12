@@ -10,7 +10,7 @@
 	    </servoy>
 	</dependencies>
 	<info>
-    	<icon path="screenshots/agent.gif"/>
+    	<icon path="screenshots/agent.png"/>
     	<description>A plugin for showing a message animation. With the agent plugin, you can show, hide, move and let the agent speak.</description>
     </info>
 	<requiresRestart/>

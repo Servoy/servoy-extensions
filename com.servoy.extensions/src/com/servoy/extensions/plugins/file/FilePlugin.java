@@ -58,7 +58,7 @@ public class FilePlugin implements IClientPlugin
 
 	public Icon getImage()
 	{
-		java.net.URL iconUrl = this.getClass().getResource("images/file.gif"); //$NON-NLS-1$
+		java.net.URL iconUrl = this.getClass().getResource("images/file.png"); //$NON-NLS-1$
 		if (iconUrl != null)
 		{
 			return new ImageIcon(iconUrl);

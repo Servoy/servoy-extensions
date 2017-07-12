@@ -10,7 +10,7 @@
 	    </servoy>
 	</dependencies>
 	<info>
-		<icon path="screenshots/window.gif"/>
+		<icon path="screenshots/window.png"/>
 		<description>Plugin for providing the functionality of window related operations.</description>
 	</info>
 	<requiresRestart/>

@@ -10,7 +10,7 @@
 	    </servoy>
 	</dependencies>
 	<info>
-		<icon path="screenshots/docexport.gif"/>
+		<icon path="screenshots/textexport.png"/>
 		<description>Plugin for import/export of csv file as database data.</description>
 	</info>
 	<requiresRestart/>

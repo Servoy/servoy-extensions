@@ -100,12 +100,12 @@ public class UDPPlugin implements IClientPlugin
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see com.servoy.j2db.plugins.IClientPlugin#getImage()
 	 */
 	public Icon getImage()
 	{
-		iconUrl = this.getClass().getResource("images/udp.gif"); //$NON-NLS-1$
+		iconUrl = this.getClass().getResource("images/udp.png"); //$NON-NLS-1$
 		if (iconUrl != null)
 		{
 			return new ImageIcon(iconUrl);
@@ -118,7 +118,7 @@ public class UDPPlugin implements IClientPlugin
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
 	 */
 	public void propertyChange(PropertyChangeEvent evt)

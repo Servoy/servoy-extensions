@@ -30,7 +30,7 @@ import com.servoy.j2db.scripting.IScriptable;
 
 /**
  * Rawsql plugin client plugin.
- * 
+ *
  * @author jblok
  */
 public class RawSQLPlugin implements IClientPlugin
@@ -103,7 +103,7 @@ public class RawSQLPlugin implements IClientPlugin
 
 	public Icon getImage()
 	{
-		java.net.URL iconUrl = this.getClass().getResource("images/sql.gif"); //$NON-NLS-1$
+		java.net.URL iconUrl = this.getClass().getResource("images/raw_sql.png"); //$NON-NLS-1$
 		if (iconUrl != null)
 		{
 			return new ImageIcon(iconUrl);
@@ -116,7 +116,7 @@ public class RawSQLPlugin implements IClientPlugin
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
 	 */
 	public void propertyChange(PropertyChangeEvent evt)
