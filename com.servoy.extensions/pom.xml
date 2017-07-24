@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.servoy</groupId>
 	<artifactId>com.servoy.extensions</artifactId>
-	<version>8.2.0.3100</version>
+	<version>8.2.0.3101_rc1</version>
 
 	<repositories>
 		<repository>
@@ -16,11 +16,7 @@
 			<url>http://developer.servoy.com/mvn_repository/</url>
 		</repository>
 	</repositories>
-
-	<properties>
-		<servoy-version>8.2.0.3100</servoy-version>
-	</properties>
-
+	
 	<profiles>
 		<profile>
 			<id>not_dev</id>
@@ -33,27 +29,27 @@
 				<dependency>
 					<groupId>com.servoy</groupId>
 					<artifactId>servoy_shared</artifactId>
-					<version>${servoy-version}</version>
+					<version>${project.version}</version>
 				</dependency>
 				<dependency>
 					<groupId>com.servoy</groupId>
 					<artifactId>servoy_base</artifactId>
-					<version>${servoy-version}</version>
+					<version>${project.version}</version>
 				</dependency>
 				<dependency>
 					<groupId>com.servoy</groupId>
 					<artifactId>org.eclipse.dltk.javascript.rhino</artifactId>
-					<version>${servoy-version}</version>
+					<version>${project.version}</version>
 				</dependency>
 				<dependency>
 					<groupId>com.servoy</groupId>
 					<artifactId>servoy_headless_client</artifactId>
-					<version>${servoy-version}</version>
+					<version>${project.version}</version>
 				</dependency>
 				<dependency>
 					<groupId>com.servoy</groupId>
 					<artifactId>servoy_smart_client</artifactId>
-					<version>${servoy-version}</version>
+					<version>${project.version}</version>
 				</dependency>
 			</dependencies>
 		</profile>
