@@ -19,6 +19,8 @@ package com.servoy.extensions.plugins.clientmanager;
 
 import java.io.Serializable;
 
+import com.servoy.j2db.util.UUID;
+
 /**
  * @author jcompagner
  *
@@ -28,6 +30,7 @@ public class BroadcastInfo implements Serializable
 	private final String channelName;
 	private final String name;
 	private final IBroadcaster broadCaster;
+	private final UUID uuid = UUID.randomUUID();
 
 	public BroadcastInfo(IBroadcaster broadCaster, String name, String channelName)
 	{
@@ -52,5 +55,21 @@ public class BroadcastInfo implements Serializable
 	public IBroadcaster getBroadCaster()
 	{
 		return broadCaster;
+	}
+
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (obj instanceof BroadcastInfo)
+		{
+			return uuid.equals(((BroadcastInfo)obj).uuid);
+		}
+		return false;
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return uuid.hashCode();
 	}
 }

@@ -99,7 +99,10 @@ public class Broadcaster implements IBroadcaster, IJavaScriptType
 		try
 		{
 			plugin.getClientService().deregisterChannelListener(bci);
-			UnicastRemoteObject.unexportObject(this, true);
+			if (plugin.getClientPluginAccess() instanceof ISmartClientPluginAccess && !plugin.getClientPluginAccess().isInDeveloper())
+			{
+				UnicastRemoteObject.unexportObject(this, true);
+			}
 		}
 		catch (RemoteException e)
 		{

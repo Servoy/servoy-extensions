@@ -147,7 +147,7 @@ public class ClientManagerServer implements IServerPlugin, IClientManagerService
 		{
 			for (BroadcastInfo bci : list)
 			{
-				if (bci != info) try
+				if (!bci.equals(info)) try
 				{
 					bci.getBroadCaster().channelMessage(info.getName(), message);
 				}

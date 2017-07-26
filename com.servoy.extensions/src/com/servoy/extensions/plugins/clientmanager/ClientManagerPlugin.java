@@ -101,6 +101,17 @@ public class ClientManagerPlugin implements IClientPlugin
 
 	public void propertyChange(PropertyChangeEvent evt)
 	{
+		if (liveBroadcasters != null && "solution".equals(evt.getPropertyName())) //$NON-NLS-1$
+		{
+			try
+			{
+				unload();
+			}
+			catch (PluginException e)
+			{
+				Debug.error(e);
+			}
+		}
 	}
 
 	public IClientPluginAccess getClientPluginAccess()
