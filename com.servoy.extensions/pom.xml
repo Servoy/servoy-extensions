@@ -69,65 +69,6 @@
 				<plugins>
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-scm-plugin</artifactId>
-						<version>1.9.5</version>
-						<executions>
-							<execution>
-								<id>checkout_servoy_client</id>
-								<phase>generate-resources</phase>
-								<goals>
-									<goal>checkout</goal>
-								</goals>
-								<configuration>
-									<connectionUrl>scm:git:https://github.com/Servoy/servoy-client.git</connectionUrl>
-									<scmVersion>v82x_branch</scmVersion>
-									<scmVersionType>branch</scmVersionType>
-									<checkoutDirectory>${project.build.directory}/servoy-client</checkoutDirectory>
-									<workingDirectory>${project.build.directory}/servoy-client</workingDirectory>
-									<skipCheckoutIfExists>true</skipCheckoutIfExists>
-								</configuration>
-							</execution>
-							<execution>
-								<id>update_servoy_client</id>
-								<phase>generate-resources</phase>
-								<goals>
-									<goal>update</goal>
-								</goals>
-								<configuration>
-									<connectionUrl>scm:git:https://github.com/Servoy/servoy-client.git</connectionUrl>
-									<scmVersion>v82x_branch</scmVersion>
-									<scmVersionType>branch</scmVersionType>
-									<checkoutDirectory>${project.build.directory}/servoy-client</checkoutDirectory>
-									<workingDirectory>${project.build.directory}/servoy-client</workingDirectory>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-					<plugin>
-						<artifactId>maven-resources-plugin</artifactId>
-						<version>3.0.2</version>
-						<executions>
-							<execution>
-								<id>copy-resources</id>
-								<!-- here the phase you need -->
-								<phase>generate-resources</phase>
-								<goals>
-									<goal>copy-resources</goal>
-								</goals>
-								<configuration>
-									<outputDirectory>${workspace_dir}</outputDirectory>
-									<resources>
-										<resource>
-											<directory>${project.build.directory}/servoy-client</directory>
-											<filtering>true</filtering>
-										</resource>
-									</resources>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-dependency-plugin</artifactId>
 						<version>3.0.0</version>
 						<executions>
@@ -146,6 +87,24 @@
 											<type>zip</type>
 											<overWrite>true</overWrite>
 											<outputDirectory>${project.build.directory}/repository</outputDirectory>
+										</artifactItem>
+										<artifactItem>
+											<groupId>com.servoy</groupId>
+											<artifactId>servoy_base</artifactId>
+											<version>${project.version}</version>
+											<type>zip</type>
+											<classifier>project</classifier>
+											<overWrite>true</overWrite>
+											<outputDirectory>${workspace_dir}/servoy_base/</outputDirectory>
+										</artifactItem>
+										<artifactItem>
+											<groupId>com.servoy</groupId>
+											<artifactId>servoy_shared</artifactId>
+											<version>${project.version}</version>
+											<type>zip</type>
+											<classifier>project</classifier>
+											<overWrite>true</overWrite>
+											<outputDirectory>${workspace_dir}/servoy_shared/</outputDirectory>
 										</artifactItem>
 									</artifactItems>
 								</configuration>

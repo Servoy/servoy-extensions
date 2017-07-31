@@ -27,7 +27,7 @@ public class JSClientInformation implements IScriptable
 	 * The type of the application started by this client.
 	 *
 	 * @sample
-	 * var clients = plugins.maintenance.getConnectedClients();
+	 * var clients = plugins.clientmanager.getConnectedClients();
 	 * application.output('There are ' + clients.length + ' connected clients.');
 	 * for (var i = 0; i < clients.length; i++)
 	 * {

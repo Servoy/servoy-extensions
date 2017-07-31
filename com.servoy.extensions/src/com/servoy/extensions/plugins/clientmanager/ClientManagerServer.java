@@ -7,7 +7,6 @@ import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import com.servoy.j2db.Messages;
 import com.servoy.j2db.plugins.IServerAccess;
 import com.servoy.j2db.plugins.IServerPlugin;
 import com.servoy.j2db.plugins.PluginException;
@@ -55,7 +54,7 @@ public class ClientManagerServer implements IServerPlugin, IClientManagerService
 	public Properties getProperties()
 	{
 		Properties props = new Properties();
-		props.put(DISPLAY_NAME, Messages.getString("servoy.plugin.maintenanceserver.displayname")); //$NON-NLS-1$
+		props.put(DISPLAY_NAME, "Client Manager Service"); //$NON-NLS-1$
 		return props;
 	}
 
