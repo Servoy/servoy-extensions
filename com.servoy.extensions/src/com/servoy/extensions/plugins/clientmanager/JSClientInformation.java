@@ -8,6 +8,7 @@ import com.servoy.j2db.scripting.IScriptable;
 import com.servoy.j2db.server.shared.IClientInformation;
 
 @ServoyDocumented
+@ServoyClientSupport(ng = true, mc = false, wc = true, sc = true)
 public class JSClientInformation implements IScriptable
 {
 	private final IClientInformation clientInformation;

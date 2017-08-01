@@ -22,6 +22,7 @@ import java.rmi.server.UnicastRemoteObject;
 
 import org.mozilla.javascript.Function;
 
+import com.servoy.base.scripting.annotations.ServoyClientSupport;
 import com.servoy.j2db.documentation.ServoyDocumented;
 import com.servoy.j2db.scripting.FunctionDefinition;
 import com.servoy.j2db.scripting.IJavaScriptType;
@@ -33,6 +34,7 @@ import com.servoy.j2db.util.Debug;
  *
  */
 @ServoyDocumented
+@ServoyClientSupport(ng = true, mc = false, wc = true, sc = true)
 public class Broadcaster implements IBroadcaster, IJavaScriptType
 {
 	private final BroadcastInfo bci;

@@ -106,6 +106,15 @@
 											<overWrite>true</overWrite>
 											<outputDirectory>${workspace_dir}/servoy_shared/</outputDirectory>
 										</artifactItem>
+										<artifactItem>
+											<groupId>com.servoy</groupId>
+											<artifactId>org.eclipse.dltk.javascript.rhino</artifactId>
+											<version>${project.version}</version>
+											<type>zip</type>
+											<classifier>project</classifier>
+											<overWrite>true</overWrite>
+											<outputDirectory>${workspace_dir}/org.eclipse.dltk.javascript.rhino/</outputDirectory>
+										</artifactItem>
 									</artifactItems>
 								</configuration>
 							</execution>

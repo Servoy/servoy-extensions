@@ -4,6 +4,7 @@ import java.rmi.RemoteException;
 
 import org.mozilla.javascript.Function;
 
+import com.servoy.base.scripting.annotations.ServoyClientSupport;
 import com.servoy.j2db.documentation.ServoyDocumented;
 import com.servoy.j2db.scripting.IReturnedTypesProvider;
 import com.servoy.j2db.scripting.IScriptable;
@@ -14,6 +15,7 @@ import com.servoy.j2db.util.Debug;
  * @author gerzse
  */
 @ServoyDocumented(publicName = ClientManagerPlugin.PLUGIN_NAME, scriptingName = "plugins." + ClientManagerPlugin.PLUGIN_NAME)
+@ServoyClientSupport(ng = true, mc = false, wc = true, sc = true)
 @SuppressWarnings("boxing")
 public class ClientManagerProvider implements IScriptable, IReturnedTypesProvider
 {
@@ -61,6 +63,10 @@ public class ClientManagerProvider implements IScriptable, IReturnedTypesProvide
 	/**
 	 * Get a broadcast object giving it a (nick)name and on a specific channel, the callback is used for getting messages of other clients on that channel
 	 * The function gets 2 arguments (nickName, message)
+	 *
+	 * @sample
+	 * var broadcaster = plugins.clientmanager.getBroadcaster("nickname","mychatchannel",callback);
+	 * broadcaster.broadcastMessage("Hallo");
 	 *
 	 * @param name The nickname for this user on this channel
 	 * @param channelName The channel name where should be listened to (and send messages to)

@@ -4,3 +4,4 @@ servoy-extension.warnings.txt
 servoy-extension.xml
 /build
 /target/
+/servoy.log
