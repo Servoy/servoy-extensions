@@ -2,6 +2,8 @@ package com.servoy.extensions.plugins.clientmanager;
 
 import java.util.Date;
 
+import org.mozilla.javascript.annotations.JSFunction;
+
 import com.servoy.base.scripting.annotations.ServoyClientSupport;
 import com.servoy.j2db.documentation.ServoyDocumented;
 import com.servoy.j2db.scripting.IScriptable;
@@ -156,6 +158,7 @@ public class JSClientInformation implements IScriptable
 	 * Gets the array of client information strings as seen on the admin page.
 	 * @return a String array with the client information
 	 */
+	@JSFunction
 	public String[] getClientInfos()
 	{
 		return clientInformation.getClientInfos();
