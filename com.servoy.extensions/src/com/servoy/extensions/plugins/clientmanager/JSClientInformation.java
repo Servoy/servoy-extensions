@@ -153,6 +153,15 @@ public class JSClientInformation implements IScriptable
 	}
 
 	/**
+	 * Gets the array of client information strings as seen on the admin page.
+	 * @return a String array with the client information
+	 */
+	public String[] getClientInfos()
+	{
+		return clientInformation.getClientInfos();
+	}
+
+	/**
 	 * @deprecated As of release 5.2, replaced by {@link #getUserUID()}.
 	 */
 	@Deprecated
