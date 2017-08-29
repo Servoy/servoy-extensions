@@ -81,7 +81,7 @@ public class TextXportPlugin implements IClientPlugin, ActionListener
 				imp.addActionListener(this);
 				import_Menu.add(imp);
 			}
-			en = new Enabler(imp, exp);
+			en = new Enabler(imp, exp, application);
 		}
 	}
 
