@@ -17,12 +17,16 @@
 
 package com.servoy.extensions.plugins.tabxport;
 
+import com.servoy.base.scripting.annotations.ServoyClientSupport;
+import com.servoy.j2db.documentation.ServoyDocumented;
 import com.servoy.j2db.scripting.IScriptable;
 
 /**
  * @author lvostinar
  *
  */
+@ServoyDocumented(scriptingName = "DataProviderExport")
+@ServoyClientSupport(ng = true, wc = true, sc = true)
 public class DataProviderExport implements IScriptable
 {
 	final String dataprovider;

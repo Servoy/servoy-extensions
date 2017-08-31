@@ -20,14 +20,18 @@ package com.servoy.extensions.plugins.tabxport;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.servoy.base.scripting.annotations.ServoyClientSupport;
 import com.servoy.j2db.IApplication;
 import com.servoy.j2db.dataprocessing.IFoundSet;
+import com.servoy.j2db.documentation.ServoyDocumented;
 import com.servoy.j2db.scripting.IScriptable;
 
 /**
  * @author lvostinar
  *
  */
+@ServoyDocumented(scriptingName = "TabExporter")
+@ServoyClientSupport(ng = true, wc = true, sc = true)
 public class TabExporter implements IScriptable
 {
 	private final IApplication application;
@@ -53,6 +57,8 @@ public class TabExporter implements IScriptable
 	 * exporter.addDataProvider('item_id').setValueList('myvaluelist');
 	 * exporter.addDataProvider('mydate').setFormat('yyyy/dd/MM');
 	 * var content = exporter.textExport();
+	 *
+	 * @param dataprovider The dataprovider string to add as a column to export
 	 *
 	 * @return dataprovider export object
 	 */
