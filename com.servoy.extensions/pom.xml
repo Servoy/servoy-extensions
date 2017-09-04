@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.servoy</groupId>
 	<artifactId>com.servoy.extensions</artifactId>
-	<version>8.2.0.3103</version>
+	<version>8.3.0.3200_b1</version>
 
 	<repositories>
 		<repository>
@@ -22,8 +22,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.compiler.source>1.7</maven.compiler.source>
 		<maven.compiler.target>1.7</maven.compiler.target>
-		<servoy-repo.url>http://developer.servoy.com/p2_repository/compile_target/install/</servoy-repo.url>
-		<servoy-deltapack.url>http://developer.servoy.com/p2_repository/compile_target/install/deltapack/</servoy-deltapack.url>
+		<servoy-repo.url>http://download.eclipse.org/eclipse/updates/4.7-M-builds/M-4.7.1RC3-201709011220/</servoy-repo.url>
 		<servoy-shiplibs.url>http://developer.servoy.com/p2_repository/ship_plugins/</servoy-shiplibs.url>
 		<workspace_dir>${project.basedir}/../</workspace_dir>
 		<servoy-local.url>${project.baseUri}/target/repository/</servoy-local.url>
@@ -134,11 +133,6 @@
 								<repository>
 									<id>servoy_shiblibs</id>
 									<url>${servoy-shiplibs.url}</url>
-									<layout>p2</layout>
-								</repository>
-								<repository>
-									<id>servoy_deltapack</id>
-									<url>${servoy-deltapack.url}</url>
 									<layout>p2</layout>
 								</repository>
 								<repository>
@@ -475,17 +469,17 @@
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpclient</artifactId>
-			<version>4.3.6</version>
+			<version>4.5.2</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpcore</artifactId>
-			<version>4.3.3</version>
+			<version>4.4.6</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpmime</artifactId>
-			<version>4.3.6</version>
+			<version>4.5.2</version>
 		</dependency>
 		<dependency>
 			<groupId>javax.mail</groupId>
