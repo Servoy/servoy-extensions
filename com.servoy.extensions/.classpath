@@ -16,24 +16,7 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/servoy_smart_client"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.eclipse.dltk.javascript.rhino"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/servoy_base"/>
-	<classpathentry exported="true" kind="lib" path="lib/inmethod-grid.jar" sourcepath="lib/inmethod-grid-1.4.10-sources.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/jakarta-poi.jar" sourcepath="libsrc/poi-src-3.11-20141221.zip"/>
-	<classpathentry exported="true" kind="lib" path="lib/metadataextractor.jar" sourcepath="libsrc/metadataextractor-src.zip"/>
-	<classpathentry exported="true" kind="lib" path="lib/jFdfTk.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/itext.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/quartz.jar" sourcepath="libsrc/quartz-1.8.4-src.zip"/>
-	<classpathentry exported="true" kind="lib" path="lib/RapidSpell_US_UK_Dict.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/RapidSpell.jar"/>
-	<classpathentry kind="lib" path="lib/openid4java.jar" sourcepath="libsrc/openid4java-src.zip"/>
-	<classpathentry kind="lib" path="/servoy_shared/lib/tim-api.jar"/>
 	<classpathentry kind="lib" path="lib/jfxrt.jar"/>
-	<classpathentry kind="lib" path="/eclipse_target/compile_target/install/plugins/org.apache.httpcomponents.httpclient_4.3.6.v201411290715.jar"/>
-	<classpathentry kind="lib" path="/eclipse_target/compile_target/install/plugins/org.apache.httpcomponents.httpcore_4.3.3.v201411290715.jar"/>
-	<classpathentry kind="lib" path="/eclipse_target/compile_target/install/plugins/javax.servlet_3.1.0.v201410161800.jar"/>
-	<classpathentry kind="lib" path="/eclipse_target/ship_plugins/plugins/org.slf4j.api_1.7.2.v20121108-1250.jar"/>
-	<classpathentry kind="lib" path="/eclipse_target/ship_plugins/plugins/jabsorb_1.3.3.jar" sourcepath="/eclipse_target/ship_plugins/plugins/jabsorb.source_1.3.3.jar"/>
-	<classpathentry kind="lib" path="/eclipse_target/compile_target/install/plugins/org.apache.commons.logging_1.1.1.v201101211721.jar"/>
-	<classpathentry kind="lib" path="lib/amqp-client-4.1.0.jar" sourcepath="C:/Users/jcomp/.m2/repository/com/rabbitmq/amqp-client/4.1.0/amqp-client-4.1.0-sources.jar"/>
 	<classpathentry kind="con" path="org.eclipse.m2e.MAVEN2_CLASSPATH_CONTAINER">
 		<attributes>
 			<attribute name="maven.pomderived" value="true"/>
