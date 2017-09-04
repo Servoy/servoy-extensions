@@ -83,6 +83,10 @@ public class TextXportPlugin implements IClientPlugin, ActionListener
 			}
 			en = new Enabler(imp, exp, application);
 		}
+		else
+		{
+			en = new Enabler(null, null, application);
+		}
 	}
 
 	public Properties getProperties()
