@@ -101,7 +101,7 @@ public class ClientManagerPlugin implements IClientPlugin
 
 	public void propertyChange(PropertyChangeEvent evt)
 	{
-		if (liveBroadcasters != null && "solution".equals(evt.getPropertyName())) //$NON-NLS-1$
+		if (liveBroadcasters != null && "solution".equals(evt.getPropertyName()) && evt.getNewValue() == null) //$NON-NLS-1$
 		{
 			try
 			{
