@@ -10,7 +10,7 @@
 	    </servoy>
 	</dependencies>
 	<info>
-		<icon path="screenshots/calculator.gif"/>
+		<icon path="screenshots/amortization.png"/>
     	<description>Plugin offering amortization calculations. It can be used to return an amortization schedule, calculate prorated expense payments and to determine financing variables, including the amount and terms of payments.</description>
 	</info>
 	<requiresRestart/>

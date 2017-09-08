@@ -24,6 +24,9 @@ import java.io.BufferedWriter;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
+import java.sql.Types;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import javax.swing.BorderFactory;
@@ -41,9 +44,14 @@ import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
 
 import com.servoy.extensions.plugins.tabxport.ExportSpecifyDestinationPanel.DataProviderWithLabel;
+import com.servoy.j2db.IApplication;
 import com.servoy.j2db.Messages;
+import com.servoy.j2db.component.ComponentFactory;
 import com.servoy.j2db.dataprocessing.IFoundSet;
 import com.servoy.j2db.dataprocessing.IRecord;
+import com.servoy.j2db.dataprocessing.IValueList;
+import com.servoy.j2db.persistence.ValueList;
+import com.servoy.j2db.util.Debug;
 import com.servoy.j2db.util.Utils;
 import com.servoy.j2db.util.gui.FileNameSuggestionFileChooser;
 import com.servoy.j2db.util.wizard.IWizard;
@@ -221,7 +229,7 @@ public class ExportSpecifyFilePanel extends JPanel implements ActionListener, IW
 						dataProviders[i] = ((DataProviderWithLabel)dlm.get(i)).dataProvider.getDataProviderID();
 					}
 					IFoundSet data = (IFoundSet)state.getProperty("foundset"); //$NON-NLS-1$
-					fileData = populateFileData(data, dataProviders, sep);
+					fileData = populateFileData(null, data, dataProviders, sep, null, null);
 					rows = data.getSize();
 				}
 				catch (Exception ex)
@@ -237,8 +245,24 @@ public class ExportSpecifyFilePanel extends JPanel implements ActionListener, IW
 		};
 	}
 
-	public static StringBuffer populateFileData(IFoundSet foundSet, String[] dataProviders, String sep)
+	public static StringBuffer populateFileData(IApplication application, IFoundSet foundSet, String[] dataProviders, String sep, String[] formats,
+		String[] valuelists)
 	{
+		IValueList[] runtimeValuelists = new IValueList[dataProviders.length];
+		if (application != null && valuelists != null)
+		{
+			for (int i = 0; i < dataProviders.length; i++)
+			{
+				if (valuelists[i] != null)
+				{
+					ValueList vl = application.getFlattenedSolution().getValueList(valuelists[i]);
+					if (vl != null)
+					{
+						runtimeValuelists[i] = ComponentFactory.getRealValueList(application, vl, true, Types.OTHER, null, null, true);
+					}
+				}
+			}
+		}
 		StringBuffer fData = new StringBuffer();
 		for (int i = 0; i < foundSet.getSize(); i++)
 		{
@@ -246,6 +270,14 @@ public class ExportSpecifyFilePanel extends JPanel implements ActionListener, IW
 			for (int k = 0; k < dataProviders.length; k++)
 			{
 				Object obj = s.getValue(dataProviders[k]);
+				if (runtimeValuelists[k] != null)
+				{
+					int index = runtimeValuelists[k].realValueIndexOf(obj);
+					if (index != -1)
+					{
+						obj = runtimeValuelists[k].getElementAt(index);
+					}
+				}
 				if (obj instanceof String && ((String)obj).length() != 0)
 				{
 					fData.append("\""); //$NON-NLS-1$
@@ -255,7 +287,30 @@ public class ExportSpecifyFilePanel extends JPanel implements ActionListener, IW
 				{
 					fData.append("\""); //$NON-NLS-1$
 				}
-				if (obj != null) fData.append(obj);
+				if (obj != null)
+				{
+					if (formats != null && formats[k] != null)
+					{
+						try
+						{
+							if (obj instanceof Date)
+							{
+								SimpleDateFormat dformatter = new SimpleDateFormat(formats[k]);
+								obj = dformatter.format((Date)obj);
+							}
+							else if (obj instanceof Number)
+							{
+								DecimalFormat nformatter = new DecimalFormat(formats[k]);
+								obj = nformatter.format(obj);
+							}
+						}
+						catch (Exception ex)
+						{
+							Debug.error(ex);
+						}
+					}
+					fData.append(obj);
+				}
 				if (obj instanceof String && ((String)obj).length() != 0)
 				{
 					fData.append("\""); //$NON-NLS-1$

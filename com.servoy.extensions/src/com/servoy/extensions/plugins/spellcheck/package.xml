@@ -16,7 +16,7 @@
     	</lib>
 	</dependencies>
 	<info>
-		<icon path="screenshots/spell.gif"/>
+		<icon path="screenshots/spellcheck.png"/>
 		<description>Plugin for checking the spelling of texts.</description>
 	</info>
 	<requiresRestart/>

@@ -10,7 +10,7 @@
 	    </servoy>
 	</dependencies>
 	<info>
-		<icon path="screenshots/udp.gif"/>
+		<icon path="screenshots/udp.png"/>
 		<description>Plugin for UDP protocol communication. It provides functionality to create UDP packets, send and receive a packet, modify packet data, starting and stopping a UPD connection socket.</description>
 	</info>
 	<requiresRestart/>

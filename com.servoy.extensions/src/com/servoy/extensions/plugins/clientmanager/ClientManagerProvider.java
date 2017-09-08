@@ -1,9 +1,14 @@
 package com.servoy.extensions.plugins.clientmanager;
 
 import java.rmi.RemoteException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import org.mozilla.javascript.Function;
+import org.mozilla.javascript.annotations.JSFunction;
 
+import com.servoy.base.scripting.annotations.ServoyClientSupport;
 import com.servoy.j2db.documentation.ServoyDocumented;
 import com.servoy.j2db.scripting.IReturnedTypesProvider;
 import com.servoy.j2db.scripting.IScriptable;
@@ -14,6 +19,7 @@ import com.servoy.j2db.util.Debug;
  * @author gerzse
  */
 @ServoyDocumented(publicName = ClientManagerPlugin.PLUGIN_NAME, scriptingName = "plugins." + ClientManagerPlugin.PLUGIN_NAME)
+@ServoyClientSupport(ng = true, mc = false, wc = true, sc = true)
 @SuppressWarnings("boxing")
 public class ClientManagerProvider implements IScriptable, IReturnedTypesProvider
 {
@@ -62,6 +68,10 @@ public class ClientManagerProvider implements IScriptable, IReturnedTypesProvide
 	 * Get a broadcast object giving it a (nick)name and on a specific channel, the callback is used for getting messages of other clients on that channel
 	 * The function gets 2 arguments (nickName, message)
 	 *
+	 * @sample
+	 * var broadcaster = plugins.clientmanager.getBroadcaster("nickname","mychatchannel",callback);
+	 * broadcaster.broadcastMessage("Hallo");
+	 *
 	 * @param name The nickname for this user on this channel
 	 * @param channelName The channel name where should be listened to (and send messages to)
 	 * @param callback The callback when for incomming messages
@@ -88,21 +98,65 @@ public class ClientManagerProvider implements IScriptable, IReturnedTypesProvide
 	 */
 	public JSClientInformation[] js_getConnectedClients()
 	{
+		return js_getConnectedClients(null);
+	}
+
+	/**
+	/**
+	 * Returns an array of JSClientInformation elements describing the clients connected to the server filtered by the a client info string.
+	 * This way you can ask for a specific set of clients that have a specific information added to there client information.
+	 *
+	 * @sampleas js_getConnectedClients()
+	 *
+	 * @param clientInfoFilter The filter string
+	 *
+	 *@return JSClientInformation[]
+	 */
+	public JSClientInformation[] js_getConnectedClients(String clientInfoFilter)
+	{
 		try
 		{
+			List<JSClientInformation> infos = new ArrayList<>();
 			IClientInformation[] connectedClients = plugin.getClientService().getConnectedClients();
-			JSClientInformation[] infos = new JSClientInformation[connectedClients == null ? 0 : connectedClients.length];
-			for (int i = 0; i < infos.length; i++)
+			for (IClientInformation connectedClient : connectedClients)
 			{
-				infos[i] = new JSClientInformation(connectedClients[i]);
+				if (clientInfoFilter == null || Arrays.asList(connectedClient.getClientInfos()).contains(clientInfoFilter))
+					infos.add(new JSClientInformation(connectedClient));
 			}
-			return infos;
+			return infos.toArray(new JSClientInformation[infos.size()]);
 		}
 		catch (Exception e)
 		{
 			Debug.error("Exception while retrieving connected clients information.", e); //$NON-NLS-1$
 			return null;
 		}
+	}
+
+	/**
+	 * Returns the current client JSClientInformation object.
+	 *
+	 * @return
+	 */
+	@JSFunction
+	public JSClientInformation getClientInformation()
+	{
+		String clientId = plugin.getClientPluginAccess().getClientID();
+		try
+		{
+			IClientInformation[] connectedClients = plugin.getClientService().getConnectedClients();
+			for (IClientInformation connectedClient : connectedClients)
+			{
+				if (connectedClient.getClientID().equals(clientId))
+				{
+					return new JSClientInformation(connectedClient);
+				}
+			}
+		}
+		catch (RemoteException e)
+		{
+			Debug.error("Exception while retrieving connected clients information.", e); //$NON-NLS-1$
+		}
+		return null;
 	}
 
 	/**

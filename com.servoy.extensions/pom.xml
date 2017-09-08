@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.servoy</groupId>
 	<artifactId>com.servoy.extensions</artifactId>
-	<version>8.2.0.3100</version>
+	<version>8.3.0.3200_b1</version>
 
 	<repositories>
 		<repository>
@@ -16,10 +16,18 @@
 			<url>http://developer.servoy.com/mvn_repository/</url>
 		</repository>
 	</repositories>
-
 	<properties>
-		<servoy-version>8.2.0.3100</servoy-version>
+		<tycho.version>1.0.0</tycho.version>
+		<tycho.extra.version>1.0.0</tycho.extra.version>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<maven.compiler.source>1.7</maven.compiler.source>
+		<maven.compiler.target>1.7</maven.compiler.target>
+		<servoy-repo.url>http://download.eclipse.org/eclipse/updates/4.7-M-builds/M-4.7.1RC3-201709011220/</servoy-repo.url>
+		<servoy-shiplibs.url>http://developer.servoy.com/p2_repository/ship_plugins/</servoy-shiplibs.url>
+		<workspace_dir>${project.basedir}/../</workspace_dir>
+		<servoy-local.url>${project.baseUri}/target/repository/</servoy-local.url>
 	</properties>
+
 
 	<profiles>
 		<profile>
@@ -33,29 +41,160 @@
 				<dependency>
 					<groupId>com.servoy</groupId>
 					<artifactId>servoy_shared</artifactId>
-					<version>${servoy-version}</version>
+					<version>${project.version}</version>
 				</dependency>
 				<dependency>
 					<groupId>com.servoy</groupId>
 					<artifactId>servoy_base</artifactId>
-					<version>${servoy-version}</version>
+					<version>${project.version}</version>
 				</dependency>
 				<dependency>
 					<groupId>com.servoy</groupId>
 					<artifactId>org.eclipse.dltk.javascript.rhino</artifactId>
-					<version>${servoy-version}</version>
+					<version>${project.version}</version>
 				</dependency>
 				<dependency>
 					<groupId>com.servoy</groupId>
 					<artifactId>servoy_headless_client</artifactId>
-					<version>${servoy-version}</version>
+					<version>${project.version}</version>
 				</dependency>
 				<dependency>
 					<groupId>com.servoy</groupId>
 					<artifactId>servoy_smart_client</artifactId>
-					<version>${servoy-version}</version>
+					<version>${project.version}</version>
 				</dependency>
 			</dependencies>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-dependency-plugin</artifactId>
+						<version>3.0.0</version>
+						<executions>
+							<execution>
+								<id>unpack</id>
+								<phase>generate-resources</phase>
+								<goals>
+									<goal>unpack</goal>
+								</goals>
+								<configuration>
+									<artifactItems>
+										<artifactItem>
+											<groupId>com.servoy</groupId>
+											<artifactId>com.servoy.eclipse.docgenerator.client.product</artifactId>
+											<version>1.4.1</version>
+											<type>zip</type>
+											<overWrite>true</overWrite>
+											<outputDirectory>${project.build.directory}/repository</outputDirectory>
+										</artifactItem>
+										<artifactItem>
+											<groupId>com.servoy</groupId>
+											<artifactId>servoy_base</artifactId>
+											<version>${project.version}</version>
+											<type>zip</type>
+											<classifier>project</classifier>
+											<overWrite>true</overWrite>
+											<outputDirectory>${workspace_dir}/servoy_base/</outputDirectory>
+										</artifactItem>
+										<artifactItem>
+											<groupId>com.servoy</groupId>
+											<artifactId>servoy_shared</artifactId>
+											<version>${project.version}</version>
+											<type>zip</type>
+											<classifier>project</classifier>
+											<overWrite>true</overWrite>
+											<outputDirectory>${workspace_dir}/servoy_shared/</outputDirectory>
+										</artifactItem>
+										<artifactItem>
+											<groupId>com.servoy</groupId>
+											<artifactId>org.eclipse.dltk.javascript.rhino</artifactId>
+											<version>${project.version}</version>
+											<type>zip</type>
+											<classifier>project</classifier>
+											<overWrite>true</overWrite>
+											<outputDirectory>${workspace_dir}/org.eclipse.dltk.javascript.rhino/</outputDirectory>
+										</artifactItem>
+									</artifactItems>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.eclipse.tycho.extras</groupId>
+						<artifactId>tycho-eclipserun-plugin</artifactId>
+						<version>${tycho.extra.version}</version>
+						<configuration>
+							<repositories>
+								<repository>
+									<id>servoy</id>
+									<url>${servoy-repo.url}</url>
+									<layout>p2</layout>
+								</repository>
+								<repository>
+									<id>servoy_shiblibs</id>
+									<url>${servoy-shiplibs.url}</url>
+									<layout>p2</layout>
+								</repository>
+								<repository>
+									<id>servoy_local</id>
+									<url>${servoy-local.url}</url>
+									<layout>p2</layout>
+								</repository>
+							</repositories>
+							<dependencies>
+								<dependency>
+									<groupId>com.servoy</groupId>
+									<artifactId>com.servoy.eclipse.docgenerator.client</artifactId>
+									<type>eclipse-plugin</type>
+								</dependency>
+								<dependency>
+									<groupId>com.servoy</groupId>
+									<artifactId>com.servoy.eclipse.docgenerator</artifactId>
+									<type>eclipse-plugin</type>
+								</dependency>
+								<dependency>
+									<groupId>com.servoy</groupId>
+									<artifactId>com.servoy.eclipse.docgenerator.ui</artifactId>
+									<type>eclipse-plugin</type>
+								</dependency>
+								<dependency>
+									<groupId>com.servoy</groupId>
+									<artifactId>org.eclipse.dltk.javascript.rhino</artifactId>
+									<type>eclipse-plugin</type>
+								</dependency>
+							</dependencies>
+						</configuration>
+						<executions>
+							<execution>
+								<id>jslib</id>
+								<phase>generate-resources</phase>
+								<configuration>
+									<applicationsArgs>
+										<args>-application</args>
+										<args>com.servoy.eclipse.docgenerator.client.default</args>
+										<args>-data</args>
+										<args>${workspace_dir}/</args>
+										<args>--workspace</args>
+										<args>${workspace_dir}/</args>
+										<args>--project</args>
+										<args>servoy_base</args>
+										<args>com.servoy.base</args>
+										<args>--project</args>
+										<args>com.servoy.extensions</args>
+										<args>com.servoy.extensions</args>
+										<args>--autopilot</args>
+										<args>--import-projects</args>
+										<args>true</args>
+									</applicationsArgs>
+								</configuration>
+								<goals>
+									<goal>eclipse-run</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
 		</profile>
 	</profiles>
 	<build>
@@ -330,17 +469,17 @@
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpclient</artifactId>
-			<version>4.3.6</version>
+			<version>4.5.2</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpcore</artifactId>
-			<version>4.3.3</version>
+			<version>4.4.6</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpmime</artifactId>
-			<version>4.3.6</version>
+			<version>4.5.2</version>
 		</dependency>
 		<dependency>
 			<groupId>javax.mail</groupId>

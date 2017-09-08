@@ -26,7 +26,7 @@ public class ClientManagerPlugin implements IClientPlugin
 
 	public Icon getImage()
 	{
-		java.net.URL iconUrl = this.getClass().getResource("images/maintenance.gif"); //$NON-NLS-1$
+		java.net.URL iconUrl = this.getClass().getResource("images/clientmanager.png"); //$NON-NLS-1$
 		if (iconUrl != null) return new ImageIcon(iconUrl);
 		else return null;
 	}
@@ -101,6 +101,17 @@ public class ClientManagerPlugin implements IClientPlugin
 
 	public void propertyChange(PropertyChangeEvent evt)
 	{
+		if (liveBroadcasters != null && "solution".equals(evt.getPropertyName()) && evt.getNewValue() == null) //$NON-NLS-1$
+		{
+			try
+			{
+				unload();
+			}
+			catch (PluginException e)
+			{
+				Debug.error(e);
+			}
+		}
 	}
 
 	public IClientPluginAccess getClientPluginAccess()

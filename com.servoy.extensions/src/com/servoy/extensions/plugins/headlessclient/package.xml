@@ -10,7 +10,7 @@
 	    </servoy>
 	</dependencies>
 	<info>
-		<icon path="screenshots/console.gif"/>
+		<icon path="screenshots/headlessclient.png"/>
 		<description>Plugin for managing headless clients.</description>
 	</info>
 	<requiresRestart/>

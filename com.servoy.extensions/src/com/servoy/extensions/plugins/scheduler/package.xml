@@ -16,7 +16,7 @@
     	</lib>
 	</dependencies>
 	<info>
-		<icon path="screenshots/timer.gif"/>
+		<icon path="screenshots/scheduler.png"/>
 		<description>Plugin for executing scheduled jobs. It enables you to schedule methods (scripts) to run at a certain time or interval.</description>
 	</info>
 	<requiresRestart/>

@@ -142,7 +142,7 @@ public class AgentPlugin implements IClientPlugin
 
 	public Icon getImage()
 	{
-		java.net.URL iconUrl = this.getClass().getResource("images/agent.gif"); //$NON-NLS-1$
+		java.net.URL iconUrl = this.getClass().getResource("images/agent.png"); //$NON-NLS-1$
 		if (iconUrl != null)
 		{
 			return new ImageIcon(iconUrl);

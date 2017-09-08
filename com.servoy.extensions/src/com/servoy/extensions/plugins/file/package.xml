@@ -10,7 +10,7 @@
 	    </servoy>
 	</dependencies>
 	<info>
-		<icon path="screenshots/file.gif"/>
+		<icon path="screenshots/file.png"/>
 		<description>Plugin for file handling. It provides file and folder functions such as creating, modifying, deleting, returning content and/or size of files and folders.</description>
 	</info>
 	<requiresRestart/>

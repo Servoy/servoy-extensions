@@ -40,7 +40,7 @@ public class SchedulerPlugin implements IClientPlugin
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see com.servoy.j2db.plugins.IClientPlugin#initialize(com.servoy.j2db.plugins.IClientPluginAccess)
 	 */
 	@SuppressWarnings("nls")
@@ -52,7 +52,7 @@ public class SchedulerPlugin implements IClientPlugin
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see com.servoy.j2db.plugins.IClientPlugin#getPreferencePanels()
 	 */
 	public PreferencePanel[] getPreferencePanels()
@@ -62,7 +62,7 @@ public class SchedulerPlugin implements IClientPlugin
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see com.servoy.j2db.plugins.IClientPlugin#getName()
 	 */
 	public String getName()
@@ -72,12 +72,12 @@ public class SchedulerPlugin implements IClientPlugin
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see com.servoy.j2db.plugins.IClientPlugin#getImage()
 	 */
 	public Icon getImage()
 	{
-		java.net.URL iconUrl = this.getClass().getResource("images/timer.gif"); //$NON-NLS-1$
+		java.net.URL iconUrl = this.getClass().getResource("images/scheduler.png"); //$NON-NLS-1$
 		if (iconUrl != null)
 		{
 			return new ImageIcon(iconUrl);
@@ -90,7 +90,7 @@ public class SchedulerPlugin implements IClientPlugin
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see com.servoy.j2db.plugins.IClientPlugin#getScriptObject()
 	 */
 	public IScriptable getScriptObject()
@@ -109,7 +109,7 @@ public class SchedulerPlugin implements IClientPlugin
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see com.servoy.j2db.plugins.IPlugin#load()
 	 */
 	public void load() throws PluginException
@@ -118,7 +118,7 @@ public class SchedulerPlugin implements IClientPlugin
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see com.servoy.j2db.plugins.IPlugin#unload()
 	 */
 	public void unload() throws PluginException
@@ -132,7 +132,7 @@ public class SchedulerPlugin implements IClientPlugin
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see com.servoy.j2db.plugins.IPlugin#getProperties()
 	 */
 	public Properties getProperties()
@@ -142,7 +142,7 @@ public class SchedulerPlugin implements IClientPlugin
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
 	 */
 	public void propertyChange(PropertyChangeEvent evt)

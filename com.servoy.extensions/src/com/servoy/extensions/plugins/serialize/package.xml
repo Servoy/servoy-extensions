@@ -10,7 +10,7 @@
 	    </servoy>
 	</dependencies>
 	<info>
-		<icon path="screenshots/docsave.gif"/>
+		<icon path="screenshots/serialize.png"/>
 		<description>Plugin for doing data serialization. It provides functions to serialize an object to JSON text and/or deserialize from JSON text to an object.</description>
 	</info>
 	<requiresRestart/>

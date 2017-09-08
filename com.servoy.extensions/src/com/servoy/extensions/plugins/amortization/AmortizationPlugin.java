@@ -55,7 +55,7 @@ public class AmortizationPlugin implements IClientPlugin
 
 	public Icon getImage()
 	{
-		java.net.URL iconUrl = this.getClass().getResource("images/calculator.gif"); //$NON-NLS-1$
+		java.net.URL iconUrl = this.getClass().getResource("images/amortization.png"); //$NON-NLS-1$
 		if (iconUrl != null)
 		{
 			return new ImageIcon(iconUrl);

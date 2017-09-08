@@ -31,7 +31,7 @@ import com.servoy.j2db.plugins.IClientPluginAccess;
 public class OptionsRequest extends BaseRequest
 {
 	/**
-	 * Constant for specifying the options header 
+	 * Constant for specifying the options header
 	 */
 	protected static String OPTIONS_HEADER = "Allow"; //$NON-NLS-1$
 
@@ -48,6 +48,8 @@ public class OptionsRequest extends BaseRequest
 
 	/**
 	 * Returns the supported HTTP Request operations as a String Array
+	 *
+	 * @param res The response request to get the allowed methods from.
 	 *
 	 * @sample
 	 * var supportedOperations = request.getAllowedMethods()

@@ -2,12 +2,15 @@ package com.servoy.extensions.plugins.clientmanager;
 
 import java.util.Date;
 
+import org.mozilla.javascript.annotations.JSFunction;
+
 import com.servoy.base.scripting.annotations.ServoyClientSupport;
 import com.servoy.j2db.documentation.ServoyDocumented;
 import com.servoy.j2db.scripting.IScriptable;
 import com.servoy.j2db.server.shared.IClientInformation;
 
 @ServoyDocumented
+@ServoyClientSupport(ng = true, mc = false, wc = true, sc = true)
 public class JSClientInformation implements IScriptable
 {
 	private final IClientInformation clientInformation;
@@ -27,7 +30,7 @@ public class JSClientInformation implements IScriptable
 	 * The type of the application started by this client.
 	 *
 	 * @sample
-	 * var clients = plugins.maintenance.getConnectedClients();
+	 * var clients = plugins.clientmanager.getConnectedClients();
 	 * application.output('There are ' + clients.length + ' connected clients.');
 	 * for (var i = 0; i < clients.length; i++)
 	 * {
@@ -149,6 +152,16 @@ public class JSClientInformation implements IScriptable
 	public String js_getUserUID()
 	{
 		return clientInformation.getUserUID();
+	}
+
+	/**
+	 * Gets the array of client information strings as seen on the admin page.
+	 * @return a String array with the client information
+	 */
+	@JSFunction
+	public String[] getClientInfos()
+	{
+		return clientInformation.getClientInfos();
 	}
 
 	/**
