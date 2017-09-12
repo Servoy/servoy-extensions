@@ -24,6 +24,7 @@ import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.mozilla.javascript.Context;
 import org.mozilla.javascript.JavaScriptException;
 import org.mozilla.javascript.NativeError;
 import org.mozilla.javascript.RhinoException;
@@ -286,7 +287,16 @@ public class HeadlessServerPlugin implements IHeadlessServer, IServerPlugin
 						convertedArgs[i] = correctServerObject.getJSONConverter().convertFromJSON(c.getPluginAccess().getDatabaseManager(), args[i]);
 					}
 				}
-				return correctServerObject.getJSONConverter().convertToJSON(c.getPluginAccess().executeMethod(contextName, methodName, convertedArgs, false));
+				try
+				{
+					Context.enter();
+					return correctServerObject.getJSONConverter().convertToJSON(
+						c.getPluginAccess().executeMethod(contextName, methodName, convertedArgs, false));
+				}
+				finally
+				{
+					Context.exit();
+				}
 			}
 			catch (JavaScriptException jse)
 			{
