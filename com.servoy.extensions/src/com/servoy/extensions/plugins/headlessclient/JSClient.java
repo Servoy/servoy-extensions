@@ -42,14 +42,14 @@ public class JSClient implements IScriptable, IConstantsObject
 
 	/**
 	 * Constant that is returned as a JSEvent type when in the callback method when it executed normally.
-	 * 
+	 *
 	 * @sampleas js_shutdown()
 	 */
 	public static final String CALLBACK_EVENT = "headlessCallback"; //$NON-NLS-1$
 
 	/**
 	 * Constant that is returned as a JSEvent type when in the callback method when an exception occurred.
-	 * 
+	 *
 	 * @sampleas js_shutdown()
 	 */
 	public static final String CALLBACK_EXCEPTION_EVENT = "headlessExceptionCallback"; //$NON-NLS-1$
@@ -70,10 +70,10 @@ public class JSClient implements IScriptable, IConstantsObject
 
 	/**
 	 * Gets the id of the client.
-	 * 
+	 *
 	 * This client id can be used to find the client from the headless client plugin.
 	 * Note that this client id is not the same id as the id displayed on the Aplicationb Server admin page.
-	 * 
+	 *
 	 * @sample
 	 * var headlessClient = plugins.headlessclient.createClient("someSolution", "user", "pass", null);
 	 * var clientID = headlessClient.getClientID()
@@ -94,13 +94,13 @@ public class JSClient implements IScriptable, IConstantsObject
 
 	/**
 	 * Queues a method call on the remote server. The callback method will be called when the method is executed on the server
-	 * and the return value is given as the JSEvent.data object with the JSEvent.getType() value of JSClient.CALLBACK_EVENT. 
+	 * and the return value is given as the JSEvent.data object with the JSEvent.getType() value of JSClient.CALLBACK_EVENT.
 	 * If an exception is thrown somewhere then the callback method will be called with
 	 * the exception as the JSEvent data object with the JSEvent.getType() value of JSClient.CALLBACK_EXCEPTION_EVENT
 	 * The second argument that is give back is the JSClient instance that did the call.
-	 * 
+	 *
 	 * @sampleas js_shutdown()
-	 * 
+	 *
 	 * @param contextName The context of the given method, null if it is global method or a form name for a form method.
 	 * @param methodName The method name.
 	 * @param args The arguments that should be passed to the method.
@@ -260,22 +260,29 @@ public class JSClient implements IScriptable, IConstantsObject
 	 * @clonedesc js_shutdown()
 	 * @sampleas js_shutdown()
 	 *
-	 * @param force 
+	 * @param force
 	 */
-	public void js_shutdown(boolean force)
+	public void js_shutdown(final boolean force)
 	{
-		try
+		plugin.getPluginAccess().getExecutor().execute(new Runnable()
 		{
-			headlessServer.shutDown(clientID, force);
-		}
-		catch (Exception ex)
-		{
-			Debug.error(ex);
-		}
-		finally
-		{
-			/* if (! */js_isValid()/* ) clientPool.remove(clientID) */; // js_isValid() already removes it from the pool if invalid
-		}
+			@Override
+			public void run()
+			{
+				try
+				{
+					headlessServer.shutDown(clientID, force);
+				}
+				catch (Exception ex)
+				{
+					Debug.error(ex);
+				}
+				finally
+				{
+					/* if (! */js_isValid()/* ) clientPool.remove(clientID) */; // js_isValid() already removes it from the pool if invalid
+				}
+			}
+		});
 	}
 
 	/**
@@ -298,7 +305,7 @@ public class JSClient implements IScriptable, IConstantsObject
 	 * 		application.output("value get from scopes.globals.number :: " + null);
 	 * 	}
 	 * }
-	 * 
+	 *
 	 * @param contextName The context of the given method, null if it is global method or a form name for a form method
 	 * @param dataprovider the data-provider name as seen in Servoy
 	 * @return the value for the data-provider.
@@ -350,9 +357,9 @@ public class JSClient implements IScriptable, IConstantsObject
 
 	/**
 	 * Set a data-provider value.
-	 * 
+	 *
 	 * @sampleas js_getDataProviderValue(String, String)
-	 * 
+	 *
 	 * @param contextName The context of the given method, null if it is global method or a form name for a form method.
 	 * @param dataprovider the data-provider name as seen in Servoy.
 	 * @param value the value to set.
@@ -366,7 +373,7 @@ public class JSClient implements IScriptable, IConstantsObject
 	/**
 	 * @clonedesc js_setDataProviderValue(String, String, Object)
 	 * @sampleas js_setDataProviderValue(String, String, Object)
-	 * 
+	 *
 	 * @param contextName The context of the given method, null if it is global method or a form name for a form method
 	 * @param dataprovider the data-provider name as seen in Servoy
 	 * @param value the value to set
