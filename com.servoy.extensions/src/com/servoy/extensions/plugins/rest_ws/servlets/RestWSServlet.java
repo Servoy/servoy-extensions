@@ -346,7 +346,7 @@ public class RestWSServlet extends HttpServlet
 			Object result = wsService(WS_CREATE, new Object[] { decodeContent(request.getContentType(), contentType, contents, charset) }, request, response,
 				client.getLeft());
 			HTTPUtils.setNoCacheHeaders(response);
-			if (result != null)
+			if (result != null && result != Undefined.instance)
 			{
 				sendResult(request, response, result, contentType);
 			}
@@ -1204,6 +1204,7 @@ public class RestWSServlet extends HttpServlet
 					content = "<?xml version=\"1.0\" encoding=\"" + charset + "\"?>\n" + ((isXML) ? result.toString() : XML.toString(json, null));
 					break;
 				case CONTENT_MULTIPART :
+				case CONTENT_FORMPOST :
 					content = "";
 					break;
 				case CONTENT_TEXT :
@@ -1218,6 +1219,7 @@ public class RestWSServlet extends HttpServlet
 			{
 				//multipart requests cannot respond multipart responses so treat response as json
 				case CONTENT_MULTIPART :
+				case CONTENT_FORMPOST :
 				case CONTENT_JSON :
 					resultContentType = "application/json";
 					break;
