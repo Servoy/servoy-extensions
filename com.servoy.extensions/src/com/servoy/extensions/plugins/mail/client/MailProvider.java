@@ -84,7 +84,8 @@ public class MailProvider implements IReturnedTypesProvider, IScriptable
 				overrideProperties = new String[] { "mail.pop3.host=" + args[5] }; //$NON-NLS-1$
 			}
 		}
-		return receiveMail(userName, password, Boolean.valueOf(leaveMsgsOnServer), Integer.valueOf(receiveMode), onlyreceiveMsgWithSentDate, overrideProperties);
+		return receiveMail(userName, password, Boolean.valueOf(leaveMsgsOnServer), Integer.valueOf(receiveMode), onlyreceiveMsgWithSentDate,
+			overrideProperties);
 	}
 
 	/**
@@ -106,7 +107,7 @@ public class MailProvider implements IReturnedTypesProvider, IScriptable
 	 * 		application.output(msg.getHtmlMsg())
 	 * 		application.output(msg.getPlainMsg())
 	 * 		var attachments = msg.getAttachments()
-	 * 		if (attachments != null) 
+	 * 		if (attachments != null)
 	 * 		{
 	 * 			for (var j = 0 ; j < attachments.length ; j++)
 	 * 			{
@@ -118,11 +119,11 @@ public class MailProvider implements IReturnedTypesProvider, IScriptable
 	 * 		}
 	 * 	}
 	 * }
-	 * 
 	 *
-	 * @param username 
-	 * @param password 
-	 * @param leaveMsgsOnServer 
+	 *
+	 * @param username
+	 * @param password
+	 * @param leaveMsgsOnServer
 	 */
 	public MailMessage[] js_receiveMail(String username, String password, Boolean leaveMsgsOnServer)
 	{
@@ -148,11 +149,11 @@ public class MailProvider implements IReturnedTypesProvider, IScriptable
 	 * 		application.output(msg.getSubject())
 	 * 	}
 	 * }
-	 * 
-	 * @param username 
-	 * @param password 
-	 * @param leaveMsgsOnServer 
-	 * @param receiveMode 
+	 *
+	 * @param username
+	 * @param password
+	 * @param leaveMsgsOnServer
+	 * @param receiveMode
 	 */
 	public MailMessage[] js_receiveMail(String username, String password, Boolean leaveMsgsOnServer, Number receiveMode)
 	{
@@ -179,12 +180,12 @@ public class MailProvider implements IReturnedTypesProvider, IScriptable
 	 * 		application.output(msg.getSubject())
 	 * 	}
 	 * }
-	 * 
-	 * @param username 
-	 * @param password 
-	 * @param leaveMsgsOnServer 
-	 * @param receiveMode 
-	 * @param onlyReceiveMsgWithSentDate 
+	 *
+	 * @param username
+	 * @param password
+	 * @param leaveMsgsOnServer
+	 * @param receiveMode
+	 * @param onlyReceiveMsgWithSentDate
 	 */
 	public MailMessage[] js_receiveMail(String username, String password, Boolean leaveMsgsOnServer, Number receiveMode, Date onlyReceiveMsgWithSentDate)
 	{
@@ -197,7 +198,7 @@ public class MailProvider implements IReturnedTypesProvider, IScriptable
 	 * @sample
 	 * //it is also possible to first receive the headers and later receive a full message
 	 * var receiveMode = 0;//0=FULL,1=HEADERS_ONLY,2=NO_ATTACHMENTS
-	 * var pop3Host = 'myserver.com';  
+	 * var pop3Host = 'myserver.com';
 	 * var msgs = plugins.mail.receiveMail('mylogin', 'secretpass',  true,  receiveMode,  null, pop3Host);
 	 * if (msgs != null) //if is null error occurred!
 	 * {
@@ -213,7 +214,7 @@ public class MailProvider implements IReturnedTypesProvider, IScriptable
 	 * 		application.output(msg.getHtmlMsg())
 	 * 		application.output(msg.getPlainMsg())
 	 * 		var attachments = msg.getAttachments()
-	 * 		if (attachments != null) 
+	 * 		if (attachments != null)
 	 * 		{
 	 * 			for (var j = 0 ; j < attachments.length ; j++)
 	 * 			{
@@ -225,13 +226,13 @@ public class MailProvider implements IReturnedTypesProvider, IScriptable
 	 * 		}
 	 * 	}
 	 * }
-	 * 
-	 * @param username 
-	 * @param password 
-	 * @param leaveMsgsOnServer 
-	 * @param receiveMode 
-	 * @param onlyReceiveMsgWithSentDate 
-	 * @param pop3Host 
+	 *
+	 * @param username
+	 * @param password
+	 * @param leaveMsgsOnServer
+	 * @param receiveMode
+	 * @param onlyReceiveMsgWithSentDate
+	 * @param pop3Host
 	 */
 	public MailMessage[] js_receiveMail(String username, String password, Boolean leaveMsgsOnServer, Number receiveMode, Date onlyReceiveMsgWithSentDate,
 		String pop3Host)
@@ -249,13 +250,13 @@ public class MailProvider implements IReturnedTypesProvider, IScriptable
 	 *
 	 * @sample
 	 * var receiveMode = 1;//0=FULL,1=HEADERS_ONLY,2=NO_ATTACHMENTS
-	 * 
+	 *
 	 * var properties = new Array();
 	 * properties[0] = 'mail.pop3.port=995';
 	 * properties[1] = 'mail.pop3.ssl.enable=true';
 	 * properties[2] = 'mail.pop3.host=myserver.com';
 	 * properties[3] = 'mail.pop3.user=user@myserver.com';
-	 * 
+	 *
 	 * var msgs = plugins.mail.receiveMail('mylogin', 'secretpass',  true,  receiveMode,  null, properties);
 	 * if (msgs != null) //if is null error occurred!
 	 * {
@@ -270,13 +271,13 @@ public class MailProvider implements IReturnedTypesProvider, IScriptable
 	 * 		application.output(msg.getSubject())
 	 * 	}
 	 * }
-	 * 
-	 * @param username 
-	 * @param password 
-	 * @param leaveMsgsOnServer 
-	 * @param receiveMode  
-	 * @param onlyReceiveMsgWithSentDate  
-	 * @param properties  
+	 *
+	 * @param username
+	 * @param password
+	 * @param leaveMsgsOnServer
+	 * @param receiveMode
+	 * @param onlyReceiveMsgWithSentDate
+	 * @param properties
 	 */
 	public MailMessage[] js_receiveMail(String username, String password, Boolean leaveMsgsOnServer, Number receiveMode, Date onlyReceiveMsgWithSentDate,
 		String[] properties)
@@ -294,7 +295,7 @@ public class MailProvider implements IReturnedTypesProvider, IScriptable
 
 		//create if not yet created
 		createMailService();
-		//incase the server is not started in developer		
+		//incase the server is not started in developer
 		if (mailService != null)
 		{
 			//receive mail
@@ -323,7 +324,7 @@ public class MailProvider implements IReturnedTypesProvider, IScriptable
 	 * var plainArray = plugins.mail.getPlainMailAddresses('John Cobb <from_me@example.com>,Pete Cobb<from_pete@example.com>');
 	 * application.output(plainArray[0]) //will return 'from_me@example.com'
 	 *
-	 * @param addressesString 
+	 * @param addressesString
 	 */
 	public String[] js_getPlainMailAddresses(String addresses)
 	{
@@ -346,7 +347,7 @@ public class MailProvider implements IReturnedTypesProvider, IScriptable
 	 * @sample
 	 * plugins.mail.isValidEmailAddress("me@example.com");
 	 *
-	 * @param email 
+	 * @param email
 	 */
 	public boolean js_isValidEmailAddress(String email)
 	{
@@ -379,7 +380,7 @@ public class MailProvider implements IReturnedTypesProvider, IScriptable
 	 * 	application.output(msg.getFromAddresses())
 	 * }
 	 *
-	 * @param binaryblob/string 
+	 * @param binaryblob/string
 	 */
 	public MailMessage js_getMailMessage(Object data)
 	{
@@ -388,7 +389,7 @@ public class MailProvider implements IReturnedTypesProvider, IScriptable
 		//create if not yet created
 		createMailService();
 
-		//incase the server is not started in developer		
+		//incase the server is not started in developer
 		if (mailService != null)
 		{
 			try
@@ -421,13 +422,13 @@ public class MailProvider implements IReturnedTypesProvider, IScriptable
 	 * var attachment1 = plugins.mail.createBinaryAttachment('logo1.gif',plugins.file.readFile('c:/temp/a_logo.gif'));
 	 * var attachment2 = plugins.mail.createBinaryAttachment('logo2.gif',plugins.file.readFile('c:/temp/another_logo.gif'));
 	 * var success = plugins.mail.sendMail('to_someone@example.com', 'John Cobb <from_me@example.org>', 'subject', 'msgText',null,null,new Array(attachment1,attachment2));
-	 * if (!success) 
+	 * if (!success)
 	 * {
 	 * 	plugins.dialogs.showWarningDialog('Alert','Failed to send mail','OK');
 	 * }
 	 *
-	 * @param filename 
-	 * @param binarydata 
+	 * @param filename
+	 * @param binarydata
 	 */
 	public Attachment js_createBinaryAttachment(String filename, byte[] binarydata)
 	{
@@ -442,14 +443,14 @@ public class MailProvider implements IReturnedTypesProvider, IScriptable
 	 * var attachment1 = plugins.mail.createBinaryAttachment('logo1.gif',plugins.file.readFile('c:/temp/a_logo.gif', 'image/gif'));
 	 * var attachment2 = plugins.mail.createBinaryAttachment('logo2.gif',plugins.file.readFile('c:/temp/another_logo.gif', 'image/gif'));
 	 * var success = plugins.mail.sendMail('to_someone@example.com', 'John Cobb <from_me@example.org>', 'subject', 'msgText',null,null,new Array(attachment1,attachment2));
-	 * if (!success) 
+	 * if (!success)
 	 * {
 	 * 	plugins.dialogs.showWarningDialog('Alert','Failed to send mail','OK');
 	 * }
 	 *
-	 * @param filename 
-	 * @param binarydata 
-	 * @param mimeType 
+	 * @param filename
+	 * @param binarydata
+	 * @param mimeType
 	 */
 	public Attachment js_createBinaryAttachment(String filename, byte[] binarydata, String mimeType)
 	{
@@ -463,13 +464,13 @@ public class MailProvider implements IReturnedTypesProvider, IScriptable
 	 * @sample
 	 * var attachment = plugins.mail.createTextAttachment('readme.html','<html>bla bla bla');
 	 * var success = plugins.mail.sendMail('to_someone@example.com', 'John Cobb <from_me@example.com>', 'subject', 'msgText',null,null,attachment);
-	 * if (!success) 
+	 * if (!success)
 	 * {
 	 * 	plugins.dialogs.showWarningDialog('Alert','Failed to send mail','OK');
 	 * }
 	 *
-	 * @param filename 
-	 * @param textdata 
+	 * @param filename
+	 * @param textdata
 	 */
 	public Attachment js_createTextAttachment(String filename, String textdata)
 	{
@@ -483,14 +484,14 @@ public class MailProvider implements IReturnedTypesProvider, IScriptable
 	 * @sample
 	 * var attachment = plugins.mail.createTextAttachment('readme.html','<html>bla bla bla', 'text/html');
 	 * var success = plugins.mail.sendMail('to_someone@example.com', 'John Cobb <from_me@example.com>', 'subject', 'msgText',null,null,attachment);
-	 * if (!success) 
+	 * if (!success)
 	 * {
 	 * 	plugins.dialogs.showWarningDialog('Alert','Failed to send mail','OK');
 	 * }
 	 *
-	 * @param filename 
-	 * @param textdata 
-	 * @param mimeType 
+	 * @param filename
+	 * @param textdata
+	 * @param mimeType
 	 */
 	public Attachment js_createTextAttachment(String filename, String textdata, String mimeType)
 	{
@@ -504,11 +505,11 @@ public class MailProvider implements IReturnedTypesProvider, IScriptable
 	 * @sample
 	 * var msgText = 'plain msg<html>styled html msg<img src="%%embedded%%"></html>';
 	 * var success = plugins.mail.sendMail('to_someone@example.com,to_someone_else@example.net', 'John Cobb <from_me@example.com>,replyTo@example.com', 'subject', msgText);
-	 * if (!success) 
+	 * if (!success)
 	 * {
 	 * 	plugins.dialogs.showWarningDialog('Alert','Failed to send mail','OK');
 	 * }
-	 * 
+	 *
 	 * @param to A string containing 1 or multiple addresses seperated by a comma.
 	 * @param from A string containing an address and an optional reply address, seperated by a comma.
 	 * @param subject The subject of the mail
@@ -525,11 +526,11 @@ public class MailProvider implements IReturnedTypesProvider, IScriptable
 	 * @sample
 	 * var msgText = 'plain msg<html>styled html msg<img src="%%embedded%%"></html>';
 	 * var success = plugins.mail.sendMail('to_someone@example.com,to_someone_else@example.net', 'John Cobb <from_me@example.com>', 'subject', msgText,'cc1@example.com,cc2@example.com');
-	 * if (!success) 
+	 * if (!success)
 	 * {
 	 * 	plugins.dialogs.showWarningDialog('Alert','Failed to send mail','OK');
 	 * }
-	 * 
+	 *
 	 * @param to A string containing 1 or multiple addresses seperated by a comma.
 	 * @param from A string containing an address and an optional reply address, seperated by a comma.
 	 * @param subject The subject of the mail
@@ -547,18 +548,18 @@ public class MailProvider implements IReturnedTypesProvider, IScriptable
 	 * @sample
 	 * var msgText = 'plain msg<html>styled html msg<img src="%%embedded%%"></html>';
 	 * var success = plugins.mail.sendMail('to_someone@example.com,to_someone_else@example.net', 'John Cobb <from_me@example.com>', 'subject', msgText,null,'bcc1@example.com');
-	 * if (!success) 
+	 * if (!success)
 	 * {
 	 * 	plugins.dialogs.showWarningDialog('Alert','Failed to send mail','OK');
 	 * }
-	 * 
+	 *
 	 *
 	 * @param to A string containing 1 or multiple addresses seperated by a comma.
 	 * @param from A string containing an address and an optional reply address, seperated by a comma.
 	 * @param subject The subject of the mail
 	 * @param msgText The message text
 	 * @param cc One or more addresses seperated by a comma
-	 * @param bcc One or more addresses seperated by a comma 
+	 * @param bcc One or more addresses seperated by a comma
 	 */
 	public boolean js_sendMail(String to, String from, String subject, String msgText, String cc, String bcc)
 	{
@@ -573,17 +574,17 @@ public class MailProvider implements IReturnedTypesProvider, IScriptable
 	 * var attachment2 = plugins.mail.createTextAttachment('embedded','A text attachement');
 	 * var msgText = 'plain msg<html>styled html msg<img src="%%embedded%%"></html>';
 	 * var success = plugins.mail.sendMail('to_someone@example.com,to_someone_else@example.net', 'John Cobb <from_me@example.com>', 'subject', msgText,null,'bcc1@example.com,bcc2@example.com',[attachment1,attachment2]);
-	 * if (!success) 
+	 * if (!success)
 	 * {
 	 * 	plugins.dialogs.showWarningDialog('Alert','Failed to send mail','OK');
 	 * }
-	 * 
+	 *
 	 * @param to A string containing 1 or multiple addresses seperated by a comma.
 	 * @param from A string containing an address and an optional reply address, seperated by a comma.
 	 * @param subject The subject of the mail
 	 * @param msgText The message text
 	 * @param cc One or more addresses seperated by a comma
-	 * @param bcc One or more addresses seperated by a comma 
+	 * @param bcc One or more addresses seperated by a comma
 	 * @param attachments The attachments
 	 */
 	public boolean js_sendMail(String to, String from, String subject, String msgText, String cc, String bcc, Attachment[] attachments)
@@ -601,20 +602,20 @@ public class MailProvider implements IReturnedTypesProvider, IScriptable
 	 * //it is possbile to set all kind of smtp properties
 	 * var properties = new Array()
 	 * properties[0] = 'mail.smtp.host=myserver.com'
-	 * // properties specification can be found at:http://java.sun.com/products/javamail/javadocs/com/sun/mail/smtp/package-summary.html
+	 * // properties specification can be found at:https://javaee.github.io/javamail/docs/api/com/sun/mail/smtp/package-summary.html
 	 * var success = plugins.mail.sendMail('to_someone@example.com,to_someone_else@example.net', 'John Cobb <from_me@example.com>', 'subject', msgText,null,'unnamed@example.com',[attachment1,attachement2],properties);
-	 * if (!success) 
+	 * if (!success)
 	 * {
 	 * 	plugins.dialogs.showWarningDialog('Alert','Failed to send mail','OK');
 	 * }
-	 * 
+	 *
 	 *
 	 * @param to A string containing 1 or multiple addresses seperated by a comma.
 	 * @param from A string containing an address and an optional reply address, seperated by a comma.
 	 * @param subject The subject of the mail
 	 * @param msgText The message text
 	 * @param cc One or more addresses seperated by a comma
-	 * @param bcc One or more addresses seperated by a comma 
+	 * @param bcc One or more addresses seperated by a comma
 	 * @param attachments The attachments
 	 * @param overrideProperties An array of properties
 	 */
@@ -633,7 +634,7 @@ public class MailProvider implements IReturnedTypesProvider, IScriptable
 	 * var msgText = 'plain msg<html>styled html msg<img src="%%embedded%%"></html>';
 	 * var smtphost = 'myserver.com';
 	 * var success = plugins.mail.sendMail('to_someone@example.com,to_someone_else@example.net', 'John Cobb <from_me@example.com>', 'subject', msgText,null,'unnamed@example.com',[attachment1,attachement2],smtphost);
-	 * if (!success) 
+	 * if (!success)
 	 * {
 	 * 	plugins.dialogs.showWarningDialog('Alert','Failed to send mail','OK');
 	 * }
@@ -643,7 +644,7 @@ public class MailProvider implements IReturnedTypesProvider, IScriptable
 	 * @param subject The subject of the mail
 	 * @param msgText The message text
 	 * @param cc One or more addresses seperated by a comma
-	 * @param bcc One or more addresses seperated by a comma 
+	 * @param bcc One or more addresses seperated by a comma
 	 * @param attachments The attachments
 	 * @param smtpHost The smtp host
 	 */
@@ -659,7 +660,7 @@ public class MailProvider implements IReturnedTypesProvider, IScriptable
 	 * var attachment = plugins.mail.createBinaryAttachment('embedded',plugins.file.readFile('c:/temp/a_logo.gif'));
 	 * var msgText = 'plain msg<html>styled html msg<img src="%%embedded%%"></html>';
 	 * var success = plugins.mail.sendMail('to_someone@example.com,to_someone_else@example.net', 'John Cobb <from_me@example.com>', 'subject', msgText,null,'bcc1@example.com,bcc2@example.com',attachment);
-	 * if (!success) 
+	 * if (!success)
 	 * {
 	 * 	plugins.dialogs.showWarningDialog('Alert','Failed to send mail','OK');
 	 * }
@@ -669,7 +670,7 @@ public class MailProvider implements IReturnedTypesProvider, IScriptable
 	 * @param subject The subject of the mail
 	 * @param msgText The message text
 	 * @param cc One or more addresses seperated by a comma
-	 * @param bcc One or more addresses seperated by a comma 
+	 * @param bcc One or more addresses seperated by a comma
 	 * @param attachment A single attachment
 	 */
 	public boolean js_sendMail(String to, String from, String subject, String msgText, String cc, String bcc, Attachment attachment)
@@ -686,9 +687,9 @@ public class MailProvider implements IReturnedTypesProvider, IScriptable
 	 * //it is possbile to set all kind of smtp properties
 	 * var properties = new Array()
 	 * properties[0] = 'mail.smtp.host=myserver.com'
-	 * // properties specification can be found at:http://java.sun.com/products/javamail/javadocs/com/sun/mail/smtp/package-summary.html
+	 * // properties specification can be found at:https://javaee.github.io/javamail/docs/api/com/sun/mail/smtp/package-summary.html
 	 * var success = plugins.mail.sendMail('to_someone@example.com,to_someone_else@example.net', 'John Cobb <from_me@example.com>', 'subject', msgText,null,'unnamed@example.com',attachment,properties);
-	 * if (!success) 
+	 * if (!success)
 	 * {
 	 * 	plugins.dialogs.showWarningDialog('Alert','Failed to send mail','OK');
 	 * }
@@ -698,11 +699,12 @@ public class MailProvider implements IReturnedTypesProvider, IScriptable
 	 * @param subject The subject of the mail
 	 * @param msgText The message text
 	 * @param cc One or more addresses seperated by a comma
-	 * @param bcc One or more addresses seperated by a comma 
+	 * @param bcc One or more addresses seperated by a comma
 	 * @param attachment A single attachment
 	 * @param overrideProperties An array of properties
 	 */
-	public boolean js_sendMail(String to, String from, String subject, String msgText, String cc, String bcc, Attachment attachment, String[] overrideProperties)
+	public boolean js_sendMail(String to, String from, String subject, String msgText, String cc, String bcc, Attachment attachment,
+		String[] overrideProperties)
 	{
 		return sendMail(to, from, subject, msgText, cc, bcc, getAttachments(attachment), overrideProperties);
 	}
@@ -715,7 +717,7 @@ public class MailProvider implements IReturnedTypesProvider, IScriptable
 	 * var msgText = 'plain msg<html>styled html msg<img src="%%embedded%%"></html>';
 	 * var smtphost = 'myserver.com';
 	 * var success = plugins.mail.sendMail('to_someone@example.com,to_someone_else@example.net', 'John Cobb <from_me@example.com>', 'subject', msgText,null,'unnamed@example.com',attachment,smtphost);
-	 * if (!success) 
+	 * if (!success)
 	 * {
 	 * 	plugins.dialogs.showWarningDialog('Alert','Failed to send mail','OK');
 	 * }
@@ -725,7 +727,7 @@ public class MailProvider implements IReturnedTypesProvider, IScriptable
 	 * @param subject The subject of the mail
 	 * @param msgText The message text
 	 * @param cc One or more addresses seperated by a comma
-	 * @param bcc One or more addresses seperated by a comma 
+	 * @param bcc One or more addresses seperated by a comma
 	 * @param attachment A single attachment
 	 * @param smtpHost The smtp host
 	 */
@@ -741,11 +743,11 @@ public class MailProvider implements IReturnedTypesProvider, IScriptable
 	 * @sample
 	 * var msgText = 'plain msg<html>styled html msg<img src="%%embedded%%"></html>';
 	 * var success = plugins.mail.sendBulkMail('to_someone@example.com,to_someone_else@example.net', 'John Cobb <from_me@example.com>,replyTo@example.com', 'subject', msgText);
-	 * if (!success) 
+	 * if (!success)
 	 * {
 	 * 	plugins.dialogs.showWarningDialog('Alert','Failed to send bulk mail','OK');
 	 * }
-	 * 
+	 *
 	 * @param to A string containing 1 or multiple addresses seperated by a comma.
 	 * @param from A string containing an address and an optional reply address, seperated by a comma.
 	 * @param subject The subject of the bulk mail
@@ -763,11 +765,11 @@ public class MailProvider implements IReturnedTypesProvider, IScriptable
 	 * @sample
 	 * var msgText = 'plain msg<html>styled html msg<img src="%%embedded%%"></html>';
 	 * var success = plugins.mail.sendBulkMail('to_someone@example.com,to_someone_else@example.net', 'John Cobb <from_me@example.com>', 'subject', msgText,'cc1@example.com,cc2@example.com');
-	 * if (!success) 
+	 * if (!success)
 	 * {
 	 * 	plugins.dialogs.showWarningDialog('Alert','Failed to send bulk mail','OK');
 	 * }
-	 * 
+	 *
 	 * @param to A string containing 1 or multiple addresses seperated by a comma.
 	 * @param from A string containing an address and an optional reply address, seperated by a comma.
 	 * @param subject The subject of the bulk mail
@@ -782,22 +784,22 @@ public class MailProvider implements IReturnedTypesProvider, IScriptable
 	/**
 	 * Send a bulk mail, if you make the msgText start with <html> the message will be sent in html (and you can use all html formatting).
 	 * A bulk email makes it possible for one to not receive "out of office" emails back from receiver.
-	 * 
+	 *
 	 * @sample
 	 * var msgText = 'plain msg<html>styled html msg<img src="%%embedded%%"></html>';
 	 * var success = plugins.mail.sendBulkMail('to_someone@example.com,to_someone_else@example.net', 'John Cobb <from_me@example.com>', 'subject', msgText,null,'bcc1@example.com');
-	 * if (!success) 
+	 * if (!success)
 	 * {
 	 * 	plugins.dialogs.showWarningDialog('Alert','Failed to send bulk mail','OK');
 	 * }
-	 * 
+	 *
 	 *
 	 * @param to A string containing 1 or multiple addresses seperated by a comma.
 	 * @param from A string containing an address and an optional reply address, seperated by a comma.
 	 * @param subject The subject of the bulk mail
 	 * @param msgText The message text
 	 * @param cc One or more addresses seperated by a comma
-	 * @param bcc One or more addresses seperated by a comma 
+	 * @param bcc One or more addresses seperated by a comma
 	 */
 	public boolean js_sendBulkMail(String to, String from, String subject, String msgText, String cc, String bcc)
 	{
@@ -807,23 +809,23 @@ public class MailProvider implements IReturnedTypesProvider, IScriptable
 	/**
 	 * Send a bulk mail, if you make the msgText start with <html> the message will be sent in html (and you can use all html formatting).
 	 * A bulk email makes it possible for one to not receive "out of office" emails back from receiver.
-	 * 
+	 *
 	 * @sample
 	 * var attachment1 = plugins.mail.createBinaryAttachment('embedded',plugins.file.readFile('c:/temp/a_logo.gif'));
 	 * var attachment2 = plugins.mail.createTextAttachment('embedded','A text attachement');
 	 * var msgText = 'plain msg<html>styled html msg<img src="%%embedded%%"></html>';
 	 * var success = plugins.mail.sendBulkMail('to_someone@example.com,to_someone_else@example.net', 'John Cobb <from_me@example.com>', 'subject', msgText,null,'bcc1@example.com,bcc2@example.com',[attachment1,attachment2]);
-	 * if (!success) 
+	 * if (!success)
 	 * {
 	 * 	plugins.dialogs.showWarningDialog('Alert','Failed to send bulk mail','OK');
 	 * }
-	 * 
+	 *
 	 * @param to A string containing 1 or multiple addresses seperated by a comma.
 	 * @param from A string containing an address and an optional reply address, seperated by a comma.
 	 * @param subject The subject of the bulk mail
 	 * @param msgText The message text
 	 * @param cc One or more addresses seperated by a comma
-	 * @param bcc One or more addresses seperated by a comma 
+	 * @param bcc One or more addresses seperated by a comma
 	 * @param attachments The attachments
 	 */
 	public boolean js_sendBulkMail(String to, String from, String subject, String msgText, String cc, String bcc, Attachment[] attachments)
@@ -834,7 +836,7 @@ public class MailProvider implements IReturnedTypesProvider, IScriptable
 	/**
 	 * Send a bulk mail, if you make the msgText start with <html> the message will be sent in html (and you can use all html formatting).
 	 * A bulk email makes it possible for one to not receive "out of office" emails back from receiver.
-	 * 
+	 *
 	 * @sample
 	 * var attachment1 = plugins.mail.createBinaryAttachment('embedded',plugins.file.readFile('c:/temp/a_logo.gif'));
 	 * var attachment2 = plugins.mail.createTextAttachment('embedded','A text attachement');
@@ -842,20 +844,20 @@ public class MailProvider implements IReturnedTypesProvider, IScriptable
 	 * //it is possbile to set all kind of smtp properties
 	 * var properties = new Array()
 	 * properties[0] = 'mail.smtp.host=myserver.com'
-	 * // properties specification can be found at:http://java.sun.com/products/javamail/javadocs/com/sun/mail/smtp/package-summary.html
+	 * // properties specification can be found at:https://javaee.github.io/javamail/docs/api/com/sun/mail/smtp/package-summary.html
 	 * var success = plugins.mail.sendBulkMail('to_someone@example.com,to_someone_else@example.net', 'John Cobb <from_me@example.com>', 'subject', msgText,null,'unnamed@example.com',[attachment1,attachement2],properties);
-	 * if (!success) 
+	 * if (!success)
 	 * {
 	 * 	plugins.dialogs.showWarningDialog('Alert','Failed to send bulk mail','OK');
 	 * }
-	 * 
+	 *
 	 *
 	 * @param to A string containing 1 or multiple addresses seperated by a comma.
 	 * @param from A string containing an address and an optional reply address, seperated by a comma.
 	 * @param subject The subject of the bulk mail
 	 * @param msgText The message text
 	 * @param cc One or more addresses seperated by a comma
-	 * @param bcc One or more addresses seperated by a comma 
+	 * @param bcc One or more addresses seperated by a comma
 	 * @param attachments The attachments
 	 * @param overrideProperties An array of properties
 	 * @deprecated replaced with plugins.mail.sendBulkMail(to, from, subject, msgText, cc, bcc, attachments, overrideProperties)
@@ -870,7 +872,7 @@ public class MailProvider implements IReturnedTypesProvider, IScriptable
 	/**
 	 * Send a bulk mail, if you make the msgText start with <html> the message will be sent in html (and you can use all html formatting).
 	 * A bulk email makes it possible for one to not receive "out of office" emails back from receiver.
-	 * 
+	 *
 	 * @sample
 	 * var attachment1 = plugins.mail.createBinaryAttachment('embedded',plugins.file.readFile('c:/temp/a_logo.gif'));
 	 * var attachment2 = plugins.mail.createTextAttachment('embedded','A text attachement');
@@ -878,20 +880,20 @@ public class MailProvider implements IReturnedTypesProvider, IScriptable
 	 * //it is possbile to set all kind of smtp properties
 	 * var properties = new Array()
 	 * properties[0] = 'mail.smtp.host=myserver.com'
-	 * // properties specification can be found at:http://java.sun.com/products/javamail/javadocs/com/sun/mail/smtp/package-summary.html
+	 * // properties specification can be found at:https://javaee.github.io/javamail/docs/api/com/sun/mail/smtp/package-summary.html
 	 * var success = plugins.mail.sendBulkMail('to_someone@example.com,to_someone_else@example.net', 'John Cobb <from_me@example.com>', 'subject', msgText,null,'unnamed@example.com',[attachment1,attachement2],properties);
-	 * if (!success) 
+	 * if (!success)
 	 * {
 	 * 	plugins.dialogs.showWarningDialog('Alert','Failed to send bulk mail','OK');
 	 * }
-	 * 
+	 *
 	 *
 	 * @param to A string containing 1 or multiple addresses seperated by a comma.
 	 * @param from A string containing an address and an optional reply address, seperated by a comma.
 	 * @param subject The subject of the bulk mail
 	 * @param msgText The message text
 	 * @param cc One or more addresses seperated by a comma
-	 * @param bcc One or more addresses seperated by a comma 
+	 * @param bcc One or more addresses seperated by a comma
 	 * @param attachments The attachments
 	 * @param overrideProperties An array of properties
 	 */
@@ -904,14 +906,14 @@ public class MailProvider implements IReturnedTypesProvider, IScriptable
 	/**
 	 * Send a bulk mail, if you make the msgText start with <html> the message will be sent in html (and you can use all html formatting).
 	 * A bulk email makes it possible for one to not receive "out of office" emails back from receiver.
-	 * 
+	 *
 	 * @sample
 	 * var attachment1 = plugins.mail.createBinaryAttachment('embedded',plugins.file.readFile('c:/temp/a_logo.gif'));
 	 * var attachment2 = plugins.mail.createTextAttachment('embedded','A text attachement');
 	 * var msgText = 'plain msg<html>styled html msg<img src="%%embedded%%"></html>';
 	 * var smtphost = 'myserver.com';
 	 * var success = plugins.mail.sendBulkMail('to_someone@example.com,to_someone_else@example.net', 'John Cobb <from_me@example.com>', 'subject', msgText,null,'unnamed@example.com',[attachment1,attachement2],smtphost);
-	 * if (!success) 
+	 * if (!success)
 	 * {
 	 * 	plugins.dialogs.showWarningDialog('Alert','Failed to send bulk mail','OK');
 	 * }
@@ -921,7 +923,7 @@ public class MailProvider implements IReturnedTypesProvider, IScriptable
 	 * @param subject The subject of the bulk mail
 	 * @param msgText The message text
 	 * @param cc One or more addresses seperated by a comma
-	 * @param bcc One or more addresses seperated by a comma 
+	 * @param bcc One or more addresses seperated by a comma
 	 * @param attachments The attachments
 	 * @param smtpHost The smtp host
 	 */
@@ -933,12 +935,12 @@ public class MailProvider implements IReturnedTypesProvider, IScriptable
 	/**
 	 * Send a bulk mail, if you make the msgText start with <html> the message will be sent in html (and you can use all html formatting).
 	 * A bulk email makes it possible for one to not receive "out of office" emails back from receiver.
-	 * 
+	 *
 	 * @sample
 	 * var attachment = plugins.mail.createBinaryAttachment('embedded',plugins.file.readFile('c:/temp/a_logo.gif'));
 	 * var msgText = 'plain msg<html>styled html msg<img src="%%embedded%%"></html>';
 	 * var success = plugins.mail.sendBulkMail('to_someone@example.com,to_someone_else@example.net', 'John Cobb <from_me@example.com>', 'subject', msgText,null,'bcc1@example.com,bcc2@example.com',attachment);
-	 * if (!success) 
+	 * if (!success)
 	 * {
 	 * 	plugins.dialogs.showWarningDialog('Alert','Failed to send bulk mail','OK');
 	 * }
@@ -948,7 +950,7 @@ public class MailProvider implements IReturnedTypesProvider, IScriptable
 	 * @param subject The subject of the bulk mail
 	 * @param msgText The message text
 	 * @param cc One or more addresses seperated by a comma
-	 * @param bcc One or more addresses seperated by a comma 
+	 * @param bcc One or more addresses seperated by a comma
 	 * @param attachment A single attachment
 	 */
 	public boolean js_sendBulkMail(String to, String from, String subject, String msgText, String cc, String bcc, Attachment attachment)
@@ -959,16 +961,16 @@ public class MailProvider implements IReturnedTypesProvider, IScriptable
 	/**
 	 * Send a bulk mail, if you make the msgText start with <html> the message will be sent in html (and you can use all html formatting).
 	 * A bulk email makes it possible for one to not receive "out of office" emails back from receiver.
-	 * 
+	 *
 	 * @sample
 	 * var attachment = plugins.mail.createBinaryAttachment('embedded',plugins.file.readFile('c:/temp/a_logo.gif'));
 	 * var msgText = 'plain msg<html>styled html msg<img src="%%embedded%%"></html>';
 	 * //it is possbile to set all kind of smtp properties
 	 * var properties = new Array()
 	 * properties[0] = 'mail.smtp.host=myserver.com'
-	 * // properties specification can be found at:http://java.sun.com/products/javamail/javadocs/com/sun/mail/smtp/package-summary.html
+	 * // properties specification can be found at:https://javaee.github.io/javamail/docs/api/com/sun/mail/smtp/package-summary.html
 	 * var success = plugins.mail.sendBulkMail('to_someone@example.com,to_someone_else@example.net', 'John Cobb <from_me@example.com>', 'subject', msgText,null,'unnamed@example.com',attachment,properties);
-	 * if (!success) 
+	 * if (!success)
 	 * {
 	 * 	plugins.dialogs.showWarningDialog('Alert','Failed to send bulk mail','OK');
 	 * }
@@ -978,7 +980,7 @@ public class MailProvider implements IReturnedTypesProvider, IScriptable
 	 * @param subject The subject of the bulk mail
 	 * @param msgText The message text
 	 * @param cc One or more addresses seperated by a comma
-	 * @param bcc One or more addresses seperated by a comma 
+	 * @param bcc One or more addresses seperated by a comma
 	 * @param attachment A single attachment
 	 * @param overrideProperties An array of properties
 	 */
@@ -991,13 +993,13 @@ public class MailProvider implements IReturnedTypesProvider, IScriptable
 	/**
 	 * Send a bulk mail, if you make the msgText start with <html> the message will be sent in html (and you can use all html formatting).
 	 * A bulk email makes it possible for one to not receive "out of office" emails back from receiver.
-	 * 
+	 *
 	 * @sample
 	 * var attachment = plugins.mail.createBinaryAttachment('embedded',plugins.file.readFile('c:/temp/a_logo.gif'));
 	 * var msgText = 'plain msg<html>styled html msg<img src="%%embedded%%"></html>';
 	 * var smtphost = 'myserver.com';
 	 * var success = plugins.mail.sendBulkMail('to_someone@example.com,to_someone_else@example.net', 'John Cobb <from_me@example.com>', 'subject', msgText,null,'unnamed@example.com',attachment,smtphost);
-	 * if (!success) 
+	 * if (!success)
 	 * {
 	 * 	plugins.dialogs.showWarningDialog('Alert','Failed to send bulk mail','OK');
 	 * }
@@ -1007,7 +1009,7 @@ public class MailProvider implements IReturnedTypesProvider, IScriptable
 	 * @param subject The subject of the bulk mail
 	 * @param msgText The message text
 	 * @param cc One or more addresses seperated by a comma
-	 * @param bcc One or more addresses seperated by a comma 
+	 * @param bcc One or more addresses seperated by a comma
 	 * @param attachment A single attachment
 	 * @param smtpHost The smtp host
 	 */
@@ -1054,13 +1056,14 @@ public class MailProvider implements IReturnedTypesProvider, IScriptable
 		//create if not yet created
 		createMailService();
 
-		//incase the server is not started in developer		
+		//incase the server is not started in developer
 		if (mailService != null)
 		{
 			//send mail
 			try
 			{
-				mailService.sendMail(plugin.getClientPluginAccess().getClientID(), to, fromAndReply, subject, msgText, cc, bcc, attachments, overrideProperties);
+				mailService.sendMail(plugin.getClientPluginAccess().getClientID(), to, fromAndReply, subject, msgText, cc, bcc, attachments,
+					overrideProperties);
 				return true;
 			}
 			catch (Exception mex)
@@ -1090,7 +1093,7 @@ public class MailProvider implements IReturnedTypesProvider, IScriptable
 		//create if not yet created
 		createMailService();
 
-		//incase the server is not started in developer		
+		//incase the server is not started in developer
 		if (mailService != null)
 		{
 			//send mail
@@ -1133,7 +1136,7 @@ public class MailProvider implements IReturnedTypesProvider, IScriptable
 	 *
 	 * @sample
 	 * var success = plugins.mail.sendMail('to_someone@example.com,to_someone_else@example.org', 'John Cobb <from_me@example.com>', 'subject', 'my message',null,'unnamed@example.com');
-	 * if (!success) 
+	 * if (!success)
 	 * {
 	 * 	plugins.dialogs.showWarningDialog('Alert',plugins.mail.getLastSendMailExceptionMsg(),'OK');
 	 * }
