@@ -304,7 +304,6 @@
 									</copy>
 									<copy overwrite="true"
 										todir="${project.build.directory}/plugins_beans/plugins/images">
-										<fileset file="${project.basedir}/lib/jai_imageio.jar" />
 										<fileset file="${project.basedir}/lib/metadataextractor.jar" />
 									</copy>
 
