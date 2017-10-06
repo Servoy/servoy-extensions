@@ -123,6 +123,7 @@ public class RawSQLProvider implements IScriptable
 	 */
 	public boolean js_executeSQL(String serverName, String tableName, String sql, Object[] sql_args)
 	{
+		exception = null;
 		try
 		{
 			ServerMapping serverMapping = getServerMapping(serverName);
@@ -176,6 +177,7 @@ public class RawSQLProvider implements IScriptable
 			throw new RuntimeException("In/Out Arguments should be same size as directionality array"); //$NON-NLS-1$
 		}
 
+		exception = null;
 		try
 		{
 			ServerMapping serverMapping = getServerMapping(serverName);
@@ -183,7 +185,7 @@ public class RawSQLProvider implements IScriptable
 			// TODO HOW TO HANDLE ARGS WITH NULL?? sHOULD BE CONVERTED TO NullValue?????
 			IDataSet set = getSQLService().executeStoredProcedure(plugin.getClientPluginAccess().getClientID(), serverMapping.remoteServername,
 				serverMapping.transactionID, procedureDeclaration, arguments, inOutDirectionality, 0, maxNumberOfRowsToRetrieve);
-			return new JSDataSet(((ClientPluginAccessProvider)plugin.getClientPluginAccess()).getApplication(), set);
+			return convert(set)[0];
 		}
 		catch (ServoyException ex)
 		{
@@ -227,14 +229,41 @@ public class RawSQLProvider implements IScriptable
 	 *
 	 * @return the result sets created by the procedure.
 	 */
-	public IDataSet[] js_executeStoredProcedure(String serverName, String procedureDeclaration, Object[] arguments, int maxNumberOfRowsToRetrieve)
+	public JSDataSet[] js_executeStoredProcedure(String serverName, String procedureDeclaration, Object[] arguments, int maxNumberOfRowsToRetrieve)
 		throws Exception
 	{
-		ServerMapping serverMapping = getServerMapping(serverName);
+		exception = null;
+		try
+		{
+			ServerMapping serverMapping = getServerMapping(serverName);
 
-		// TODO HOW TO HANDLE ARGS WITH NULL?? sHOULD BE CONVERTED TO NullValue?????
-		return getSQLService().executeStoredProcedure(plugin.getClientPluginAccess().getClientID(), serverMapping.remoteServername,
-			serverMapping.transactionID, procedureDeclaration, arguments, 0, maxNumberOfRowsToRetrieve);
+			// TODO HOW TO HANDLE ARGS WITH NULL?? sHOULD BE CONVERTED TO NullValue?????
+			IDataSet[] dataSets = getSQLService().executeStoredProcedure(plugin.getClientPluginAccess().getClientID(), serverMapping.remoteServername,
+				serverMapping.transactionID, procedureDeclaration, arguments, 0, maxNumberOfRowsToRetrieve);
+			return convert(dataSets);
+		}
+		catch (ServoyException ex)
+		{
+			exception = ex;
+			Debug.error(ex);
+			return new JSDataSet[] { new JSDataSet(ex) };
+		}
+		catch (Exception e)
+		{
+			exception = e;
+			Debug.error(e);
+			return null;
+		}
+	}
+
+	private JSDataSet[] convert(IDataSet... dataSets)
+	{
+		JSDataSet[] jsDatasets = new JSDataSet[dataSets.length];
+		for (int i = 0; i < dataSets.length; i++)
+		{
+			jsDatasets[i] = new JSDataSet(((ClientPluginAccessProvider)plugin.getClientPluginAccess()).getApplication(), dataSets[i]);
+		}
+		return jsDatasets;
 	}
 
 	/**
@@ -392,6 +421,4 @@ public class RawSQLProvider implements IScriptable
 			this.transactionID = transactionID;
 		}
 	}
-
-
 }
