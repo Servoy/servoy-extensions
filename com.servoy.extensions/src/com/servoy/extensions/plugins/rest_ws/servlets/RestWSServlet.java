@@ -606,16 +606,14 @@ public class RestWSServlet extends HttpServlet
 			Object result = fd_headers.executeSync(client.getPluginAccess(), null);
 			if (result instanceof String)
 			{
-				String[] l_r = String.valueOf(result).split("=");
-				if (l_r.length == 2) response.addHeader(l_r[0], l_r[1]);
+				addHeaderToResponse(response, String.valueOf(result), wsRequest);
 			}
 			else if (result instanceof Object[])
 			{
 				Object[] resultArray = (Object[])result;
 				for (Object element : resultArray)
 				{
-					String[] l_r = String.valueOf(element).split("=");
-					if (l_r.length == 2) response.addHeader(l_r[0], l_r[1]);
+					addHeaderToResponse(response, String.valueOf(element), wsRequest);
 				}
 			}
 		}
@@ -666,6 +664,15 @@ public class RestWSServlet extends HttpServlet
 		return result;
 
 
+	}
+
+	private void addHeaderToResponse(HttpServletResponse response, String headerString, WsRequest wsRequest)
+	{
+		int equalSignIndex = headerString.indexOf('=');
+		if (equalSignIndex > 0) response.addHeader(headerString.substring(0, equalSignIndex), headerString.substring(equalSignIndex + 1));
+		else Debug.error(
+			"Cannot send back header value from 'ws_response_headers'; it should be a String containing a key value pair separated by an equal sign but it is: '" +
+				headerString + "'. Solution/form: " + wsRequest.solutionName + " -> " + wsRequest.formName);
 	}
 
 	private Object checkAuthorization(HttpServletRequest request, IClientPluginAccess client, String solutionName, String formName) throws Exception
