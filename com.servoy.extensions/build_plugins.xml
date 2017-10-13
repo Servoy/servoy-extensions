@@ -1145,7 +1145,6 @@
 		/>
 		<copy overwrite="true" file="resources/images/images.jar.jnlp" todir="${plugins.dir}"/>
 		<copy overwrite="true" todir="${plugins.dir}/images">
-			<fileset file="lib/jai_imageio.jar"/>
 			<fileset file="lib/metadataextractor.jar"/>
 		</copy>
 		<delete dir="${tempForJar.dir}"/>
@@ -1163,7 +1162,6 @@
 			<fileset file="resources/images/images.jar.jnlp"/>
 		</copy>
 		<copy overwrite="true" todir="${tempForJar.dir}/application_server/plugins/images">
-			<fileset file="lib/jai_imageio.jar"/>
 			<fileset file="lib/metadataextractor.jar"/>
 		</copy>
 		<copy overwrite="true" todir="${tempForJar.dir}/screenshots">

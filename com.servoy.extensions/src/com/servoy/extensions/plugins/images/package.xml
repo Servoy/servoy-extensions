@@ -8,12 +8,6 @@
 	    <servoy>
 	       <min-version>7.1.0</min-version>
 	    </servoy>
-	    <lib>
-        	<id>com.sun.media.imageio</id> <!-- MANIFEST.MF listed id ("Extension-Name" from MANIFEST.MF) -->
-       		<path>application_server/plugins/images/jai_imageio.jar</path>
-      		<version>1.1</version>
-       		<min-version>1.1</min-version>
-    	</lib>
     	<lib>
         	<id>com.drew.imaging</id> <!-- most relevant package name in the jar file (no useful MANIFEST.MF listed id available here) -->
        		<path>application_server/plugins/images/metadataextractor.jar</path>
