@@ -775,6 +775,31 @@ public class WindowProvider implements IReturnedTypesProvider, IScriptable
 	}
 
 	/**
+	 * Show a form as popup panel, where the closeFormPopup can pass return a value to a dataprovider in the specified scope. Can show relative to a component or at specified coordinates.
+	 * Show on specified location is only supported in NGClient.
+	 *
+	 * @sample
+	 * // Show a form as popup panel, where the closeFormPopup can pass return a value to a dataprovider in the specified scope.
+	 * plugins.window.showFormPopup(null,forms.orderPicker,foundset.getSelectedRecord(),"order_id");
+	 * // plugins.window.showFormPopup(null,forms.orderPicker,foundset.getSelectedRecord(),"order_id",-1,-1,100,100);
+	 * // do call closeFormPopup(ordervalue) from the orderPicker form
+	 *
+	 * @param elementToShowRelatedTo element to show related to or null to center in screen
+	 * @param form the form to show
+	 * @param scope the scope to put retval into
+	 * @param dataproviderID the dataprovider of scope to fill
+	 * @param width popup width
+	 * @param height popup height
+	 * @param x popup x location
+	 * @param y popup y location
+	 */
+	@ServoyClientSupport(ng = true, wc = false, sc = false)
+	public void js_showFormPopup(IComponent elementToShowRelatedTo, IForm form, Object scope, String dataproviderID, int width, int height, int x, int y)
+	{
+		//ng only, just for the docs
+	}
+
+	/**
 	 * Close the current form popup panel and assign the value to the configured data provider.
 	 * @sampleas js_showFormPopup(IComponent, IForm, Object, String)
 	 *

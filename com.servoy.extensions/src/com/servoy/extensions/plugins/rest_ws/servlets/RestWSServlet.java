@@ -46,6 +46,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.XML;
 import org.mozilla.javascript.JavaScriptException;
+import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.Undefined;
 import org.mozilla.javascript.Wrapper;
 import org.mozilla.javascript.xml.XMLObject;
@@ -121,6 +122,15 @@ public class RestWSServlet extends HttpServlet
 
 	private static final int CONTENT_DEFAULT = CONTENT_JSON;
 	private static final String CHARSET_DEFAULT = "UTF-8";
+
+	/**
+	 * Just a convention used by Servoy in ws_response_headers() return value to define the name/key of a header to be returned. (must be String)
+	 */
+	private static final String HEADER_NAME = "name";
+	/**
+	 * Just a convention used by Servoy in ws_response_headers() return value to define the value of a header to be returned. (must be String)
+	 */
+	private static final String HEADER_VALUE = "value";
 
 	private final RestWSPlugin plugin;
 
@@ -604,20 +614,16 @@ public class RestWSServlet extends HttpServlet
 		if (fd_headers.exists(client.getPluginAccess()) == FunctionDefinition.Exist.METHOD_FOUND)
 		{
 			Object result = fd_headers.executeSync(client.getPluginAccess(), null);
-			if (result instanceof String)
-			{
-				String[] l_r = String.valueOf(result).split("=");
-				if (l_r.length == 2) response.addHeader(l_r[0], l_r[1]);
-			}
-			else if (result instanceof Object[])
+
+			if (result instanceof Object[])
 			{
 				Object[] resultArray = (Object[])result;
 				for (Object element : resultArray)
 				{
-					String[] l_r = String.valueOf(element).split("=");
-					if (l_r.length == 2) response.addHeader(l_r[0], l_r[1]);
+					addHeaderToResponse(response, element, wsRequest);
 				}
 			}
+			else addHeaderToResponse(response, result, wsRequest);
 		}
 
 		Object[] args = null;
@@ -666,6 +672,40 @@ public class RestWSServlet extends HttpServlet
 		return result;
 
 
+	}
+
+	private void addHeaderToResponse(HttpServletResponse response, Object headerItem, WsRequest wsRequest)
+	{
+		boolean done = false;
+		if (headerItem instanceof String)
+		{
+			// something like 'Content-Disposition=attachment;filename="test.txt"'
+			String headerString = (String)headerItem;
+			int equalSignIndex = headerString.indexOf('=');
+			if (equalSignIndex > 0)
+			{
+				response.addHeader(headerString.substring(0, equalSignIndex), headerString.substring(equalSignIndex + 1));
+				done = true;
+			}
+		}
+		else if (headerItem instanceof Scriptable)
+		{
+			// something like {
+			// 			name: "Content-Disposition",
+			// 			value: 'attachment;filename="test.txt"'
+			// }
+			Scriptable headerItemObject = (Scriptable)headerItem;
+			if (headerItemObject.has(HEADER_NAME, headerItemObject) && headerItemObject.has(HEADER_VALUE, headerItemObject))
+			{
+				response.addHeader(String.valueOf(headerItemObject.get(HEADER_NAME, headerItemObject)),
+					String.valueOf(headerItemObject.get(HEADER_VALUE, headerItemObject)));
+				done = true;
+			}
+		}
+
+		if (!done) Debug.error(
+			"Cannot send back header value from 'ws_response_headers'; it should be either a String containing a key-value pair separated by an equal sign or an object with 'name' and 'value' in it, but it is: '" +
+				headerItem + "'. Solution/form: " + wsRequest.solutionName + " -> " + wsRequest.formName);
 	}
 
 	private Object checkAuthorization(HttpServletRequest request, IClientPluginAccess client, String solutionName, String formName) throws Exception
