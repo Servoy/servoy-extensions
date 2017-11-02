@@ -40,6 +40,7 @@ import com.servoy.j2db.plugins.IServerAccess;
 import com.servoy.j2db.plugins.IServerPlugin;
 import com.servoy.j2db.plugins.PluginException;
 import com.servoy.j2db.util.Debug;
+import com.servoy.j2db.util.Utils;
 
 /**
  * @author jcompagner
@@ -87,6 +88,22 @@ public class DataNotifyBroadCaster implements IServerPlugin
 		{
 			ConnectionFactory factory = new ConnectionFactory();
 			factory.setHost(hostname);
+			String username = app.getSettings().getProperty("amqpbroadcaster.username");
+			if (username != null) factory.setUsername(username);
+			String password = app.getSettings().getProperty("amqpbroadcaster.password");
+			if (password != null) factory.setPassword(password);
+			String virtualHost = app.getSettings().getProperty("amqpbroadcaster.virtualhost");
+			if (virtualHost != null) factory.setVirtualHost(virtualHost);
+			String port = app.getSettings().getProperty("amqpbroadcaster.port");
+			if (port != null) factory.setPort(Utils.getAsInteger(port));
+			String connectionTimeout = app.getSettings().getProperty("amqpbroadcaster.connectiontimeout");
+			if (connectionTimeout != null) factory.setConnectionTimeout(Utils.getAsInteger(connectionTimeout));
+			String handshakeTimeout = app.getSettings().getProperty("amqpbroadcaster.handshaketimeout");
+			if (handshakeTimeout != null) factory.setHandshakeTimeout(Utils.getAsInteger(handshakeTimeout));
+			String shutdownTimeout = app.getSettings().getProperty("amqpbroadcaster.shutdowntimeout");
+			if (shutdownTimeout != null) factory.setShutdownTimeout(Utils.getAsInteger(shutdownTimeout));
+			String channelRpcTimeout = app.getSettings().getProperty("amqpbroadcaster.rpctimeout");
+			if (channelRpcTimeout != null) factory.setChannelRpcTimeout(Utils.getAsInteger(channelRpcTimeout));
 			try
 			{
 				final IDataNotifyService dataNotifyService = app.getDataNotifyService();
@@ -173,6 +190,14 @@ public class DataNotifyBroadCaster implements IServerPlugin
 	{
 		Map<String, String> req = new LinkedHashMap<String, String>();
 		req.put("amqpbroadcaster.hostname", "Set the hostname of the AMQP (RabbitMQ) server where to connect to");
+		req.put("amqpbroadcaster.username", "Set the username of the AMQP (RabbitMQ) server where to connect to");
+		req.put("amqpbroadcaster.password", "Set the password of the AMQP (RabbitMQ) server where to connect to");
+		req.put("amqpbroadcaster.virtualhost", "Set the virtual host of the AMQP (RabbitMQ) server where to connect to");
+		req.put("amqpbroadcaster.port", "Set the port of the AMQP (RabbitMQ) server where to connect to");
+		req.put("amqpbroadcaster.connectiontimeout", "Set the connection timeout of the AMQP (RabbitMQ) connection (default value 60000 - 60 seconds)");
+		req.put("amqpbroadcaster.handshaketimeout", "Set the handshake timeout of the AMQP (RabbitMQ) connection (default value 10000 - 10 seconds)");
+		req.put("amqpbroadcaster.shutdowntimeout", "Set the shutdown timeout of the AMQP (RabbitMQ) connection (default value 10000 - 10 seconds)");
+		req.put("amqpbroadcaster.rpctimeout", "Set the rpc continuation timeout of the AMQP (RabbitMQ) channel (default value 10 minutes)");
 		return req;
 	}
 
