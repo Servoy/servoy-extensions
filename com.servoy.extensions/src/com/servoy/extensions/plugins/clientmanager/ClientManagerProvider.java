@@ -66,10 +66,13 @@ public class ClientManagerProvider implements IScriptable, IReturnedTypesProvide
 
 	/**
 	 * Get a broadcast object giving it a (nick)name and on a specific channel, the callback is used for getting messages of other clients on that channel
-	 * The function gets 2 arguments (nickName, message)
+	 * The function gets 3 arguments (nickName, message, channelName)
 	 *
 	 * @sample
-	 * var broadcaster = plugins.clientmanager.getBroadcaster("nickname","mychatchannel",callback);
+	 * function callback(nickName, message, channelName) {
+	 *    application.output('message received from ' + nickName + ' on channel ' + channelName + ': ' + message)
+	 * }
+	 * var broadcaster = plugins.clientmanager.getBroadcaster("nickname", "mychatchannel", callback);
 	 * broadcaster.broadcastMessage("Hallo");
 	 *
 	 * @param name The nickname for this user on this channel
