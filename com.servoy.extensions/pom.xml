@@ -250,7 +250,7 @@
 											failonerror="true">
 											<arg value="-J-Xmx512m" />
 											<arg value="-r" />
-											<arg value="-O" />
+											<!-- This may break some features 	<arg value="-O" /> -->
 											<arg
 												value="${project.build.directory}/plugins_beans/@{type}/@{jarname}.jar" />
 										</exec>
