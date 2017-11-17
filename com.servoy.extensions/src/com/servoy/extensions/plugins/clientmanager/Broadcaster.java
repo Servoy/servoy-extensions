@@ -133,6 +133,6 @@ public class Broadcaster implements IBroadcaster, IJavaScriptType
 	@Override
 	public void channelMessage(String name, String message) throws RemoteException
 	{
-		fd.executeAsync(plugin.getClientPluginAccess(), new Object[] { name, message });
+		fd.executeAsync(plugin.getClientPluginAccess(), new Object[] { name, message, bci.getChannelName() });
 	}
 }
