@@ -88,7 +88,7 @@ public class ClientManagerProvider implements IScriptable, IReturnedTypesProvide
 	}
 
 	/**
-	 * Returns an array of JSClientInformation elements describing the clients connected to the server.
+	 * Returns an array of JSClientInformation elements describing the clients connected to the server. Note this is snapshot information on connected clients, client information will not get updated.
 	 *
 	 * @sample
 	 * //Returns an array of JSClientInformation elements describing the clients connected to the server.
@@ -108,6 +108,7 @@ public class ClientManagerProvider implements IScriptable, IReturnedTypesProvide
 	/**
 	 * Returns an array of JSClientInformation elements describing the clients connected to the server filtered by the a client info string.
 	 * This way you can ask for a specific set of clients that have a specific information added to there client information.
+	 * Note this is snapshot information on connected clients, client information will not get updated.
 	 *
 	 * @sampleas js_getConnectedClients()
 	 *
@@ -136,7 +137,7 @@ public class ClientManagerProvider implements IScriptable, IReturnedTypesProvide
 	}
 
 	/**
-	 * Returns the current client JSClientInformation object.
+	 * Returns the current client JSClientInformation object. Note this is snapshot information, client information will not get updated.
 	 *
 	 * @return
 	 */
