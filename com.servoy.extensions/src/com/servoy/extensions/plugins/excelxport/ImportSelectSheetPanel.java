@@ -75,7 +75,7 @@ public class ImportSelectSheetPanel extends JPanel implements ActionListener, IW
 
 		table.setPreferredScrollableViewportSize(new Dimension(500, 70));
 
-		//Create the scroll pane and add the table to it. 
+		//Create the scroll pane and add the table to it.
 		JScrollPane scrollPane = new JScrollPane(table);
 
 		// Lay out topmost Part pane
@@ -275,7 +275,7 @@ class SheetTableModel extends AbstractTableModel
 		HSSFRow row = sheet.getRow(r);
 		if (row != null)
 		{
-			HSSFCell cell = row.getCell((short)c);
+			HSSFCell cell = row.getCell(c);
 			if (cell != null)
 			{
 				switch (cell.getCellType())
@@ -288,7 +288,7 @@ class SheetTableModel extends AbstractTableModel
 						}
 						return d;
 //					case HSSFCell.CELL_TYPE_NUMERIC:
-//					return cell.getStringCellValue();	
+//					return cell.getStringCellValue();
 
 					default :
 						return cell.getStringCellValue();
