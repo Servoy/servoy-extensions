@@ -126,7 +126,7 @@ public class DataNotifyBroadCaster implements IServerPlugin
 							String[] datasources = dataNotifyService.getUsedDataSources();
 							for (String ds : datasources)
 							{
-								dataNotifyService.flushCachedDatabaseData(ds);
+								dataNotifyService.flushCachedDatabaseData(ds, null);
 							}
 						}
 					});
@@ -157,11 +157,12 @@ public class DataNotifyBroadCaster implements IServerPlugin
 								{
 									if (nd.dataSource != null)
 									{
-										dataNotifyService.flushCachedDatabaseData(nd.dataSource);
+										dataNotifyService.flushCachedDatabaseData(nd.dataSource, nd.tenantData);
 									}
 									else
 									{
-										dataNotifyService.notifyDataChange(nd.server_name, nd.table_name, nd.pks, nd.action, nd.insertColumnData);
+										dataNotifyService.notifyDataChange(nd.server_name, nd.table_name, nd.pks, nd.action, nd.insertColumnData,
+											nd.tenantData);
 									}
 								}
 							}
