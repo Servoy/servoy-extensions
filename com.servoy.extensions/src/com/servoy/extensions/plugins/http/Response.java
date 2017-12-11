@@ -50,7 +50,7 @@ public class Response implements IScriptable, IJavaScriptType
 
 	public Response()
 	{
-		
+
 	}
 
 	public Response(HttpResponse response)
@@ -87,6 +87,24 @@ public class Response implements IScriptable, IJavaScriptType
 			return res.getStatusLine().getStatusCode();
 		}
 		return 0;
+	}
+
+	/**
+	 * Gets the status code's reason phrase. For example if a response contains status code 403 (Forbidden) it might be useful to know why.
+	 *
+	 * For example a Jenkins API req. could answer with "403 No valid crumb was included in the request" which will let you know
+	 * that you simply have to reques a crumb and then put that in the request headers as "Jenkins-Crumb". But you could not know that from 403 status alone...
+	 *
+	 * @sample
+	 * var statusReasonPhrase = response.getStatusReasonPhrase();
+	 */
+	public String js_getStatusReasonPhrase()
+	{
+		if (res != null)
+		{
+			return res.getStatusLine().getReasonPhrase();
+		}
+		return null;
 	}
 
 	/**
@@ -153,7 +171,7 @@ public class Response implements IScriptable, IJavaScriptType
 	 * @sample
 	 * var allHeaders = response.getResponseHeaders();
 	 * var header;
-	 * 
+	 *
 	 * for (header in allHeaders) application.output(header + ': ' + allHeaders[header]);
 	 */
 	public JSMap js_getResponseHeaders()
@@ -166,7 +184,7 @@ public class Response implements IScriptable, IJavaScriptType
 	 * @sample
 	 * var contentLength = response.getResponseHeaders("Content-Length");
 	 *
-	 * @param headerName 
+	 * @param headerName
 	 */
 	public JSMap js_getResponseHeaders(String headerName)
 	{
