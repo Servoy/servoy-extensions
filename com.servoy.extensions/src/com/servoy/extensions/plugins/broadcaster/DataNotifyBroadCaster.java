@@ -126,7 +126,7 @@ public class DataNotifyBroadCaster implements IServerPlugin
 							String[] datasources = dataNotifyService.getUsedDataSources();
 							for (String ds : datasources)
 							{
-								dataNotifyService.flushCachedDatabaseData(ds);
+								dataNotifyService.flushCachedDatabaseData(ds, null);
 							}
 						}
 					});
@@ -157,11 +157,12 @@ public class DataNotifyBroadCaster implements IServerPlugin
 								{
 									if (nd.dataSource != null)
 									{
-										dataNotifyService.flushCachedDatabaseData(nd.dataSource);
+										dataNotifyService.flushCachedDatabaseData(nd.dataSource, nd.tenantData);
 									}
 									else
 									{
-										dataNotifyService.notifyDataChange(nd.server_name, nd.table_name, nd.pks, nd.action, nd.insertColumnData);
+										dataNotifyService.notifyDataChange(nd.server_name, nd.table_name, nd.pks, nd.action, nd.insertColumnData,
+											nd.tenantData);
 									}
 								}
 							}
@@ -189,11 +190,12 @@ public class DataNotifyBroadCaster implements IServerPlugin
 	public Map<String, String> getRequiredPropertyNames()
 	{
 		Map<String, String> req = new LinkedHashMap<String, String>();
-		req.put("amqpbroadcaster.hostname", "Set the hostname of the AMQP (RabbitMQ) server where to connect to");
-		req.put("amqpbroadcaster.username", "Set the username of the AMQP (RabbitMQ) server where to connect to");
-		req.put("amqpbroadcaster.password", "Set the password of the AMQP (RabbitMQ) server where to connect to");
-		req.put("amqpbroadcaster.virtualhost", "Set the virtual host of the AMQP (RabbitMQ) server where to connect to");
-		req.put("amqpbroadcaster.port", "Set the port of the AMQP (RabbitMQ) server where to connect to");
+		req.put("amqpbroadcaster.hostname", "Set the hostname of the AMQP (RabbitMQ) server where to connect to (this is mandatory field)");
+		req.put("amqpbroadcaster.username", "Set the username of the AMQP (RabbitMQ) server where to connect to (default value is guest)");
+		req.put("amqpbroadcaster.password", "Set the password of the AMQP (RabbitMQ) server where to connect to (default value is guest)");
+		req.put("amqpbroadcaster.virtualhost", "Set the virtual host of the AMQP (RabbitMQ) server where to connect to (default value is / )");
+		req.put("amqpbroadcaster.port",
+			"Set the port of the AMQP (RabbitMQ) server where to connect to (default value is 5671 for SSL connection and 5672 for default connection)");
 		req.put("amqpbroadcaster.connectiontimeout", "Set the connection timeout of the AMQP (RabbitMQ) connection (default value 60000 - 60 seconds)");
 		req.put("amqpbroadcaster.handshaketimeout", "Set the handshake timeout of the AMQP (RabbitMQ) connection (default value 10000 - 10 seconds)");
 		req.put("amqpbroadcaster.shutdowntimeout", "Set the shutdown timeout of the AMQP (RabbitMQ) connection (default value 10000 - 10 seconds)");

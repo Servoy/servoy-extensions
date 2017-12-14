@@ -211,20 +211,20 @@ public class ExportSpecifyFilePanel extends JPanel implements ActionListener, IW
 			throw new RuntimeException("The arrays 'output column names' and 'data provider ids' must have the same length."); //$NON-NLS-1$
 		}
 		String[] columnNames = outputColumnNames != null ? outputColumnNames : dataProviders;
-		HSSFRow header = sheet.createRow((short)0 + startRow);
+		HSSFRow header = sheet.createRow(startRow);
 		for (int k = 0; k < columnNames.length; k++)
 		{
-			HSSFCell cell = header.createCell((short)(k + startColumn));
+			HSSFCell cell = header.createCell(k + startColumn);
 			cell.setCellValue(columnNames[k]);
 		}
 		HSSFCellStyle[] cellStyles = new HSSFCellStyle[dataProviders.length];
 		for (int i = 0; i < foundSet.getSize(); i++)
 		{
-			HSSFRow row = sheet.createRow((short)(i + 1 + startRow));
+			HSSFRow row = sheet.createRow(i + 1 + startRow);
 			IRecord s = foundSet.getRecord(i);
 			for (int k = 0; k < dataProviders.length; k++)
 			{
-				HSSFCell cell = row.createCell((short)(k + startColumn));
+				HSSFCell cell = row.createCell(k + startColumn);
 
 				Object obj = s.getValue(dataProviders[k]);
 				if (obj instanceof Date)
