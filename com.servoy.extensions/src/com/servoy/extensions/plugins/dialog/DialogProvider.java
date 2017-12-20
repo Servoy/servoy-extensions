@@ -113,6 +113,8 @@ public class DialogProvider implements IScriptable, IMobileDialogProvider
 	 *
 	 * @param dialogTitle Dialog title.
 	 * @param dialogMessage Dialog message.
+	 *
+	 * @return pressed button text
 	 */
 	@JSFunction
 	@ServoyClientSupport(ng = true, mc = true, wc = true, sc = true)
@@ -131,6 +133,8 @@ public class DialogProvider implements IScriptable, IMobileDialogProvider
 	 * @param dialogTitle Dialog title.
 	 * @param dialogMessage Dialog message.
 	 * @param buttonsText Array of button texts.
+	 *
+	 * @return pressed button text
 	 */
 	@JSFunction
 	@ServoyClientSupport(ng = true, mc = false, wc = true, sc = true)
@@ -154,6 +158,8 @@ public class DialogProvider implements IScriptable, IMobileDialogProvider
 	 * @param dialogTitle Dialog title.
 	 * @param dialogMessage Dialog message.
 	 * @param buttonsText Array of button texts.
+	 *
+	 * @return pressed button text
 	 */
 	@JSFunction
 	@ServoyClientSupport(ng = true, mc = false, wc = true, sc = true)
@@ -169,6 +175,7 @@ public class DialogProvider implements IScriptable, IMobileDialogProvider
 
 	/**
 	 * Shows a message dialog with the specified title, message and a customizable set of buttons.
+	 * Returns pressed button text, in case window is closed without pressing any button return value depends on client type.
 	 *
 	 * @sample
 	 * //show dialog
@@ -177,6 +184,8 @@ public class DialogProvider implements IScriptable, IMobileDialogProvider
 	 * @param dialogTitle Dialog title.
 	 * @param dialogMessage Dialog message.
 	 * @param buttonsText Array of button texts.
+	 *
+	 * @return pressed button text
 	 */
 	@JSFunction
 	@ServoyClientSupport(ng = true, mc = false, wc = true, sc = true)
@@ -192,6 +201,7 @@ public class DialogProvider implements IScriptable, IMobileDialogProvider
 
 	/**
 	 * Shows a message dialog with the specified title, message and a customizable set of buttons.
+	 * Returns pressed button text, in case window is closed without pressing any button return value depends on client type.
 	 *
 	 * @sample
 	 * //show dialog
@@ -200,6 +210,8 @@ public class DialogProvider implements IScriptable, IMobileDialogProvider
 	 * @param dialogTitle Dialog title.
 	 * @param dialogMessage Dialog message.
 	 * @param buttonsText Array of button texts.
+	 *
+	 * @return pressed button text
 	 */
 	@JSFunction
 	@ServoyClientSupport(ng = true, mc = false, wc = true, sc = true)
@@ -215,6 +227,8 @@ public class DialogProvider implements IScriptable, IMobileDialogProvider
 	 *
 	 * @param dialogTitle Dialog title.
 	 * @param dialogMessage Dialog message.
+	 *
+	 * @return pressed button text
 	 */
 	@JSFunction
 	@ServoyClientSupport(ng = true, mc = true, wc = true, sc = true)
@@ -344,6 +358,8 @@ public class DialogProvider implements IScriptable, IMobileDialogProvider
 	 * @param dialog_title
 	 * @param msg
 	 * @param options
+	 *
+	 * @return selected value or null
 	 */
 	@JSFunction
 	@ServoyClientSupport(ng = true, mc = false, wc = true, sc = true)
@@ -400,6 +416,8 @@ public class DialogProvider implements IScriptable, IMobileDialogProvider
 	 * @param dialog_title
 	 * @param msg
 	 * @param optionArray
+	 *
+	 * @return selected value or null
 	 */
 	@JSFunction
 	@ServoyClientSupport(ng = true, mc = false, wc = true, sc = true)
@@ -424,6 +442,8 @@ public class DialogProvider implements IScriptable, IMobileDialogProvider
 	 * @sample
 	 * //show input dialog ,returns nothing when canceled
 	 * var typedInput = plugins.dialogs.showInputDialog('Specify','Your name');
+	 *
+	 * @return input text or null
 	 */
 	@JSFunction
 	@ServoyClientSupport(ng = true, mc = false, wc = true, sc = true)
@@ -436,6 +456,7 @@ public class DialogProvider implements IScriptable, IMobileDialogProvider
 	 * @clonedesc showInputDialog()
 	 * @sampleas showInputDialog()
 	 * @param dialog_title
+	 * @return input text or null
 	 */
 	@JSFunction
 	@ServoyClientSupport(ng = true, mc = false, wc = true, sc = true)
@@ -449,6 +470,7 @@ public class DialogProvider implements IScriptable, IMobileDialogProvider
 	 * @sampleas showInputDialog()
 	 * @param dialog_title
 	 * @param msg
+	 * @return input text or null
 	 */
 	@JSFunction
 	@ServoyClientSupport(ng = true, mc = false, wc = true, sc = true)
@@ -463,6 +485,7 @@ public class DialogProvider implements IScriptable, IMobileDialogProvider
 	 * @param dialog_title
 	 * @param msg
 	 * @param initialValue
+	 * @return input text or null
 	 */
 	@JSFunction
 	@ServoyClientSupport(ng = true, mc = false, wc = true, sc = true)
