@@ -170,6 +170,7 @@
 								<phase>generate-resources</phase>
 								<configuration>
 									<applicationsArgs>
+										<args>-clean</args>
 										<args>-application</args>
 										<args>com.servoy.eclipse.docgenerator.client.default</args>
 										<args>-data</args>
