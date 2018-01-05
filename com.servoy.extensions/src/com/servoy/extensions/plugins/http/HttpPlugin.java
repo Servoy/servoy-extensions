@@ -27,6 +27,7 @@ import com.servoy.j2db.plugins.IClientPluginAccess;
 import com.servoy.j2db.plugins.PluginException;
 import com.servoy.j2db.preference.PreferencePanel;
 import com.servoy.j2db.scripting.IScriptable;
+import com.servoy.j2db.util.serialize.JSONConverter;
 
 /**
  * @author jblok
@@ -37,6 +38,7 @@ public class HttpPlugin implements IClientPlugin
 
 	private IClientPluginAccess access;
 	private HttpProvider impl;
+	private JSONConverter jsonConverter;
 
 	/*
 	 * @see IPlugin#load()
@@ -89,7 +91,7 @@ public class HttpPlugin implements IClientPlugin
 	{
 		if (impl == null)
 		{
-			impl = new HttpProvider(access);
+			impl = new HttpProvider(this);
 		}
 		return impl;
 	}
@@ -125,6 +127,15 @@ public class HttpPlugin implements IClientPlugin
 	public void propertyChange(PropertyChangeEvent evt)
 	{
 		// ignore
+	}
+
+	public JSONConverter getJSONConverter()
+	{
+		if (jsonConverter == null)
+		{
+			jsonConverter = new JSONConverter(getClientPluginAccess().getDatabaseManager());
+		}
+		return jsonConverter;
 	}
 
 }

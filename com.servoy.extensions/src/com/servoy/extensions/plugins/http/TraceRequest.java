@@ -21,7 +21,6 @@ import org.apache.http.client.methods.HttpTrace;
 import org.apache.http.impl.client.DefaultHttpClient;
 
 import com.servoy.j2db.documentation.ServoyDocumented;
-import com.servoy.j2db.plugins.IClientPluginAccess;
 
 /**
  * @author pbakker
@@ -36,8 +35,8 @@ public class TraceRequest extends BaseRequest
 		super();
 	}
 
-	public TraceRequest(String url, DefaultHttpClient hc, IClientPluginAccess plugin)
+	public TraceRequest(String url, DefaultHttpClient hc, HttpPlugin httpPlugin)
 	{
-		super(url, hc, new HttpTrace(url), plugin);
+		super(url, hc, new HttpTrace(url), httpPlugin);
 	}
 }

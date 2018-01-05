@@ -23,7 +23,6 @@ import org.apache.http.protocol.ExecutionContext;
 import org.apache.http.util.EntityUtils;
 
 import com.servoy.j2db.documentation.ServoyDocumented;
-import com.servoy.j2db.plugins.IClientPluginAccess;
 import com.servoy.j2db.util.Debug;
 
 /**
@@ -37,9 +36,9 @@ public class PostRequest extends BaseEntityEnclosingRequest
 		super();
 	}//only used by script engine
 
-	public PostRequest(String url, DefaultHttpClient hc, IClientPluginAccess plugin)
+	public PostRequest(String url, DefaultHttpClient hc, HttpPlugin httpPlugin)
 	{
-		super(url, hc, new HttpPost(url), plugin);
+		super(url, hc, new HttpPost(url), httpPlugin);
 	}
 
 	/**

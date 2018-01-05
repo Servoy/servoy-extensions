@@ -21,7 +21,6 @@ import org.apache.http.client.methods.HttpPatch;
 import org.apache.http.impl.client.DefaultHttpClient;
 
 import com.servoy.j2db.documentation.ServoyDocumented;
-import com.servoy.j2db.plugins.IClientPluginAccess;
 
 /**
  * @author lvostinar
@@ -35,9 +34,9 @@ public class PatchRequest extends BaseEntityEnclosingRequest
 		super();
 	}//only used by script engine
 
-	public PatchRequest(String url, DefaultHttpClient hc, IClientPluginAccess plugin)
+	public PatchRequest(String url, DefaultHttpClient hc, HttpPlugin httpPlugin)
 	{
-		super(url, hc, new HttpPatch(url), plugin);
+		super(url, hc, new HttpPatch(url), httpPlugin);
 	}
 
 }
