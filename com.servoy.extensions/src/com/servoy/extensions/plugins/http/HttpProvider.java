@@ -78,17 +78,17 @@ public class HttpProvider implements IReturnedTypesProvider, IScriptable
 
 	@Deprecated
 	private String lastPageEncoding = null;
-	private final IClientPluginAccess access;
+	private final HttpPlugin httpPlugin;
 
-	public HttpProvider(IClientPluginAccess access)
+	public HttpProvider(HttpPlugin httpPlugin)
 	{
-		this.access = access;
+		this.httpPlugin = httpPlugin;
 	}
 
 	// default constructor
 	public HttpProvider()
 	{
-		this.access = null;
+		this.httpPlugin = null;
 	}
 
 	/**
@@ -178,7 +178,7 @@ public class HttpProvider implements IReturnedTypesProvider, IScriptable
 
 	protected URL createURLFromString(String url) throws MalformedURLException
 	{
-		return createURLFromString(url, access);
+		return createURLFromString(url, httpPlugin.getClientPluginAccess());
 	}
 
 	public static URL createURLFromString(String url, IClientPluginAccess access) throws MalformedURLException
@@ -713,7 +713,7 @@ public class HttpProvider implements IReturnedTypesProvider, IScriptable
 		{
 			client = getOrCreateHTTPclient(clientname, a_url);
 		}
-		return new PostRequest(a_url, client, access);
+		return new PostRequest(a_url, client, httpPlugin);
 	}
 
 	@Deprecated
@@ -743,7 +743,7 @@ public class HttpProvider implements IReturnedTypesProvider, IScriptable
 	 */
 	public HttpClient js_createNewHttpClient()
 	{
-		return new HttpClient(access);
+		return new HttpClient(httpPlugin);
 	}
 
 	/**

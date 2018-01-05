@@ -21,7 +21,6 @@ import org.apache.http.client.methods.HttpOptions;
 import org.apache.http.impl.client.DefaultHttpClient;
 
 import com.servoy.j2db.documentation.ServoyDocumented;
-import com.servoy.j2db.plugins.IClientPluginAccess;
 
 /**
  * @author pbakker
@@ -41,9 +40,9 @@ public class OptionsRequest extends BaseRequest
 		super();
 	}
 
-	public OptionsRequest(String url, DefaultHttpClient hc, IClientPluginAccess plugin)
+	public OptionsRequest(String url, DefaultHttpClient hc, HttpPlugin httpPlugin)
 	{
-		super(url, hc, new HttpOptions(url), plugin);
+		super(url, hc, new HttpOptions(url), httpPlugin);
 	}
 
 	/**
