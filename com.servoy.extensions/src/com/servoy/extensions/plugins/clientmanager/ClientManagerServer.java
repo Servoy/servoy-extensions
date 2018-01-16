@@ -77,7 +77,13 @@ public class ClientManagerServer implements IServerPlugin, IClientManagerService
 	@Override
 	public IClientInformation[] getConnectedClients()
 	{
-		return application.getConnectedClients();
+		IClientInformation[] connectedClients = application.getConnectedClients();
+		IClientInformation[] copy = new IClientInformation[connectedClients.length];
+		for (int i = 0; i < connectedClients.length; i++)
+		{
+			copy[i] = new ClientInfoCopy(connectedClients[i]);
+		}
+		return copy;
 	}
 
 	@Override
