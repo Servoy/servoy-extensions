@@ -18,6 +18,7 @@
 package com.servoy.extensions.plugins.clientmanager;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.Date;
 
 import com.servoy.j2db.server.shared.IClientInformation;
@@ -128,6 +129,14 @@ public class ClientInfoCopy implements IClientInformation, Serializable
 	public String[] getClientInfos()
 	{
 		return clientInfos;
+	}
+
+	@Override
+	public String toString()
+	{
+		return "CI:[clientID=" + clientID + ", hostIdentifier=" + hostIdentifier + ", hostName=" + hostName + ", hostAddress=" + hostAddress + ", userName=" +
+			userName + ", userUID=" + userUID + ", applicationType=" + applicationType + ", openSolutionName=" + openSolutionName + ", lastAccessedTime=" +
+			lastAccessedTime + ", idleTime=" + idleTime + ", loginTime=" + loginTime + ", clientInfos=" + Arrays.toString(clientInfos) + "]";
 	}
 
 }
