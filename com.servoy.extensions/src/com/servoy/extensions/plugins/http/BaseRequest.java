@@ -18,11 +18,14 @@
 package com.servoy.extensions.plugins.http;
 
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.apache.commons.codec.binary.Base64;
 import org.apache.http.HttpEntity;
+import org.apache.http.HttpHeaders;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.Credentials;
 import org.apache.http.auth.NTCredentials;
@@ -54,6 +57,7 @@ public abstract class BaseRequest implements IScriptable, IJavaScriptType
 	protected HttpContext context;
 	protected Map<String, String[]> headers;
 	private HttpPlugin httpPlugin;
+	protected boolean usePreemptiveAuthentication = false;
 
 	public BaseRequest()
 	{
@@ -167,6 +171,17 @@ public abstract class BaseRequest implements IScriptable, IJavaScriptType
 		}
 	}
 
+	/**
+	 * Whatever to use preemptive authentication (sending the credentials in the header, avoiding the server request to
+	 * the client - useful when uploading files, as some http servers would cancel the first request from the client, if too big,
+	 * as the authentication request to the client was not yet sent)
+	 * @param b
+	 */
+	public void js_usePreemptiveAuthentication(boolean b)
+	{
+		this.usePreemptiveAuthentication = b;
+	}
+
 	protected HttpEntity buildEntity() throws Exception
 	{
 		return null;
@@ -190,23 +205,33 @@ public abstract class BaseRequest implements IScriptable, IJavaScriptType
 
 		if (!Utils.stringIsEmpty(userName))
 		{
-			BasicCredentialsProvider bcp = new BasicCredentialsProvider();
-			URL _url = HttpProvider.createURLFromString(url, httpPlugin.getClientPluginAccess());
-			Credentials cred = null;
-			if (windowsAuthentication)
+			if (usePreemptiveAuthentication)
 			{
-				if (context == null)
-				{
-					context = new BasicHttpContext();
-				}
-				cred = new NTCredentials(userName, password, workstation, domain);
+				String auth = userName + ":" + password;
+				byte[] encodedAuth = Base64.encodeBase64(auth.getBytes(Charset.forName("ISO-8859-1")));
+				String authHeader = "Basic " + new String(encodedAuth);
+				method.setHeader(HttpHeaders.AUTHORIZATION, authHeader);
 			}
 			else
 			{
-				cred = new UsernamePasswordCredentials(userName, password);
+				BasicCredentialsProvider bcp = new BasicCredentialsProvider();
+				URL _url = HttpProvider.createURLFromString(url, httpPlugin.getClientPluginAccess());
+				Credentials cred = null;
+				if (windowsAuthentication)
+				{
+					if (context == null)
+					{
+						context = new BasicHttpContext();
+					}
+					cred = new NTCredentials(userName, password, workstation, domain);
+				}
+				else
+				{
+					cred = new UsernamePasswordCredentials(userName, password);
+				}
+				bcp.setCredentials(new AuthScope(_url.getHost(), _url.getPort()), cred);
+				client.setCredentialsProvider(bcp);
 			}
-			bcp.setCredentials(new AuthScope(_url.getHost(), _url.getPort()), cred);
-			client.setCredentialsProvider(bcp);
 		}
 
 		return new Response(client.execute(method, context));
