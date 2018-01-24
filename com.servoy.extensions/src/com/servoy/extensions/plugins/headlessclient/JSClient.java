@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executor;
 
+import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Function;
 import org.mozilla.javascript.Undefined;
 
@@ -113,6 +114,7 @@ public class JSClient implements IScriptable, IConstantsObject
 		{
 			public void run()
 			{
+				Context.enter();
 				try
 				{
 					Object retval = null;
@@ -167,6 +169,7 @@ public class JSClient implements IScriptable, IConstantsObject
 				}
 				finally
 				{
+					Context.exit();
 					synchronized (methodCalls)
 					{
 						methodCalls.remove(this);
