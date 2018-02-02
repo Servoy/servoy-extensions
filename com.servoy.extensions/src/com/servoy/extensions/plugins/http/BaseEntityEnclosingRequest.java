@@ -44,7 +44,6 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HTTP;
 
 import com.servoy.extensions.plugins.file.JSFile;
-import com.servoy.j2db.plugins.IClientPluginAccess;
 import com.servoy.j2db.util.Debug;
 import com.servoy.j2db.util.Pair;
 import com.servoy.j2db.util.Utils;
@@ -66,9 +65,9 @@ public class BaseEntityEnclosingRequest extends BaseRequest
 	{
 	}
 
-	public BaseEntityEnclosingRequest(String url, DefaultHttpClient hc, HttpRequestBase method, IClientPluginAccess plugin)
+	public BaseEntityEnclosingRequest(String url, DefaultHttpClient hc, HttpRequestBase method, HttpPlugin httpPlugin)
 	{
-		super(url, hc, method, plugin);
+		super(url, hc, method, httpPlugin);
 		clearFiles();
 	}
 
@@ -149,7 +148,8 @@ public class BaseEntityEnclosingRequest extends BaseRequest
 			}
 			else if (f instanceof JSFile)
 			{
-				entity = new InputStreamEntity(((JSFile)f).getAbstractFile().getInputStream(), ((JSFile)f).js_size(), ContentType.create("binary/octet-stream")); //$NON-NLS-1$
+				entity = new InputStreamEntity(((JSFile)f).getAbstractFile().getInputStream(), ((JSFile)f).js_size(),
+					ContentType.create("binary/octet-stream")); //$NON-NLS-1$
 			}
 			else
 			{
@@ -170,9 +170,8 @@ public class BaseEntityEnclosingRequest extends BaseRequest
 				}
 				else if (file instanceof JSFile)
 				{
-					((MultipartEntity)entity).addPart(e.getKey().getLeft(),
-						new ByteArrayBody(Utils.getBytesFromInputStream(((JSFile)file).getAbstractFile().getInputStream()), "binary/octet-stream",
-							((JSFile)file).js_getName()));
+					((MultipartEntity)entity).addPart(e.getKey().getLeft(), new ByteArrayBody(
+						Utils.getBytesFromInputStream(((JSFile)file).getAbstractFile().getInputStream()), "binary/octet-stream", ((JSFile)file).js_getName()));
 				}
 				else
 				{

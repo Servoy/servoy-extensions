@@ -21,7 +21,6 @@ import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.impl.client.DefaultHttpClient;
 
 import com.servoy.j2db.documentation.ServoyDocumented;
-import com.servoy.j2db.plugins.IClientPluginAccess;
 
 /**
  * @author pbakker
@@ -36,8 +35,8 @@ public class DeleteRequest extends BaseRequest
 		super();
 	}
 
-	public DeleteRequest(String url, DefaultHttpClient hc, IClientPluginAccess plugin)
+	public DeleteRequest(String url, DefaultHttpClient hc, HttpPlugin httpPlugin)
 	{
-		super(url, hc, new HttpDelete(url), plugin);
+		super(url, hc, new HttpDelete(url), httpPlugin);
 	}
 }

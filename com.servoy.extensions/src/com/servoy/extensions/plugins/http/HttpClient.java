@@ -57,15 +57,15 @@ public class HttpClient implements IScriptable, IJavaScriptType
 
 	private String proxyUser = null;
 	private String proxyPassword = null;
-	private final IClientPluginAccess plugin;
+	private final HttpPlugin httpPlugin;
 
-	public HttpClient(IClientPluginAccess plugin)
+	public HttpClient(HttpPlugin httpPlugin)
 	{
 		client = new DefaultHttpClient();
 		client.getParams().setParameter(ClientPNames.ALLOW_CIRCULAR_REDIRECTS, Boolean.TRUE);
 		client.getAuthSchemes().register(AuthPolicy.NTLM, new NTLMSchemeFactory());
 		client.getAuthSchemes().register(AuthPolicy.SPNEGO, new NegotiateSchemeFactory());
-		this.plugin = plugin;
+		this.httpPlugin = httpPlugin;
 
 
 		try
@@ -110,12 +110,13 @@ public class HttpClient implements IScriptable, IJavaScriptType
 						if (lastCertificates != null)
 						{
 							// allow for next time
-							if (HttpClient.this.plugin.getApplicationType() == IClientPluginAccess.CLIENT ||
-								HttpClient.this.plugin.getApplicationType() == IClientPluginAccess.RUNTIME)
+							if (HttpClient.this.httpPlugin.getClientPluginAccess().getApplicationType() == IClientPluginAccess.CLIENT ||
+								HttpClient.this.httpPlugin.getClientPluginAccess().getApplicationType() == IClientPluginAccess.RUNTIME)
 							{
 								// show dialog
 								CertificateDialog dialog = new CertificateDialog(
-									((ISmartRuntimeWindow)HttpClient.this.plugin.getCurrentRuntimeWindow()).getWindow(), remoteAddress, lastCertificates);
+									((ISmartRuntimeWindow)HttpClient.this.httpPlugin.getClientPluginAccess().getCurrentRuntimeWindow()).getWindow(),
+									remoteAddress, lastCertificates);
 								if (dialog.shouldAccept())
 								{
 									allowedCertTrustStrategy.add(lastCertificates);
@@ -324,7 +325,7 @@ public class HttpClient implements IScriptable, IJavaScriptType
 	public PostRequest js_createPostRequest(String url)
 	{
 		HttpProvider.setHttpClientProxy(client, url, proxyUser, proxyPassword);
-		return new PostRequest(url, client, plugin);
+		return new PostRequest(url, client, httpPlugin);
 	}
 
 	/**
@@ -347,7 +348,7 @@ public class HttpClient implements IScriptable, IJavaScriptType
 	public GetRequest js_createGetRequest(String url)
 	{
 		HttpProvider.setHttpClientProxy(client, url, proxyUser, proxyPassword);
-		return new GetRequest(url, client, plugin);
+		return new GetRequest(url, client, httpPlugin);
 	}
 
 	/**
@@ -365,7 +366,7 @@ public class HttpClient implements IScriptable, IJavaScriptType
 	public DeleteRequest js_createDeleteRequest(String url)
 	{
 		HttpProvider.setHttpClientProxy(client, url, proxyUser, proxyPassword);
-		return new DeleteRequest(url, client, plugin);
+		return new DeleteRequest(url, client, httpPlugin);
 	}
 
 	/**
@@ -382,7 +383,7 @@ public class HttpClient implements IScriptable, IJavaScriptType
 	public PatchRequest js_createPatchRequest(String url)
 	{
 		HttpProvider.setHttpClientProxy(client, url, proxyUser, proxyPassword);
-		return new PatchRequest(url, client, plugin);
+		return new PatchRequest(url, client, httpPlugin);
 	}
 
 	/**
@@ -399,7 +400,7 @@ public class HttpClient implements IScriptable, IJavaScriptType
 	public PutRequest js_createPutRequest(String url)
 	{
 		HttpProvider.setHttpClientProxy(client, url, proxyUser, proxyPassword);
-		return new PutRequest(url, client, plugin);
+		return new PutRequest(url, client, httpPlugin);
 	}
 
 	/**
@@ -415,7 +416,7 @@ public class HttpClient implements IScriptable, IJavaScriptType
 	public OptionsRequest js_createOptionsRequest(String url)
 	{
 		HttpProvider.setHttpClientProxy(client, url, proxyUser, proxyPassword);
-		return new OptionsRequest(url, client, plugin);
+		return new OptionsRequest(url, client, httpPlugin);
 	}
 
 	/**
@@ -433,7 +434,7 @@ public class HttpClient implements IScriptable, IJavaScriptType
 	public HeadRequest js_createHeadRequest(String url)
 	{
 		HttpProvider.setHttpClientProxy(client, url, proxyUser, proxyPassword);
-		return new HeadRequest(url, client, plugin);
+		return new HeadRequest(url, client, httpPlugin);
 	}
 
 	/**
@@ -450,7 +451,7 @@ public class HttpClient implements IScriptable, IJavaScriptType
 	public TraceRequest js_createTraceRequest(String url)
 	{
 		HttpProvider.setHttpClientProxy(client, url, proxyUser, proxyPassword);
-		return new TraceRequest(url, client, plugin);
+		return new TraceRequest(url, client, httpPlugin);
 	}
 
 	/**

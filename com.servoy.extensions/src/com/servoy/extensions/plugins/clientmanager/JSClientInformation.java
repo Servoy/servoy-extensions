@@ -182,4 +182,11 @@ public class JSClientInformation implements IScriptable
 	{
 		return clientInformation.getLastAccessedTime();
 	}
+
+	@Override
+	public String toString()
+	{
+		return "JSClientInformation [" + clientInformation + "]";
+	}
+
 }
