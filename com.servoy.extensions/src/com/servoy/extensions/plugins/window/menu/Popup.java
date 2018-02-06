@@ -179,4 +179,21 @@ public class Popup extends AbstractMenu
 			}
 		}
 	}
+
+	/**
+	 * Get/set the css class of the popup menu. This only works in NGClient
+	 *
+	 */
+	@ServoyClientSupport(ng = true, wc = false, sc = false)
+	public String js_getCssClass()
+	{
+		//implemented in ng only
+		return null;
+	}
+
+	public void js_setCssClass(String cssClsss)
+	{
+		//implemented in ng only
+	}
+
 }
