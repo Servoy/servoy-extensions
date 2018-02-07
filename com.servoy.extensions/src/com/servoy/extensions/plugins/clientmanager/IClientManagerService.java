@@ -3,6 +3,7 @@ package com.servoy.extensions.plugins.clientmanager;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
+import com.servoy.j2db.dataprocessing.JSDataSet;
 import com.servoy.j2db.server.shared.IClientInformation;
 
 public interface IClientManagerService extends Remote
@@ -24,5 +25,7 @@ public interface IClientManagerService extends Remote
 	void registerChannelListener(BroadcastInfo info) throws RemoteException;
 
 	boolean isInMaintenanceMode() throws RemoteException;
+
+	JSDataSet getLocks() throws RemoteException;
 
 }

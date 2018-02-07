@@ -9,11 +9,14 @@ import org.mozilla.javascript.Function;
 import org.mozilla.javascript.annotations.JSFunction;
 
 import com.servoy.base.scripting.annotations.ServoyClientSupport;
+import com.servoy.j2db.dataprocessing.JSDataSet;
+import com.servoy.j2db.dataprocessing.RowManager;
 import com.servoy.j2db.documentation.ServoyDocumented;
 import com.servoy.j2db.scripting.IReturnedTypesProvider;
 import com.servoy.j2db.scripting.IScriptable;
 import com.servoy.j2db.server.shared.IClientInformation;
 import com.servoy.j2db.util.Debug;
+import com.servoy.j2db.util.Utils;
 
 /**
  * @author gerzse
@@ -249,5 +252,64 @@ public class ClientManagerProvider implements IScriptable, IReturnedTypesProvide
 		{
 			Debug.error("Exception while shutting down client '" + clientId + "'.", e); //$NON-NLS-1$ //$NON-NLS-2$
 		}
+	}
+
+	/**
+	 *	Get a dataset will all locks on the server. The dataset will have four columns: datasource, acquireDate, clientId, pkHash.
+	 *	Each row in the dataset will be a lock.
+	 *
+	 *	@sample
+	 * 	var locks = plugins.clientmanager.getLocks();
+	 */
+	public JSDataSet js_getLocks()
+	{
+		try
+		{
+			return plugin.getClientService().getLocks();
+		}
+		catch (Exception e)
+		{
+			Debug.error("Exception while getting locks.", e); //$NON-NLS-1$
+		}
+		return new JSDataSet();
+	}
+
+	/**
+	 * Get client that locked the record from a specific datasource or null if record is not locked.
+	 *
+	 * @sample
+	 * var client = plugins.clientmanager.getLockedByClient(foundset.getDataSource(),record.getPKs());
+	 *
+	 * @param datasource
+	 * @param pks
+	 * @return Client information
+	 */
+	public JSClientInformation js_getLockedByClient(String datasource, Object[] pks)
+	{
+		try
+		{
+			JSDataSet locks = plugin.getClientService().getLocks();
+			if (locks != null && locks.js_getMaxRowIndex() > 0)
+			{
+				IClientInformation[] connectedClients = plugin.getClientService().getConnectedClients();
+				for (int i = 1; i <= locks.js_getMaxRowIndex(); i++)
+				{
+					for (IClientInformation connectedClient : connectedClients)
+					{
+						if (Utils.equalObjects(datasource, locks.getValue(i - 1, 0)) &&
+							Utils.equalObjects(connectedClient.getClientID(), locks.getValue(i - 1, 2)) &&
+							Utils.equalObjects(RowManager.createPKHashKey(pks), locks.getValue(i - 1, 3)))
+						{
+							return new JSClientInformation(connectedClient);
+						}
+					}
+				}
+			}
+		}
+		catch (Exception e)
+		{
+			Debug.error("Exception while finding locked by client.", e); //$NON-NLS-1$
+		}
+		return null;
 	}
 }

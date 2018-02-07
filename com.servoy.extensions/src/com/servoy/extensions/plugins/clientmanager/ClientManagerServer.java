@@ -7,6 +7,7 @@ import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import com.servoy.j2db.dataprocessing.JSDataSet;
 import com.servoy.j2db.plugins.IServerAccess;
 import com.servoy.j2db.plugins.IServerPlugin;
 import com.servoy.j2db.plugins.PluginException;
@@ -163,6 +164,12 @@ public class ClientManagerServer implements IServerPlugin, IClientManagerService
 				}
 			}
 		}
+	}
+
+	@Override
+	public JSDataSet getLocks() throws RemoteException
+	{
+		return application.getLocks();
 	}
 
 }
