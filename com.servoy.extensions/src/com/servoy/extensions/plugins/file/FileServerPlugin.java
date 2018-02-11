@@ -340,7 +340,8 @@ public class FileServerPlugin implements IServerPlugin, IFileService
 	{
 		if (defaultFolder == null)
 		{
-			throw new IOException("File Plugin is unloaded");
+			throw new IOException("File Plugin is unloaded because default folder (property: servoy.FileServerService.defaultFolder: " +
+				application.getSettings().getProperty(IFileService.DEFAULT_FOLDER_PROPERTY) + ") could not be used/created");
 		}
 		if (!application.isServerProcess(clientId) && !application.isAuthenticated(clientId))
 		{
