@@ -47,7 +47,8 @@ import com.servoy.j2db.util.Utils;
  */
 public class DataNotifyBroadCaster implements IServerPlugin
 {
-	public static final String EXCHANGE_NAME = "databroadcast";
+	private static final String EXCHANGE_NAME = "databroadcast";
+	private static final String ROUTING_KEY = "";
 	private static final String ORIGIN_SERVER_UUID = UUID.randomUUID().toString();
 
 	private Connection connection;
@@ -104,6 +105,10 @@ public class DataNotifyBroadCaster implements IServerPlugin
 			if (shutdownTimeout != null) factory.setShutdownTimeout(Utils.getAsInteger(shutdownTimeout));
 			String channelRpcTimeout = app.getSettings().getProperty("amqpbroadcaster.rpctimeout");
 			if (channelRpcTimeout != null) factory.setChannelRpcTimeout(Utils.getAsInteger(channelRpcTimeout));
+
+			String exchangeName = app.getSettings().getProperty("amqpbroadcaster.exchange", EXCHANGE_NAME);
+			String routingKey = app.getSettings().getProperty("amqpbroadcaster.routingkey", ROUTING_KEY);
+
 			try
 			{
 				final IDataNotifyService dataNotifyService = app.getDataNotifyService();
@@ -133,15 +138,15 @@ public class DataNotifyBroadCaster implements IServerPlugin
 				}
 				channel = connection.createChannel();
 
-				channel.exchangeDeclare(EXCHANGE_NAME, "fanout");
-
-				dataNotifyService.registerDataNotifyListener(new DataNotifyListener(ORIGIN_SERVER_UUID, channel, connection));
+				channel.exchangeDeclare(exchangeName, "fanout");
+				dataNotifyService.registerDataNotifyListener(new DataNotifyListener(ORIGIN_SERVER_UUID, channel, connection, exchangeName, routingKey));
 
 				String queueName = channel.queueDeclare().getQueue();
-				channel.queueBind(queueName, EXCHANGE_NAME, "");
+				channel.queueBind(queueName, exchangeName, routingKey);
 
 				Consumer consumer = new DefaultConsumer(channel)
 				{
+
 					@Override
 					public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException
 					{
@@ -196,6 +201,8 @@ public class DataNotifyBroadCaster implements IServerPlugin
 		req.put("amqpbroadcaster.virtualhost", "Set the virtual host of the AMQP (RabbitMQ) server where to connect to (default value is / )");
 		req.put("amqpbroadcaster.port",
 			"Set the port of the AMQP (RabbitMQ) server where to connect to (default value is 5671 for SSL connection and 5672 for default connection)");
+		req.put("amqpbroadcaster.exchange", "Set the exchange through which the databroadcast notifications are send (default value is databroadcast)");
+		req.put("amqpbroadcaster.routingkey", "Set the key for routing the databroadcast notifications (default to empty string)");
 		req.put("amqpbroadcaster.connectiontimeout", "Set the connection timeout of the AMQP (RabbitMQ) connection (default value 60000 - 60 seconds)");
 		req.put("amqpbroadcaster.handshaketimeout", "Set the handshake timeout of the AMQP (RabbitMQ) connection (default value 10000 - 10 seconds)");
 		req.put("amqpbroadcaster.shutdowntimeout", "Set the shutdown timeout of the AMQP (RabbitMQ) connection (default value 10000 - 10 seconds)");

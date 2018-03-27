@@ -33,7 +33,7 @@ import com.servoy.j2db.plugins.IDataNotifyListener;
 import com.servoy.j2db.util.Debug;
 
 /**
- * @author jcomp
+ * @author jcompagner
  *
  */
 public class DataNotifyListener implements IDataNotifyListener
@@ -41,14 +41,18 @@ public class DataNotifyListener implements IDataNotifyListener
 	private final Channel channel;
 	private final String originServerUUID;
 	private final List<byte[]> failedList = new ArrayList<>();
+	private final String exchangeName;
+	private final String routingKey;
 
 	/**
 	 * @param channel
 	 */
-	public DataNotifyListener(String originServerUUID, Channel channel, Connection connection)
+	public DataNotifyListener(String originServerUUID, Channel channel, Connection connection, String exchangeName, String routingKey)
 	{
 		this.originServerUUID = originServerUUID;
 		this.channel = channel;
+		this.exchangeName = exchangeName;
+		this.routingKey = routingKey;
 		if (connection instanceof RecoverableConnection)
 		{
 			((RecoverableConnection)connection).addRecoveryListener(new RecoveryListener()
@@ -129,7 +133,7 @@ public class DataNotifyListener implements IDataNotifyListener
 		}
 		try
 		{
-			channel.basicPublish(DataNotifyBroadCaster.EXCHANGE_NAME, "", null, bytes);
+			channel.basicPublish(exchangeName, routingKey, null, bytes);
 		}
 		catch (Exception e)
 		{
