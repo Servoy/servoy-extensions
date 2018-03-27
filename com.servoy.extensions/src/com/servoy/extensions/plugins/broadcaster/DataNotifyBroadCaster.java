@@ -195,7 +195,6 @@ public class DataNotifyBroadCaster implements IServerPlugin
 	public Map<String, String> getRequiredPropertyNames()
 	{
 		Map<String, String> req = new LinkedHashMap<String, String>();
-		req.put("amqpbroadcaster.username", "Set the username of the AMQP (RabbitMQ) server where to connect to (default value is guest)");
 		req.put("amqpbroadcaster.hostname", "Set the hostname of the AMQP (RabbitMQ) server where to connect to (this is mandatory field)");
 		req.put("amqpbroadcaster.username", "Set the username of the AMQP (RabbitMQ) server where to connect to (default value is guest)");
 		req.put("amqpbroadcaster.password", "Set the password of the AMQP (RabbitMQ) server where to connect to (default value is guest)");
