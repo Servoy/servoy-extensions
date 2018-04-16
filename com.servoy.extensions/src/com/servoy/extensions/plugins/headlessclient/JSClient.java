@@ -267,7 +267,7 @@ public class JSClient implements IScriptable, IConstantsObject
 	 */
 	public void js_shutdown(final boolean force)
 	{
-		plugin.getPluginAccess().getExecutor().execute(new Runnable()
+		new Thread(new Runnable()
 		{
 			@Override
 			public void run()
@@ -285,7 +285,7 @@ public class JSClient implements IScriptable, IConstantsObject
 					/* if (! */js_isValid()/* ) clientPool.remove(clientID) */; // js_isValid() already removes it from the pool if invalid
 				}
 			}
-		});
+		}, "JSClient shutdown: " + js_getClientID() + " by client :" + plugin.getPluginAccess().getClientID()).start();
 	}
 
 	/**
