@@ -20,11 +20,10 @@ import javax.servlet.http.Cookie;
 
 import org.mozilla.javascript.annotations.JSFunction;
 
-import com.servoy.extensions.plugins.headlessclient.HeadlessClientPlugin;
 import com.servoy.j2db.documentation.ServoyDocumented;
 import com.servoy.j2db.scripting.IScriptable;
 
-@ServoyDocumented(publicName = HeadlessClientPlugin.PLUGIN_NAME, scriptingName = "plugins." + HeadlessClientPlugin.PLUGIN_NAME)
+@ServoyDocumented(publicName = RestWSClientPlugin.PLUGIN_NAME, scriptingName = "plugins." + RestWSClientPlugin.PLUGIN_NAME)
 public class RestWSClientProvider implements IScriptable
 {
 	private final RestWSClientPlugin plugin;
