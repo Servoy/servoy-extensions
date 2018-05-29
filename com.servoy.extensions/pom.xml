@@ -23,9 +23,8 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.compiler.source>1.7</maven.compiler.source>
 		<maven.compiler.target>1.7</maven.compiler.target>
-		<servoy-repo.url>
-			http://download.eclipse.org/eclipse/updates/4.8milestones/S-4.8M6-201803080630/</servoy-repo.url>
-		<servoy-shiplibs.url>http://developer.servoy.com/p2_repository/ship_plugins/</servoy-shiplibs.url>
+		<servoy-repo.url>http://download.eclipse.org/eclipse/updates/4.8milestones/S-4.8RC2-201805240900/</servoy-repo.url>
+		<servoy-shiplibs.url>http://developer.servoy.com/p2_repository/ship_plugins84/</servoy-shiplibs.url>
 		<workspace_dir>${project.basedir}/../</workspace_dir>
 		<servoy-local.url>${project.baseUri}/target/repository/</servoy-local.url>
 	</properties>
@@ -162,6 +161,11 @@
 								<dependency>
 									<groupId>com.servoy</groupId>
 									<artifactId>org.eclipse.dltk.javascript.rhino</artifactId>
+									<type>eclipse-plugin</type>
+								</dependency>
+								<dependency>
+									<groupId>org.eclipse.osgi</groupId>
+									<artifactId>org.eclipse.osgi.compatibility.state</artifactId>
 									<type>eclipse-plugin</type>
 								</dependency>
 							</dependencies>
