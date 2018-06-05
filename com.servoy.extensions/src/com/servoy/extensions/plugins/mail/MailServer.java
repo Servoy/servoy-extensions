@@ -219,7 +219,7 @@ public class MailServer implements IMailService, IServerPlugin
 		message.setSentDate(new Date());
 		String overrideAddress = properties.getProperty("mail.development.override.address");
 		String overrideFeedback = null;
-		if (overrideAddress != null)
+		if (overrideAddress != null && !overrideAddress.trim().isEmpty())
 		{
 			addRecipients(message, overrideAddress, Message.RecipientType.TO);
 			overrideFeedback = " (Override: TO=" + to + ", CC: " + (cc == null ? "" : cc) + ", BCC: " + (bcc == null ? "" : bcc) + ")";
