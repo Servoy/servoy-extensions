@@ -30,6 +30,7 @@ import org.mozilla.javascript.NativeError;
 import org.mozilla.javascript.RhinoException;
 
 import com.servoy.extensions.plugins.headlessclient.ServerPluginDispatcher.Call;
+import com.servoy.j2db.ExitScriptException;
 import com.servoy.j2db.IServiceProvider;
 import com.servoy.j2db.persistence.Solution;
 import com.servoy.j2db.plugins.IServerAccess;
@@ -300,6 +301,7 @@ public class HeadlessServerPlugin implements IHeadlessServer, IServerPlugin
 			}
 			catch (JavaScriptException jse)
 			{
+				if (jse.getValue() instanceof ExitScriptException) return null;
 				Debug.log(jse);
 				Object o = jse.getValue();
 				if (o instanceof NativeError)
@@ -310,6 +312,7 @@ public class HeadlessServerPlugin implements IHeadlessServer, IServerPlugin
 			}
 			catch (RhinoException e)
 			{
+				if (e.getCause() instanceof ExitScriptException) return null;
 				Debug.error(e);
 				// wrap it in a normal exception, else serializeable exceptions will happen.
 				throw new ExceptionWrapper(correctServerObject.getJSONConverter().convertToJSON(e.details()));
