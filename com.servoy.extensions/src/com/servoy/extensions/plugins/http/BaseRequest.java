@@ -143,7 +143,7 @@ public abstract class BaseRequest implements IScriptable, IJavaScriptType
 		}
 		catch (Exception ex)
 		{
-			Debug.error(ex);
+			logError(ex, userName, null, null);
 			return null;
 		}
 	}
@@ -166,7 +166,7 @@ public abstract class BaseRequest implements IScriptable, IJavaScriptType
 		}
 		catch (Exception ex)
 		{
-			Debug.error(ex);
+			logError(ex, userName, workstation, domain);
 			return null;
 		}
 	}
@@ -393,7 +393,7 @@ public abstract class BaseRequest implements IScriptable, IJavaScriptType
 				}
 				catch (final Exception ex)
 				{
-					Debug.error(ex);
+					logError(ex, username, workstation, domain);
 					if (errorFunctionDef != null)
 					{
 						callbackArgs[0] = ex.getMessage();
@@ -403,6 +403,12 @@ public abstract class BaseRequest implements IScriptable, IJavaScriptType
 			}
 		};
 		httpPlugin.getClientPluginAccess().getExecutor().execute(runnable);
+	}
+
+	private void logError(Exception ex, String username, String workstation, String domain)
+	{
+		Debug.error("Error executing a request to " + method.getURI() + " with method " + method.getMethod() + " with user: " + username + ", workstation: " +
+			workstation + ",domain: " + domain, ex);
 	}
 
 }
