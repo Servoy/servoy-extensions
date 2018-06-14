@@ -99,16 +99,15 @@ public class RestWSPlugin implements IServerPlugin
 		Map<String, String> req = new HashMap<String, String>();
 		req.put(CLIENT_POOL_SIZE_PROPERTY, "Max number of clients used (this defines the number of concurrent requests and licences used), default = " +
 			CLIENT_POOL_SIZE_DEFAULT + ", when running in developer this setting is ignored, pool size will always be 1");
-		req.put(CLIENT_POOL_EXCHAUSTED_ACTION_PROPERTY,
-			"The following values are supported for this property:\n" +
-				//
-				ACTION_BLOCK + " (default): requests will wait untill a client becomes available, when running in developer this value will be used\n" +
-				//
-				ACTION_FAIL + ": the request will fail. The API will generate a SERVICE_UNAVAILABLE response (HTTP " +
-				HttpServletResponse.SC_SERVICE_UNAVAILABLE + ")\n" +
-				//
-				ACTION_GROW +
-				": allows the pool to temporarily grow, by starting additional clients. These will be automatically removed when not required anymore.");
+		req.put(CLIENT_POOL_EXCHAUSTED_ACTION_PROPERTY, "The following values are supported for this property:\n" +
+			//
+			ACTION_BLOCK + " (default): requests will wait untill a client becomes available, when running in developer this value will be used\n" +
+			//
+			ACTION_FAIL + ": the request will fail. The API will generate a SERVICE_UNAVAILABLE response (HTTP " + HttpServletResponse.SC_SERVICE_UNAVAILABLE +
+			")\n" +
+			//
+			ACTION_GROW +
+			": allows the pool to temporarily grow, by starting additional clients. These will be automatically removed when not required anymore.");
 		req.put(AUTHORIZED_GROUPS_PROPERTY,
 			"Only authenticated users in the listed groups (comma-separated) have access, when left empty unauthorised access is allowed");
 
@@ -318,10 +317,13 @@ public class RestWSPlugin implements IServerPlugin
 					boolean solutionReopened = false;
 					try
 					{
-						client.closeSolution(true);
-						String[] arr = poolKey.split(":");
-						client.loadSolution(arr.length == 2 ? arr[0] : poolKey); // avoid the ":nodebug" part from the pool key...
-						solutionReopened = true;
+						if (client.isValid())
+						{
+							client.closeSolution(true);
+							String[] arr = poolKey.split(":");
+							client.loadSolution(arr.length == 2 ? arr[0] : poolKey); // avoid the ":nodebug" part from the pool key...
+							solutionReopened = true;
+						}
 					}
 					catch (Exception ex)
 					{
