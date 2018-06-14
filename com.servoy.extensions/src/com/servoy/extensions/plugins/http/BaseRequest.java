@@ -38,6 +38,7 @@ import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
 import org.mozilla.javascript.Function;
 
+import com.servoy.j2db.plugins.IClientPluginAccess;
 import com.servoy.j2db.scripting.FunctionDefinition;
 import com.servoy.j2db.scripting.IJavaScriptType;
 import com.servoy.j2db.scripting.IScriptable;
@@ -387,8 +388,16 @@ public abstract class BaseRequest implements IScriptable, IJavaScriptType
 
 					if (successFunctionDef != null)
 					{
-						callbackArgs[0] = response;
-						successFunctionDef.executeAsync(httpPlugin.getClientPluginAccess(), callbackArgs);
+						IClientPluginAccess access = httpPlugin.getClientPluginAccess();
+						if (access != null)
+						{
+							callbackArgs[0] = response;
+							successFunctionDef.executeAsync(access, callbackArgs);
+						}
+						else
+						{
+							Debug.log("Callback for request: " + method.getURI() + " was given: " + successFunctionDef + " but the client was already closed");
+						}
 					}
 				}
 				catch (final Exception ex)
@@ -396,8 +405,17 @@ public abstract class BaseRequest implements IScriptable, IJavaScriptType
 					logError(ex, username, workstation, domain);
 					if (errorFunctionDef != null)
 					{
-						callbackArgs[0] = ex.getMessage();
-						errorFunctionDef.executeAsync(httpPlugin.getClientPluginAccess(), callbackArgs);
+						IClientPluginAccess access = httpPlugin.getClientPluginAccess();
+						if (access != null)
+						{
+							callbackArgs[0] = ex.getMessage();
+							errorFunctionDef.executeAsync(access, callbackArgs);
+						}
+						else
+						{
+							Debug.log(
+								"Error callback for request: " + method.getURI() + " was given: " + errorFunctionDef + " but the client was already closed");
+						}
 					}
 				}
 			}
