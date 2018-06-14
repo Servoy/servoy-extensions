@@ -94,6 +94,20 @@ public class JSClient implements IScriptable, IConstantsObject
 	private final List<Runnable> methodCalls = new ArrayList<Runnable>();
 
 	/**
+	 * Queues a method call on the remote server (without a callback method).
+	 *
+	 * @sampleas js_shutdown()
+	 *
+	 * @param contextName The context of the given method, null if it is global method or a form name for a form method.
+	 * @param methodName The method name.
+	 * @param args The arguments that should be passed to the method.
+	 */
+	public void js_queueMethod(final String contextName, final String methodName, final Object[] args)
+	{
+		js_queueMethod(contextName, methodName, args, null);
+	}
+
+	/**
 	 * Queues a method call on the remote server. The callback method will be called when the method is executed on the server
 	 * and the return value is given as the JSEvent.data object with the JSEvent.getType() value of JSClient.CALLBACK_EVENT.
 	 * If an exception is thrown somewhere then the callback method will be called with
@@ -109,7 +123,7 @@ public class JSClient implements IScriptable, IConstantsObject
 	 */
 	public void js_queueMethod(final String contextName, final String methodName, final Object[] args, Function notifyCallBackMethod)
 	{
-		final FunctionDefinition functionDef = new FunctionDefinition(notifyCallBackMethod);
+		final FunctionDefinition functionDef = notifyCallBackMethod != null ? new FunctionDefinition(notifyCallBackMethod) : null;
 		Runnable runnable = new Runnable()
 		{
 			public void run()
@@ -133,38 +147,47 @@ public class JSClient implements IScriptable, IConstantsObject
 						}
 						retval = plugin.getJSONConverter().convertFromJSON(
 							headlessServer.executeMethod(clientID, contextName, methodName, convertedArgs, plugin.getPluginAccess().getClientID()));
-						JSEvent event = new JSEvent();
-						event.setType(CALLBACK_EVENT);
-						event.setData(retval);
-						// function def will not throw an exception.
-						functionDef.executeAsync(plugin.getPluginAccess(), new Object[] { event, JSClient.this });
+						if (functionDef != null)
+						{
+							JSEvent event = new JSEvent();
+							event.setType(CALLBACK_EVENT);
+							event.setData(retval);
+							// function def will not throw an exception.
+							functionDef.executeAsync(plugin.getPluginAccess(), new Object[] { event, JSClient.this });
+						}
 					}
 					catch (ExceptionWrapper ex)
 					{
 						Debug.log("Error calling method " + methodName + ", context: " + contextName + " on client " + clientID, ex); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-						JSEvent event = new JSEvent();
-						event.setType(CALLBACK_EXCEPTION_EVENT);
-						Object data = ex.getMessage();
-						try
+						if (functionDef != null)
 						{
-							// see catch JavaScriptException in headlessServer.executeMethod
-							data = plugin.getJSONConverter().convertFromJSON(data);
+							JSEvent event = new JSEvent();
+							event.setType(CALLBACK_EXCEPTION_EVENT);
+							Object data = ex.getMessage();
+							try
+							{
+								// see catch JavaScriptException in headlessServer.executeMethod
+								data = plugin.getJSONConverter().convertFromJSON(data);
+							}
+							catch (Exception e)
+							{
+								Debug.error(e);
+							}
+							event.setData(data);
+							functionDef.executeAsync(plugin.getPluginAccess(), new Object[] { event, JSClient.this });
 						}
-						catch (Exception e)
-						{
-							Debug.error(e);
-						}
-						event.setData(data);
-						functionDef.executeAsync(plugin.getPluginAccess(), new Object[] { event, JSClient.this });
 					}
 					catch (Exception ex)
 					{
 						Debug.log("Error calling method " + methodName + ", context: " + contextName + " on client " + clientID, ex); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-						JSEvent event = new JSEvent();
-						event.setType(CALLBACK_EXCEPTION_EVENT);
-						Object data = ex.getMessage();
-						event.setData(data);
-						functionDef.executeAsync(plugin.getPluginAccess(), new Object[] { event, JSClient.this });
+						if (functionDef != null)
+						{
+							JSEvent event = new JSEvent();
+							event.setType(CALLBACK_EXCEPTION_EVENT);
+							Object data = ex.getMessage();
+							event.setData(data);
+							functionDef.executeAsync(plugin.getPluginAccess(), new Object[] { event, JSClient.this });
+						}
 					}
 				}
 				finally
