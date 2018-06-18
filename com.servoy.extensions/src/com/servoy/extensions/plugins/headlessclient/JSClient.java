@@ -97,6 +97,7 @@ public class JSClient implements IScriptable, IConstantsObject
 	 * Queues a method call on the remote server, without a callback method.
 	 * Please note that calling queueMethod without a callback does not return anything: no result of the remote method or no exception if something went wrong.
 	 *
+	 * @sample
 	 * if (jsclient && jsclient.isValid())
 	 * {
 	 * 	var x = new Object();
