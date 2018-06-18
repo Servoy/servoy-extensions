@@ -426,7 +426,7 @@ public abstract class BaseRequest implements IScriptable, IJavaScriptType
 	private void logError(Exception ex, String username, String workstation, String domain)
 	{
 		Debug.error("Error executing a request to " + method.getURI() + " with method " + method.getMethod() + " with user: " + username + ", workstation: " +
-			workstation + ",domain: " + domain, ex);
+			workstation + ", domain: " + domain, ex);
 	}
 
 }
