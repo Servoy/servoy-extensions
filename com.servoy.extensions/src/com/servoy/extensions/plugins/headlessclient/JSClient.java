@@ -94,9 +94,17 @@ public class JSClient implements IScriptable, IConstantsObject
 	private final List<Runnable> methodCalls = new ArrayList<Runnable>();
 
 	/**
-	 * Queues a method call on the remote server (without a callback method).
+	 * Queues a method call on the remote server, without a callback method.
+	 * Please note that calling queueMethod without a callback does not return anything: no result of the remote method or no exception if something went wrong.
 	 *
-	 * @sampleas js_shutdown()
+	 * if (jsclient && jsclient.isValid())
+	 * {
+	 * 	var x = new Object();
+	 * 	x.name = 'remote1';
+	 * 	x.number = 10;
+	 * 	// this calls a 'remoteMethod' on the server as a global method, because the context (first argument is set to null), you can use a formname to call a form method
+	 * 	jsclient.queueMethod(null, "remoteMethod", [x]);
+	 * }
 	 *
 	 * @param contextName The context of the given method, null if it is global method or a form name for a form method.
 	 * @param methodName The method name.
