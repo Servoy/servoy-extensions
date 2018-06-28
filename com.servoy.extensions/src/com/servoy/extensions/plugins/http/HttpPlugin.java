@@ -64,13 +64,21 @@ public class HttpPlugin implements IClientPlugin
 	 */
 	public void unload() throws PluginException
 	{
+		closeClients();
+		access = null;
+		impl = null;
+	}
+
+	/**
+	 *
+	 */
+	private void closeClients()
+	{
 		for (HttpClient httpClient : openClients)
 		{
 			httpClient.client.close();
 		}
 		openClients.clear();
-		access = null;
-		impl = null;
 	}
 
 	public Properties getProperties()
@@ -128,14 +136,12 @@ public class HttpPlugin implements IClientPlugin
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
-	 */
 	public void propertyChange(PropertyChangeEvent evt)
 	{
-		// ignore
+		if ("solution".equals(evt.getPropertyName()) && evt.getNewValue() == null) //$NON-NLS-1$
+		{
+			closeClients();
+		}
 	}
 
 	public JSONConverter getJSONConverter()
