@@ -743,7 +743,9 @@ public class HttpProvider implements IReturnedTypesProvider, IScriptable
 	 */
 	public HttpClient js_createNewHttpClient()
 	{
-		return new HttpClient(httpPlugin);
+		HttpClient httpClient = new HttpClient(httpPlugin);
+		httpPlugin.clientCreated(httpClient);
+		return httpClient;
 	}
 
 	/**
@@ -955,5 +957,4 @@ public class HttpProvider implements IReturnedTypesProvider, IScriptable
 			}
 		}
 	}
-
 }
