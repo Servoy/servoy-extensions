@@ -20,6 +20,9 @@ import java.beans.PropertyChangeEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -44,6 +47,8 @@ public class HttpPlugin implements IClientPlugin
 
 	private final List<HttpClient> openClients = new ArrayList<>();
 
+	private final ExecutorService executor = Executors.newCachedThreadPool();
+
 	/*
 	 * @see IPlugin#load()
 	 */
@@ -67,6 +72,7 @@ public class HttpPlugin implements IClientPlugin
 		closeClients();
 		access = null;
 		impl = null;
+		executor.shutdownNow();
 	}
 
 	/**
@@ -167,6 +173,14 @@ public class HttpPlugin implements IClientPlugin
 	void clientCreated(HttpClient httpClient)
 	{
 		openClients.add(httpClient);
+	}
+
+	/**
+	 * @return
+	 */
+	public Executor getExecutor()
+	{
+		return executor;
 	}
 
 }
