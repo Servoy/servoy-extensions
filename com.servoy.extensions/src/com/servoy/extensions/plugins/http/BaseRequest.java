@@ -420,7 +420,7 @@ public abstract class BaseRequest implements IScriptable, IJavaScriptType
 				}
 			}
 		};
-		httpPlugin.getClientPluginAccess().getExecutor().execute(runnable);
+		httpPlugin.getExecutor().execute(runnable);
 	}
 
 	private void logError(Exception ex, String username, String workstation, String domain)

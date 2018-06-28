@@ -38,6 +38,7 @@ import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.impl.auth.NTLMSchemeFactory;
 import org.apache.http.impl.auth.NegotiateSchemeFactory;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 import org.apache.http.impl.cookie.BasicClientCookie;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
@@ -61,7 +62,9 @@ public class HttpClient implements IScriptable, IJavaScriptType
 
 	public HttpClient(HttpPlugin httpPlugin)
 	{
-		client = new DefaultHttpClient();
+		ThreadSafeClientConnManager manager = new ThreadSafeClientConnManager();
+		manager.setDefaultMaxPerRoute(5);
+		client = new DefaultHttpClient(manager);
 		client.getParams().setParameter(ClientPNames.ALLOW_CIRCULAR_REDIRECTS, Boolean.TRUE);
 		client.getAuthSchemes().register(AuthPolicy.NTLM, new NTLMSchemeFactory());
 		client.getAuthSchemes().register(AuthPolicy.SPNEGO, new NegotiateSchemeFactory());
@@ -149,6 +152,15 @@ public class HttpClient implements IScriptable, IJavaScriptType
 		{
 			Debug.error("Can't register a https scheme", e); //$NON-NLS-1$
 		}
+	}
+
+	/**
+	 * releases all resources that this client has, should be called after usage.
+	 */
+	public void js_close()
+	{
+		client.close();
+		httpPlugin.clientClosed(this);
 	}
 
 	/**
