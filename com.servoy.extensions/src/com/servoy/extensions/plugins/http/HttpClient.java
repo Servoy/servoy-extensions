@@ -155,6 +155,15 @@ public class HttpClient implements IScriptable, IJavaScriptType
 	}
 
 	/**
+	 * releases all resources that this client has, should be called after usage.
+	 */
+	public void js_close()
+	{
+		client.close();
+		httpPlugin.clientClosed(this);
+	}
+
+	/**
 	 * Sets a timeout in milliseconds for retrieving of data (when 0 there is no timeout).
 	 *
 	 * @sample

@@ -17,6 +17,8 @@
 package com.servoy.extensions.plugins.http;
 
 import java.beans.PropertyChangeEvent;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 import javax.swing.Icon;
@@ -40,6 +42,8 @@ public class HttpPlugin implements IClientPlugin
 	private HttpProvider impl;
 	private JSONConverter jsonConverter;
 
+	private final List<HttpClient> openClients = new ArrayList<>();
+
 	/*
 	 * @see IPlugin#load()
 	 */
@@ -60,6 +64,11 @@ public class HttpPlugin implements IClientPlugin
 	 */
 	public void unload() throws PluginException
 	{
+		for (HttpClient httpClient : openClients)
+		{
+			httpClient.client.close();
+		}
+		openClients.clear();
 		access = null;
 		impl = null;
 	}
@@ -136,6 +145,22 @@ public class HttpPlugin implements IClientPlugin
 			jsonConverter = new JSONConverter(getClientPluginAccess().getDatabaseManager());
 		}
 		return jsonConverter;
+	}
+
+	/**
+	 * @param httpClient
+	 */
+	void clientClosed(HttpClient httpClient)
+	{
+		openClients.remove(httpClient);
+	}
+
+	/**
+	 * @param httpClient
+	 */
+	void clientCreated(HttpClient httpClient)
+	{
+		openClients.add(httpClient);
 	}
 
 }
