@@ -17,6 +17,7 @@
 package com.servoy.extensions.plugins.http;
 
 import java.beans.PropertyChangeEvent;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -32,6 +33,7 @@ import com.servoy.j2db.plugins.IClientPluginAccess;
 import com.servoy.j2db.plugins.PluginException;
 import com.servoy.j2db.preference.PreferencePanel;
 import com.servoy.j2db.scripting.IScriptable;
+import com.servoy.j2db.util.Debug;
 import com.servoy.j2db.util.serialize.JSONConverter;
 
 /**
@@ -82,7 +84,14 @@ public class HttpPlugin implements IClientPlugin
 	{
 		for (HttpClient httpClient : openClients)
 		{
-			httpClient.client.close();
+			try
+			{
+				httpClient.client.close();
+			}
+			catch (IOException e)
+			{
+				Debug.error(e);
+			}
 		}
 		openClients.clear();
 	}

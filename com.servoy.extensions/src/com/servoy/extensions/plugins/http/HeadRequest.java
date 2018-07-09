@@ -17,8 +17,10 @@
 
 package com.servoy.extensions.plugins.http;
 
+import org.apache.http.client.config.RequestConfig.Builder;
 import org.apache.http.client.methods.HttpHead;
-import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.impl.client.CloseableHttpClient;
 
 import com.servoy.j2db.documentation.ServoyDocumented;
 
@@ -35,8 +37,9 @@ public class HeadRequest extends BaseRequest
 		super();
 	}
 
-	public HeadRequest(String url, DefaultHttpClient hc, HttpPlugin httpPlugin)
+	public HeadRequest(String url, CloseableHttpClient hc, HttpPlugin httpPlugin, Builder requestConfigBuilder,
+		BasicCredentialsProvider proxyCredentialsProvider)
 	{
-		super(url, hc, new HttpHead(url), httpPlugin);
+		super(url, hc, new HttpHead(url), httpPlugin, requestConfigBuilder, proxyCredentialsProvider);
 	}
 }
