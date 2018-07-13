@@ -28,6 +28,7 @@ import java.util.Map.Entry;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
+import org.apache.http.client.config.RequestConfig.Builder;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.entity.ContentType;
@@ -35,11 +36,12 @@ import org.apache.http.entity.FileEntity;
 import org.apache.http.entity.InputStreamEntity;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.entity.mime.HttpMultipartMode;
-import org.apache.http.entity.mime.MultipartEntity;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.entity.mime.content.ByteArrayBody;
 import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.entity.mime.content.StringBody;
-import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HTTP;
 
@@ -65,9 +67,10 @@ public class BaseEntityEnclosingRequest extends BaseRequest
 	{
 	}
 
-	public BaseEntityEnclosingRequest(String url, DefaultHttpClient hc, HttpRequestBase method, HttpPlugin httpPlugin)
+	public BaseEntityEnclosingRequest(String url, CloseableHttpClient hc, HttpRequestBase method, HttpPlugin httpPlugin, Builder requestConfigBuilder,
+		BasicCredentialsProvider proxyCredentialsProvider)
 	{
-		super(url, hc, method, httpPlugin);
+		super(url, hc, method, httpPlugin, requestConfigBuilder, proxyCredentialsProvider);
 		clearFiles();
 	}
 
@@ -135,7 +138,7 @@ public class BaseEntityEnclosingRequest extends BaseRequest
 			}
 			else if (!Utils.stringIsEmpty(content))
 			{
-				entity = new StringEntity(content, mimeType, charset);
+				entity = new StringEntity(content, ContentType.create(mimeType, charset));
 				content = null;
 			}
 		}
@@ -158,7 +161,8 @@ public class BaseEntityEnclosingRequest extends BaseRequest
 		}
 		else
 		{
-			entity = new MultipartEntity(HttpMultipartMode.BROWSER_COMPATIBLE);
+			MultipartEntityBuilder builder = MultipartEntityBuilder.create();
+			builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
 
 			// For File parameters
 			for (Entry<Pair<String, String>, Object> e : files.entrySet())
@@ -166,19 +170,18 @@ public class BaseEntityEnclosingRequest extends BaseRequest
 				Object file = e.getValue();
 				if (file instanceof File)
 				{
-					((MultipartEntity)entity).addPart(e.getKey().getLeft(), new FileBody((File)file));
+					builder.addPart(e.getKey().getLeft(), new FileBody((File)file));
 				}
 				else if (file instanceof JSFile)
 				{
-					((MultipartEntity)entity).addPart(e.getKey().getLeft(), new ByteArrayBody(
-						Utils.getBytesFromInputStream(((JSFile)file).getAbstractFile().getInputStream()), "binary/octet-stream", ((JSFile)file).js_getName()));
+					builder.addPart(e.getKey().getLeft(), new ByteArrayBody(Utils.getBytesFromInputStream(((JSFile)file).getAbstractFile().getInputStream()),
+						ContentType.create("binary/octet-stream"), ((JSFile)file).js_getName()));
 				}
 				else
 				{
 					Debug.error("could not add file to post request unknown type: " + file);
 				}
 			}
-
 			// add the parameters
 			if (params != null)
 			{
@@ -187,9 +190,10 @@ public class BaseEntityEnclosingRequest extends BaseRequest
 				{
 					NameValuePair nvp = it.next();
 					// For usual String parameters
-					((MultipartEntity)entity).addPart(nvp.getName(), new StringBody(nvp.getValue(), "text/plain", Charset.forName(charset)));
+					builder.addPart(nvp.getName(), new StringBody(nvp.getValue(), ContentType.create("text/plain", Charset.forName(charset))));
 				}
 			}
+			entity = builder.build();
 		}
 
 		// entity may have been set already, see PutRequest.js_setFile

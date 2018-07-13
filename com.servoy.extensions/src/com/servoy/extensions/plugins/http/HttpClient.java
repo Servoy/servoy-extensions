@@ -18,30 +18,26 @@
 package com.servoy.extensions.plugins.http;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.net.UnknownHostException;
 import java.security.cert.X509Certificate;
 import java.sql.Date;
+import java.util.ArrayList;
 import java.util.List;
 
+import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLPeerUnverifiedException;
-import javax.net.ssl.SSLSocket;
 
-import org.apache.http.client.params.AuthPolicy;
-import org.apache.http.client.params.ClientPNames;
-import org.apache.http.conn.ConnectTimeoutException;
-import org.apache.http.conn.scheme.Scheme;
-import org.apache.http.conn.ssl.SSLSocketFactory;
-import org.apache.http.impl.auth.NTLMSchemeFactory;
-import org.apache.http.impl.auth.NegotiateSchemeFactory;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
+import org.apache.http.client.CookieStore;
+import org.apache.http.client.config.AuthSchemes;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.config.RequestConfig.Builder;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.impl.client.BasicCookieStore;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.cookie.BasicClientCookie;
-import org.apache.http.params.HttpConnectionParams;
-import org.apache.http.params.HttpParams;
+import org.apache.http.ssl.SSLContexts;
 
 import com.servoy.j2db.documentation.ServoyDocumented;
 import com.servoy.j2db.plugins.IClientPluginAccess;
@@ -54,58 +50,45 @@ import com.servoy.j2db.util.Utils;
 @ServoyDocumented
 public class HttpClient implements IScriptable, IJavaScriptType
 {
-	DefaultHttpClient client;
-
-	private String proxyUser = null;
-	private String proxyPassword = null;
+	CloseableHttpClient client;
+	CookieStore cookieStore;
+	Builder requestConfigBuilder;
 	private final HttpPlugin httpPlugin;
+	private String proxyUser;
+	private String proxyPassword;
 
 	public HttpClient(HttpPlugin httpPlugin)
 	{
-		ThreadSafeClientConnManager manager = new ThreadSafeClientConnManager();
-		manager.setDefaultMaxPerRoute(5);
-		client = new DefaultHttpClient(manager);
-		client.getParams().setParameter(ClientPNames.ALLOW_CIRCULAR_REDIRECTS, Boolean.TRUE);
-		client.getAuthSchemes().register(AuthPolicy.NTLM, new NTLMSchemeFactory());
-		client.getAuthSchemes().register(AuthPolicy.SPNEGO, new NegotiateSchemeFactory());
 		this.httpPlugin = httpPlugin;
 
+		HttpClientBuilder builder = HttpClientBuilder.create();
+		requestConfigBuilder = RequestConfig.custom();
+		requestConfigBuilder.setCircularRedirectsAllowed(true);
+		builder.setMaxConnPerRoute(5);
+
+		ArrayList<String> authPrefs = new ArrayList<String>();
+		authPrefs.add(AuthSchemes.NTLM);
+		authPrefs.add(AuthSchemes.SPNEGO);
+		requestConfigBuilder.setProxyPreferredAuthSchemes(authPrefs);
+		requestConfigBuilder.setTargetPreferredAuthSchemes(authPrefs);
+
+		cookieStore = new BasicCookieStore();
+		builder.setDefaultCookieStore(cookieStore);
 
 		try
 		{
 			final AllowedCertTrustStrategy allowedCertTrustStrategy = new AllowedCertTrustStrategy();
-			SSLSocketFactory sf = new SSLSocketFactory(allowedCertTrustStrategy)
+			SSLContext sslContext = SSLContexts.custom().loadTrustMaterial(allowedCertTrustStrategy).build();
+
+			SSLConnectionSocketFactory socketFactory = new SSLConnectionSocketFactory(sslContext)
 			{
 				@Override
-				public Socket connectSocket(Socket socket, InetSocketAddress remoteAddress, InetSocketAddress localAddress, HttpParams params)
-					throws IOException, UnknownHostException, ConnectTimeoutException
+				public Socket connectSocket(int connectTimeout, Socket socket, org.apache.http.HttpHost host, InetSocketAddress remoteAddress,
+					InetSocketAddress localAddress, org.apache.http.protocol.HttpContext context) throws IOException
 				{
-					if (socket instanceof SSLSocket)
-					{
-						try
-						{
-							Method s = socket.getClass().getMethod("setHost", String.class);
-							s.invoke(socket, remoteAddress.getHostName());
-						}
-						catch (NoSuchMethodException ex)
-						{
-						}
-						catch (IllegalAccessException ex)
-						{
-						}
-						catch (InvocationTargetException ex)
-						{
-						}
-						catch (IllegalArgumentException ex)
-						{
-						}
-						catch (SecurityException ex)
-						{
-						}
-					}
 					try
 					{
-						return super.connectSocket(socket, remoteAddress, localAddress, params);
+						return super.connectSocket(connectTimeout, socket, host, remoteAddress, localAddress, context);
 					}
 					catch (SSLPeerUnverifiedException ex)
 					{
@@ -124,7 +107,7 @@ public class HttpClient implements IScriptable, IJavaScriptType
 								{
 									allowedCertTrustStrategy.add(lastCertificates);
 									// try it again now with the new chain.
-									return super.connectSocket(socket, remoteAddress, localAddress, params);
+									return super.connectSocket(connectTimeout, socket, host, remoteAddress, localAddress, context);
 								}
 							}
 							else
@@ -142,16 +125,16 @@ public class HttpClient implements IScriptable, IJavaScriptType
 						// always just clear the last request.
 						allowedCertTrustStrategy.getAndClearLastCertificates();
 					}
-
 				}
 			};
-			Scheme https = new Scheme("https", 443, sf); //$NON-NLS-1$
-			client.getConnectionManager().getSchemeRegistry().register(https);
+			builder.setSSLSocketFactory(socketFactory);
 		}
-		catch (Exception e)
+		catch (Exception ex)
 		{
-			Debug.error("Can't register a https scheme", e); //$NON-NLS-1$
+			Debug.error("Can't set up ssl socket factory", ex); //$NON-NLS-1$
 		}
+
+		client = builder.build();
 	}
 
 	/**
@@ -159,8 +142,15 @@ public class HttpClient implements IScriptable, IJavaScriptType
 	 */
 	public void js_close()
 	{
-		client.close();
-		httpPlugin.clientClosed(this);
+		try
+		{
+			client.close();
+			httpPlugin.clientClosed(this);
+		}
+		catch (IOException e)
+		{
+			Debug.error(e);
+		}
 	}
 
 	/**
@@ -173,9 +163,8 @@ public class HttpClient implements IScriptable, IJavaScriptType
 	 */
 	public void js_setTimeout(int timeout)
 	{
-		HttpParams params = client.getParams();
-		HttpConnectionParams.setConnectionTimeout(params, timeout);
-		HttpConnectionParams.setSoTimeout(params, timeout);
+		requestConfigBuilder.setSocketTimeout(timeout);
+		requestConfigBuilder.setConnectTimeout(timeout);
 	}
 
 	/**
@@ -271,7 +260,7 @@ public class HttpClient implements IScriptable, IJavaScriptType
 			cookie.setSecure(secure);
 		}
 		cookie.setDomain(domain);
-		client.getCookieStore().addCookie(cookie);
+		cookieStore.addCookie(cookie);
 		return true;
 	}
 
@@ -291,7 +280,7 @@ public class HttpClient implements IScriptable, IJavaScriptType
 	 */
 	public Cookie js_getCookie(String cookieName)
 	{
-		List<org.apache.http.cookie.Cookie> cookies = client.getCookieStore().getCookies();
+		List<org.apache.http.cookie.Cookie> cookies = cookieStore.getCookies();
 		for (org.apache.http.cookie.Cookie element : cookies)
 		{
 			if (element.getName().equals(cookieName)) return new com.servoy.extensions.plugins.http.Cookie(element);
@@ -307,7 +296,7 @@ public class HttpClient implements IScriptable, IJavaScriptType
 	 */
 	public Cookie[] js_getCookies()
 	{
-		List<org.apache.http.cookie.Cookie> cookies = client.getCookieStore().getCookies();
+		List<org.apache.http.cookie.Cookie> cookies = cookieStore.getCookies();
 		Cookie[] cookieObjects = new Cookie[cookies.size()];
 		for (int i = 0; i < cookies.size(); i++)
 		{
@@ -336,8 +325,8 @@ public class HttpClient implements IScriptable, IJavaScriptType
 	 */
 	public PostRequest js_createPostRequest(String url)
 	{
-		HttpProvider.setHttpClientProxy(client, url, proxyUser, proxyPassword);
-		return new PostRequest(url, client, httpPlugin);
+		return new PostRequest(url, client, httpPlugin, requestConfigBuilder,
+			HttpProvider.setHttpClientProxy(requestConfigBuilder, url, proxyUser, proxyPassword));
 	}
 
 	/**
@@ -359,8 +348,8 @@ public class HttpClient implements IScriptable, IJavaScriptType
 	 */
 	public GetRequest js_createGetRequest(String url)
 	{
-		HttpProvider.setHttpClientProxy(client, url, proxyUser, proxyPassword);
-		return new GetRequest(url, client, httpPlugin);
+		return new GetRequest(url, client, httpPlugin, requestConfigBuilder,
+			HttpProvider.setHttpClientProxy(requestConfigBuilder, url, proxyUser, proxyPassword));
 	}
 
 	/**
@@ -377,8 +366,8 @@ public class HttpClient implements IScriptable, IJavaScriptType
 	 */
 	public DeleteRequest js_createDeleteRequest(String url)
 	{
-		HttpProvider.setHttpClientProxy(client, url, proxyUser, proxyPassword);
-		return new DeleteRequest(url, client, httpPlugin);
+		return new DeleteRequest(url, client, httpPlugin, requestConfigBuilder,
+			HttpProvider.setHttpClientProxy(requestConfigBuilder, url, proxyUser, proxyPassword));
 	}
 
 	/**
@@ -394,8 +383,8 @@ public class HttpClient implements IScriptable, IJavaScriptType
 	 */
 	public PatchRequest js_createPatchRequest(String url)
 	{
-		HttpProvider.setHttpClientProxy(client, url, proxyUser, proxyPassword);
-		return new PatchRequest(url, client, httpPlugin);
+		return new PatchRequest(url, client, httpPlugin, requestConfigBuilder,
+			HttpProvider.setHttpClientProxy(requestConfigBuilder, url, proxyUser, proxyPassword));
 	}
 
 	/**
@@ -411,8 +400,8 @@ public class HttpClient implements IScriptable, IJavaScriptType
 	 */
 	public PutRequest js_createPutRequest(String url)
 	{
-		HttpProvider.setHttpClientProxy(client, url, proxyUser, proxyPassword);
-		return new PutRequest(url, client, httpPlugin);
+		return new PutRequest(url, client, httpPlugin, requestConfigBuilder,
+			HttpProvider.setHttpClientProxy(requestConfigBuilder, url, proxyUser, proxyPassword));
 	}
 
 	/**
@@ -427,8 +416,8 @@ public class HttpClient implements IScriptable, IJavaScriptType
 	 */
 	public OptionsRequest js_createOptionsRequest(String url)
 	{
-		HttpProvider.setHttpClientProxy(client, url, proxyUser, proxyPassword);
-		return new OptionsRequest(url, client, httpPlugin);
+		return new OptionsRequest(url, client, httpPlugin, requestConfigBuilder,
+			HttpProvider.setHttpClientProxy(requestConfigBuilder, url, proxyUser, proxyPassword));
 	}
 
 	/**
@@ -445,8 +434,8 @@ public class HttpClient implements IScriptable, IJavaScriptType
 	 */
 	public HeadRequest js_createHeadRequest(String url)
 	{
-		HttpProvider.setHttpClientProxy(client, url, proxyUser, proxyPassword);
-		return new HeadRequest(url, client, httpPlugin);
+		return new HeadRequest(url, client, httpPlugin, requestConfigBuilder,
+			HttpProvider.setHttpClientProxy(requestConfigBuilder, url, proxyUser, proxyPassword));
 	}
 
 	/**
@@ -462,8 +451,8 @@ public class HttpClient implements IScriptable, IJavaScriptType
 	 */
 	public TraceRequest js_createTraceRequest(String url)
 	{
-		HttpProvider.setHttpClientProxy(client, url, proxyUser, proxyPassword);
-		return new TraceRequest(url, client, httpPlugin);
+		return new TraceRequest(url, client, httpPlugin, requestConfigBuilder,
+			HttpProvider.setHttpClientProxy(requestConfigBuilder, url, proxyUser, proxyPassword));
 	}
 
 	/**

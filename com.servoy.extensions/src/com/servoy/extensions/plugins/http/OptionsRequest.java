@@ -17,8 +17,10 @@
 
 package com.servoy.extensions.plugins.http;
 
+import org.apache.http.client.config.RequestConfig.Builder;
 import org.apache.http.client.methods.HttpOptions;
-import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.impl.client.CloseableHttpClient;
 
 import com.servoy.j2db.documentation.ServoyDocumented;
 
@@ -40,9 +42,10 @@ public class OptionsRequest extends BaseRequest
 		super();
 	}
 
-	public OptionsRequest(String url, DefaultHttpClient hc, HttpPlugin httpPlugin)
+	public OptionsRequest(String url, CloseableHttpClient hc, HttpPlugin httpPlugin, Builder requestConfigBuilder,
+		BasicCredentialsProvider proxyCredentialsProvider)
 	{
-		super(url, hc, new HttpOptions(url), httpPlugin);
+		super(url, hc, new HttpOptions(url), httpPlugin, requestConfigBuilder, proxyCredentialsProvider);
 	}
 
 	/**
