@@ -17,7 +17,13 @@
 package com.servoy.extensions.plugins.http;
 
 import java.beans.PropertyChangeEvent;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -27,6 +33,7 @@ import com.servoy.j2db.plugins.IClientPluginAccess;
 import com.servoy.j2db.plugins.PluginException;
 import com.servoy.j2db.preference.PreferencePanel;
 import com.servoy.j2db.scripting.IScriptable;
+import com.servoy.j2db.util.Debug;
 import com.servoy.j2db.util.serialize.JSONConverter;
 
 /**
@@ -39,6 +46,10 @@ public class HttpPlugin implements IClientPlugin
 	private IClientPluginAccess access;
 	private HttpProvider impl;
 	private JSONConverter jsonConverter;
+
+	private final List<HttpClient> openClients = new ArrayList<>();
+
+	private final ExecutorService executor = Executors.newCachedThreadPool();
 
 	/*
 	 * @see IPlugin#load()
@@ -60,8 +71,29 @@ public class HttpPlugin implements IClientPlugin
 	 */
 	public void unload() throws PluginException
 	{
+		closeClients();
 		access = null;
 		impl = null;
+		executor.shutdownNow();
+	}
+
+	/**
+	 *
+	 */
+	private void closeClients()
+	{
+		for (HttpClient httpClient : openClients)
+		{
+			try
+			{
+				httpClient.client.close();
+			}
+			catch (IOException e)
+			{
+				Debug.error(e);
+			}
+		}
+		openClients.clear();
 	}
 
 	public Properties getProperties()
@@ -119,14 +151,12 @@ public class HttpPlugin implements IClientPlugin
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
-	 */
 	public void propertyChange(PropertyChangeEvent evt)
 	{
-		// ignore
+		if ("solution".equals(evt.getPropertyName()) && evt.getNewValue() == null) //$NON-NLS-1$
+		{
+			closeClients();
+		}
 	}
 
 	public JSONConverter getJSONConverter()
@@ -136,6 +166,30 @@ public class HttpPlugin implements IClientPlugin
 			jsonConverter = new JSONConverter(getClientPluginAccess().getDatabaseManager());
 		}
 		return jsonConverter;
+	}
+
+	/**
+	 * @param httpClient
+	 */
+	void clientClosed(HttpClient httpClient)
+	{
+		openClients.remove(httpClient);
+	}
+
+	/**
+	 * @param httpClient
+	 */
+	void clientCreated(HttpClient httpClient)
+	{
+		openClients.add(httpClient);
+	}
+
+	/**
+	 * @return
+	 */
+	public Executor getExecutor()
+	{
+		return executor;
 	}
 
 }

@@ -20,6 +20,7 @@ import java.util.Map;
 
 import com.servoy.j2db.dataprocessing.ITypedColumnConverter;
 import com.servoy.j2db.persistence.IColumnTypes;
+import com.servoy.j2db.util.serialize.JSONSerializerWrapper;
 
 public class StringSerializer implements ITypedColumnConverter
 {
@@ -49,7 +50,7 @@ public class StringSerializer implements ITypedColumnConverter
 
 	public String getName()
 	{
-		return "StringSerializer";
+		return JSONSerializerWrapper.STRING_SERIALIZER_NAME;
 	}
 
 	public int[] getSupportedColumnTypes()

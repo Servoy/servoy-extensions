@@ -17,8 +17,10 @@
 
 package com.servoy.extensions.plugins.http;
 
+import org.apache.http.client.config.RequestConfig.Builder;
 import org.apache.http.client.methods.HttpPut;
-import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.impl.client.CloseableHttpClient;
 
 import com.servoy.extensions.plugins.file.JSFile;
 import com.servoy.j2db.documentation.ServoyDocumented;
@@ -36,9 +38,10 @@ public class PutRequest extends BaseEntityEnclosingRequest
 		super();
 	}
 
-	public PutRequest(String url, DefaultHttpClient hc, HttpPlugin httpPlugin)
+	public PutRequest(String url, CloseableHttpClient hc, HttpPlugin httpPlugin, Builder requestConfigBuilder,
+		BasicCredentialsProvider proxyCredentialsProvider)
 	{
-		super(url, hc, new HttpPut(url), httpPlugin);
+		super(url, hc, new HttpPut(url), httpPlugin, requestConfigBuilder, proxyCredentialsProvider);
 	}
 
 	/**

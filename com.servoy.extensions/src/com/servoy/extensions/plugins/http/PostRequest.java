@@ -16,14 +16,12 @@
  */
 package com.servoy.extensions.plugins.http;
 
-import org.apache.http.HttpResponse;
+import org.apache.http.client.config.RequestConfig.Builder;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.protocol.ExecutionContext;
-import org.apache.http.util.EntityUtils;
+import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.impl.client.CloseableHttpClient;
 
 import com.servoy.j2db.documentation.ServoyDocumented;
-import com.servoy.j2db.util.Debug;
 
 /**
  * @author jblok
@@ -36,80 +34,10 @@ public class PostRequest extends BaseEntityEnclosingRequest
 		super();
 	}//only used by script engine
 
-	public PostRequest(String url, DefaultHttpClient hc, HttpPlugin httpPlugin)
+	public PostRequest(String url, CloseableHttpClient hc, HttpPlugin httpPlugin, Builder requestConfigBuilder,
+		BasicCredentialsProvider proxyCredentialsProvider)
 	{
-		super(url, hc, new HttpPost(url), httpPlugin);
-	}
-
-	/**
-	 * @deprecated Replaced by {@link #setCharset(String)}
-	 */
-	@Deprecated
-	public void js_setEncoding(String encoding)
-	{
-		js_setCharset(encoding);
-	}
-
-
-	/**
-	 * @deprecated Replaced by {@link #executeRequest(String,String)}
-	 *
-	 * @sample
-	 * //null
-	 * var httpCode = poster.doPost()
-	 *
-	 * @param username optional
-	 * @param password optional
-	 */
-	@Deprecated
-	public int js_doPost(Object[] args)
-	{
-
-		String username = null;
-		String password = null;
-		if (args.length == 2)
-		{
-			username = "" + args[0]; //$NON-NLS-1$
-			password = "" + args[1]; //$NON-NLS-1$
-		}
-		try
-		{
-			Response res = js_executeRequest(username, password);
-			return res.js_getStatusCode();
-		}
-		catch (Exception ex)
-		{
-			Debug.error(ex);
-			return 0;
-		}
-	}
-
-
-	/**
-	 * Get the result page data after a post.
-	 *
-	 * @deprecated Replaced by {@link #executeRequest(String,String)}
-	 *
-	 * @sample
-	 * var pageData = poster.getPageData()
-	 */
-	@Deprecated
-	public String js_getPageData()
-	{
-		try
-		{
-			if (context != null)
-			{
-				HttpResponse response = (HttpResponse)context.getAttribute(ExecutionContext.HTTP_RESPONSE);
-				context = null;
-				return EntityUtils.toString(response.getEntity());
-			}
-		}
-		catch (Exception e)
-		{
-			Debug.error(e);
-		}
-		return ""; //$NON-NLS-1$
+		super(url, hc, new HttpPost(url), httpPlugin, requestConfigBuilder, proxyCredentialsProvider);
 	}
 
 }

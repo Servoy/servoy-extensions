@@ -18,26 +18,29 @@
 package com.servoy.extensions.plugins.http;
 
 import java.net.URL;
-import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.apache.commons.codec.binary.Base64;
 import org.apache.http.HttpEntity;
-import org.apache.http.HttpHeaders;
+import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.Credentials;
 import org.apache.http.auth.NTCredentials;
 import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.AuthCache;
+import org.apache.http.client.config.RequestConfig.Builder;
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.client.protocol.HttpClientContext;
+import org.apache.http.impl.auth.BasicScheme;
+import org.apache.http.impl.client.BasicAuthCache;
 import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.protocol.BasicHttpContext;
-import org.apache.http.protocol.HttpContext;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.mozilla.javascript.Function;
 
+import com.servoy.j2db.plugins.IClientPluginAccess;
 import com.servoy.j2db.scripting.FunctionDefinition;
 import com.servoy.j2db.scripting.IJavaScriptType;
 import com.servoy.j2db.scripting.IScriptable;
@@ -51,25 +54,27 @@ import com.servoy.j2db.util.Utils;
 @SuppressWarnings("nls")
 public abstract class BaseRequest implements IScriptable, IJavaScriptType
 {
-	protected DefaultHttpClient client;
+	protected CloseableHttpClient client;
 	protected final HttpRequestBase method;
 	protected String url;
-	protected HttpContext context;
 	protected Map<String, String[]> headers;
 	private HttpPlugin httpPlugin;
 	protected boolean usePreemptiveAuthentication = false;
+	private Builder requestConfigBuilder;
+	private BasicCredentialsProvider proxyCredentialsProvider;
 
 	public BaseRequest()
 	{
 		method = null;
 	}//only used by script engine
 
-	public BaseRequest(String url, DefaultHttpClient hc, HttpRequestBase method, HttpPlugin httpPlugin)
+	public BaseRequest(String url, CloseableHttpClient hc, HttpRequestBase method, HttpPlugin httpPlugin, Builder requestConfigBuilder,
+		BasicCredentialsProvider proxyCredentialsProvider)
 	{
 		this.url = url;
 		if (hc == null)
 		{
-			client = new DefaultHttpClient();
+			client = HttpClientBuilder.create().build();
 		}
 		else
 		{
@@ -78,6 +83,8 @@ public abstract class BaseRequest implements IScriptable, IJavaScriptType
 		headers = new HashMap<String, String[]>();
 		this.method = method;
 		this.httpPlugin = httpPlugin;
+		this.requestConfigBuilder = requestConfigBuilder;
+		this.proxyCredentialsProvider = proxyCredentialsProvider;
 	}
 
 	/**
@@ -143,7 +150,7 @@ public abstract class BaseRequest implements IScriptable, IJavaScriptType
 		}
 		catch (Exception ex)
 		{
-			Debug.error(ex);
+			logError(ex, userName, null, null);
 			return null;
 		}
 	}
@@ -166,7 +173,7 @@ public abstract class BaseRequest implements IScriptable, IJavaScriptType
 		}
 		catch (Exception ex)
 		{
-			Debug.error(ex);
+			logError(ex, userName, workstation, domain);
 			return null;
 		}
 	}
@@ -189,6 +196,7 @@ public abstract class BaseRequest implements IScriptable, IJavaScriptType
 
 	private Response executeRequest(String userName, String password, String workstation, String domain, boolean windowsAuthentication) throws Exception
 	{
+		HttpClientContext context = null;
 		HttpEntity entity = buildEntity();
 		if (entity != null) ((HttpEntityEnclosingRequestBase)method).setEntity(entity);
 
@@ -202,38 +210,38 @@ public abstract class BaseRequest implements IScriptable, IJavaScriptType
 				method.addHeader(name, value);
 			}
 		}
-
+		if (proxyCredentialsProvider != null)
+		{
+			context = HttpClientContext.create();
+			context.setCredentialsProvider(proxyCredentialsProvider);
+		}
 		if (!Utils.stringIsEmpty(userName))
 		{
-			if (usePreemptiveAuthentication)
+			if (context == null) context = HttpClientContext.create();
+
+			BasicCredentialsProvider bcp = new BasicCredentialsProvider();
+			URL _url = HttpProvider.createURLFromString(url, httpPlugin.getClientPluginAccess());
+			Credentials cred = null;
+			if (windowsAuthentication)
 			{
-				String auth = userName + ":" + password;
-				byte[] encodedAuth = Base64.encodeBase64(auth.getBytes(Charset.forName("ISO-8859-1")));
-				String authHeader = "Basic " + new String(encodedAuth);
-				method.setHeader(HttpHeaders.AUTHORIZATION, authHeader);
+				cred = new NTCredentials(userName, password, workstation, domain);
 			}
 			else
 			{
-				BasicCredentialsProvider bcp = new BasicCredentialsProvider();
-				URL _url = HttpProvider.createURLFromString(url, httpPlugin.getClientPluginAccess());
-				Credentials cred = null;
-				if (windowsAuthentication)
-				{
-					if (context == null)
-					{
-						context = new BasicHttpContext();
-					}
-					cred = new NTCredentials(userName, password, workstation, domain);
-				}
-				else
-				{
-					cred = new UsernamePasswordCredentials(userName, password);
-				}
-				bcp.setCredentials(new AuthScope(_url.getHost(), _url.getPort()), cred);
-				client.setCredentialsProvider(bcp);
+				cred = new UsernamePasswordCredentials(userName, password);
+			}
+			bcp.setCredentials(new AuthScope(_url.getHost(), _url.getPort()), cred);
+			context.setCredentialsProvider(bcp);
+
+			if (usePreemptiveAuthentication)
+			{
+				AuthCache authCache = new BasicAuthCache();
+				BasicScheme basicAuth = new BasicScheme();
+				authCache.put(new HttpHost(_url.getHost(), _url.getPort()), basicAuth);
+				context.setAuthCache(authCache);
 			}
 		}
-
+		method.setConfig(requestConfigBuilder.build());
 		return new Response(client.execute(method, context));
 	}
 
@@ -387,22 +395,45 @@ public abstract class BaseRequest implements IScriptable, IJavaScriptType
 
 					if (successFunctionDef != null)
 					{
-						callbackArgs[0] = response;
-						successFunctionDef.executeAsync(httpPlugin.getClientPluginAccess(), callbackArgs);
+						IClientPluginAccess access = httpPlugin.getClientPluginAccess();
+						if (access != null)
+						{
+							callbackArgs[0] = response;
+							successFunctionDef.executeAsync(access, callbackArgs);
+						}
+						else
+						{
+							Debug.log("Callback for request: " + method.getURI() + " was given: " + successFunctionDef + " but the client was already closed");
+						}
 					}
 				}
 				catch (final Exception ex)
 				{
-					Debug.error(ex);
+					logError(ex, username, workstation, domain);
 					if (errorFunctionDef != null)
 					{
-						callbackArgs[0] = ex.getMessage();
-						errorFunctionDef.executeAsync(httpPlugin.getClientPluginAccess(), callbackArgs);
+						IClientPluginAccess access = httpPlugin.getClientPluginAccess();
+						if (access != null)
+						{
+							callbackArgs[0] = ex.getMessage();
+							errorFunctionDef.executeAsync(access, callbackArgs);
+						}
+						else
+						{
+							Debug.log(
+								"Error callback for request: " + method.getURI() + " was given: " + errorFunctionDef + " but the client was already closed");
+						}
 					}
 				}
 			}
 		};
-		httpPlugin.getClientPluginAccess().getExecutor().execute(runnable);
+		httpPlugin.getExecutor().execute(runnable);
+	}
+
+	private void logError(Exception ex, String username, String workstation, String domain)
+	{
+		Debug.error("Error executing a request to " + method.getURI() + " with method " + method.getMethod() + " with user: " + username + ", workstation: " +
+			workstation + ", domain: " + domain, ex);
 	}
 
 }

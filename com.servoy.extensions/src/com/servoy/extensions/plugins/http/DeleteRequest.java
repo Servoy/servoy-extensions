@@ -17,8 +17,10 @@
 
 package com.servoy.extensions.plugins.http;
 
+import org.apache.http.client.config.RequestConfig.Builder;
 import org.apache.http.client.methods.HttpDelete;
-import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.impl.client.CloseableHttpClient;
 
 import com.servoy.j2db.documentation.ServoyDocumented;
 
@@ -35,8 +37,9 @@ public class DeleteRequest extends BaseRequest
 		super();
 	}
 
-	public DeleteRequest(String url, DefaultHttpClient hc, HttpPlugin httpPlugin)
+	public DeleteRequest(String url, CloseableHttpClient hc, HttpPlugin httpPlugin, Builder requestConfigBuilder,
+		BasicCredentialsProvider proxyCredentialsProvider)
 	{
-		super(url, hc, new HttpDelete(url), httpPlugin);
+		super(url, hc, new HttpDelete(url), httpPlugin, requestConfigBuilder, proxyCredentialsProvider);
 	}
 }

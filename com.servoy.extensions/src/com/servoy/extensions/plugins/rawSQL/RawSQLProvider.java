@@ -105,7 +105,10 @@ public class RawSQLProvider implements IScriptable
 	 * @param serverName the name of the server
 	 * @param tableName the name of the table
 	 * @param sql the sql query to execute
+	 *
+	 * @deprecated As of Servoy 8.3 deprecated because tableName parameter is not needed/used.
 	 */
+	@Deprecated
 	public boolean js_executeSQL(String serverName, String tableName, String sql)
 	{
 		return js_executeSQL(serverName, tableName, sql, null);
@@ -120,14 +123,79 @@ public class RawSQLProvider implements IScriptable
 	 * @param tableName the name of the table
 	 * @param sql the sql query to execute
 	 * @param sql_args the arguments for the query
+	 *
+	 * @deprecated As of Servoy 8.3 deprecated because tableName parameter is not needed/used.
 	 */
+	@Deprecated
 	public boolean js_executeSQL(String serverName, String tableName, String sql, Object[] sql_args)
 	{
 		exception = null;
 		try
 		{
 			ServerMapping serverMapping = getServerMapping(serverName);
-			return getSQLService().executeSQL(plugin.getClientPluginAccess().getClientID(), serverMapping.remoteServername, tableName, sql, sql_args,
+			return getSQLService().executeSQL(plugin.getClientPluginAccess().getClientID(), serverMapping.remoteServername, sql, sql_args,
+				serverMapping.transactionID);
+		}
+		catch (Exception ex)
+		{
+			exception = ex;
+			Debug.error(ex);
+			return false;
+		}
+	}
+
+	/**
+	 * Execute any SQL, returns true if successful.
+	 *
+	 * @sample
+	 * /****************************************************************************
+	 * WARNING! You can cause data loss or serious data integrity compromises!
+	 * You should have a THOROUGH understanding of both SQL and your backend
+	 * database (and other interfaces that may use that backend) BEFORE YOU USE
+	 * ANY OF THESE COMMANDS.
+	 * You should also READ THE DOCUMENTATION BEFORE USING ANY OF THESE COMMANDS
+	 * ****************************************************************************&#47;
+	 *
+	 * var country = 'NL'
+	 * var done = plugins.rawSQL.executeSQL("example_data","update employees set country = ?", [country])
+	 * if (done)
+	 * {
+	 * 	//flush is required when changes are made in db
+	 * 	plugins.rawSQL.flushAllClientsCache("example_data","employees")
+	 * }
+	 * else
+	 * {
+	 * 	var msg = plugins.rawSQL.getException().getMessage(); //see exception node for more info about the exception obj
+	 * 	plugins.dialogs.showErrorDialog('Error',  'SQL exception: '+msg,  'Ok')
+	 * }
+	 *
+	 * // Note that when this function is used to create a new table in the database, this table will only be seen by
+	 * // the Servoy Application Server when the table name starts with 'temp_', otherwise a server restart is needed.
+	 *
+	 * @param serverName the name of the server
+	 * @param sql the sql query to execute
+	 */
+	public boolean js_executeSQL(String serverName, String sql)
+	{
+		return js_executeSQL(serverName, sql, (Object[])null);
+	}
+
+	/**
+	 * @clonedesc js_executeSQL(String,String,String)
+	 *
+	 * @sampleas js_executeSQL(String,String,String)
+	 *
+	 * @param serverName the name of the server
+	 * @param sql the sql query to execute
+	 * @param sql_args the arguments for the query
+	 */
+	public boolean js_executeSQL(String serverName, String sql, Object[] sql_args)
+	{
+		exception = null;
+		try
+		{
+			ServerMapping serverMapping = getServerMapping(serverName);
+			return getSQLService().executeSQL(plugin.getClientPluginAccess().getClientID(), serverMapping.remoteServername, sql, sql_args,
 				serverMapping.transactionID);
 		}
 		catch (Exception ex)

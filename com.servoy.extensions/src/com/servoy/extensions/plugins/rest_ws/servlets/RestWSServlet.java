@@ -38,6 +38,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpServletResponseWrapper;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
@@ -51,11 +52,13 @@ import org.mozilla.javascript.Undefined;
 import org.mozilla.javascript.Wrapper;
 import org.mozilla.javascript.xml.XMLObject;
 
+import com.servoy.extensions.plugins.rest_ws.RestWSClientPlugin;
 import com.servoy.extensions.plugins.rest_ws.RestWSPlugin;
 import com.servoy.extensions.plugins.rest_ws.RestWSPlugin.ExecFailedException;
 import com.servoy.extensions.plugins.rest_ws.RestWSPlugin.NoClientsException;
 import com.servoy.extensions.plugins.rest_ws.RestWSPlugin.NotAuthenticatedException;
 import com.servoy.extensions.plugins.rest_ws.RestWSPlugin.NotAuthorizedException;
+import com.servoy.j2db.plugins.IClientPlugin;
 import com.servoy.j2db.plugins.IClientPluginAccess;
 import com.servoy.j2db.scripting.FunctionDefinition;
 import com.servoy.j2db.scripting.FunctionDefinition.Exist;
@@ -145,41 +148,43 @@ public class RestWSServlet extends HttpServlet
 	@Override
 	protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
 	{
+		RestWSServletResponse restWSServletResponse = new RestWSServletResponse(response);
+
 		String value = request.getHeader("Origin");
 		if (value == null)
 		{
 			value = "*";
 		}
-		response.setHeader("Access-Control-Allow-Origin", value);
-		response.setHeader("Access-Control-Max-Age", "1728000");
-		response.setHeader("Access-Control-Allow-Credentials", "true");
+		restWSServletResponse.setHeader("Access-Control-Allow-Origin", value);
+		restWSServletResponse.setHeader("Access-Control-Max-Age", "1728000");
+		restWSServletResponse.setHeader("Access-Control-Allow-Credentials", "true");
 
 		if (request.getHeader("Access-Control-Request-Method") != null)
 		{
-			response.setHeader("Access-Control-Allow-Methods", "GET, DELETE, POST, PUT, OPTIONS");
+			restWSServletResponse.setHeader("Access-Control-Allow-Methods", "GET, DELETE, POST, PUT, OPTIONS");
 		}
 
 		if (getNodebugHeadderValue(request))
 		{
-			response.setHeader("Access-Control-Expose-Headers", WS_NODEBUG_HEADER + ", " + WS_USER_PROPERTIES_HEADER);
+			restWSServletResponse.setHeader("Access-Control-Expose-Headers", WS_NODEBUG_HEADER + ", " + WS_USER_PROPERTIES_HEADER);
 		}
 		else
 		{
-			response.setHeader("Access-Control-Expose-Headers", WS_USER_PROPERTIES_HEADER);
+			restWSServletResponse.setHeader("Access-Control-Expose-Headers", WS_USER_PROPERTIES_HEADER);
 		}
 		value = request.getHeader("Access-Control-Request-Headers");
 		if (value != null)
 		{
-			response.setHeader("Access-Control-Allow-Headers", value);
+			restWSServletResponse.setHeader("Access-Control-Allow-Headers", value);
 		}
 
 		if (request.getMethod().equals("PATCH"))
 		{
-			doPatch(request, response);
+			doPatch(request, restWSServletResponse);
 		}
 		else
 		{
-			super.service(request, response);
+			super.service(request, restWSServletResponse);
 		}
 	}
 
@@ -228,9 +233,9 @@ public class RestWSServlet extends HttpServlet
 	 */
 	private Pair<IHeadlessClient, String> getClient(HttpServletRequest request) throws Exception
 	{
-		WsRequest wsRequest = parsePath(request);
+		WsRequestPath wsRequestPath = parsePath(request);
 		boolean nodebug = getNodebugHeadderValue(request);
-		String solutionName = nodebug ? wsRequest.solutionName + ":nodebug" : wsRequest.solutionName;
+		String solutionName = nodebug ? wsRequestPath.solutionName + ":nodebug" : wsRequestPath.solutionName;
 		IHeadlessClient client = plugin.getClient(solutionName.toString());
 		return new Pair<IHeadlessClient, String>(client, solutionName);
 	}
@@ -432,7 +437,7 @@ public class RestWSServlet extends HttpServlet
 		}
 	}
 
-	protected void doPatch(HttpServletRequest request, HttpServletResponse response) throws IOException
+	private void doPatch(HttpServletRequest request, HttpServletResponse response) throws IOException
 	{
 		Pair<IHeadlessClient, String> client = null;
 		boolean reloadSolution = plugin.shouldReloadSolutionAfterRequest();
@@ -487,36 +492,36 @@ public class RestWSServlet extends HttpServlet
 	protected void doOptions(HttpServletRequest request, HttpServletResponse response) throws IOException
 	{
 		IHeadlessClient client = null;
-		WsRequest wsRequest = null;
+		WsRequestPath wsRequestPath = null;
 		boolean nodebug = getNodebugHeadderValue(request);
 		boolean reloadSolution = plugin.shouldReloadSolutionAfterRequest();
 		try
 		{
 			plugin.log.trace("OPTIONS");
-			wsRequest = parsePath(request);
+			wsRequestPath = parsePath(request);
 
-			client = plugin.getClient(nodebug ? wsRequest.solutionName + ":nodebug" : wsRequest.solutionName);
+			client = plugin.getClient(nodebug ? wsRequestPath.solutionName + ":nodebug" : wsRequestPath.solutionName);
 			setApplicationUserProperties(request, client.getPluginAccess());
 			String retval = "TRACE, OPTIONS";
-			if (new FunctionDefinition(wsRequest.formName, WS_READ).exists(client.getPluginAccess()) == FunctionDefinition.Exist.METHOD_FOUND)
+			if (new FunctionDefinition(wsRequestPath.formName, WS_READ).exists(client.getPluginAccess()) == FunctionDefinition.Exist.METHOD_FOUND)
 			{
 				retval += ", GET";
 			}
 			//TODO: implement HEAD?
 			retval += ", HEAD";
-			if (new FunctionDefinition(wsRequest.formName, WS_CREATE).exists(client.getPluginAccess()) == FunctionDefinition.Exist.METHOD_FOUND)
+			if (new FunctionDefinition(wsRequestPath.formName, WS_CREATE).exists(client.getPluginAccess()) == FunctionDefinition.Exist.METHOD_FOUND)
 			{
 				retval += ", POST";
 			}
-			if (new FunctionDefinition(wsRequest.formName, WS_UPDATE).exists(client.getPluginAccess()) == FunctionDefinition.Exist.METHOD_FOUND)
+			if (new FunctionDefinition(wsRequestPath.formName, WS_UPDATE).exists(client.getPluginAccess()) == FunctionDefinition.Exist.METHOD_FOUND)
 			{
 				retval += ", PUT";
 			}
-			if (new FunctionDefinition(wsRequest.formName, WS_PATCH).exists(client.getPluginAccess()) == FunctionDefinition.Exist.METHOD_FOUND)
+			if (new FunctionDefinition(wsRequestPath.formName, WS_PATCH).exists(client.getPluginAccess()) == FunctionDefinition.Exist.METHOD_FOUND)
 			{
 				retval += ", PATCH";
 			}
-			if (new FunctionDefinition(wsRequest.formName, WS_DELETE).exists(client.getPluginAccess()) == FunctionDefinition.Exist.METHOD_FOUND)
+			if (new FunctionDefinition(wsRequestPath.formName, WS_DELETE).exists(client.getPluginAccess()) == FunctionDefinition.Exist.METHOD_FOUND)
 			{
 				retval += ", DELETE";
 			}
@@ -550,12 +555,12 @@ public class RestWSServlet extends HttpServlet
 		{
 			if (client != null)
 			{
-				plugin.releaseClient(nodebug ? wsRequest.solutionName + ":nodebug" : wsRequest.solutionName, client, reloadSolution);
+				plugin.releaseClient(nodebug ? wsRequestPath.solutionName + ":nodebug" : wsRequestPath.solutionName, client, reloadSolution);
 			}
 		}
 	}
 
-	public WsRequest parsePath(HttpServletRequest request)
+	public WsRequestPath parsePath(HttpServletRequest request)
 	{
 		String path = request.getPathInfo(); //without servlet name
 
@@ -568,11 +573,11 @@ public class RestWSServlet extends HttpServlet
 			throw new IllegalArgumentException(path);
 		}
 
-		return new WsRequest(segments[2], segments[3], Utils.arraySub(segments, 4, segments.length));
+		return new WsRequestPath(segments[2], segments[3], Utils.arraySub(segments, 4, segments.length));
 	}
 
 	/**
-	 * call the service method.
+	 * call the service method, make the request ansd response available for the client-plugin.
 	 * Throws {@link NoClientsException} when no license is available
 	 * @param methodName
 	 * @param fixedArgs
@@ -581,36 +586,62 @@ public class RestWSServlet extends HttpServlet
 	 * @return
 	 * @throws Exception
 	 */
-	protected Object wsService(String methodName, Object[] fixedArgs, HttpServletRequest request, HttpServletResponse response, IHeadlessClient client)
+	private Object wsService(String methodName, Object[] fixedArgs, HttpServletRequest request, HttpServletResponse response, IHeadlessClient client)
 		throws Exception
 	{
-		//update cookies in the application from request
+		RestWSClientPlugin clientPlugin = (RestWSClientPlugin)client.getPluginAccess().getPluginManager().getPlugin(IClientPlugin.class,
+			RestWSClientPlugin.PLUGIN_NAME);
+		try
+		{
+			if (clientPlugin == null)
+			{
+				plugin.log.warn("Could not find client plugin " + RestWSClientPlugin.PLUGIN_NAME);
+			}
+			else
+			{
+				clientPlugin.setRequestResponse(request, response);
+			}
+			return doWsService(methodName, fixedArgs, request, response, client);
+		}
+		finally
+		{
+			if (clientPlugin != null)
+			{
+				clientPlugin.setRequestResponse(null, null);
+			}
+		}
+	}
+
+	private Object doWsService(String methodName, Object[] fixedArgs, HttpServletRequest request, HttpServletResponse response, IHeadlessClient client)
+		throws Exception
+	{
+		// update cookies in the application from request
 		setApplicationUserProperties(request, client.getPluginAccess());
-		String path = request.getPathInfo(); //without servlet name
+		String path = request.getPathInfo(); // without servlet name
 
 		if (plugin.log.isDebugEnabled()) plugin.log.debug("Request '" + path + '\'');
 
-		WsRequest wsRequest = parsePath(request);
+		WsRequestPath wsRequestPath = parsePath(request);
 
-		Object ws_authenticate_result = checkAuthorization(request, client.getPluginAccess(), wsRequest.solutionName, wsRequest.formName);
+		Object ws_authenticate_result = checkAuthorization(request, client.getPluginAccess(), wsRequestPath.solutionName, wsRequestPath.formName);
 
-		FunctionDefinition fd = new FunctionDefinition(wsRequest.formName, methodName);
+		FunctionDefinition fd = new FunctionDefinition(wsRequestPath.formName, methodName);
 		Exist functionExists = fd.exists(client.getPluginAccess());
 		if (functionExists == FunctionDefinition.Exist.NO_SOLUTION)
 		{
-			throw new WebServiceException("Solution " + wsRequest.solutionName + " not loaded", HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+			throw new WebServiceException("Solution " + wsRequestPath.solutionName + " not loaded", HttpServletResponse.SC_SERVICE_UNAVAILABLE);
 		}
 		if (functionExists == FunctionDefinition.Exist.FORM_NOT_FOUND)
 		{
-			throw new WebServiceException("Form " + wsRequest.formName + " not found", HttpServletResponse.SC_NOT_FOUND);
+			throw new WebServiceException("Form " + wsRequestPath.formName + " not found", HttpServletResponse.SC_NOT_FOUND);
 		}
 		if (functionExists != FunctionDefinition.Exist.METHOD_FOUND)
 		{
-			throw new WebServiceException("Method " + methodName + " not found" + (wsRequest.formName != null ? " on form " + wsRequest.formName : ""),
+			throw new WebServiceException("Method " + methodName + " not found" + (wsRequestPath.formName != null ? " on form " + wsRequestPath.formName : ""),
 				HttpServletResponse.SC_METHOD_NOT_ALLOWED);
 		}
 
-		FunctionDefinition fd_headers = new FunctionDefinition(wsRequest.formName, WS_RESPONSE_HEADERS);
+		FunctionDefinition fd_headers = new FunctionDefinition(wsRequestPath.formName, WS_RESPONSE_HEADERS);
 		if (fd_headers.exists(client.getPluginAccess()) == FunctionDefinition.Exist.METHOD_FOUND)
 		{
 			Object result = fd_headers.executeSync(client.getPluginAccess(), null);
@@ -620,16 +651,16 @@ public class RestWSServlet extends HttpServlet
 				Object[] resultArray = (Object[])result;
 				for (Object element : resultArray)
 				{
-					addHeaderToResponse(response, element, wsRequest);
+					addHeaderToResponse(response, element, wsRequestPath);
 				}
 			}
-			else addHeaderToResponse(response, result, wsRequest);
+			else addHeaderToResponse(response, result, wsRequestPath);
 		}
 
 		Object[] args = null;
-		if (fixedArgs != null || wsRequest.args.length > 0 || request.getParameterMap().size() > 0)
+		if (fixedArgs != null || wsRequestPath.args.length > 0 || request.getParameterMap().size() > 0)
 		{
-			args = new Object[((fixedArgs == null) ? 0 : fixedArgs.length) + wsRequest.args.length +
+			args = new Object[((fixedArgs == null) ? 0 : fixedArgs.length) + wsRequestPath.args.length +
 				((request.getParameterMap().size() > 0 || ws_authenticate_result != null) ? 1 : 0)];
 			int idx = 0;
 			if (fixedArgs != null)
@@ -637,10 +668,10 @@ public class RestWSServlet extends HttpServlet
 				System.arraycopy(fixedArgs, 0, args, 0, fixedArgs.length);
 				idx += fixedArgs.length;
 			}
-			if (wsRequest.args.length > 0)
+			if (wsRequestPath.args.length > 0)
 			{
-				System.arraycopy(wsRequest.args, 0, args, idx, wsRequest.args.length);
-				idx += wsRequest.args.length;
+				System.arraycopy(wsRequestPath.args, 0, args, idx, wsRequestPath.args.length);
+				idx += wsRequestPath.args.length;
 			}
 			if (request.getParameterMap().size() > 0 || ws_authenticate_result != null)
 			{
@@ -654,27 +685,25 @@ public class RestWSServlet extends HttpServlet
 			}
 		}
 
-		if (plugin.log.isDebugEnabled()) plugin.log.debug("executeMethod('" + wsRequest.formName + "', '" + methodName + "', <args>)");
+		if (plugin.log.isDebugEnabled()) plugin.log.debug("executeMethod('" + wsRequestPath.formName + "', '" + methodName + "', <args>)");
 		// DO NOT USE FunctionDefinition here! we want to be able to catch possible exceptions!
 		Object result;
 		try
 		{
-			result = client.getPluginAccess().executeMethod(wsRequest.formName, methodName, args, false);
+			result = client.getPluginAccess().executeMethod(wsRequestPath.formName, methodName, args, false);
 		}
 		catch (Exception e)
 		{
-			plugin.log.info("Method execution failed: executeMethod('" + wsRequest.formName + "', '" + methodName + "', <args>)", e);
+			plugin.log.info("Method execution failed: executeMethod('" + wsRequestPath.formName + "', '" + methodName + "', <args>)", e);
 			throw new ExecFailedException(e);
 		}
 		if (plugin.log.isDebugEnabled()) plugin.log.debug("result = " + (result == null ? "<NULL>" : ("'" + result + '\'')));
 		// flush updated cookies from the application
 		setResponseUserProperties(request, response, client.getPluginAccess());
 		return result;
-
-
 	}
 
-	private void addHeaderToResponse(HttpServletResponse response, Object headerItem, WsRequest wsRequest)
+	private void addHeaderToResponse(HttpServletResponse response, Object headerItem, WsRequestPath wsRequestPath)
 	{
 		boolean done = false;
 		if (headerItem instanceof String)
@@ -705,7 +734,7 @@ public class RestWSServlet extends HttpServlet
 
 		if (!done) Debug.error(
 			"Cannot send back header value from 'ws_response_headers'; it should be either a String containing a key-value pair separated by an equal sign or an object with 'name' and 'value' in it, but it is: '" +
-				headerItem + "'. Solution/form: " + wsRequest.solutionName + " -> " + wsRequest.formName);
+				headerItem + "'. Solution/form: " + wsRequestPath.solutionName + " -> " + wsRequestPath.formName);
 	}
 
 	private Object checkAuthorization(HttpServletRequest request, IClientPluginAccess client, String solutionName, String formName) throws Exception
@@ -798,12 +827,10 @@ public class RestWSServlet extends HttpServlet
 		throw new NotAuthorizedException("User not authorized");
 	}
 
-	protected byte[] getBody(HttpServletRequest request) throws IOException
+	private byte[] getBody(HttpServletRequest request) throws IOException
 	{
-		InputStream is = null;
-		try
+		try (InputStream is = request.getInputStream())
 		{
-			is = request.getInputStream();
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
 			byte[] buffer = new byte[128];
@@ -814,13 +841,6 @@ public class RestWSServlet extends HttpServlet
 			}
 
 			return baos.toByteArray();
-		}
-		finally
-		{
-			if (is != null)
-			{
-				is.close();
-			}
 		}
 	}
 
@@ -900,7 +920,7 @@ public class RestWSServlet extends HttpServlet
 	 * <br/>
 	 * calling getHeaderKey(header,"name","--") will return <b>myFile<b/>
 	 */
-	protected String getHeaderKey(String header, String key, String defaultValue)
+	private String getHeaderKey(String header, String key, String defaultValue)
 	{
 		if (header != null)
 		{
@@ -945,7 +965,7 @@ public class RestWSServlet extends HttpServlet
 			}
 			catch (JSONException e)
 			{
-				Debug.error("cannot get json object from " + WS_USER_PROPERTIES_HEADER + " headder: ", e);
+				Debug.error("cannot get json object from " + WS_USER_PROPERTIES_HEADER + " header: ", e);
 			}
 		}
 		else
@@ -1136,112 +1156,58 @@ public class RestWSServlet extends HttpServlet
 		return request.getHeader(WS_NODEBUG_HEADER) != null;
 	}
 
-	protected void sendResult(HttpServletRequest request, HttpServletResponse response, Object result, int defaultContentType) throws Exception
+	private void sendResult(HttpServletRequest request, HttpServletResponse response, Object result, int defaultContentType) throws Exception
 	{
-		String resultContentType;
 		byte[] bytes;
 
-		if (result instanceof byte[])
+		String charset;
+		if (response instanceof RestWSServletResponse && ((RestWSServletResponse)response).characterEncodingSet)
+		{
+			// characterEncoding was set using rest_ws client plugin
+			charset = response.getCharacterEncoding();
+		}
+		else
+		{
+			String contentTypeCharset = getHeaderKey(request.getHeader("Content-Type"), "charset", CHARSET_DEFAULT);
+			charset = getHeaderKey(request.getHeader("Accept"), "charset", contentTypeCharset);
+		}
+
+		String resultContentType = response.getContentType();
+		if (resultContentType != null)
+		{
+			// content type was set using rest_ws client plugin
+			String content = getContent(response, result, false, getContentType(resultContentType));
+			bytes = content.getBytes(charset);
+		}
+		else if (result instanceof byte[])
 		{
 			bytes = (byte[])result;
-			resultContentType = MimeTypes.getContentType(bytes);
-
-			if (request.getHeader("Accept") != null)
-			{
-				String[] acceptContentTypes = request.getHeader("Accept").split(",");
-
-				if (resultContentType == null)
-				{
-					// cannot determine content type, just use first from accept header
-					resultContentType = getFirstNonpatternContentType(acceptContentTypes);
-					if (resultContentType != null && acceptContentTypes.length > 1)
-					{
-						plugin.log.warn("Could not determine byte array content type, using {} from accept header {}", resultContentType,
-							request.getHeader("Accept"));
-					}
-				}
-
-				if (resultContentType == null)
-				{
-					resultContentType = "application/octet-stream"; // if still null, then set to standard
-				}
-
-				// check if content type based on bytes is in accept header
-				boolean found = false;
-				for (String acc : acceptContentTypes)
-				{
-					if (matchContentType(acc.trim().split(";")[0], resultContentType))
-					{
-						found = true;
-						break;
-					}
-				}
-
-				if (!found)
-				{
-					plugin.log.warn("Byte array content type {} not found in accept header {}", resultContentType, request.getHeader("Accept"));
-				}
-			}
-
-			if (resultContentType == null)
-			{
-				resultContentType = "application/octet-stream"; // if still null, then set to standard
-			}
+			resultContentType = getBytesContentType(request, bytes);
 		}
 		else
 		{
 			int contentType = getRequestContentType(request, "Accept", null, defaultContentType);
-
 			if (contentType == CONTENT_BINARY)
 			{
 				plugin.log.error("Request for binary data was made, but the return data is not a byte array; return data is " + result);
 				sendError(response, HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
 				return;
 			}
-			boolean isXML = result instanceof XMLObject;
-			boolean isJSON = result instanceof JSONObject || result instanceof JSONArray;
 
-			Object json;
-			if (isXML)
-			{
-				json = XML.toJSONObject(result.toString());
-			}
-			else if (isJSON)
-			{
-				json = result;
-			}
-			else
-			{
-				try
-				{
-					json = plugin.getJSONSerializer().toJSON(result);
-				}
-				catch (Exception e)
-				{
-					Debug.error("Failed to convert " + result + " to a json sturucture", e);
-					throw e;
-				}
-			}
+			String content = getContent(response, result, true, contentType);
 
-			String content;
-			String contentTypeCharset = getHeaderKey(request.getHeader("Content-Type"), "charset", CHARSET_DEFAULT);
-			String charset = getHeaderKey(request.getHeader("Accept"), "charset", contentTypeCharset);
 			switch (contentType)
 			{
 				case CONTENT_JSON :
 					String callback = request.getParameter("callback");
 					if (callback != null && !callback.equals(""))
 					{
-						content = callback + '(' + json.toString() + ')';
-					}
-					else
-					{
-						content = json.toString();
+						content = callback + '(' + content + ')';
 					}
 					break;
 
 				case CONTENT_XML :
-					content = "<?xml version=\"1.0\" encoding=\"" + charset + "\"?>\n" + ((isXML) ? result.toString() : XML.toString(json, null));
+					content = "<?xml version=\"1.0\" encoding=\"" + charset + "\"?>\n" + content;
 					break;
 				case CONTENT_MULTIPART :
 				case CONTENT_FORMPOST :
@@ -1257,7 +1223,7 @@ public class RestWSServlet extends HttpServlet
 
 			switch (contentType)
 			{
-				//multipart requests cannot respond multipart responses so treat response as json
+				// multipart requests cannot respond multipart responses so treat response as json
 				case CONTENT_MULTIPART :
 				case CONTENT_FORMPOST :
 				case CONTENT_JSON :
@@ -1277,32 +1243,111 @@ public class RestWSServlet extends HttpServlet
 			}
 
 			resultContentType = resultContentType + ";charset=" + charset;
+
+			response.setHeader("Content-Type", resultContentType);
+
 			bytes = content.getBytes(charset);
+
 		}
 
-		response.setHeader("Content-Type", resultContentType);
 		response.setContentLength(bytes.length);
 
-		ServletOutputStream outputStream = null;
+		try (ServletOutputStream outputStream = response.getOutputStream())
+		{
+			outputStream.write(bytes);
+			outputStream.flush();
+		}
+	}
+
+	/**
+	 *
+	 * @param response
+	 * @param result
+	 * @param interpretResult
+	 * @param contentType
+	 * @return
+	 * @throws Exception
+	 */
+	private String getContent(HttpServletResponse response, Object result, boolean interpretResult, int contentType) throws Exception
+	{
+		if (result instanceof XMLObject)
+		{
+			if (contentType == CONTENT_JSON)
+			{
+				return XML.toJSONObject(result.toString()).toString();
+			}
+			return result.toString();
+		}
+
+		if (contentType == CONTENT_XML)
+		{
+			XML.toString(result, null);
+		}
+
+		if (!interpretResult || result instanceof JSONObject || result instanceof JSONArray)
+		{
+			return result == null ? "" : result.toString();
+		}
+
 		try
 		{
-			outputStream = response.getOutputStream();
-			outputStream.write(bytes);
+			return plugin.getJSONSerializer().toJSON(result).toString();
 		}
-		finally
+		catch (Exception e)
 		{
-			if (outputStream != null)
+			Debug.error("Failed to convert " + result + " to a json structure", e);
+			throw e;
+		}
+	}
+
+	private String getBytesContentType(HttpServletRequest request, byte[] bytes)
+	{
+		String resultContentType;
+		resultContentType = MimeTypes.getContentType(bytes);
+
+		if (request.getHeader("Accept") != null)
+		{
+			String[] acceptContentTypes = request.getHeader("Accept").split(",");
+
+			if (resultContentType == null)
 			{
-				try
+				// cannot determine content type, just use first from accept header
+				resultContentType = getFirstNonpatternContentType(acceptContentTypes);
+				if (resultContentType != null && acceptContentTypes.length > 1)
 				{
-					outputStream.flush();
-				}
-				finally
-				{
-					outputStream.close();
+					plugin.log.warn("Could not determine byte array content type, using {} from accept header {}", resultContentType,
+						request.getHeader("Accept"));
 				}
 			}
+
+			if (resultContentType == null)
+			{
+				resultContentType = "application/octet-stream"; // if still null, then set to standard
+			}
+
+			// check if content type based on bytes is in accept header
+			boolean found = false;
+			for (String acc : acceptContentTypes)
+			{
+				if (matchContentType(acc.trim().split(";")[0], resultContentType))
+				{
+					found = true;
+					break;
+				}
+			}
+
+			if (!found)
+			{
+				plugin.log.warn("Byte array content type {} not found in accept header {}", resultContentType, request.getHeader("Accept"));
+			}
 		}
+
+		if (resultContentType == null)
+		{
+			resultContentType = "application/octet-stream"; // if still null, then set to standard
+		}
+
+		return resultContentType;
 	}
 
 	private static String getFirstNonpatternContentType(String[] contentTypes)
@@ -1343,7 +1388,7 @@ public class RestWSServlet extends HttpServlet
 	 * @param error
 	 * @throws IOException
 	 */
-	protected void sendError(HttpServletResponse response, int error) throws IOException
+	private void sendError(HttpServletResponse response, int error) throws IOException
 	{
 		sendError(response, error, null);
 	}
@@ -1355,7 +1400,7 @@ public class RestWSServlet extends HttpServlet
 	 * @param errorResponse
 	 * @throws IOException
 	 */
-	protected void sendError(HttpServletResponse response, int error, String errorResponse) throws IOException
+	private void sendError(HttpServletResponse response, int error, String errorResponse) throws IOException
 	{
 		response.setStatus(error);
 		if (errorResponse == null)
@@ -1378,13 +1423,31 @@ public class RestWSServlet extends HttpServlet
 				default :
 			}
 
-			Writer w = response.getWriter();
-			w.write(errorResponse);
-			w.close();
+			try (Writer w = response.getWriter())
+			{
+				w.write(errorResponse);
+			}
 		}
 	}
 
-	public static class WsRequest
+	private static class RestWSServletResponse extends HttpServletResponseWrapper
+	{
+		boolean characterEncodingSet;
+
+		public RestWSServletResponse(HttpServletResponse response)
+		{
+			super(response);
+		}
+
+		@Override
+		public void setCharacterEncoding(String charset)
+		{
+			characterEncodingSet = true;
+			super.setCharacterEncoding(charset);
+		}
+	}
+
+	public static class WsRequestPath
 	{
 		public final String solutionName;
 		public final String formName;
@@ -1395,7 +1458,7 @@ public class RestWSServlet extends HttpServlet
 		 * @param formName
 		 * @param args
 		 */
-		public WsRequest(String solutionName, String formName, String[] args)
+		public WsRequestPath(String solutionName, String formName, String[] args)
 		{
 			this.solutionName = solutionName;
 			this.formName = formName;

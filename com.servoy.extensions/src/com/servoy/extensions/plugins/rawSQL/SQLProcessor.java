@@ -40,7 +40,7 @@ import com.servoy.j2db.util.Utils;
 
 /**
  * Rawsql plugin server plugin.
- * 
+ *
  * @author jblok
  */
 
@@ -95,7 +95,7 @@ public class SQLProcessor implements ISQLService, IServerPlugin
 		return req;
 	}
 
-	public boolean executeSQL(String clientId, String server, String table, String sql, Object[] questiondata, String tid)
+	public boolean executeSQL(String clientId, String server, String sql, Object[] questiondata, String tid)
 	{
 		if (!checkAccess(clientId)) return false;
 
