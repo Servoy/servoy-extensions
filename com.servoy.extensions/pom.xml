@@ -29,7 +29,6 @@
 		<servoy-local.url>${project.baseUri}/target/repository/</servoy-local.url>
 	</properties>
 
-
 	<profiles>
 		<profile>
 			<id>not_dev</id>
@@ -132,7 +131,7 @@
 									<layout>p2</layout>
 								</repository>
 								<repository>
-									<id>servoy_shiblibs</id>
+									<id>servoy_shiplibs</id>
 									<url>${servoy-shiplibs.url}</url>
 									<layout>p2</layout>
 								</repository>
