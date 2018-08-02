@@ -18,9 +18,6 @@ package com.servoy.extensions.plugins.headlessclient;
 
 import java.io.Serializable;
 
-import com.servoy.j2db.server.annotations.TerracottaInstrumentedClass;
-
-@TerracottaInstrumentedClass
 public class ClientNotFoundException extends IllegalStateException implements Serializable
 {
 	private final String info;
