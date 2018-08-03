@@ -120,20 +120,22 @@ public class HeadlessServerPlugin implements IHeadlessServer, IServerPlugin
 
 		// search for an existing client
 		boolean createNewClient = true;
-		// client exists; we need to know if the solution is the same one
-		Pair<String, Boolean> solutionNameAndValidity = serverPluginDispatcher.callOnCorrectServer(new GetSolutionNameCall(clientKey));
-
-		if (solutionNameAndValidity.getRight().booleanValue())
+		if (clients.containsKey(clientKey))
 		{
-			String loadedSolutionName = solutionNameAndValidity.getLeft();
-			if (loadedSolutionName == null || !loadedSolutionName.equals(solutionname))
-			{
-				String name = (loadedSolutionName == null ? "<null>" : loadedSolutionName);
-				throw new ClientNotFoundException(clientKey, name);
-			}
-			createNewClient = false;
-		}
+			// client exists; we need to know if the solution is the same one
+			Pair<String, Boolean> solutionNameAndValidity = serverPluginDispatcher.callOnCorrectServer(new GetSolutionNameCall(clientKey));
 
+			if (solutionNameAndValidity.getRight().booleanValue())
+			{
+				String loadedSolutionName = solutionNameAndValidity.getLeft();
+				if (loadedSolutionName == null || !loadedSolutionName.equals(solutionname))
+				{
+					String name = (loadedSolutionName == null ? "<null>" : loadedSolutionName);
+					throw new ClientNotFoundException(clientKey, name);
+				}
+				createNewClient = false;
+			}
+		}
 		if (createNewClient)
 		{
 			IHeadlessClient c = HeadlessClientFactory.createHeadlessClient(solutionname, username, password, solutionOpenMethodArgs);
@@ -341,9 +343,12 @@ public class HeadlessServerPlugin implements IHeadlessServer, IServerPlugin
 
 	public boolean isValid(String clientKey)
 	{
-		Boolean validB = serverPluginDispatcher.callOnCorrectServer(new CheckValidityCall(clientKey));
-		boolean valid = (validB != null ? validB.booleanValue() : false);
-
+		boolean valid = false;
+		if (clients.containsKey(clientKey))
+		{
+			Boolean validB = serverPluginDispatcher.callOnCorrectServer(new CheckValidityCall(clientKey));
+			valid = (validB != null ? validB.booleanValue() : false);
+		}
 		return valid;
 	}
 
