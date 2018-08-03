@@ -8,10 +8,6 @@
 
 	<repositories>
 		<repository>
-			<id>terracotta-releases</id>
-			<url>http://www.terracotta.org/download/reflector/releases/</url>
-		</repository>
-		<repository>
 			<id>developer_repo</id>
 			<name>developer_repo</name>
 			<url>http://developer.servoy.com/mvn_repository/</url>

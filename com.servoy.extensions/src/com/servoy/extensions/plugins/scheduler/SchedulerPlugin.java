@@ -47,7 +47,6 @@ public class SchedulerPlugin implements IClientPlugin
 	public void initialize(IClientPluginAccess acc) throws PluginException
 	{
 		this.access = acc;
-		System.setProperty("org.terracotta.quartz.skipUpdateCheck", "true");
 	}
 
 	/*
