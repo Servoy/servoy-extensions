@@ -16,13 +16,10 @@
  */
 package com.servoy.extensions.plugins.headlessclient;
 
-import com.servoy.j2db.server.annotations.TerracottaInstrumentedClass;
-
 /**
  * Meant to be thrown in place of other non-serializable exceptions - through RMI.
  * @author acostescu
  */
-@TerracottaInstrumentedClass
 public class ExceptionWrapper extends RuntimeException // implements Serializable
 {
 	public ExceptionWrapper(String detail)

@@ -18,9 +18,6 @@ package com.servoy.extensions.plugins.headlessclient;
 
 import java.io.Serializable;
 
-import com.servoy.j2db.server.annotations.TerracottaInstrumentedClass;
-
-@TerracottaInstrumentedClass
 public final class UndefinedMarker implements Serializable
 {
 	public static UndefinedMarker INSTANCE = new UndefinedMarker();
