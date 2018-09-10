@@ -27,7 +27,7 @@ import com.servoy.j2db.documentation.ServoyDocumented;
  *
  */
 @ServoyDocumented
-public class DeleteRequest extends BaseRequest
+public class DeleteRequest extends BaseEntityEnclosingRequest
 {
 	//only used by script engine
 	public DeleteRequest()
