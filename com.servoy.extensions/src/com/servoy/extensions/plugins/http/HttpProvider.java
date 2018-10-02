@@ -246,6 +246,7 @@ public class HttpProvider implements IReturnedTypesProvider, IScriptable
 
 	/**
 	 * Create an http client (like a web browser with session binding) usable todo multiple request/posts in same server session.
+	 * Make sure you call client.close() on it after you used this client object to clean up resources.
 	 *
 	 * @sample
 	 * var client = plugins.http.createNewHttpClient();

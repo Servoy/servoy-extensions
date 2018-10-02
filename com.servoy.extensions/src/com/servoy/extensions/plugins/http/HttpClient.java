@@ -80,53 +80,7 @@ public class HttpClient implements IScriptable, IJavaScriptType
 			final AllowedCertTrustStrategy allowedCertTrustStrategy = new AllowedCertTrustStrategy();
 			SSLContext sslContext = SSLContexts.custom().loadTrustMaterial(allowedCertTrustStrategy).build();
 
-			SSLConnectionSocketFactory socketFactory = new SSLConnectionSocketFactory(sslContext)
-			{
-				@Override
-				public Socket connectSocket(int connectTimeout, Socket socket, org.apache.http.HttpHost host, InetSocketAddress remoteAddress,
-					InetSocketAddress localAddress, org.apache.http.protocol.HttpContext context) throws IOException
-				{
-					try
-					{
-						return super.connectSocket(connectTimeout, socket, host, remoteAddress, localAddress, context);
-					}
-					catch (SSLPeerUnverifiedException ex)
-					{
-						X509Certificate[] lastCertificates = allowedCertTrustStrategy.getAndClearLastCertificates();
-						if (lastCertificates != null)
-						{
-							// allow for next time
-							if (HttpClient.this.httpPlugin.getClientPluginAccess().getApplicationType() == IClientPluginAccess.CLIENT ||
-								HttpClient.this.httpPlugin.getClientPluginAccess().getApplicationType() == IClientPluginAccess.RUNTIME)
-							{
-								// show dialog
-								CertificateDialog dialog = new CertificateDialog(
-									((ISmartRuntimeWindow)HttpClient.this.httpPlugin.getClientPluginAccess().getCurrentRuntimeWindow()).getWindow(),
-									remoteAddress, lastCertificates);
-								if (dialog.shouldAccept())
-								{
-									allowedCertTrustStrategy.add(lastCertificates);
-									// try it again now with the new chain.
-									return super.connectSocket(connectTimeout, socket, host, remoteAddress, localAddress, context);
-								}
-							}
-							else
-							{
-								Debug.error("Couldn't connect to " + remoteAddress +
-									", please make sure that the ssl certificates of that site are added to the java keystore." +
-									"Download the keystore in the browser and update the java cacerts file in jre/lib/security: " +
-									"keytool -import -file downloaded.crt -keystore cacerts");
-							}
-						}
-						throw ex;
-					}
-					finally
-					{
-						// always just clear the last request.
-						allowedCertTrustStrategy.getAndClearLastCertificates();
-					}
-				}
-			};
+			SSLConnectionSocketFactory socketFactory = new CertificateSSLSocketFactoryHandler(sslContext, allowedCertTrustStrategy, httpPlugin);
 			builder.setSSLSocketFactory(socketFactory);
 		}
 		catch (Exception ex)
@@ -472,5 +426,68 @@ public class HttpClient implements IScriptable, IJavaScriptType
 			this.proxyPassword = password;
 		}
 	}
+
+	private static final class CertificateSSLSocketFactoryHandler extends SSLConnectionSocketFactory
+	{
+		private final AllowedCertTrustStrategy allowedCertTrustStrategy;
+		private final HttpPlugin httpPlugin;
+
+		/**
+		 * @param sslContext
+		 * @param allowedCertTrustStrategy
+		 */
+		private CertificateSSLSocketFactoryHandler(SSLContext sslContext, AllowedCertTrustStrategy allowedCertTrustStrategy, HttpPlugin httpPlugin)
+		{
+			super(sslContext);
+			this.allowedCertTrustStrategy = allowedCertTrustStrategy;
+			this.httpPlugin = httpPlugin;
+		}
+
+		@Override
+		public Socket connectSocket(int connectTimeout, Socket socket, org.apache.http.HttpHost host, InetSocketAddress remoteAddress,
+			InetSocketAddress localAddress, org.apache.http.protocol.HttpContext context) throws IOException
+		{
+			try
+			{
+				return super.connectSocket(connectTimeout, socket, host, remoteAddress, localAddress, context);
+			}
+			catch (SSLPeerUnverifiedException ex)
+			{
+				X509Certificate[] lastCertificates = allowedCertTrustStrategy.getAndClearLastCertificates();
+				if (lastCertificates != null)
+				{
+					// allow for next time
+					if (httpPlugin.getClientPluginAccess().getApplicationType() == IClientPluginAccess.CLIENT ||
+						httpPlugin.getClientPluginAccess().getApplicationType() == IClientPluginAccess.RUNTIME)
+					{
+						// show dialog
+						CertificateDialog dialog = new CertificateDialog(
+							((ISmartRuntimeWindow)this.httpPlugin.getClientPluginAccess().getCurrentRuntimeWindow()).getWindow(), remoteAddress,
+							lastCertificates);
+						if (dialog.shouldAccept())
+						{
+							allowedCertTrustStrategy.add(lastCertificates);
+							// try it again now with the new chain.
+							return super.connectSocket(connectTimeout, socket, host, remoteAddress, localAddress, context);
+						}
+					}
+					else
+					{
+						Debug.error("Couldn't connect to " + remoteAddress +
+							", please make sure that the ssl certificates of that site are added to the java keystore." +
+							"Download the keystore in the browser and update the java cacerts file in jre/lib/security: " +
+							"keytool -import -file downloaded.crt -keystore cacerts");
+					}
+				}
+				throw ex;
+			}
+			finally
+			{
+				// always just clear the last request.
+				allowedCertTrustStrategy.getAndClearLastCertificates();
+			}
+		}
+	}
+
 
 }
