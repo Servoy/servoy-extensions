@@ -17,8 +17,10 @@
 package com.servoy.extensions.plugins.http;
 
 import java.beans.PropertyChangeEvent;
-import java.util.ArrayList;
-import java.util.List;
+import java.lang.ref.Reference;
+import java.lang.ref.ReferenceQueue;
+import java.lang.ref.WeakReference;
+import java.util.HashMap;
 import java.util.Properties;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
@@ -26,6 +28,8 @@ import java.util.concurrent.Executors;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
+
+import org.apache.http.impl.client.DefaultHttpClient;
 
 import com.servoy.j2db.plugins.IClientPlugin;
 import com.servoy.j2db.plugins.IClientPluginAccess;
@@ -45,7 +49,9 @@ public class HttpPlugin implements IClientPlugin
 	private HttpProvider impl;
 	private JSONConverter jsonConverter;
 
-	private final List<HttpClient> openClients = new ArrayList<>();
+	private final HashMap<WeakReference<HttpClient>, DefaultHttpClient> openClients = new HashMap<>();
+	private final ReferenceQueue<HttpClient> queue = new ReferenceQueue<>();
+
 
 	private final ExecutorService executor = Executors.newCachedThreadPool();
 
@@ -80,9 +86,9 @@ public class HttpPlugin implements IClientPlugin
 	 */
 	private void closeClients()
 	{
-		for (HttpClient httpClient : openClients)
+		for (DefaultHttpClient httpClient : openClients.values())
 		{
-			httpClient.client.close();
+			httpClient.close();
 		}
 		openClients.clear();
 	}
@@ -164,7 +170,14 @@ public class HttpPlugin implements IClientPlugin
 	 */
 	void clientClosed(HttpClient httpClient)
 	{
-		openClients.remove(httpClient);
+		for (WeakReference<HttpClient> element : openClients.keySet())
+		{
+			if (element.get() == httpClient)
+			{
+				openClients.remove(element);
+				break;
+			}
+		}
 	}
 
 	/**
@@ -172,7 +185,20 @@ public class HttpPlugin implements IClientPlugin
 	 */
 	void clientCreated(HttpClient httpClient)
 	{
-		openClients.add(httpClient);
+		Reference< ? extends HttpClient> ref = queue.poll();
+		while (ref != null)
+		{
+			DefaultHttpClient client = openClients.remove(ref);
+			if (client != null)
+			{
+				client.close();
+			}
+			ref = queue.poll();
+		}
+		// The HttpClient object is the scriptable that should not have any reference to itself then scripting
+		// so if scripting doesn't reference it anymore then it should be garbage collected.
+		// Then the actaul commons http client can be closed correctly
+		openClients.put(new WeakReference<HttpClient>(httpClient, queue), httpClient.client);
 	}
 
 	/**
