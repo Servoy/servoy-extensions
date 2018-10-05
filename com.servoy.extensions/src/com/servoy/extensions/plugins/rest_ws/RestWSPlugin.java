@@ -63,6 +63,7 @@ import com.servoy.j2db.util.serialize.JSONSerializerWrapper;
 public class RestWSPlugin implements IServerPlugin
 {
 	private static final String CLIENT_POOL_SIZE_PROPERTY = "rest_ws_plugin_client_pool_size";
+	private static final String CLIENT_POOL_SIZE_PER_SOLUTION_PROPERTY = "rest_ws_plugin_client_pool_size_per_solution";
 	private static final int CLIENT_POOL_SIZE_DEFAULT = 5;
 	private static final String CLIENT_POOL_EXCHAUSTED_ACTION_PROPERTY = "rest_ws_plugin_client_pool_exhausted_action";
 	private static final String ACTION_BLOCK = "block";
@@ -99,6 +100,9 @@ public class RestWSPlugin implements IServerPlugin
 		Map<String, String> req = new HashMap<String, String>();
 		req.put(CLIENT_POOL_SIZE_PROPERTY, "Max number of clients used (this defines the number of concurrent requests and licences used), default = " +
 			CLIENT_POOL_SIZE_DEFAULT + ", when running in developer this setting is ignored, pool size will always be 1");
+		req.put(CLIENT_POOL_SIZE_PER_SOLUTION_PROPERTY, "Max number of clients per solution. If this is set then '" + CLIENT_POOL_SIZE_PROPERTY +
+			"' is ignored (the max total size will be number of solutions multiplied by this value). Default is not set");
+
 		req.put(CLIENT_POOL_EXCHAUSTED_ACTION_PROPERTY, "The following values are supported for this property:\n" +
 			//
 			ACTION_BLOCK + " (default): requests will wait untill a client becomes available, when running in developer this value will be used\n" +
@@ -106,8 +110,9 @@ public class RestWSPlugin implements IServerPlugin
 			ACTION_FAIL + ": the request will fail. The API will generate a SERVICE_UNAVAILABLE response (HTTP " + HttpServletResponse.SC_SERVICE_UNAVAILABLE +
 			")\n" +
 			//
-			ACTION_GROW +
-			": allows the pool to temporarily grow, by starting additional clients. These will be automatically removed when not required anymore.");
+			ACTION_GROW + ": allows the pool to  grow, by starting additional clients. This will void (both -1) the properties '" + CLIENT_POOL_SIZE_PROPERTY +
+			"' and '" + CLIENT_POOL_SIZE_PER_SOLUTION_PROPERTY +
+			"' and the latter is used as the max idle per solution, so the pool will remove idle clients if the pool has that reached that number of ilde clients for that solution");
 		req.put(AUTHORIZED_GROUPS_PROPERTY,
 			"Only authenticated users in the listed groups (comma-separated) have access, when left empty unauthorised access is allowed");
 
@@ -189,6 +194,7 @@ public class RestWSPlugin implements IServerPlugin
 			if (!ApplicationServerRegistry.get().isDeveloperStartup())
 			{
 				int poolSize;
+				int poolSizePerSolution;
 				try
 				{
 					poolSize = Integer.parseInt(application.getSettings().getProperty(CLIENT_POOL_SIZE_PROPERTY, "" + CLIENT_POOL_SIZE_DEFAULT).trim());
@@ -196,6 +202,21 @@ public class RestWSPlugin implements IServerPlugin
 				catch (NumberFormatException nfe)
 				{
 					poolSize = CLIENT_POOL_SIZE_DEFAULT;
+				}
+
+				try
+				{
+					poolSizePerSolution = Integer.parseInt(application.getSettings().getProperty(CLIENT_POOL_SIZE_PER_SOLUTION_PROPERTY, "-1").trim());
+				}
+				catch (NumberFormatException nfe)
+				{
+					poolSizePerSolution = -1;
+				}
+				if (poolSizePerSolution > 0)
+				{
+					// if per solution is set, then set the max total pool size on -1
+					poolSize = -1;
+					config.setMaxTotalPerKey(poolSizePerSolution);
 				}
 				config.setMaxTotal(poolSize);
 
@@ -209,6 +230,11 @@ public class RestWSPlugin implements IServerPlugin
 				else if (ACTION_GROW.equalsIgnoreCase(exchaustedActionCode))
 				{
 					config.setMaxTotal(-1);
+					config.setMaxTotalPerKey(-1);
+					if (poolSizePerSolution > 0)
+					{
+						config.setMaxIdlePerKey(poolSizePerSolution);
+					}
 					if (log.isDebugEnabled()) log.debug("Client pool, exchaustedAction=" + ACTION_GROW);
 				}
 				else

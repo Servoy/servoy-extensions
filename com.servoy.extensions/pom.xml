@@ -8,10 +8,6 @@
 
 	<repositories>
 		<repository>
-			<id>terracotta-releases</id>
-			<url>http://www.terracotta.org/download/reflector/releases/</url>
-		</repository>
-		<repository>
 			<id>developer_repo</id>
 			<name>developer_repo</name>
 			<url>http://developer.servoy.com/mvn_repository/</url>
@@ -519,11 +515,6 @@
 			<groupId>com.servoy</groupId>
 			<artifactId>jabsorb</artifactId>
 			<version>1.3.0.s2</version>
-		</dependency>
-		<dependency>
-			<groupId>org.terracotta.api</groupId>
-			<artifactId>tim-api</artifactId>
-			<version>1.3.0</version>
 		</dependency>
 		<dependency>
 			<groupId>com.servoy</groupId>
