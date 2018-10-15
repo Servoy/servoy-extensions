@@ -25,7 +25,6 @@
 		<servoy-local.url>${project.baseUri}/target/repository/</servoy-local.url>
 	</properties>
 
-
 	<profiles>
 		<profile>
 			<id>not_dev</id>
@@ -128,7 +127,7 @@
 									<layout>p2</layout>
 								</repository>
 								<repository>
-									<id>servoy_shiblibs</id>
+									<id>servoy_shiplibs</id>
 									<url>${servoy-shiplibs.url}</url>
 									<layout>p2</layout>
 								</repository>
@@ -262,7 +261,7 @@
 											failonerror="true">
 											<arg value="-J-Xmx512m" />
 											<arg value="-r" />
-											<arg value="-O" />
+											<!-- This may break some features 	<arg value="-O" /> -->
 											<arg
 												value="${project.build.directory}/plugins_beans/@{type}/@{jarname}.jar" />
 										</exec>
@@ -515,7 +514,7 @@
 		<dependency>
 			<groupId>com.servoy</groupId>
 			<artifactId>jabsorb</artifactId>
-			<version>1.3.3</version>
+			<version>1.3.0.s2</version>
 		</dependency>
 		<dependency>
 			<groupId>com.servoy</groupId>

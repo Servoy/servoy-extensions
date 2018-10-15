@@ -160,6 +160,7 @@ public class JSClient implements IScriptable, IConstantsObject
 						{
 							JSEvent event = new JSEvent();
 							event.setType(CALLBACK_EVENT);
+							event.setName(methodName);
 							event.setData(retval);
 							// function def will not throw an exception.
 							functionDef.executeAsync(plugin.getPluginAccess(), new Object[] { event, JSClient.this });

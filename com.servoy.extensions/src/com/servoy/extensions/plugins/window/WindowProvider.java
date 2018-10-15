@@ -220,6 +220,7 @@ public class WindowProvider implements IReturnedTypesProvider, IScriptable
 			event.setElementName(component.getName());
 		}
 		event.setFormName(formName);
+		event.setName("onKeyPress");
 		Object ret = null;
 		if (globalHandler != null)
 		{
