@@ -41,6 +41,7 @@ import com.servoy.j2db.plugins.PluginException;
 import com.servoy.j2db.preference.PreferencePanel;
 import com.servoy.j2db.server.headlessclient.HeadlessClientFactory;
 import com.servoy.j2db.server.shared.ApplicationServerRegistry;
+import com.servoy.j2db.server.shared.IClientInformation;
 import com.servoy.j2db.server.shared.IHeadlessClient;
 import com.servoy.j2db.util.Debug;
 import com.servoy.j2db.util.Utils;
@@ -101,14 +102,14 @@ public class RestWSPlugin implements IServerPlugin
 			CLIENT_POOL_SIZE_DEFAULT + ", when running in developer this setting is ignored, pool size will always be 1");
 		req.put(CLIENT_POOL_EXCHAUSTED_ACTION_PROPERTY,
 			"The following values are supported for this property:\n" +
-				//
-				ACTION_BLOCK + " (default): requests will wait untill a client becomes available, when running in developer this value will be used\n" +
-				//
+			//
+			ACTION_BLOCK + " (default): requests will wait untill a client becomes available, when running in developer this value will be used\n" +
+			//
 				ACTION_FAIL + ": the request will fail. The API will generate a SERVICE_UNAVAILABLE response (HTTP " +
 				HttpServletResponse.SC_SERVICE_UNAVAILABLE + ")\n" +
-				//
-				ACTION_GROW +
-				": allows the pool to temporarily grow, by starting additional clients. These will be automatically removed when not required anymore.");
+			//
+			ACTION_GROW +
+			": allows the pool to temporarily grow, by starting additional clients. These will be automatically removed when not required anymore.");
 		req.put(AUTHORIZED_GROUPS_PROPERTY,
 			"Only authenticated users in the listed groups (comma-separated) have access, when left empty unauthorised access is allowed");
 
@@ -268,8 +269,26 @@ public class RestWSPlugin implements IServerPlugin
 						}
 					}
 					boolean valid = client.isValid();
+					if (valid && !isClientRegistered(client.getClientID()))
+					{
+						log.warn("Client invalid because no longer registered with the server " + client.getClientID());
+						valid = false;
+					}
+
 					if (log.isDebugEnabled()) log.debug("Validated session client for solution '" + key + "', valid = " + valid);
 					return valid;
+				}
+
+				private boolean isClientRegistered(String clientID)
+				{
+					for (IClientInformation connectedClient : application.getConnectedClients())
+					{
+						if (connectedClient.getClientID().equals(clientID))
+						{
+							return true;
+						}
+					}
+					return false;
 				}
 
 				@Override
