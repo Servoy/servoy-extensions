@@ -74,8 +74,6 @@ public class HttpProvider implements IReturnedTypesProvider, IScriptable
 {
 	private String proxyUser = null;
 	private String proxyPassword = null;
-	private static String proxyHost = null;
-	private static int proxyPort = 8080;
 	private int timeout = -1;
 
 	@Deprecated
@@ -270,16 +268,16 @@ public class HttpProvider implements IReturnedTypesProvider, IScriptable
 			}
 			if (url != null)
 			{
-				setHttpClientProxy(client, url, proxyUser, proxyPassword, proxyHost, proxyPort);
+				setHttpClientProxy(client, url, proxyUser, proxyPassword);
 			}
 		}
 		return client;
 	}
 
-	public static void setHttpClientProxy(DefaultHttpClient client, String url, String proxyUser, String proxyPassword, String proxyHostName, int port)
+	public static void setHttpClientProxy(DefaultHttpClient client, String url, String proxyUser, String proxyPassword)
 	{
-		proxyHost = proxyHostName;
-		proxyPort = port;
+		String proxyHost = null;
+		int proxyPort = 8080;
 		try
 		{
 			System.setProperty("java.net.useSystemProxies", "true");
@@ -307,7 +305,6 @@ public class HttpProvider implements IReturnedTypesProvider, IScriptable
 
 		if (proxyHost == null && System.getProperty("http.proxyHost") != null && !"".equals(System.getProperty("http.proxyHost")))
 		{
-			proxyPort = 8080;
 			proxyHost = System.getProperty("http.proxyHost");
 			try
 			{
@@ -445,7 +442,7 @@ public class HttpProvider implements IReturnedTypesProvider, IScriptable
 		ByteArrayOutputStream sb = new ByteArrayOutputStream();
 		try
 		{
-			setHttpClientProxy(client, url, proxyUser, proxyPassword, proxyHost, proxyPort);
+			setHttpClientProxy(client, url, proxyUser, proxyPassword);
 
 			HttpGet method = new HttpGet(url);
 
