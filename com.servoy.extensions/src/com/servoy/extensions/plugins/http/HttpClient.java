@@ -63,6 +63,9 @@ public class HttpClient implements IScriptable, IJavaScriptType
 
 	private String proxyUser = null;
 	private String proxyPassword = null;
+	private String proxyHost = null;
+	private int proxyPort = 8080;
+
 	private final HttpPlugin httpPlugin;
 
 	public HttpClient(HttpPlugin httpPlugin)
@@ -271,7 +274,7 @@ public class HttpClient implements IScriptable, IJavaScriptType
 	 */
 	public PostRequest js_createPostRequest(String url)
 	{
-		HttpProvider.setHttpClientProxy(client, url, proxyUser, proxyPassword);
+		HttpProvider.setHttpClientProxy(client, url, proxyUser, proxyPassword, proxyHost, proxyPort);
 		return new PostRequest(url, client, httpPlugin);
 	}
 
@@ -294,7 +297,7 @@ public class HttpClient implements IScriptable, IJavaScriptType
 	 */
 	public GetRequest js_createGetRequest(String url)
 	{
-		HttpProvider.setHttpClientProxy(client, url, proxyUser, proxyPassword);
+		HttpProvider.setHttpClientProxy(client, url, proxyUser, proxyPassword, proxyHost, proxyPort);
 		return new GetRequest(url, client, httpPlugin);
 	}
 
@@ -312,7 +315,7 @@ public class HttpClient implements IScriptable, IJavaScriptType
 	 */
 	public DeleteRequest js_createDeleteRequest(String url)
 	{
-		HttpProvider.setHttpClientProxy(client, url, proxyUser, proxyPassword);
+		HttpProvider.setHttpClientProxy(client, url, proxyUser, proxyPassword, proxyHost, proxyPort);
 		return new DeleteRequest(url, client, httpPlugin);
 	}
 
@@ -329,7 +332,7 @@ public class HttpClient implements IScriptable, IJavaScriptType
 	 */
 	public PatchRequest js_createPatchRequest(String url)
 	{
-		HttpProvider.setHttpClientProxy(client, url, proxyUser, proxyPassword);
+		HttpProvider.setHttpClientProxy(client, url, proxyUser, proxyPassword, proxyHost, proxyPort);
 		return new PatchRequest(url, client, httpPlugin);
 	}
 
@@ -346,7 +349,7 @@ public class HttpClient implements IScriptable, IJavaScriptType
 	 */
 	public PutRequest js_createPutRequest(String url)
 	{
-		HttpProvider.setHttpClientProxy(client, url, proxyUser, proxyPassword);
+		HttpProvider.setHttpClientProxy(client, url, proxyUser, proxyPassword, proxyHost, proxyPort);
 		return new PutRequest(url, client, httpPlugin);
 	}
 
@@ -362,7 +365,7 @@ public class HttpClient implements IScriptable, IJavaScriptType
 	 */
 	public OptionsRequest js_createOptionsRequest(String url)
 	{
-		HttpProvider.setHttpClientProxy(client, url, proxyUser, proxyPassword);
+		HttpProvider.setHttpClientProxy(client, url, proxyUser, proxyPassword, proxyHost, proxyPort);
 		return new OptionsRequest(url, client, httpPlugin);
 	}
 
@@ -380,7 +383,7 @@ public class HttpClient implements IScriptable, IJavaScriptType
 	 */
 	public HeadRequest js_createHeadRequest(String url)
 	{
-		HttpProvider.setHttpClientProxy(client, url, proxyUser, proxyPassword);
+		HttpProvider.setHttpClientProxy(client, url, proxyUser, proxyPassword, proxyHost, proxyPort);
 		return new HeadRequest(url, client, httpPlugin);
 	}
 
@@ -397,7 +400,7 @@ public class HttpClient implements IScriptable, IJavaScriptType
 	 */
 	public TraceRequest js_createTraceRequest(String url)
 	{
-		HttpProvider.setHttpClientProxy(client, url, proxyUser, proxyPassword);
+		HttpProvider.setHttpClientProxy(client, url, proxyUser, proxyPassword, proxyHost, proxyPort);
 		return new TraceRequest(url, client, httpPlugin);
 	}
 
@@ -419,6 +422,28 @@ public class HttpClient implements IScriptable, IJavaScriptType
 		}
 	}
 
+	/**
+	 * Set proxy server.
+	 *
+	 * @sample
+	 * client.setClientProxyServer('server',port);
+	 *
+	 * @param hostname - proxy host // null value will clear proxyHost settings;
+	 * @param port - proxy port //null value will clear proxyHost settings;
+	 */
+	public void js_setClientProxyServer(String hostname, Integer port)
+	{
+		if (!Utils.stringIsEmpty(hostname) && port != null)
+		{
+			this.proxyHost = hostname;
+			this.proxyPort = Math.abs(port.intValue());
+		}
+		else
+		{
+			this.proxyHost = null;
+			this.proxyPort = 8080;
+		}
+	}
 
 	private static final class CertificateSSLSocketFactoryHandler extends SSLSocketFactory
 	{
