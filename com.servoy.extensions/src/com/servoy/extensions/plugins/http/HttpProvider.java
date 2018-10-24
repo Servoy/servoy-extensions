@@ -158,33 +158,43 @@ public class HttpProvider implements IReturnedTypesProvider, IScriptable
 		}
 	}
 
-	public static BasicCredentialsProvider setHttpClientProxy(Builder requestConfigBuilder, String url, String proxyUser, String proxyPassword)
+	public static BasicCredentialsProvider setHttpClientProxy(Builder requestConfigBuilder, String url, String proxyUser, String proxyPassword,
+		String proxyHostName, int port)
 	{
 		String proxyHost = null;
 		int proxyPort = 8080;
-		try
+
+		if (proxyHostName != null)
 		{
-			System.setProperty("java.net.useSystemProxies", "true");
-			URI uri = new URI(url);
-			List<Proxy> proxies = ProxySelector.getDefault().select(uri);
-			if (proxies != null && requestConfigBuilder != null)
+			proxyHost = proxyHostName;
+			proxyPort = port;
+		}
+		else
+		{
+			try
 			{
-				for (Proxy proxy : proxies)
+				System.setProperty("java.net.useSystemProxies", "true");
+				URI uri = new URI(url);
+				List<Proxy> proxies = ProxySelector.getDefault().select(uri);
+				if (proxies != null && requestConfigBuilder != null)
 				{
-					if (proxy.address() != null && proxy.address() instanceof InetSocketAddress)
+					for (Proxy proxy : proxies)
 					{
-						InetSocketAddress address = (InetSocketAddress)proxy.address();
-						proxyHost = address.getHostName();
-						HttpHost host = new HttpHost(address.getHostName(), address.getPort());
-						requestConfigBuilder.setProxy(host);
-						break;
+						if (proxy.address() != null && proxy.address() instanceof InetSocketAddress)
+						{
+							InetSocketAddress address = (InetSocketAddress)proxy.address();
+							proxyHost = address.getHostName();
+							HttpHost host = new HttpHost(address.getHostName(), address.getPort());
+							requestConfigBuilder.setProxy(host);
+							break;
+						}
 					}
 				}
 			}
-		}
-		catch (Exception ex)
-		{
-			Debug.log(ex);
+			catch (Exception ex)
+			{
+				Debug.log(ex);
+			}
 		}
 
 		if (proxyHost == null && System.getProperty("http.proxyHost") != null && !"".equals(System.getProperty("http.proxyHost")))

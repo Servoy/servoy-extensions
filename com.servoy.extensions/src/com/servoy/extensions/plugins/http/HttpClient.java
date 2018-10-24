@@ -56,6 +56,8 @@ public class HttpClient implements IScriptable, IJavaScriptType
 	private final HttpPlugin httpPlugin;
 	private String proxyUser;
 	private String proxyPassword;
+	private String proxyHost;
+	private int proxyPort = 8080;
 
 	public HttpClient(HttpPlugin httpPlugin)
 	{
@@ -280,7 +282,7 @@ public class HttpClient implements IScriptable, IJavaScriptType
 	public PostRequest js_createPostRequest(String url)
 	{
 		return new PostRequest(url, client, httpPlugin, requestConfigBuilder,
-			HttpProvider.setHttpClientProxy(requestConfigBuilder, url, proxyUser, proxyPassword));
+			HttpProvider.setHttpClientProxy(requestConfigBuilder, url, proxyUser, proxyPassword, proxyHost, proxyPort));
 	}
 
 	/**
@@ -303,7 +305,7 @@ public class HttpClient implements IScriptable, IJavaScriptType
 	public GetRequest js_createGetRequest(String url)
 	{
 		return new GetRequest(url, client, httpPlugin, requestConfigBuilder,
-			HttpProvider.setHttpClientProxy(requestConfigBuilder, url, proxyUser, proxyPassword));
+			HttpProvider.setHttpClientProxy(requestConfigBuilder, url, proxyUser, proxyPassword, proxyHost, proxyPort));
 	}
 
 	/**
@@ -321,7 +323,7 @@ public class HttpClient implements IScriptable, IJavaScriptType
 	public DeleteRequest js_createDeleteRequest(String url)
 	{
 		return new DeleteRequest(url, client, httpPlugin, requestConfigBuilder,
-			HttpProvider.setHttpClientProxy(requestConfigBuilder, url, proxyUser, proxyPassword));
+			HttpProvider.setHttpClientProxy(requestConfigBuilder, url, proxyUser, proxyPassword, proxyHost, proxyPort));
 	}
 
 	/**
@@ -338,7 +340,7 @@ public class HttpClient implements IScriptable, IJavaScriptType
 	public PatchRequest js_createPatchRequest(String url)
 	{
 		return new PatchRequest(url, client, httpPlugin, requestConfigBuilder,
-			HttpProvider.setHttpClientProxy(requestConfigBuilder, url, proxyUser, proxyPassword));
+			HttpProvider.setHttpClientProxy(requestConfigBuilder, url, proxyUser, proxyPassword, proxyHost, proxyPort));
 	}
 
 	/**
@@ -355,7 +357,7 @@ public class HttpClient implements IScriptable, IJavaScriptType
 	public PutRequest js_createPutRequest(String url)
 	{
 		return new PutRequest(url, client, httpPlugin, requestConfigBuilder,
-			HttpProvider.setHttpClientProxy(requestConfigBuilder, url, proxyUser, proxyPassword));
+			HttpProvider.setHttpClientProxy(requestConfigBuilder, url, proxyUser, proxyPassword, proxyHost, proxyPort));
 	}
 
 	/**
@@ -371,7 +373,7 @@ public class HttpClient implements IScriptable, IJavaScriptType
 	public OptionsRequest js_createOptionsRequest(String url)
 	{
 		return new OptionsRequest(url, client, httpPlugin, requestConfigBuilder,
-			HttpProvider.setHttpClientProxy(requestConfigBuilder, url, proxyUser, proxyPassword));
+			HttpProvider.setHttpClientProxy(requestConfigBuilder, url, proxyUser, proxyPassword, proxyHost, proxyPort));
 	}
 
 	/**
@@ -389,7 +391,7 @@ public class HttpClient implements IScriptable, IJavaScriptType
 	public HeadRequest js_createHeadRequest(String url)
 	{
 		return new HeadRequest(url, client, httpPlugin, requestConfigBuilder,
-			HttpProvider.setHttpClientProxy(requestConfigBuilder, url, proxyUser, proxyPassword));
+			HttpProvider.setHttpClientProxy(requestConfigBuilder, url, proxyUser, proxyPassword, proxyHost, proxyPort));
 	}
 
 	/**
@@ -406,7 +408,7 @@ public class HttpClient implements IScriptable, IJavaScriptType
 	public TraceRequest js_createTraceRequest(String url)
 	{
 		return new TraceRequest(url, client, httpPlugin, requestConfigBuilder,
-			HttpProvider.setHttpClientProxy(requestConfigBuilder, url, proxyUser, proxyPassword));
+			HttpProvider.setHttpClientProxy(requestConfigBuilder, url, proxyUser, proxyPassword, proxyHost, proxyPort));
 	}
 
 	/**
@@ -424,6 +426,29 @@ public class HttpClient implements IScriptable, IJavaScriptType
 		{
 			this.proxyUser = userName;
 			this.proxyPassword = password;
+		}
+	}
+
+	/**
+	 * Set proxy server.
+	 *
+	 * @sample
+	 * client.setClientProxyServer('server',port);
+	 *
+	 * @param hostname - proxy host // null value will clear proxyHost settings;
+	 * @param port - proxy port //null value will clear proxyHost settings;
+	 */
+	public void js_setClientProxyServer(String hostname, Integer port)
+	{
+		if (!Utils.stringIsEmpty(hostname) && port != null)
+		{
+			this.proxyHost = hostname;
+			this.proxyPort = Math.abs(port.intValue());
+		}
+		else
+		{
+			this.proxyHost = null;
+			this.proxyPort = 8080;
 		}
 	}
 
