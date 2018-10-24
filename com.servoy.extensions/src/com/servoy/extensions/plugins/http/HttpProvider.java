@@ -168,6 +168,8 @@ public class HttpProvider implements IReturnedTypesProvider, IScriptable
 		{
 			proxyHost = proxyHostName;
 			proxyPort = port;
+			HttpHost host = new HttpHost(proxyHost, proxyPort);
+			requestConfigBuilder.setProxy(host);
 		}
 		else
 		{
@@ -195,21 +197,20 @@ public class HttpProvider implements IReturnedTypesProvider, IScriptable
 			{
 				Debug.log(ex);
 			}
-		}
-
-		if (proxyHost == null && System.getProperty("http.proxyHost") != null && !"".equals(System.getProperty("http.proxyHost")))
-		{
-			proxyHost = System.getProperty("http.proxyHost");
-			try
+			if (proxyHost == null && System.getProperty("http.proxyHost") != null && !"".equals(System.getProperty("http.proxyHost")))
 			{
-				proxyPort = Integer.parseInt(System.getProperty("http.proxyPort"));
+				proxyHost = System.getProperty("http.proxyHost");
+				try
+				{
+					proxyPort = Integer.parseInt(System.getProperty("http.proxyPort"));
+				}
+				catch (Exception ex)
+				{
+					//ignore
+				}
+				HttpHost host = new HttpHost(proxyHost, proxyPort);
+				requestConfigBuilder.setProxy(host);
 			}
-			catch (Exception ex)
-			{
-				//ignore
-			}
-			HttpHost host = new HttpHost(proxyHost, proxyPort);
-			requestConfigBuilder.setProxy(host);
 		}
 
 		if (proxyUser != null)
