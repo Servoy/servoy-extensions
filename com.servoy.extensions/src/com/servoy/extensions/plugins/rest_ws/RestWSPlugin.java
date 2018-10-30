@@ -41,6 +41,7 @@ import com.servoy.j2db.plugins.PluginException;
 import com.servoy.j2db.preference.PreferencePanel;
 import com.servoy.j2db.server.headlessclient.HeadlessClientFactory;
 import com.servoy.j2db.server.shared.ApplicationServerRegistry;
+import com.servoy.j2db.server.shared.IClientInformation;
 import com.servoy.j2db.server.shared.IHeadlessClient;
 import com.servoy.j2db.util.Debug;
 import com.servoy.j2db.util.Utils;
@@ -293,8 +294,26 @@ public class RestWSPlugin implements IServerPlugin
 						}
 					}
 					boolean valid = client.isValid();
+					if (valid && !isClientRegistered(client.getClientID()))
+					{
+						log.warn("Client invalid because no longer registered with the server " + client.getClientID());
+						valid = false;
+					}
+
 					if (log.isDebugEnabled()) log.debug("Validated session client for solution '" + key + "', valid = " + valid);
 					return valid;
+				}
+
+				private boolean isClientRegistered(String clientID)
+				{
+					for (IClientInformation connectedClient : application.getConnectedClients())
+					{
+						if (connectedClient.getClientID().equals(clientID))
+						{
+							return true;
+						}
+					}
+					return false;
 				}
 
 				@Override
