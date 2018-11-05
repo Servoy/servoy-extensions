@@ -9,7 +9,6 @@
    </information>
    <resources>
       <jar href="/plugins/mail.jar" download="eager" part="mail" version="%%version%%"/>
-      <jar href="/plugins/activation.jar" download="eager" part="mail" version="%%version%%"/>
       <package name="javax.mail.*" part="mail" recursive="true"/>      
    </resources>
    <component-desc/>
