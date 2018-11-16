@@ -42,9 +42,7 @@ import javax.servlet.http.HttpServletResponseWrapper;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
-import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 import org.json.XML;
 import org.mozilla.javascript.JavaScriptException;
 import org.mozilla.javascript.Scriptable;
@@ -1270,6 +1268,11 @@ public class RestWSServlet extends HttpServlet
 	 */
 	private String getContent(HttpServletResponse response, Object result, boolean interpretResult, int contentType) throws Exception
 	{
+		if (result == null)
+		{
+			return "";
+		}
+
 		if (result instanceof XMLObject)
 		{
 			if (contentType == CONTENT_JSON)
@@ -1281,23 +1284,24 @@ public class RestWSServlet extends HttpServlet
 
 		if (contentType == CONTENT_XML)
 		{
-			XML.toString(result, null);
+			Object json = plugin.getJSONSerializer().toJSON(result);
+			return XML.toString(json, null);
 		}
 
-		if (!interpretResult || result instanceof JSONObject || result instanceof JSONArray)
+		if (interpretResult)
 		{
-			return result == null ? "" : result.toString();
+			try
+			{
+				return plugin.getJSONSerializer().toJSON(result).toString();
+			}
+			catch (Exception e)
+			{
+				Debug.error("Failed to convert " + result + " to a json structure", e);
+				throw e;
+			}
 		}
 
-		try
-		{
-			return plugin.getJSONSerializer().toJSON(result).toString();
-		}
-		catch (Exception e)
-		{
-			Debug.error("Failed to convert " + result + " to a json structure", e);
-			throw e;
-		}
+		return result.toString();
 	}
 
 	private String getBytesContentType(HttpServletRequest request, byte[] bytes)
