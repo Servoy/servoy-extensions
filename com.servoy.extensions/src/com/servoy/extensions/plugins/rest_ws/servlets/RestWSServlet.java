@@ -42,7 +42,9 @@ import javax.servlet.http.HttpServletResponseWrapper;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
+import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 import org.json.XML;
 import org.mozilla.javascript.JavaScriptException;
 import org.mozilla.javascript.Scriptable;
@@ -1284,11 +1286,15 @@ public class RestWSServlet extends HttpServlet
 
 		if (contentType == CONTENT_XML)
 		{
+			if (result instanceof JSONObject || result instanceof JSONArray)
+			{
+				return XML.toString(result.toString(), null);
+			}
 			Object json = plugin.getJSONSerializer().toJSON(result);
 			return XML.toString(json, null);
 		}
 
-		if (interpretResult)
+		if (interpretResult && !(result instanceof JSONObject || result instanceof JSONArray))
 		{
 			try
 			{
