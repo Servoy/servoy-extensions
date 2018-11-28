@@ -1270,6 +1270,11 @@ public class RestWSServlet extends HttpServlet
 	 */
 	private String getContent(HttpServletResponse response, Object result, boolean interpretResult, int contentType) throws Exception
 	{
+		if (result == null)
+		{
+			return "";
+		}
+
 		if (result instanceof XMLObject)
 		{
 			if (contentType == CONTENT_JSON)
@@ -1281,23 +1286,28 @@ public class RestWSServlet extends HttpServlet
 
 		if (contentType == CONTENT_XML)
 		{
-			XML.toString(result, null);
+			if (result instanceof JSONObject || result instanceof JSONArray)
+			{
+				return XML.toString(result.toString(), null);
+			}
+			Object json = plugin.getJSONSerializer().toJSON(result);
+			return XML.toString(json, null);
 		}
 
-		if (!interpretResult || result instanceof JSONObject || result instanceof JSONArray)
+		if (interpretResult && !(result instanceof JSONObject || result instanceof JSONArray))
 		{
-			return result == null ? "" : result.toString();
+			try
+			{
+				return plugin.getJSONSerializer().toJSON(result).toString();
+			}
+			catch (Exception e)
+			{
+				Debug.error("Failed to convert " + result + " to a json structure", e);
+				throw e;
+			}
 		}
 
-		try
-		{
-			return plugin.getJSONSerializer().toJSON(result).toString();
-		}
-		catch (Exception e)
-		{
-			Debug.error("Failed to convert " + result + " to a json structure", e);
-			throw e;
-		}
+		return result.toString();
 	}
 
 	private String getBytesContentType(HttpServletRequest request, byte[] bytes)
