@@ -22,14 +22,12 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.security.cert.X509Certificate;
 import java.sql.Date;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLPeerUnverifiedException;
 
 import org.apache.http.client.CookieStore;
-import org.apache.http.client.config.AuthSchemes;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.config.RequestConfig.Builder;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
@@ -67,12 +65,6 @@ public class HttpClient implements IScriptable, IJavaScriptType
 		requestConfigBuilder = RequestConfig.custom();
 		requestConfigBuilder.setCircularRedirectsAllowed(true);
 		builder.setMaxConnPerRoute(5);
-
-		ArrayList<String> authPrefs = new ArrayList<String>();
-		authPrefs.add(AuthSchemes.NTLM);
-		authPrefs.add(AuthSchemes.SPNEGO);
-		requestConfigBuilder.setProxyPreferredAuthSchemes(authPrefs);
-		requestConfigBuilder.setTargetPreferredAuthSchemes(authPrefs);
 
 		cookieStore = new BasicCookieStore();
 		builder.setDefaultCookieStore(cookieStore);
