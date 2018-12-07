@@ -57,6 +57,7 @@ import com.servoy.extensions.plugins.window.menu.wicket.WicketMenuHandler;
 import com.servoy.extensions.plugins.window.popup.IPopupShower;
 import com.servoy.extensions.plugins.window.popup.swing.SwingPopupShower;
 import com.servoy.extensions.plugins.window.popup.wicket.WicketPopupShower;
+import com.servoy.extensions.plugins.window.popupform.FormPopup;
 import com.servoy.extensions.plugins.window.shortcut.IShortcutHandler;
 import com.servoy.extensions.plugins.window.shortcut.swing.SwingShortcutHandler;
 import com.servoy.extensions.plugins.window.shortcut.wicket.WicketShortcutHandler;
@@ -825,6 +826,13 @@ public class WindowProvider implements IReturnedTypesProvider, IScriptable
 		boolean showBackdrop)
 	{
 		//ng only, just for the docs
+	}
+
+	@ServoyClientSupport(ng = true, wc = false, sc = false)
+	public FormPopup js_createFormPopup(IComponent elementToShowRelatedTo, IForm form)
+	{
+		//ng only, just for the docs
+		return null;
 	}
 
 	/**
@@ -1658,7 +1666,7 @@ public class WindowProvider implements IReturnedTypesProvider, IScriptable
 	@SuppressWarnings("deprecation")
 	public Class< ? >[] getAllReturnedTypes()
 	{
-		return new Class[] { Menu.class, RadioButton.class, CheckBox.class, MenuItem.class, JSMenuItem.class/* deprecated */, Popup.class, ToolBar.class, MenuBar.class };
+		return new Class[] { Menu.class, RadioButton.class, CheckBox.class, FormPopup.class, MenuItem.class, JSMenuItem.class/* deprecated */, Popup.class, ToolBar.class, MenuBar.class };
 	}
 
 	/**
