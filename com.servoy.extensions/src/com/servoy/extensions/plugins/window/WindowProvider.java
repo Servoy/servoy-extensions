@@ -828,8 +828,18 @@ public class WindowProvider implements IReturnedTypesProvider, IScriptable
 		//ng only, just for the docs
 	}
 
+	/**
+	 * Create a form popup that can be filled with data and shown.
+	 *
+	 * @sample
+	 * plugins.window.createFormPopup(forms.orderPicker).show();
+	 *
+	 * @param form the form to show
+	 *
+	 * @return FormPopup
+	 */
 	@ServoyClientSupport(ng = true, wc = false, sc = false)
-	public FormPopup js_createFormPopup(IComponent elementToShowRelatedTo, IForm form)
+	public FormPopup js_createFormPopup(IForm form)
 	{
 		//ng only, just for the docs
 		return null;
