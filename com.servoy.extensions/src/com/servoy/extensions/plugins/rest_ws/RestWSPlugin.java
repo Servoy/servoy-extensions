@@ -63,7 +63,7 @@ import com.servoy.j2db.util.serialize.JSONSerializerWrapper;
 public class RestWSPlugin implements IServerPlugin
 {
 	private static final String CLIENT_POOL_SIZE_PROPERTY = "rest_ws_plugin_client_pool_size";
-	private static final String CLIENT_POOL_SIZE_PER_SOLUTION_PROPERTY = "rest_ws_plugin_client_pool_size_per_solution";
+	private static final String DEPRECATED_CLIENT_POOL_SIZE_PER_SOLUTION_PROPERTY = "rest_ws_plugin_client_pool_size_per_solution";
 	private static final int CLIENT_POOL_SIZE_DEFAULT = 5;
 	private static final String CLIENT_POOL_EXCHAUSTED_ACTION_PROPERTY = "rest_ws_plugin_client_pool_exhausted_action";
 	private static final String ACTION_BLOCK = "block";
@@ -98,21 +98,18 @@ public class RestWSPlugin implements IServerPlugin
 	public Map<String, String> getRequiredPropertyNames()
 	{
 		Map<String, String> req = new HashMap<String, String>();
-		req.put(CLIENT_POOL_SIZE_PROPERTY, "Max number of clients used (this defines the number of concurrent requests and licences used), default = " +
-			CLIENT_POOL_SIZE_DEFAULT + ", when running in developer this setting is ignored, pool size will always be 1");
-		req.put(CLIENT_POOL_SIZE_PER_SOLUTION_PROPERTY, "Max number of clients per solution. If this is set then '" + CLIENT_POOL_SIZE_PROPERTY +
-			"' is ignored (the max total size will be number of solutions multiplied by this value). Default is not set");
+		req.put(CLIENT_POOL_SIZE_PROPERTY,
+			"Max number of clients per solution used (this defines the number of concurrent requests and licences used per solution), default = " +
+				CLIENT_POOL_SIZE_DEFAULT + ". The same value is used for maximum number of idle clients. In case of " + CLIENT_POOL_EXCHAUSTED_ACTION_PROPERTY +
+				"=" + ACTION_GROW + ", the number of clients may become higher. When running in developer this setting is ignored, pool size will always be 1");
 
-		req.put(CLIENT_POOL_EXCHAUSTED_ACTION_PROPERTY, "The following values are supported for this property:\n" +
-			//
-			ACTION_BLOCK + " (default): requests will wait untill a client becomes available, when running in developer this value will be used\n" +
-			//
+		req.put(CLIENT_POOL_EXCHAUSTED_ACTION_PROPERTY, "The following values are supported for this setting:\n" + //
+			ACTION_BLOCK + " (default): requests will wait untill a client becomes available, when running in developer this value will be used\n" + //
 			ACTION_FAIL + ": the request will fail. The API will generate a SERVICE_UNAVAILABLE response (HTTP " + HttpServletResponse.SC_SERVICE_UNAVAILABLE +
-			")\n" +
-			//
-			ACTION_GROW + ": allows the pool to  grow, by starting additional clients. This will void (both -1) the properties '" + CLIENT_POOL_SIZE_PROPERTY +
-			"' and '" + CLIENT_POOL_SIZE_PER_SOLUTION_PROPERTY +
-			"' and the latter is used as the max idle per solution, so the pool will remove idle clients if the pool has that reached that number of ilde clients for that solution");
+			")\n" + //
+			ACTION_GROW +
+			": allows the pool to  grow, by starting additional clients. The number of clients per solution may become higher than defined by setting '" +
+			CLIENT_POOL_SIZE_PROPERTY + "', but will shrink back to that value when clients in the pool become idle.");
 		req.put(AUTHORIZED_GROUPS_PROPERTY,
 			"Only authenticated users in the listed groups (comma-separated) have access, when left empty unauthorised access is allowed");
 
@@ -189,36 +186,38 @@ public class RestWSPlugin implements IServerPlugin
 
 			// in developer multiple clients do not work well with debugger
 			config.setBlockWhenExhausted(true);
-			config.setMaxTotal(1);
+			int maxTotalPerKey = 1;
+			int maxIdlePerKey = maxTotalPerKey;
 
 			if (!ApplicationServerRegistry.get().isDeveloperStartup())
 			{
-				int poolSize;
-				int poolSizePerSolution;
 				try
 				{
-					poolSize = Integer.parseInt(application.getSettings().getProperty(CLIENT_POOL_SIZE_PROPERTY, "" + CLIENT_POOL_SIZE_DEFAULT).trim());
+					maxTotalPerKey = Integer.parseInt(application.getSettings().getProperty(DEPRECATED_CLIENT_POOL_SIZE_PER_SOLUTION_PROPERTY, "-1").trim());
 				}
 				catch (NumberFormatException nfe)
 				{
-					poolSize = CLIENT_POOL_SIZE_DEFAULT;
+					maxTotalPerKey = -1;
+				}
+				if (maxTotalPerKey > 0)
+				{
+					log.warn("Deprecated setting {} used, it is replaced by {}", DEPRECATED_CLIENT_POOL_SIZE_PER_SOLUTION_PROPERTY, CLIENT_POOL_SIZE_PROPERTY);
+				}
+				else
+				{
+					try
+					{
+						maxTotalPerKey = Integer.parseInt(
+							application.getSettings().getProperty(CLIENT_POOL_SIZE_PROPERTY, "" + CLIENT_POOL_SIZE_DEFAULT).trim());
+					}
+					catch (NumberFormatException nfe)
+					{
+						maxTotalPerKey = CLIENT_POOL_SIZE_DEFAULT;
+					}
 				}
 
-				try
-				{
-					poolSizePerSolution = Integer.parseInt(application.getSettings().getProperty(CLIENT_POOL_SIZE_PER_SOLUTION_PROPERTY, "-1").trim());
-				}
-				catch (NumberFormatException nfe)
-				{
-					poolSizePerSolution = -1;
-				}
-				if (poolSizePerSolution > 0)
-				{
-					// if per solution is set, then set the max total pool size on -1
-					poolSize = -1;
-					config.setMaxTotalPerKey(poolSizePerSolution);
-				}
-				config.setMaxTotal(poolSize);
+				maxIdlePerKey = maxTotalPerKey;
+
 
 				String exchaustedActionCode = application.getSettings().getProperty(CLIENT_POOL_EXCHAUSTED_ACTION_PROPERTY);
 				if (exchaustedActionCode != null) exchaustedActionCode = exchaustedActionCode.trim();
@@ -229,12 +228,7 @@ public class RestWSPlugin implements IServerPlugin
 				}
 				else if (ACTION_GROW.equalsIgnoreCase(exchaustedActionCode))
 				{
-					config.setMaxTotal(-1);
-					config.setMaxTotalPerKey(-1);
-					if (poolSizePerSolution > 0)
-					{
-						config.setMaxIdlePerKey(poolSizePerSolution);
-					}
+					maxTotalPerKey = -1;
 					if (log.isDebugEnabled()) log.debug("Client pool, exchaustedAction=" + ACTION_GROW);
 				}
 				else
@@ -244,7 +238,10 @@ public class RestWSPlugin implements IServerPlugin
 				}
 			}
 
-			if (log.isDebugEnabled()) log.debug("Creating client pool, maxSize=" + config.getMaxTotal());
+			config.setMaxTotalPerKey(maxTotalPerKey);
+			config.setMaxIdlePerKey(maxIdlePerKey);
+			if (log.isDebugEnabled())
+				log.debug("Creating client pool, maxTotalPerKey=" + config.getMaxTotalPerKey() + ", maxIdlePerKey=" + config.getMaxIdlePerKey());
 
 			clientPool = new GenericKeyedObjectPool<>(new BaseKeyedPooledObjectFactory<String, IHeadlessClient>()
 			{
