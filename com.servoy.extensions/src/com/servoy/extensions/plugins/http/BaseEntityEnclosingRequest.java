@@ -56,7 +56,7 @@ import com.servoy.j2db.util.Utils;
 public class BaseEntityEnclosingRequest extends BaseRequest
 {
 	private String content;
-	private String mimeType;
+	private String mimeType = ContentType.TEXT_PLAIN.getMimeType();
 	protected String charset = HTTP.UTF_8;
 
 	private Map<Pair<String, String>, Object> files;

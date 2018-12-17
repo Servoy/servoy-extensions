@@ -246,7 +246,32 @@ public class ClientManagerProvider implements IScriptable, IReturnedTypesProvide
 	{
 		try
 		{
-			plugin.getClientService().shutDownClient(clientId);
+			plugin.getClientService().shutDownClient(clientId, false);
+		}
+		catch (Exception e)
+		{
+			Debug.error("Exception while shutting down client '" + clientId + "'.", e); //$NON-NLS-1$ //$NON-NLS-2$
+		}
+	}
+
+	/**
+	 * Shuts down a specific client, identified by its clientId. The clientIds are retrieved by calling the getConnectedClients method. This method returns immediately, it does not wait until the client shuts down.
+	 * If forceUnregister is true, the client will unregister itself from server. Beware this should be used only if you are sure client is already closed (cannot connect anymore)
+	 *
+	 * @sample
+	 * //Shuts down a specific client, identified by its clientId. The clientIds are retrieved by calling the getConnectedClients method. This method returns immediately, it does not wait until the client shuts down.
+	 * var clients = plugins.clientmanager.getConnectedClients();
+	 * for (var i=0; i<clients.length; i++)
+	 * 	plugins.clientmanager.shutDownClient(clients[i].getClientId());
+	 *
+	 * @param clientId
+	 * @param forceUnregister client is forced to unregister from server
+	 */
+	public void js_shutDownClient(String clientId, boolean forceUnregister)
+	{
+		try
+		{
+			plugin.getClientService().shutDownClient(clientId, forceUnregister);
 		}
 		catch (Exception e)
 		{

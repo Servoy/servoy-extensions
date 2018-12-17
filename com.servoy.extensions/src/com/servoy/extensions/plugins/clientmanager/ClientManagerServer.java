@@ -106,9 +106,9 @@ public class ClientManagerServer implements IServerPlugin, IClientManagerService
 	}
 
 	@Override
-	public void shutDownClient(String clientId)
+	public void shutDownClient(String clientId, boolean forceUnregister)
 	{
-		application.shutDownClient(clientId);
+		application.shutDownClient(clientId, forceUnregister);
 	}
 
 	@Override
