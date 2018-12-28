@@ -62,9 +62,9 @@ public class HeadlessClientProvider implements IScriptable, IReturnedTypesProvid
 	/**
 	 * This will try to get a existing client by the given id if that client is already created for that specific solution;
 	 * it will create a headless client on the server that will open the given solution if it didn't exists yet.
-	 * 
+	 *
 	 * If the client does exist but it is not loaded with that solution an exception will be thrown.
-	 * 
+	 *
 	 * NOTE: in the developer this will only load the solution in debug mode when it is the current active solution or a module of the active solution;
 	 * you can load any solution from the workspace when you pass "nodebug" as last argument in the arguments list (it should still use the same resources project).
 	 * But then you won't be able to debug it, breakpoints won't hit.
@@ -73,19 +73,19 @@ public class HeadlessClientProvider implements IScriptable, IReturnedTypesProvid
 	 * // Creates a headless client that will open the given solution.
 	 * var storedSolutionSpecificID = "aaaabbbbccccc1111";
 	 * var headlessClient = plugins.headlessclient.getOrCreateClient(storedSolutionSpecificID, "someSolution", "user", "pass", null);
-	 * if (headlessClient != null && headlessClient.isValid()) { 
+	 * if (headlessClient != null && headlessClient.isValid()) {
 	 * 	var x = new Object();
 	 * 	x.name = 'remote1';
 	 * 	x.number = 10;
 	 * 	headlessClient.queueMethod(null, "remoteMethod", [x], callback);
 	 * }
-	 * 
-	 * @param clientId The client to lookup by id, if not found a new headless client is created with this id.  
+	 *
+	 * @param clientId The client to lookup by id, if not found a new headless client is created with this id.
 	 * @param solutionname The solution to load
 	 * @param username The user name that is used to login to the solution
 	 * @param password The password for the user
 	 * @param solutionOpenMethodArgs The arguments that will be passed to the solution open method.
-	 * 
+	 *
 	 * @return An existing JSClient or the JSClient that is created.
 	 */
 	public JSClient js_getOrCreateClient(String clientId, String solutionname, String username, String password, Object[] solutionOpenMethodArgs)
@@ -115,27 +115,28 @@ public class HeadlessClientProvider implements IScriptable, IReturnedTypesProvid
 
 	/**
 	 * Creates a headless client on the server that will open the given solution.
-	 * The clientId of this client can be stored in the database to be shared between clients so that that specific client can be used 
-	 * over multiply clients later on or picked up later on by this client. (Even after restart of this client) 
+	 * The clientId of this client can be stored in the database to be shared between clients so that that specific client can be used
+	 * over multiply clients later on or picked up later on by this client. (Even after restart of this client)
 	 *
-	 * NOTE: in the developer this will only load the solution in debug mode when it is the current active solution or a module of the active solution;
-	 * you can load any solution from the workspace when you pass "nodebug" as last argument in the arguments list (it should still use the same resources project).
+	 * NOTE: in the developer this will only load one solution in debug mode when it is the current active solution or a module of the active solution.
+	 * So calling createClient with the same or another solution/module will replace the existig debug client.
+	 * You can load any solution (and have multily  JSClient instances) from the workspace when you pass "nodebug" as last argument in the arguments list (it should still use the same resources project).
 	 * But then you won't be able to debug it, breakpoints won't hit.
-	 *  
+	 *
 	 * @sample
 	 * // Creates a headless client that will open the given solution.
 	 * var headlessClient = plugins.headlessclient.createClient("someSolution", "user", "pass", null);
-	 * if (headlessClient != null && headlessClient.isValid()) { 
+	 * if (headlessClient != null && headlessClient.isValid()) {
 	 * 	var x = new Object();
 	 * 	x.name = 'remote1';
 	 * 	x.number = 10;
 	 * 	headlessClient.queueMethod(null, "remoteMethod", [x], callback);
 	 * }
 	 *
-	 * @param solutionName 
-	 * @param username 
-	 * @param password 
-	 * @param solutionOpenMethodArgs 
+	 * @param solutionName
+	 * @param username
+	 * @param password
+	 * @param solutionOpenMethodArgs
 	 */
 	public JSClient js_createClient(String solutionName, String username, String password, Object[] solutionOpenMethodArgs)
 	{
@@ -167,7 +168,7 @@ public class HeadlessClientProvider implements IScriptable, IReturnedTypesProvid
 	 * 	 headlessClient.queueMethod(null, "someRemoteMethod", null, callback);
 	 * }
 	 *
-	 * @param clientID 
+	 * @param clientID
 	 */
 	public JSClient js_getClient(String clientID)
 	{
