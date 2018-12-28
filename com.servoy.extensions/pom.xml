@@ -337,6 +337,12 @@
 										<fileset file="${project.basedir}/lib/openid4java.jar" />
 										<fileset file="${project.basedir}/lib/guice-2.0.jar" />
 									</copy>
+									<makejar srcdir="oauth" />
+									<copy overwrite="true"
+										todir="${project.build.directory}/plugins_beans/plugins/oauth">
+										<fileset file="${project.basedir}/lib/scribejava-apis-6.2.0.jar" />
+										<fileset file="${project.basedir}/lib/scribejava-core-6.2.0.jar" />
+									</copy>
 									<makejar srcdir="pdf_forms" />
 									<copy overwrite="true"
 										todir="${project.build.directory}/plugins_beans/plugins/adobe_pdf_forms">
@@ -583,6 +589,16 @@
 			<version>8.0</version>
 			<scope>system</scope>
 			<systemPath>${project.basedir}/lib/jfxrt.jar</systemPath>
+		</dependency>
+		<dependency>
+   			<groupId>com.github.scribejava</groupId>
+    		<artifactId>scribejava-apis</artifactId>
+   			<version>6.2.0</version>
+		</dependency>
+		<dependency>
+   			<groupId>com.github.scribejava</groupId>
+    		<artifactId>scribejava-core</artifactId>
+   			<version>6.2.0</version>
 		</dependency>
 	</dependencies>
 </project>
