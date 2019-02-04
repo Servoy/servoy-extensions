@@ -23,18 +23,15 @@ import java.util.Iterator;
 import java.util.Map;
 
 import org.apache.http.HttpEntity;
-import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.Credentials;
 import org.apache.http.auth.NTCredentials;
 import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.AuthCache;
 import org.apache.http.client.config.RequestConfig.Builder;
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.impl.auth.BasicScheme;
-import org.apache.http.impl.client.BasicAuthCache;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
@@ -235,10 +232,7 @@ public abstract class BaseRequest implements IScriptable, IJavaScriptType
 
 			if (usePreemptiveAuthentication)
 			{
-				AuthCache authCache = new BasicAuthCache();
-				BasicScheme basicAuth = new BasicScheme();
-				authCache.put(new HttpHost(_url.getHost(), _url.getPort()), basicAuth);
-				context.setAuthCache(authCache);
+				method.addHeader(new BasicScheme().authenticate(cred, method, context));
 			}
 		}
 		method.setConfig(requestConfigBuilder.build());
