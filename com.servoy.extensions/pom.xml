@@ -59,11 +59,6 @@
 					<artifactId>servoy_smart_client</artifactId>
 					<version>${project.version}</version>
 				</dependency>
-				<dependency>
-					<groupId>com.servoy</groupId>
-					<artifactId>servoy_ngclient</artifactId>
-					<version>${project.version}</version>
-				</dependency>
 			</dependencies>
 			<build>
 				<plugins>
@@ -334,7 +329,6 @@
 										<fileset
 											file="${project.basedir}/resources/images/images.jar.jnlp" />
 									</copy>
-									<makejar srcdir="lesscompiler" />
 									<makejar srcdir="mail"
 										includes=",META-INF/services/com.servoy.j2db.plugins.IPlugin" />
 									<makejar srcdir="openid" />
