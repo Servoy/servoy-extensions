@@ -51,10 +51,10 @@ public class LessProvider implements IScriptable
 	 * It checks if the name ends with ".less" and will return a JSMedia with the same name but then with the extendsion ".css" in the same media folder.
 	 *
 	 *  @sample
-	 *  var lessString = "@import 'solution.less';"; // generated less string for a theme/tenant or something coming from a database.
-	 *  var lessMedia = solutionModel.newMedia('tenant.less', lessString); // create a JSMedia from it
-	 *  var cssMedia = plugins.lesscompiler.compileLess(lessMedia); // compile this lessMedia (tenant.less)  to a cssMedia (tenant.css)
-	 *  application.overrideStyle('solution.less', cssMedia.getName()); // == tenant.css replacing the solution.less that is the solution stylesheet
+	 *  var lessString = "@import 'solution.less';";
+	 *  var lessMedia = solutionModel.newMedia('tenant.less', lessString);
+	 *  var cssMedia = plugins.lesscompiler.compileLess(lessMedia);
+	 *  application.overrideStyle('solution.less', cssMedia.getName()); // == tenant.css
 	 *
 	 * @param media The JSMedia file that is a less file that nees to be compiled to css
 	 * @return The converted less file as a css media file or null if it wasn't a less file..
