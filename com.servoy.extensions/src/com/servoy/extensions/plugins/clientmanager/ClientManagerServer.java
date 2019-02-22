@@ -19,13 +19,6 @@ public class ClientManagerServer implements IServerPlugin, IClientManagerService
 	private final ConcurrentHashMap<String, List<BroadcastInfo>> registeredClients = new ConcurrentHashMap<>();
 
 
-	private static IClientManagerService INSTANCE;
-
-	public static IClientManagerService getInstance()
-	{
-		return INSTANCE;
-	}
-
 	public ClientManagerServer()
 	{
 	}
@@ -40,7 +33,6 @@ public class ClientManagerServer implements IServerPlugin, IClientManagerService
 	public void initialize(IServerAccess app) throws PluginException
 	{
 		application = app;
-		INSTANCE = this;
 		try
 		{
 			app.registerRemoteService(IClientManagerService.class.getName(), this);

@@ -85,6 +85,22 @@ public class SchedulerProvider implements IScriptable
 		}
 	}
 
+	public static void shutdown()
+	{
+		if (scheduler != null)
+		{
+			try
+			{
+				scheduler.shutdown(false);
+			}
+			catch (SchedulerException e)
+			{
+				Debug.error(e);
+			}
+			scheduler = null;
+		}
+	}
+
 	/**
 	 * Adds a job to the scheduler.
 	 *
@@ -96,9 +112,9 @@ public class SchedulerProvider implements IScriptable
 	 * var endDate = new Date(startDate.getTime()+100000);
 	 * plugins.scheduler.addJob('in20seconds',startDate,method,20000,40,endDate)
 	 *
-	 * @param jobname 
-	 * @param startDate 
-	 * @param method 
+	 * @param jobname
+	 * @param startDate
+	 * @param method
 	 */
 	public void js_addJob(String jobname, Date startDate, Function method)
 	{
@@ -108,7 +124,7 @@ public class SchedulerProvider implements IScriptable
 	/**
 	 * @clonedesc js_addJob(String, Date, Function)
 	 * @sampleas js_addJob(String, Date, Function)
-	 * 
+	 *
 	 * @param jobname
 	 * @param startDate
 	 * @param method
@@ -122,7 +138,7 @@ public class SchedulerProvider implements IScriptable
 	/**
 	 * @clonedesc js_addJob(String, Date, Function)
 	 * @sampleas js_addJob(String, Date, Function)
-	 * 
+	 *
 	 * @param jobname
 	 * @param startDate
 	 * @param method
@@ -136,7 +152,7 @@ public class SchedulerProvider implements IScriptable
 	/**
 	 * @clonedesc js_addJob(String, Date, Function)
 	 * @sampleas js_addJob(String, Date, Function)
-	 * 
+	 *
 	 * @param jobname
 	 * @param startDate
 	 * @param method
@@ -151,7 +167,7 @@ public class SchedulerProvider implements IScriptable
 	/**
 	 * @clonedesc js_addJob(String, Date, Function)
 	 * @sampleas js_addJob(String, Date, Function)
-	 * 
+	 *
 	 * @param jobName
 	 * @param startDate
 	 * @param method
@@ -167,7 +183,7 @@ public class SchedulerProvider implements IScriptable
 	/**
 	 * @clonedesc js_addJob(String, Date, Function)
 	 * @sampleas js_addJob(String, Date, Function)
-	 * 
+	 *
 	 * @param jobname
 	 * @param startDate
 	 * @param method
@@ -263,10 +279,10 @@ public class SchedulerProvider implements IScriptable
 	 * var date5Days = new Date(dateNow.getTime()+5*24*60*60*1000);
 	 * plugins.scheduler.addCronJob('23:30','0 30 23 ? * *',method,dateNow,date5Days)
 	 *
-	 * @param jobname 
-	 * @param cronTimings 
-	 * @param method 
-	 * 
+	 * @param jobname
+	 * @param cronTimings
+	 * @param method
+	 *
 	 * @link http://www.quartz-scheduler.org/docs/tutorials/crontrigger.html
 	 */
 	public void js_addCronJob(String jobname, String cronTimings, Function method)
@@ -277,7 +293,7 @@ public class SchedulerProvider implements IScriptable
 	/**
 	 * @clonedesc js_addCronJob(String, String, Function)
 	 * @sampleas js_addCronJob(String, String, Function)
-	 * 
+	 *
 	 * @param jobname
 	 * @param cronTimings
 	 * @param method
@@ -291,7 +307,7 @@ public class SchedulerProvider implements IScriptable
 	/**
 	 * @clonedesc js_addCronJob(String, String, Function)
 	 * @sampleas js_addCronJob(String, String, Function)
-	 * 
+	 *
 	 * @param jobname
 	 * @param cronTimings
 	 * @param method
@@ -306,7 +322,7 @@ public class SchedulerProvider implements IScriptable
 	/**
 	 * @clonedesc js_addCronJob(String, String, Function)
 	 * @sampleas js_addCronJob(String, String, Function)
-	 * 
+	 *
 	 * @param jobname
 	 * @param cronTimings
 	 * @param method
@@ -377,7 +393,7 @@ public class SchedulerProvider implements IScriptable
 	 * // removes a job 'myjob' from the scheduler
 	 * plugins.scheduler.removeJob('myjob');
 	 *
-	 * @param jobname 
+	 * @param jobname
 	 */
 	public boolean js_removeJob(String jobname)
 	{
