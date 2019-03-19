@@ -20,6 +20,7 @@ package com.servoy.extensions.plugins.oauth;
 import org.mozilla.javascript.annotations.JSFunction;
 
 import com.github.scribejava.apis.FacebookApi;
+import com.github.scribejava.apis.LinkedInApi20;
 import com.github.scribejava.apis.MicrosoftAzureActiveDirectory20Api;
 import com.github.scribejava.core.builder.ServiceBuilder;
 import com.github.scribejava.core.builder.api.DefaultApi20;
@@ -103,6 +104,8 @@ public class OAuthProvider implements IScriptable, IReturnedTypesProvider
 				return MicrosoftAzureActiveDirectory20Api.instance();
 			case OAuthProviders.FACEBOOK :
 				return FacebookApi.instance();
+			case OAuthProviders.LINKEDIN :
+				return LinkedInApi20.instance();
 		}
 		return null;
 	}
