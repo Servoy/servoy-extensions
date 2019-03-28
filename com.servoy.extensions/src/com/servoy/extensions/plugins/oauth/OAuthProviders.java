@@ -27,6 +27,7 @@ public class OAuthProviders implements IPrefixedConstantsObject
 {
 	public static final int MICROSOFT_AD = 1;
 	public static final int FACEBOOK = 2;
+	public static final int LINKEDIN = 3;
 
 	@Override
 	public String getPrefix()
