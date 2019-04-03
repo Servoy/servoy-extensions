@@ -29,6 +29,7 @@ import org.apache.http.Header;
 import org.apache.http.HeaderElement;
 import org.apache.http.HeaderIterator;
 import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.util.EntityUtils;
 
 import com.servoy.j2db.documentation.ServoyDocumented;
@@ -47,15 +48,17 @@ public class Response implements IScriptable, IJavaScriptType
 {
 	private HttpResponse res;
 	private Object response_body = null;
+	private HttpUriRequest request;
 
 	public Response()
 	{
 
 	}
 
-	public Response(HttpResponse response)
+	public Response(HttpResponse response, HttpUriRequest request)
 	{
-		res = response;
+		this.res = response;
+		this.request = request;
 	}
 
 	public String[] getAllowedMethods()
@@ -123,7 +126,7 @@ public class Response implements IScriptable, IJavaScriptType
 			}
 			catch (Exception e)
 			{
-				Debug.error(e);
+				Debug.error("Error in when getting response body  for: " + request.getURI(), e); //$NON-NLS-1$
 				response_body = "";
 			}
 		}
@@ -159,7 +162,7 @@ public class Response implements IScriptable, IJavaScriptType
 			}
 			catch (IOException e)
 			{
-				Debug.error(e);
+				Debug.error("Error when getting media data  for: " + request.getURI(), e); //$NON-NLS-1$
 			}
 		}
 		return response_body instanceof byte[] ? (byte[])response_body : null;
@@ -215,7 +218,7 @@ public class Response implements IScriptable, IJavaScriptType
 		}
 		catch (Exception e)
 		{
-			Debug.error(e);
+			Debug.error("Error when getting response headers for: " + request.getURI(), e); //$NON-NLS-1$
 		}
 		return null;
 	}
@@ -245,7 +248,7 @@ public class Response implements IScriptable, IJavaScriptType
 		}
 		catch (IOException e)
 		{
-			Debug.error(e);
+			Debug.error("close error with " + request.getURI(), e); //$NON-NLS-1$
 		}
 		return false;
 	}

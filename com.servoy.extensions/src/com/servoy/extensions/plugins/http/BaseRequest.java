@@ -236,7 +236,7 @@ public abstract class BaseRequest implements IScriptable, IJavaScriptType
 			}
 		}
 		method.setConfig(requestConfigBuilder.build());
-		return new Response(client.execute(method, context));
+		return new Response(client.execute(method, context), method);
 	}
 
 	/**
