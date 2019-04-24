@@ -443,7 +443,7 @@
 								<artifactItem>
 									<groupId>com.rabbitmq</groupId>
 									<artifactId>amqp-client</artifactId>
-									<version>4.1.0</version>
+									<version>4.11.0</version>
 									<overWrite>true</overWrite>
 									<outputDirectory>${project.build.directory}/plugins_beans/plugins/broadcaster</outputDirectory>
 								</artifactItem>
@@ -536,7 +536,7 @@
 		<dependency>
 			<groupId>com.rabbitmq</groupId>
 			<artifactId>amqp-client</artifactId>
-			<version>4.1.0</version>
+			<version>4.11.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.openid4java</groupId>
