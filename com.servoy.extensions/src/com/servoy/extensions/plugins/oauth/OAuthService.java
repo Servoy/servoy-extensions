@@ -26,6 +26,7 @@ import com.github.scribejava.core.model.OAuth2AccessToken;
 import com.github.scribejava.core.model.OAuthRequest;
 import com.github.scribejava.core.model.Response;
 import com.github.scribejava.core.model.Verb;
+import com.github.scribejava.core.oauth.AccessTokenRequestParams;
 import com.github.scribejava.core.oauth.OAuth20Service;
 import com.servoy.j2db.scripting.IJavaScriptType;
 import com.servoy.j2db.scripting.IScriptable;
@@ -39,16 +40,18 @@ public class OAuthService implements IScriptable, IJavaScriptType
 
 	private final OAuth20Service service;
 	private OAuth2AccessToken accessToken;
+	private final String state;
 
-	public OAuthService(OAuth20Service service)
+	public OAuthService(OAuth20Service service, String state)
 	{
 		this.service = service;
+		this.state = state;
 	}
 
 	@JSFunction
 	public String getAuthorizationURL()
 	{
-		return service.getAuthorizationUrl();
+		return state != null ? service.getAuthorizationUrl(state) : service.getAuthorizationUrl();
 	}
 
 	@JSFunction
@@ -63,6 +66,21 @@ public class OAuthService implements IScriptable, IJavaScriptType
 			Debug.error("Could not set the access token.", e);
 			throw new Exception("Could not set the access token. See the log for more details");
 		}
+	}
+
+	@JSFunction
+	public void setAccessToken(String code, String scope) throws Exception
+	{
+		try
+		{
+			this.accessToken = service.getAccessToken(AccessTokenRequestParams.create(code).scope(scope));
+		}
+		catch (IOException | InterruptedException | ExecutionException e)
+		{
+			Debug.error("Could not set the access token.", e);
+			throw new Exception("Could not set the access token. See the log for more details");
+		}
+
 	}
 
 	@JSFunction

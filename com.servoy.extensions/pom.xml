@@ -340,8 +340,8 @@
 									<makejar srcdir="oauth" />
 									<copy overwrite="true"
 										todir="${project.build.directory}/plugins_beans/plugins/oauth">
-										<fileset file="${project.basedir}/lib/scribejava-apis-6.2.0.jar" />
-										<fileset file="${project.basedir}/lib/scribejava-core-6.2.0.jar" />
+										<fileset file="${project.basedir}/lib/scribejava-apis-6.5.1.jar" />
+										<fileset file="${project.basedir}/lib/scribejava-core-6.5.1.jar" />
 									</copy>
 									<makejar srcdir="pdf_forms" />
 									<copy overwrite="true"
@@ -593,12 +593,12 @@
 		<dependency>
    			<groupId>com.github.scribejava</groupId>
     		<artifactId>scribejava-apis</artifactId>
-   			<version>6.2.0</version>
+   			<version>6.5.1</version>
 		</dependency>
 		<dependency>
    			<groupId>com.github.scribejava</groupId>
     		<artifactId>scribejava-core</artifactId>
-   			<version>6.2.0</version>
+   			<version>6.5.1</version>
 		</dependency>
 	</dependencies>
 </project>
