@@ -52,6 +52,7 @@ import org.mozilla.javascript.Function;
 import org.mozilla.javascript.NativeArray;
 
 import com.servoy.base.scripting.annotations.ServoyClientSupport;
+import com.servoy.j2db.IApplication;
 import com.servoy.j2db.Messages;
 import com.servoy.j2db.documentation.ServoyDocumented;
 import com.servoy.j2db.plugins.IClientPluginAccess;
@@ -916,20 +917,20 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 		File[] files = sourceDir.listFiles();
 		if (files != null && files.length > 0)
 		{
-			for (int i = 0; i < files.length; i++)
+			for (File file : files)
 			{
-				File dest = new File(destDir, files[i].getName());
-				if (files[i].isDirectory())
+				File dest = new File(destDir, file.getName());
+				if (file.isDirectory())
 				{
-					if (!files[i].equals(destDir))
+					if (!file.equals(destDir))
 					{
-						succes = (js_copyFolder(files[i], dest) && succes);
+						succes = (js_copyFolder(file, dest) && succes);
 						if (!succes) return false;
 					}
 				}
 				else
 				{
-					succes = (js_copyFile(files[i], dest) && succes);
+					succes = (js_copyFile(file, dest) && succes);
 					if (!succes) return false;
 				}
 			}
@@ -1100,7 +1101,7 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 
 		if (destFile.isDirectory())
 		{
-			if (showWarning)
+			if (showWarning && plugin.getClientPluginAccess().getApplicationType() == IApplication.CLIENT)
 			{
 				IClientPluginAccess access = plugin.getClientPluginAccess();
 				IRuntimeWindow runtimeWindow = access.getCurrentRuntimeWindow();
@@ -2312,7 +2313,7 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 * var files = plugins.file.getRemoteFolderContents('/', '.txt');
 	 *
 	 * @since Servoy 5.2.1
-	
+
 	 * @param targetFolder
 	 * @return the array of file names
 	 */

@@ -81,11 +81,10 @@ public class OAuthProvider implements IScriptable, IReturnedTypesProvider
 	{
 		ServiceBuilder builder = new ServiceBuilder(clientId);
 		builder.apiSecret(clientSecret);
-		if (scope != null) builder.scope(scope);
-		if (state != null) builder.state(state);
+		if (scope != null) builder.defaultScope(scope);
 		if (callbackmethod != null) builder.callback(getRedirectURL(callbackmethod));
 		//TODO else check plugin.getAccess().getSolutionModel().newGlobalMethod(scopeName, code) and redirect to that
-		return new OAuthService(builder.build(getApiInstance(provider)));
+		return new OAuthService(builder.build(getApiInstance(provider)), state);
 	}
 
 	private String getRedirectURL(String callbackmethod)
