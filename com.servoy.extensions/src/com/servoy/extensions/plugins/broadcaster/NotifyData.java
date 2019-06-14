@@ -31,9 +31,9 @@ public final class NotifyData implements Serializable
 	final int action;
 	final Object[] insertColumnData;
 	final String dataSource;
-	final Object tenantData;
+	final Object[] tenantData;
 
-	public NotifyData(String originServerUUID, String server_name, String table_name, IDataSet pks, int action, Object[] insertColumnData, Object tenantData)
+	public NotifyData(String originServerUUID, String server_name, String table_name, IDataSet pks, int action, Object[] insertColumnData, Object[] tenantData)
 	{
 		this.originServerUUID = originServerUUID;
 		this.server_name = server_name;
@@ -49,7 +49,7 @@ public final class NotifyData implements Serializable
 	 * @param dataSource
 	 * @param tenantValue
 	 */
-	public NotifyData(String originServerUUID, String dataSource, Object tenantValue)
+	public NotifyData(String originServerUUID, String dataSource, Object[] tenantValue)
 	{
 		this.originServerUUID = originServerUUID;
 		this.dataSource = dataSource;

@@ -76,13 +76,13 @@ public class DataNotifyListener implements IDataNotifyListener
 	}
 
 	@Override
-	public void flushCachedDatabaseData(String dataSource, Object tenantValue)
+	public void flushCachedDatabaseData(String dataSource, Object[] tenantValue)
 	{
 		sendBytes(new NotifyData(originServerUUID, dataSource, tenantValue));
 	}
 
 	@Override
-	public void notifyDataChange(String server_name, String table_name, IDataSet pks, int action, Object[] insertColumnData, Object tenantValue)
+	public void notifyDataChange(String server_name, String table_name, IDataSet pks, int action, Object[] insertColumnData, Object[] tenantValue)
 	{
 		sendBytes(new NotifyData(originServerUUID, server_name, table_name, pks, action, insertColumnData, tenantValue));
 	}
