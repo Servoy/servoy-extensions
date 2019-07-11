@@ -25,6 +25,7 @@
 		<servoy-local.url>${project.baseUri}/target/repository/</servoy-local.url>
 		<scribejava.version>6.5.1</scribejava.version>
 		<amqp.version>5.7.0</amqp.version>
+		<doc.version>1.5.0</doc.version>
 	</properties>
 
 	<profiles>
@@ -80,7 +81,7 @@
 										<artifactItem>
 											<groupId>com.servoy</groupId>
 											<artifactId>com.servoy.eclipse.docgenerator.client.product</artifactId>
-											<version>1.4.5</version>
+											<version>${doc.version}</version>
 											<type>zip</type>
 											<overWrite>true</overWrite>
 											<outputDirectory>${project.build.directory}/repository</outputDirectory>
