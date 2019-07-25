@@ -256,12 +256,13 @@ public class MailServer implements IMailService, IServerPlugin
 			{
 				htmlMultipart = new MimeMultipart("related");
 				MimeBodyPart htmlBodyPart = new MimeBodyPart();
-
-				htmlBodyPart.setContent(html, htmlContentType);
+				htmlBodyPart.setHeader("Content-Type", htmlContentType);
 				if (encoding != null)
 				{
 					htmlBodyPart.setHeader("Content-Transfer-Encoding", encoding);
 				}
+
+				htmlBodyPart.setContent(html, htmlContentType);
 				htmlMultipart.addBodyPart(htmlBodyPart);
 
 				Iterator<MimeBodyPart> iterator = embeddedImages.iterator();
@@ -283,11 +284,12 @@ public class MailServer implements IMailService, IServerPlugin
 			messageMultipart = new MimeMultipart("alternative");
 
 			MimeBodyPart textBodyPart = new MimeBodyPart();
-			textBodyPart.setContent(plain, plainTextContentType);
 			if (encoding != null)
 			{
 				textBodyPart.setHeader("Content-Transfer-Encoding", encoding);
 			}
+			textBodyPart.setHeader("Content-Type", plainTextContentType);
+			textBodyPart.setContent(plain, plainTextContentType);
 			messageMultipart.addBodyPart(textBodyPart);
 
 			MimeBodyPart htmlBodyPart = new MimeBodyPart();
@@ -298,6 +300,7 @@ public class MailServer implements IMailService, IServerPlugin
 			else
 			{
 				htmlBodyPart.setContent(html, htmlContentType);
+				htmlBodyPart.setHeader("Content-Type", htmlContentType);
 				if (encoding != null)
 				{
 					htmlBodyPart.setHeader("Content-Transfer-Encoding", encoding);
@@ -325,6 +328,7 @@ public class MailServer implements IMailService, IServerPlugin
 				else
 				{
 					messageBodyPart.setContent(msgText, hasHTML ? htmlContentType : plainTextContentType);
+					messageBodyPart.setHeader("Content-Type", hasHTML ? htmlContentType : plainTextContentType);
 					if (encoding != null)
 					{
 						messageBodyPart.setHeader("Content-Transfer-Encoding", encoding);
@@ -354,6 +358,7 @@ public class MailServer implements IMailService, IServerPlugin
 		else
 		{
 			message.setContent(msgText, hasHTML ? htmlContentType : plainTextContentType);
+			message.setHeader("Content-Type", hasHTML ? htmlContentType : plainTextContentType);
 			if (encoding != null)
 			{
 				message.setHeader("Content-Transfer-Encoding", encoding);
