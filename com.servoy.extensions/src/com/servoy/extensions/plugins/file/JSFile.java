@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.util.Date;
 
 import com.servoy.j2db.documentation.ServoyDocumented;
+import com.servoy.j2db.plugins.IFile;
 import com.servoy.j2db.plugins.IUploadData;
 import com.servoy.j2db.scripting.IJavaScriptType;
 import com.servoy.j2db.scripting.IScriptObject;
@@ -33,7 +34,7 @@ import com.servoy.j2db.scripting.IScriptable;
  * @author Servoy Stuff
  */
 @ServoyDocumented(scriptingName = "JSFile")
-public class JSFile implements IScriptable, IJavaScriptType
+public class JSFile implements IScriptable, IJavaScriptType, IFile
 {
 	private final IAbstractFile file;
 	private JSFile[] EMPTY;
