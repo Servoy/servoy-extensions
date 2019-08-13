@@ -680,15 +680,10 @@ public class RestWSServlet extends HttpServlet
 			{
 				throw new WebServiceException("Solution " + wsRequestPath.solutionName + " not loaded", HttpServletResponse.SC_SERVICE_UNAVAILABLE);
 			}
-			if (functionExists == FunctionDefinition.Exist.FORM_NOT_FOUND)
-			{
-				throw new WebServiceException("Form/Scope " + wsRequestPath.scope_or_form + " not found", HttpServletResponse.SC_NOT_FOUND);
-			}
 			if (functionExists != FunctionDefinition.Exist.METHOD_FOUND)
 			{
-				throw new WebServiceException(
-					"Method " + methodName + " not found" + (wsRequestPath.scope_or_form != null ? " on form or scope " + wsRequestPath.scope_or_form : ""),
-					HttpServletResponse.SC_METHOD_NOT_ALLOWED);
+				throw new WebServiceException("Path " + request.getPathInfo() + " not found" +
+					(wsRequestPath.scope_or_form != null ? " for form or scope " + wsRequestPath.scope_or_form : ""), HttpServletResponse.SC_NOT_FOUND);
 			}
 		}
 		else
