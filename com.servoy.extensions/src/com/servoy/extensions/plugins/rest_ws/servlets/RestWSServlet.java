@@ -25,13 +25,12 @@ import java.io.Writer;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import javax.mail.BodyPart;
 import javax.mail.MessagingException;
@@ -241,7 +240,16 @@ public class RestWSServlet extends HttpServlet
 		WsRequestPath wsRequestPath = parsePath(request);
 		boolean nodebug = getNodebugHeadderValue(request);
 		String solutionName = nodebug ? wsRequestPath.solutionName + ":nodebug" : wsRequestPath.solutionName;
-		IHeadlessClient client = plugin.getClient(solutionName.toString());
+		IHeadlessClient client;
+		try
+		{
+			client = plugin.getClient(solutionName.toString());
+		}
+		catch (IllegalArgumentException e)
+		{
+			// solution not found
+			throw new NoClientsException();
+		}
 		return new Pair<IHeadlessClient, String>(client, solutionName);
 	}
 
@@ -505,7 +513,8 @@ public class RestWSServlet extends HttpServlet
 			plugin.log.trace("OPTIONS");
 			wsRequestPath = parsePath(request);
 
-			client = plugin.getClient(nodebug ? wsRequestPath.solutionName + ":nodebug" : wsRequestPath.solutionName);
+			client = getClient(request).getLeft();
+
 			setApplicationUserProperties(request, client.getPluginAccess());
 			String retval = "TRACE, OPTIONS";
 			if (testWsMethod(client, wsRequestPath, WS_READ))
@@ -570,15 +579,11 @@ public class RestWSServlet extends HttpServlet
 	 * @param wsRequestPath
 	 * @return
 	 */
-	private boolean testWsMethod(IHeadlessClient client, WsRequestPath wsRequestPath, String wsMethod)
+	private static boolean testWsMethod(IHeadlessClient client, WsRequestPath wsRequestPath, String wsMethod)
 	{
 		String context = getContext(client, wsRequestPath.scope_or_form);
-		boolean anyMatch = wsRequestPath.getPossibleMethods().stream().anyMatch(
-			method -> new FunctionDefinition(context, wsMethod + method.name).exists(client.getPluginAccess()) == FunctionDefinition.Exist.METHOD_FOUND);
-		if (anyMatch) return true;
-		// form/scope.ws_read
-		if (new FunctionDefinition(context, wsMethod).exists(client.getPluginAccess()) == FunctionDefinition.Exist.METHOD_FOUND) return true;
-		return false;
+		Pair<FunctionDefinition, String[]> call = getFunctioncall(wsMethod, client.getPluginAccess(), wsRequestPath, context);
+		return call.getLeft().exists(client.getPluginAccess()) == FunctionDefinition.Exist.METHOD_FOUND;
 	}
 
 	public WsRequestPath parsePath(HttpServletRequest request)
@@ -597,38 +602,50 @@ public class RestWSServlet extends HttpServlet
 			throw new IllegalArgumentException(path);
 		}
 
-		String version = "";
+		String version = null;
 		int argumentsStart = 2;
-		String solution = segments[argumentsStart++];
 		// if segment 2 is a "vX", so starts with a v and then an integer then it is a version string, should be appended to the scope or form name
-		if (solution.startsWith("v") && Utils.getAsInteger(solution.substring(1), -1) != -1)
+		if (isVersionSegment(segments, argumentsStart))
 		{
-			version = solution;
-			solution = segments[argumentsStart++];
+			version = segments[argumentsStart++];
+		}
+		String solution = segments[argumentsStart++];
+		// if segment 3 is a "vX", so starts with a v and then an integer then it is a version string, should be appended to the scope or form name
+		if (isVersionSegment(segments, argumentsStart))
+		{
+			version = segments[argumentsStart++];
 		}
 		String scope_or_form = segments[argumentsStart++];
-		// if segment 3 is a "vX", so starts with a v and then an integer then it is a version string, should be appended to the scope or form name
-		if (scope_or_form.startsWith("v") && Utils.getAsInteger(scope_or_form.substring(1), -1) != -1)
-		{
-			version = scope_or_form;
-			scope_or_form = segments[argumentsStart++];
-		}
 
-		if (!version.isEmpty()) scope_or_form = scope_or_form + "_" + version;
+		if (version != null)
+		{
+			scope_or_form = scope_or_form + "_" + version;
+		}
 		return new WsRequestPath(solution, scope_or_form, Utils.arraySub(segments, argumentsStart, segments.length));
 	}
 
 	/**
-	 * call the service method, make the request ansd response available for the client-plugin.
+	 *
+	 * @param segments
+	 * @param index
+	 */
+	private static boolean isVersionSegment(String[] segments, int index)
+	{
+		String segment = segments[index];
+		return segment.startsWith("v") && Utils.getAsInteger(segment.substring(1), -1) != -1 && index < segments.length + 1;
+	}
+
+	/**
+	 * call the service method, make the request and response available for the client-plugin.
 	 * Throws {@link NoClientsException} when no license is available
-	 * @param methodName
+	 * @param wsMethod
 	 * @param fixedArgs
 	 * @param request
 	 * @param response
 	 * @return
 	 * @throws Exception
 	 */
-	private Object wsService(String methodName, Object[] fixedArgs, HttpServletRequest request, HttpServletResponse response, IHeadlessClient client)
+	private Object wsService(String wsMethod, Object[] fixedArgs, HttpServletRequest request, HttpServletResponse response, IHeadlessClient client)
 		throws Exception
 	{
 		RestWSClientPlugin clientPlugin = (RestWSClientPlugin)client.getPluginAccess().getPluginManager().getPlugin(IClientPlugin.class,
@@ -643,7 +660,7 @@ public class RestWSServlet extends HttpServlet
 			{
 				clientPlugin.setRequestResponse(request, response);
 			}
-			return doWsService(methodName, fixedArgs, request, response, client);
+			return doWsService(wsMethod, fixedArgs, request, response, client);
 		}
 		finally
 		{
@@ -654,7 +671,7 @@ public class RestWSServlet extends HttpServlet
 		}
 	}
 
-	private Object doWsService(String methodName, Object[] fixedArgs, HttpServletRequest request, HttpServletResponse response, IHeadlessClient client)
+	private Object doWsService(String wsMethod, Object[] fixedArgs, HttpServletRequest request, HttpServletResponse response, IHeadlessClient client)
 		throws Exception
 	{
 		// update cookies in the application from request
@@ -669,28 +686,8 @@ public class RestWSServlet extends HttpServlet
 
 		String context = getContext(client, wsRequestPath.scope_or_form);
 
-		FunctionDefinition fd = null;
-		Optional<Method> found = wsRequestPath.getPossibleMethods().stream().filter(method -> new FunctionDefinition(context, methodName + method.name).exists(
-			client.getPluginAccess()) == FunctionDefinition.Exist.METHOD_FOUND).findFirst();
-		if (!found.isPresent())
-		{
-			fd = new FunctionDefinition(context, methodName);
-			Exist functionExists = fd.exists(client.getPluginAccess());
-			if (functionExists == FunctionDefinition.Exist.NO_SOLUTION)
-			{
-				throw new WebServiceException("Solution " + wsRequestPath.solutionName + " not loaded", HttpServletResponse.SC_SERVICE_UNAVAILABLE);
-			}
-			if (functionExists != FunctionDefinition.Exist.METHOD_FOUND)
-			{
-				throw new WebServiceException("Path " + request.getPathInfo() + " not found" +
-					(wsRequestPath.scope_or_form != null ? " for form or scope " + wsRequestPath.scope_or_form : ""), HttpServletResponse.SC_NOT_FOUND);
-			}
-		}
-		else
-		{
-			fd = new FunctionDefinition(context, methodName + found.get().name);
-		}
-
+		Pair<FunctionDefinition, String[]> functionCall = getExistingFunctioncall(wsMethod, request.getPathInfo(), client.getPluginAccess(), wsRequestPath,
+			context);
 
 		FunctionDefinition fd_headers = new FunctionDefinition(context, WS_RESPONSE_HEADERS);
 		if (fd_headers.exists(client.getPluginAccess()) == FunctionDefinition.Exist.METHOD_FOUND)
@@ -708,11 +705,7 @@ public class RestWSServlet extends HttpServlet
 			else addHeaderToResponse(response, result, wsRequestPath);
 		}
 
-		Object[] methodArgs = wsRequestPath.args;
-		if (found.isPresent())
-		{
-			methodArgs = found.get().getArgs();
-		}
+		Object[] methodArgs = functionCall.getRight();
 		Object[] args = null;
 		if (fixedArgs != null || methodArgs.length > 0 || request.getParameterMap().size() > 0)
 		{
@@ -741,16 +734,16 @@ public class RestWSServlet extends HttpServlet
 			}
 		}
 
-		if (plugin.log.isDebugEnabled()) plugin.log.debug("executeMethod('" + context + "', '" + methodName + "', <args>)");
+		if (plugin.log.isDebugEnabled()) plugin.log.debug("executeMethod('" + context + "', '" + wsMethod + "', <args>)");
 		// DO NOT USE FunctionDefinition here! we want to be able to catch possible exceptions!
 		Object result;
 		try
 		{
-			result = client.getPluginAccess().executeMethod(context, fd.getMethodName(), args, false);
+			result = client.getPluginAccess().executeMethod(context, functionCall.getLeft().getMethodName(), args, false);
 		}
 		catch (Exception e)
 		{
-			plugin.log.info("Method execution failed: executeMethod('" + context + "', '" + fd.getMethodName() + "', <args>)", e);
+			plugin.log.info("Method execution failed: executeMethod('" + context + "', '" + functionCall.getLeft().getMethodName() + "', <args>)", e);
 			throw new ExecFailedException(e);
 		}
 		if (plugin.log.isDebugEnabled()) plugin.log.debug("result = " + (result == null ? "<NULL>" : ("'" + result + '\'')));
@@ -759,7 +752,52 @@ public class RestWSServlet extends HttpServlet
 		return result;
 	}
 
-	private String getContext(IHeadlessClient client, String scope_or_form)
+	/**
+	 * @param wsMethod
+	 * @param pathInfo
+	 * @param pluginAccess
+	 * @param wsRequestPath
+	 * @param context
+	 * @return
+	 * @throws WebServiceException
+	 */
+	private static Pair<FunctionDefinition, String[]> getExistingFunctioncall(String wsMethod, String pathInfo, IClientPluginAccess pluginAccess,
+		WsRequestPath wsRequestPath, String context) throws WebServiceException
+	{
+		Pair<FunctionDefinition, String[]> call = getFunctioncall(wsMethod, pluginAccess, wsRequestPath, context);
+
+		Exist functionExists = call.getLeft().exists(pluginAccess);
+		if (functionExists == FunctionDefinition.Exist.NO_SOLUTION)
+		{
+			throw new WebServiceException("Solution " + wsRequestPath.solutionName + " not loaded", HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+		}
+		if (functionExists != FunctionDefinition.Exist.METHOD_FOUND)
+		{
+			throw new WebServiceException(
+				"Path " + pathInfo + " not found" + (wsRequestPath.scope_or_form != null ? " for form or scope " + wsRequestPath.scope_or_form : ""),
+				HttpServletResponse.SC_NOT_FOUND);
+		}
+		return call;
+	}
+
+	/**
+	 * @param wsMethod
+	 * @param pluginAccess
+	 * @param wsRequestPath
+	 * @param context
+	 * @return
+	 */
+	private static Pair<FunctionDefinition, String[]> getFunctioncall(String wsMethod, IClientPluginAccess pluginAccess, WsRequestPath wsRequestPath,
+		String context)
+	{
+		return wsRequestPath.getPossibleMethods() //
+			.map(method -> new Pair<>(new FunctionDefinition(context, wsMethod + method.name), method.args)) //
+			.filter(pair -> pair.getLeft().exists(pluginAccess) == FunctionDefinition.Exist.METHOD_FOUND) //
+			.findFirst() //
+			.orElseGet(() -> new Pair<>(new FunctionDefinition(context, wsMethod), wsRequestPath.args));
+	}
+
+	private static String getContext(IHeadlessClient client, String scope_or_form)
 	{
 		String[] retVal = new String[] { scope_or_form };
 		client.invokeAndWait(() -> {
@@ -1546,10 +1584,10 @@ public class RestWSServlet extends HttpServlet
 			this.args = args;
 		}
 
-		public List<Method> getPossibleMethods()
+		public Stream<Method> getPossibleMethods()
 		{
-			if (args == null || args.length == 0) return Collections.emptyList();
-			return IntStream.range(0, args.length).mapToObj(i -> new Method(args, i)).sorted().collect(Collectors.toList());
+			if (args == null || args.length == 0) return Stream.empty();
+			return IntStream.range(0, args.length).mapToObj(i -> new Method(args, i)).sorted();
 		}
 
 		@Override
@@ -1569,13 +1607,7 @@ public class RestWSServlet extends HttpServlet
 		{
 			this.args = args;
 			this.index = index;
-			StringBuilder sb = new StringBuilder();
-			for (int i = 0; i <= index; i++)
-			{
-				sb.append("_");
-				sb.append(args[i]);
-			}
-			this.name = sb.toString();
+			this.name = "_" + IntStream.rangeClosed(0, index).mapToObj(i -> args[i]).collect(Collectors.joining("_"));
 		}
 
 		String[] getArgs()
