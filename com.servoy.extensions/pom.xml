@@ -26,6 +26,8 @@
 		<scribejava.version>6.5.1</scribejava.version>
 		<amqp.version>5.7.0</amqp.version>
 		<doc.version>1.5.0</doc.version>
+		<pdfbox.version>2.0.16</pdfbox.version>
+		<fontbox.version>2.0.16</fontbox.version>
 	</properties>
 
 	<profiles>
@@ -359,6 +361,8 @@
 										<fileset file="${project.basedir}/lib/itext.jar" />
 										<fileset file="${project.basedir}/lib/bcmail.jar" />
 										<fileset file="${project.basedir}/lib/bcprov.jar" />
+										<fileset file="${project.basedir}/lib/pdfbox.jar" />
+										<fileset file="${project.basedir}/lib/fontbox.jar" />
 									</copy>
 									<makejar srcdir="rawSQL" />
 									<makejar srcdir="rest_ws" />
@@ -461,6 +465,22 @@
 									<overWrite>true</overWrite>
 									<outputDirectory>${project.build.directory}/plugins_beans/plugins/oauth</outputDirectory>
 									<destFileName>scribejava-core.jar</destFileName>
+								</artifactItem>
+								<artifactItem>
+									<groupId>org.apache.pdfbox</groupId>
+									<artifactId>pdfbox</artifactId>
+									<version>${pdfbox.version}</version>
+									<overWrite>true</overWrite>
+									<outputDirectory>${project.build.directory}/plugins_beans/plugins/pdf_output</outputDirectory>
+									<destFileName>pdfbox.jar</destFileName>
+								</artifactItem>
+								<artifactItem>
+									<groupId>org.apache.pdfbox</groupId>
+									<artifactId>fontbox</artifactId>
+									<version>${fontbox.version}</version>
+									<overWrite>true</overWrite>
+									<outputDirectory>${project.build.directory}/plugins_beans/plugins/pdf_output</outputDirectory>
+									<destFileName>fontbox.jar</destFileName>
 								</artifactItem>
 							</artifactItems>
 						</configuration>
@@ -615,6 +635,11 @@
 			<groupId>com.github.scribejava</groupId>
 			<artifactId>scribejava-core</artifactId>
 			<version>${scribejava.version}</version>
+		</dependency>
+		<dependency>
+    		<groupId>org.apache.pdfbox</groupId>
+    		<artifactId>pdfbox</artifactId>
+    		<version>${pdfbox.version}</version>
 		</dependency>
 	</dependencies>
 </project>

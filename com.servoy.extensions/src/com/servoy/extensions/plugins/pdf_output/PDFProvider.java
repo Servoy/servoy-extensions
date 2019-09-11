@@ -18,6 +18,7 @@ package com.servoy.extensions.plugins.pdf_output;
 
 import java.awt.Color;
 import java.awt.Window;
+import java.awt.image.BufferedImage;
 import java.awt.print.PrinterJob;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -28,6 +29,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.rendering.PDFRenderer;
 import org.mozilla.javascript.Scriptable;
 
 import com.lowagie.text.Document;
@@ -1022,6 +1025,59 @@ public class PDFProvider implements IScriptable
 
 		ByteArrayInputStream bais = new ByteArrayInputStream(data);
 		return ITextTools.overlayText(bais, text, locationX, locationY, isOver, fontSize, font, myColor);
+	}
+
+	/**
+	 * Create a PDF thumbnail of the specified page from the provided PDF
+	 *
+	 * @param data the PDF
+	 *
+	 * @return the PDF thumbnail
+	 *
+	 * @throws Exception
+	 */
+	@ServoyClientSupport(ng = true, wc = true, sc = true)
+	public byte[] js_getThumbnailImage(byte[] data) throws Exception
+	{
+		return js_getThumbnailImage(data, 0);
+	}
+
+	/**
+	 * Create a PDF thumbnail of the specified page from the provided PDF
+	 *
+	 * @clonedesc js_getThumbnailImage(byte[] data)
+	 *
+	 * @param data the PDF
+	 * @param int pageNumber to get thumbnail from
+	 *
+	 */
+	@ServoyClientSupport(ng = true, wc = true, sc = true)
+	public byte[] js_getThumbnailImage(byte[] data, int pageNumber) throws Exception
+	{
+		return js_getThumbnailImage(data, pageNumber, 72);
+	}
+
+	/**
+	 * Create a PDF thumbnail of the specified page from the provided PDF
+	 *
+	 * @clonedesc js_getThumbnailImage(byte[] data)
+	 *
+	 * @param data the PDF
+	 * @param int pageNumber to get thumbnail to
+	 * @param int thumbnail resolution (dpi)
+	 *
+	 */
+	@ServoyClientSupport(ng = true, wc = true, sc = true)
+	public byte[] js_getThumbnailImage(byte[] data, int pageNumber, int dpi) throws Exception
+	{
+		PDDocument pdfDoc = PDDocument.load(data);
+		PDFRenderer pdfRenderer = new PDFRenderer(pdfDoc);
+		BufferedImage myImage = pdfRenderer.renderImageWithDPI(pageNumber, dpi);
+		ByteArrayOutputStream baos = new ByteArrayOutputStream(myImage.getData().getDataBuffer().getSize());
+		baos.flush();
+		byte[] imgArray = baos.toByteArray();
+		baos.close();
+		return imgArray;
 	}
 
 }
