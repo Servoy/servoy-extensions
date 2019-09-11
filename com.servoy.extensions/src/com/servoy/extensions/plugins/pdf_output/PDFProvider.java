@@ -1045,11 +1045,12 @@ public class PDFProvider implements IScriptable
 	/**
 	 * Create a PDF thumbnail of the specified page from the provided PDF
 	 *
-	 * @clonedesc js_getThumbnailImage(byte[] data)
-	 *
 	 * @param data the PDF
-	 * @param int pageNumber to get thumbnail from
+	 * @param int pageNumber to get thumbnail to
 	 *
+	 * @return the PDF thumbnail
+	 *
+	 * @throws Exception
 	 */
 	@ServoyClientSupport(ng = true, wc = true, sc = true)
 	public byte[] js_getThumbnailImage(byte[] data, int pageNumber) throws Exception
@@ -1060,12 +1061,13 @@ public class PDFProvider implements IScriptable
 	/**
 	 * Create a PDF thumbnail of the specified page from the provided PDF
 	 *
-	 * @clonedesc js_getThumbnailImage(byte[] data)
-	 *
 	 * @param data the PDF
 	 * @param int pageNumber to get thumbnail to
 	 * @param int thumbnail resolution (dpi)
 	 *
+	 * @return the PDF thumbnail
+	 *
+	 * @throws Exception
 	 */
 	@ServoyClientSupport(ng = true, wc = true, sc = true)
 	public byte[] js_getThumbnailImage(byte[] data, int pageNumber, int dpi) throws Exception
