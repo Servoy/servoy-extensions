@@ -29,6 +29,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import javax.imageio.ImageIO;
+
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.rendering.PDFRenderer;
 import org.mozilla.javascript.Scriptable;
@@ -624,7 +626,7 @@ public class PDFProvider implements IScriptable
 	@ServoyClientSupport(ng = true, wc = true, sc = true)
 	public byte[] js_encrypt(byte[] data, String ownerPassword, String userPassword, boolean allowAssembly, boolean allowCopy, boolean allowDegradedPrinting,
 		boolean allowFillIn, boolean allowModifyAnnotations, boolean allowModifyContents, boolean allowPrinting, boolean allowScreenreaders, boolean is128bit)
-			throws Exception
+		throws Exception
 	{
 		return js_encrypt(data, ownerPassword, userPassword, allowAssembly, allowCopy, allowDegradedPrinting, allowFillIn, allowModifyAnnotations,
 			allowModifyContents, allowPrinting, allowScreenreaders, is128bit, null);
@@ -1028,11 +1030,11 @@ public class PDFProvider implements IScriptable
 	}
 
 	/**
-	 * Create a PDF thumbnail of the specified page from the provided PDF
+	 * Create a PDF thumbnail of the first page from the provided PDF.
 	 *
 	 * @param data the PDF
 	 *
-	 * @return the PDF thumbnail
+	 * @return the PDF thumbnail as PNG format
 	 *
 	 * @throws Exception
 	 */
@@ -1046,9 +1048,9 @@ public class PDFProvider implements IScriptable
 	 * Create a PDF thumbnail of the specified page from the provided PDF
 	 *
 	 * @param data the PDF
-	 * @param int pageNumber to get thumbnail to
+	 * @param int pageNumber to get thumbnail of. This parameter is zero based index.
 	 *
-	 * @return the PDF thumbnail
+	 * @return the PDF thumbnail as PNH format
 	 *
 	 * @throws Exception
 	 */
@@ -1059,10 +1061,10 @@ public class PDFProvider implements IScriptable
 	}
 
 	/**
-	 * Create a PDF thumbnail of the specified page from the provided PDF
+	 * Create a PDF thumbnail of the specified page, with the specified DPI conversion resolution, from the provided PDF
 	 *
 	 * @param data the PDF
-	 * @param int pageNumber to get thumbnail to
+	 * @param int pageNumber to get thumbnail to. This parameter is zero based index.
 	 * @param int thumbnail resolution (dpi)
 	 *
 	 * @return the PDF thumbnail
@@ -1076,6 +1078,7 @@ public class PDFProvider implements IScriptable
 		PDFRenderer pdfRenderer = new PDFRenderer(pdfDoc);
 		BufferedImage myImage = pdfRenderer.renderImageWithDPI(pageNumber, dpi);
 		ByteArrayOutputStream baos = new ByteArrayOutputStream(myImage.getData().getDataBuffer().getSize());
+		ImageIO.write(myImage, "png", baos);
 		baos.flush();
 		byte[] imgArray = baos.toByteArray();
 		baos.close();
