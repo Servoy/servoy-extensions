@@ -1030,7 +1030,18 @@ public class PDFProvider implements IScriptable
 	}
 
 	/**
-	 * Create a PDF thumbnail of the first page from the provided PDF.
+	 * Create a thumbnail from the provided PDF
+	 *
+	 * @author mvid
+	 *
+	 * @sample
+	 * //read PDF file data
+	 * var myPdf = plugins.file.readFile();
+	 * //get the thumbnail (default the first page is rendered with 72 dpi resolution)
+	 * var pngImg = plugins.pdf_output.getThumbnailImage(myPdf);
+	 * //save PNG image to file
+	 * var thumbnailFile = plugins.file.convertToJSFile()
+	 * plugins.file.writeFile(thumbnailFile, myThumbnailImg);
 	 *
 	 * @param data the PDF
 	 *
@@ -1045,12 +1056,16 @@ public class PDFProvider implements IScriptable
 	}
 
 	/**
-	 * Create a PDF thumbnail of the specified page from the provided PDF
+	 * Create a thumbnail from the provided PDF
+	 *
+	 * @author mvid
+	 *
+	 * @sampleas js_getThumbnailImage(byte[])
 	 *
 	 * @param data the PDF
 	 * @param int pageNumber to get thumbnail of. This parameter is zero based index.
 	 *
-	 * @return the PDF thumbnail as PNH format
+	 * @return the PDF thumbnail as PNG format
 	 *
 	 * @throws Exception
 	 */
@@ -1061,13 +1076,17 @@ public class PDFProvider implements IScriptable
 	}
 
 	/**
-	 * Create a PDF thumbnail of the specified page, with the specified DPI conversion resolution, from the provided PDF
+	 * Create a thumbnail from the provided PDF
+	 *
+	 * @author mvid
+	 *
+	 * @sampleas js_getThumbnailImage(byte[])
 	 *
 	 * @param data the PDF
-	 * @param int pageNumber to get thumbnail to. This parameter is zero based index.
+	 * @param int pageNumber to get thumbnail of. This parameter is zero based index.
 	 * @param int thumbnail resolution (dpi)
 	 *
-	 * @return the PDF thumbnail
+	 * @return the PDF thumbnail as PNG format
 	 *
 	 * @throws Exception
 	 */
