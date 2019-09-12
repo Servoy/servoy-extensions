@@ -965,6 +965,81 @@ public class PDFProvider implements IScriptable
 		return ITextTools.overlay(bais, foais, isOver, pages);
 	}
 
+	/**
+	 * Create a thumbnail from the provided PDF
+	 *
+	 * @author mvid
+	 *
+	 * @sample
+	 * //read PDF file data
+	 * var pdf = plugins.file.readFile();
+	 * //get the thumbnail (default the first page is rendered with 72 dpi resolution)
+	 * var pngImg = plugins.pdf_output.getThumbnailImage(pdf);
+	 * //save PNG image to file
+	 * var thumbnailFile = plugins.file.convertToJSFile()
+	 * plugins.file.writeFile(thumbnailFile, pngImg);
+	 *
+	 * @param data the PDF
+	 *
+	 * @return the PDF thumbnail as PNG format
+	 *
+	 * @throws Exception
+	 */
+	@ServoyClientSupport(ng = true, wc = true, sc = true)
+	public byte[] js_getThumbnailImage(byte[] data) throws Exception
+	{
+		return js_getThumbnailImage(data, 0);
+	}
+
+	/**
+	 * Create a thumbnail from the provided PDF
+	 *
+	 * @author mvid
+	 *
+	 * @sampleas js_getThumbnailImage(byte[])
+	 *
+	 * @param data the PDF
+	 * @param int pageNumber to get thumbnail of. This parameter is zero based index.
+	 *
+	 * @return the PDF thumbnail as PNG format
+	 *
+	 * @throws Exception
+	 */
+	@ServoyClientSupport(ng = true, wc = true, sc = true)
+	public byte[] js_getThumbnailImage(byte[] data, int pageNumber) throws Exception
+	{
+		return js_getThumbnailImage(data, pageNumber, 72);
+	}
+
+	/**
+	 * Create a thumbnail from the provided PDF
+	 *
+	 * @author mvid
+	 *
+	 * @sampleas js_getThumbnailImage(byte[])
+	 *
+	 * @param data the PDF
+	 * @param int pageNumber to get thumbnail of. This parameter is zero based index.
+	 * @param int thumbnail resolution (dpi)
+	 *
+	 * @return the PDF thumbnail as PNG format
+	 *
+	 * @throws Exception
+	 */
+	@ServoyClientSupport(ng = true, wc = true, sc = true)
+	public byte[] js_getThumbnailImage(byte[] data, int pageNumber, int dpi) throws Exception
+	{
+		PDDocument pdfDoc = PDDocument.load(data);
+		PDFRenderer pdfRenderer = new PDFRenderer(pdfDoc);
+		BufferedImage myImage = pdfRenderer.renderImageWithDPI(pageNumber, dpi);
+		ByteArrayOutputStream baos = new ByteArrayOutputStream(myImage.getData().getDataBuffer().getSize());
+		ImageIO.write(myImage, "png", baos);
+		baos.flush();
+		byte[] imgArray = baos.toByteArray();
+		baos.close();
+		return imgArray;
+	}
+
 
 	/**
 	 * Add text over every page at a 45 degree angle
@@ -1027,81 +1102,6 @@ public class PDFProvider implements IScriptable
 
 		ByteArrayInputStream bais = new ByteArrayInputStream(data);
 		return ITextTools.overlayText(bais, text, locationX, locationY, isOver, fontSize, font, myColor);
-	}
-
-	/**
-	 * Create a thumbnail from the provided PDF
-	 *
-	 * @author mvid
-	 *
-	 * @sample
-	 * //read PDF file data
-	 * var myPdf = plugins.file.readFile();
-	 * //get the thumbnail (default the first page is rendered with 72 dpi resolution)
-	 * var pngImg = plugins.pdf_output.getThumbnailImage(myPdf);
-	 * //save PNG image to file
-	 * var thumbnailFile = plugins.file.convertToJSFile()
-	 * plugins.file.writeFile(thumbnailFile, myThumbnailImg);
-	 *
-	 * @param data the PDF
-	 *
-	 * @return the PDF thumbnail as PNG format
-	 *
-	 * @throws Exception
-	 */
-	@ServoyClientSupport(ng = true, wc = true, sc = true)
-	public byte[] js_getThumbnailImage(byte[] data) throws Exception
-	{
-		return js_getThumbnailImage(data, 0);
-	}
-
-	/**
-	 * Create a thumbnail from the provided PDF
-	 *
-	 * @author mvid
-	 *
-	 * @sampleas js_getThumbnailImage(byte[])
-	 *
-	 * @param data the PDF
-	 * @param int pageNumber to get thumbnail of. This parameter is zero based index.
-	 *
-	 * @return the PDF thumbnail as PNG format
-	 *
-	 * @throws Exception
-	 */
-	@ServoyClientSupport(ng = true, wc = true, sc = true)
-	public byte[] js_getThumbnailImage(byte[] data, int pageNumber) throws Exception
-	{
-		return js_getThumbnailImage(data, pageNumber, 72);
-	}
-
-	/**
-	 * Create a thumbnail from the provided PDF
-	 *
-	 * @author mvid
-	 *
-	 * @sampleas js_getThumbnailImage(byte[])
-	 *
-	 * @param data the PDF
-	 * @param int pageNumber to get thumbnail of. This parameter is zero based index.
-	 * @param int thumbnail resolution (dpi)
-	 *
-	 * @return the PDF thumbnail as PNG format
-	 *
-	 * @throws Exception
-	 */
-	@ServoyClientSupport(ng = true, wc = true, sc = true)
-	public byte[] js_getThumbnailImage(byte[] data, int pageNumber, int dpi) throws Exception
-	{
-		PDDocument pdfDoc = PDDocument.load(data);
-		PDFRenderer pdfRenderer = new PDFRenderer(pdfDoc);
-		BufferedImage myImage = pdfRenderer.renderImageWithDPI(pageNumber, dpi);
-		ByteArrayOutputStream baos = new ByteArrayOutputStream(myImage.getData().getDataBuffer().getSize());
-		ImageIO.write(myImage, "png", baos);
-		baos.flush();
-		byte[] imgArray = baos.toByteArray();
-		baos.close();
-		return imgArray;
 	}
 
 }
