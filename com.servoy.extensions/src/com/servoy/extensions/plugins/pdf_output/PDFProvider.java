@@ -999,7 +999,7 @@ public class PDFProvider implements IScriptable
 	 * @sampleas js_getThumbnailImage(byte[])
 	 *
 	 * @param data the PDF
-	 * @param int pageNumber to get thumbnail of. This parameter is zero based index.
+	 * @param pageNumber PDF page to get thumbnail of. This parameter is zero based index.
 	 *
 	 * @return the PDF thumbnail as PNG format
 	 *
@@ -1019,8 +1019,8 @@ public class PDFProvider implements IScriptable
 	 * @sampleas js_getThumbnailImage(byte[])
 	 *
 	 * @param data the PDF
-	 * @param int pageNumber to get thumbnail of. This parameter is zero based index.
-	 * @param int thumbnail resolution (dpi)
+	 * @param pageNumber PDF page to get thumbnail of. This parameter is zero based index.
+	 * @param dpi resolution used to render the thumbnail image
 	 *
 	 * @return the PDF thumbnail as PNG format
 	 *
