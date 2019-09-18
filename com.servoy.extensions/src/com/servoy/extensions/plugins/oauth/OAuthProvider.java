@@ -71,7 +71,7 @@ public class OAuthProvider implements IScriptable, IReturnedTypesProvider
 	 * var scope = null;
 	 * var state =  "secret123337";
 	 * var callback = "deeplink";
-	 * service = plugins.oauth.getOAuthService(plugins.oauth.OAuthProviders.FACEBOOK, clientId, clientSecret, null, state, callback)
+	 * service = plugins.oauth.getOAuthService(plugins.oauth.OAuthProviders.FACEBOOK, clientId, clientSecret, null, state, callback, null)
 	 * application.showURL(service.getAuthorizationURL());
 	 *
 	 * function deeplink(a,args) {
@@ -98,11 +98,50 @@ public class OAuthProvider implements IScriptable, IReturnedTypesProvider
 	@JSFunction
 	public OAuthService getOAuthService(int provider, String clientId, String clientSecret, String scope, String state, String deeplinkmethod)
 	{
+		return getOAuthService(provider, clientId, clientSecret, scope, state, deeplinkmethod, null);
+	}
+
+	/**
+	 * Creates an OAuth service that can be used to obtain an access token and access protected data.
+	 * @sample
+	 * var clientId = "";
+	 * var clientSecret = "";
+	 * var scope = null;
+	 * var state =  "secret123337";
+	 * var callback = "deeplink";
+	 * service = plugins.oauth.getOAuthService(plugins.oauth.OAuthProviders.FACEBOOK, clientId, clientSecret, null, state, callback, null)
+	 * application.showURL(service.getAuthorizationURL());
+	 *
+	 * function deeplink(a,args) {
+	 *   service.setAccessToken(args.code);
+	 *   var response = service.executeGetRequest("https://graph.facebook.com/v2.11/me");
+	 *   if (response.getCode() == 200) {
+	 *   		 application.output(response.getBody());
+	 *   		 var json = response.getAsJSON();
+	 *   		 application.output("Name is "+json.name);
+	 *    }
+	 *   else {
+	 *     application.output('ERROR http status '+response.getCode());
+	 *     }
+	 *  }
+	 *
+	 * @param provider an OAuth provider id, see plugins.oauth.OAuthProviders
+	 * @param clientId your app id
+	 * @param clientSecret your client secret
+	 * @param scope configures the OAuth scope. This is only necessary in some APIs (like Microsoft's).
+	 * @param state configures the anti forgery session state. This is available in some APIs (like Facebook's).
+	 * @param deeplinkmethod the name of a global method, which will get the code returned by the OAuth provider
+	 * @param tenant tenant identifiers/organization (eg. Microsoft AD)
+	 * @return
+	 */
+	@JSFunction
+	public OAuthService getOAuthService(int provider, String clientId, String clientSecret, String scope, String state, String deeplinkmethod, String tenant)
+	{
 		ServiceBuilder builder = new ServiceBuilder(clientId);
 		builder.apiSecret(clientSecret);
 		if (scope != null) builder.defaultScope(scope);
 		if (deeplinkmethod != null) builder.callback(getRedirectURL(deeplinkmethod));
-		return new OAuthService(builder.build(getApiInstance(provider)), state);
+		return new OAuthService(builder.build(getApiInstance(provider, tenant)), state);
 	}
 
 	/**
@@ -116,7 +155,7 @@ public class OAuthProvider implements IScriptable, IReturnedTypesProvider
 	 * var scope = null;
 	 * var state =  "secret123337";
 	 * var timeout = 30; //wait at most 30 seconds
-	 * plugins.oauth.getOAuthService(plugins.oauth.OAuthProviders.FACEBOOK, clientId, clientSecret, null, state, myFunction, timeout)
+	 * plugins.oauth.getOAuthService(plugins.oauth.OAuthProviders.FACEBOOK, clientId, clientSecret, null, state, null, myFunction, timeout)
 	 *
 	 * function myFunction(result, auth_outcome) {
 	 *	if (result)
@@ -156,7 +195,7 @@ public class OAuthProvider implements IScriptable, IReturnedTypesProvider
 	 * @return an OAuthService object that is ready to use when the callback method is executed.
 	 */
 	@JSFunction
-	public OAuthService getOAuthService(int provider, String clientId, String clientSecret, String scope, String state, String deeplinkmethod,
+	public OAuthService getOAuthService(int provider, String clientId, String clientSecret, String scope, String state, String deeplinkmethod, String tenant,
 		Function callbackmethod, int timeout)
 	{
 		ServiceBuilder builder = new ServiceBuilder(clientId);
@@ -167,7 +206,7 @@ public class OAuthProvider implements IScriptable, IReturnedTypesProvider
 		String deeplink_name = deeplinkmethod == null ? DEEPLINK_METHOD_NAME : deeplinkmethod;
 		builder.callback(getRedirectURL(deeplink_name));
 
-		OAuthService service = new OAuthService(builder.build(getApiInstance(provider)), state);
+		OAuthService service = new OAuthService(builder.build(getApiInstance(provider, tenant)), state);
 
 		if (generateGlobalMethods)
 		{
@@ -272,12 +311,12 @@ public class OAuthProvider implements IScriptable, IReturnedTypesProvider
 		return redirectURL;
 	}
 
-	private DefaultApi20 getApiInstance(int provider)
+	private DefaultApi20 getApiInstance(int provider, String tenant)
 	{
 		switch (provider)
 		{
 			case OAuthProviders.MICROSOFT_AD :
-				return MicrosoftAzureActiveDirectory20Api.instance();
+				return tenant != null ? MicrosoftAzureActiveDirectory20Api.custom(tenant) : MicrosoftAzureActiveDirectory20Api.instance();
 			case OAuthProviders.FACEBOOK :
 				return FacebookApi.instance();
 			case OAuthProviders.LINKEDIN :
