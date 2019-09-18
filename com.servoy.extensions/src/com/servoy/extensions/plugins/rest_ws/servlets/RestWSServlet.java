@@ -791,7 +791,7 @@ public class RestWSServlet extends HttpServlet
 		String context)
 	{
 		return wsRequestPath.getPossibleMethods() //
-			.map(method -> new Pair<>(new FunctionDefinition(context, wsMethod + method.name), method.args)) //
+			.map(method -> new Pair<>(new FunctionDefinition(context, wsMethod + method.name), method.getArgs())) //
 			.filter(pair -> pair.getLeft().exists(pluginAccess) == FunctionDefinition.Exist.METHOD_FOUND) //
 			.findFirst() //
 			.orElseGet(() -> new Pair<>(new FunctionDefinition(context, wsMethod), wsRequestPath.args));
