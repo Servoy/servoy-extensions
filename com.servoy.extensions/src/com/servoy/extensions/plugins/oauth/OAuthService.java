@@ -86,7 +86,7 @@ public class OAuthService implements IScriptable, IJavaScriptType
 	@JSFunction
 	public String getAccessToken()
 	{
-		return accessToken.getAccessToken();
+		return accessToken != null ? accessToken.getAccessToken() : null;
 	}
 
 	@JSFunction
