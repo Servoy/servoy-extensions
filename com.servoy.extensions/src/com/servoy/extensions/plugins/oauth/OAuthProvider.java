@@ -156,28 +156,28 @@ public class OAuthProvider implements IScriptable, IReturnedTypesProvider
 	 * var scope = null;
 	 * var state =  "secret123337";
 	 * var timeout = 30; //wait at most 30 seconds
-	 * plugins.oauth.getOAuthService(plugins.oauth.OAuthProviders.FACEBOOK, clientId, clientSecret, null, state, null, myFunction, timeout)
+	 * plugins.oauth.getOAuthService(plugins.oauth.OAuthProviders.FACEBOOK, clientId, clientSecret, null, state, "deeplink", null, myFunction, timeout)
 	 *
 	 * function myFunction(result, auth_outcome) {
 	 *	if (result)
 	 *	{
 	 *		//SUCCESS
 	 *		var service = auth_outcome;
-	 *  	if (service.getAccessToken() == null) return;
+	 * 		if (service.getAccessToken() == null) return;
 	 *		var response = service.executeGetRequest("https://graph.facebook.com/v2.11/me");
-	 *   	if (response.getCode() == 200) {
-	 *   		 application.output(response.getBody());
-	 *   		 var json = response.getAsJSON();
-	 *   		 application.output("Name is "+json.name);
-	 *    	}
-	 *   	else {
-	 *    	 application.output('ERROR http status '+response.getCode());
-	 *     	}
-	 *	 else {
+	 *		if (response.getCode() == 200) {
+	 *			application.output(response.getBody());
+	 *			var json = response.getAsJSON();
+	 *			application.output("Name is "+json.name);
+	 *		}
+	 *		else {
+	 *			application.output('ERROR http status '+response.getCode());
+	 *		}
+	 *	else {
 	 *		//ERROR
 	 *		application.output("ERROR "+auth_outcome);//could not get access token, request timed out, etc..
 	 *	 }
-	 *	}
+	 *  }
 	 * }
 	 *
 	 * @param provider an OAuth provider id, see plugins.oauth.OAuthProviders
@@ -191,6 +191,7 @@ public class OAuthProvider implements IScriptable, IReturnedTypesProvider
 	 * 				if missing then a default deeplink method is generated under the hood with the solution model,
 	 * 				if present then should set the access token on the service
 	 * @param callback an actual function to be called when the service is ready to use
+	 * @param tenant tenant identifiers/organization (eg. Microsoft AD)
 	 * @param timeout max number of seconds in which the callbackmethod should be called (with success or error message)
 	 * 			Please note that the timeout should be enough for the user to login and accept permissions.
 	 * @return an OAuthService object that is ready to use when the callback method is executed.
