@@ -32,6 +32,7 @@ import com.github.scribejava.core.builder.ServiceBuilder;
 import com.github.scribejava.core.builder.api.DefaultApi20;
 import com.servoy.base.scripting.annotations.ServoyClientSupport;
 import com.servoy.base.solutionmodel.IBaseSMVariable;
+import com.servoy.extensions.plugins.oauth.apis.IntuitApi;
 import com.servoy.j2db.documentation.ServoyDocumented;
 import com.servoy.j2db.plugins.IAllWebClientPluginAccess;
 import com.servoy.j2db.scripting.FunctionDefinition;
@@ -321,6 +322,8 @@ public class OAuthProvider implements IScriptable, IReturnedTypesProvider
 				return FacebookApi.instance();
 			case OAuthProviders.LINKEDIN :
 				return LinkedInApi20.instance();
+			case OAuthProviders.INTUIT :
+				return IntuitApi.instance();
 		}
 		return null;
 	}
