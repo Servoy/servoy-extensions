@@ -61,7 +61,7 @@ public class OAuthService implements IScriptable, IJavaScriptType
 		try
 		{
 			this.accessToken = service.getAccessToken(code);
-			this.accessTokenExpire = System.currentTimeMillis() + accessToken.getExpiresIn() * 1000;
+			this.accessTokenExpire = System.currentTimeMillis() + accessToken.getExpiresIn().intValue() * 1000;
 		}
 		catch (IOException | InterruptedException | ExecutionException e)
 		{
@@ -76,7 +76,7 @@ public class OAuthService implements IScriptable, IJavaScriptType
 		try
 		{
 			this.accessToken = service.getAccessToken(AccessTokenRequestParams.create(code).scope(scope));
-			this.accessTokenExpire = System.currentTimeMillis() + accessToken.getExpiresIn() * 1000;
+			this.accessTokenExpire = System.currentTimeMillis() + accessToken.getExpiresIn().intValue() * 1000;
 		}
 		catch (IOException | InterruptedException | ExecutionException e)
 		{
@@ -89,6 +89,18 @@ public class OAuthService implements IScriptable, IJavaScriptType
 	public String getAccessToken()
 	{
 		return accessToken != null ? accessToken.getAccessToken() : null;
+	}
+
+	/**
+	 * Return the refresh token.
+	 * @return the refresh token or null if it is not present
+	 * @throws Exception if the access token was not set on the service
+	 */
+	@JSFunction
+	public String getRefreshToken() throws Exception
+	{
+		if (accessToken == null) throw new Exception("Could not refresh the access token, the access token was not set on the service.");
+		return accessToken.getRefreshToken();
 	}
 
 	/**
@@ -105,8 +117,17 @@ public class OAuthService implements IScriptable, IJavaScriptType
 		if (accessToken == null) throw new Exception("Could not refresh the access token, the access token was not set on the service.");
 		if (accessToken.getRefreshToken() == null || "".equals(accessToken.getRefreshToken()))
 			throw new Exception("Could not refresh the access token, the access token does not contain a refresh token.");
-		accessToken = service.refreshAccessToken(accessToken.getRefreshToken());
-		return accessToken.getAccessToken();
+		try
+		{
+			accessToken = service.refreshAccessToken(accessToken.getRefreshToken(), accessToken.getScope());
+			this.accessTokenExpire = System.currentTimeMillis() + accessToken.getExpiresIn().intValue() * 1000;
+			return accessToken.getAccessToken();
+		}
+		catch (Exception e)
+		{
+			Debug.error("Could not get a new access token", e);
+			throw new Exception("Could not get a new access token  " + e.getMessage());
+		}
 	}
 
 	/**
