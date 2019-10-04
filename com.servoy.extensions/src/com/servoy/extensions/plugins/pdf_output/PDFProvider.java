@@ -18,6 +18,7 @@ package com.servoy.extensions.plugins.pdf_output;
 
 import java.awt.Color;
 import java.awt.Window;
+import java.awt.image.BufferedImage;
 import java.awt.print.PrinterJob;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -28,6 +29,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import javax.imageio.ImageIO;
+
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.rendering.PDFRenderer;
 import org.mozilla.javascript.Scriptable;
 
 import com.lowagie.text.Document;
@@ -621,7 +626,7 @@ public class PDFProvider implements IScriptable
 	@ServoyClientSupport(ng = true, wc = true, sc = true)
 	public byte[] js_encrypt(byte[] data, String ownerPassword, String userPassword, boolean allowAssembly, boolean allowCopy, boolean allowDegradedPrinting,
 		boolean allowFillIn, boolean allowModifyAnnotations, boolean allowModifyContents, boolean allowPrinting, boolean allowScreenreaders, boolean is128bit)
-			throws Exception
+		throws Exception
 	{
 		return js_encrypt(data, ownerPassword, userPassword, allowAssembly, allowCopy, allowDegradedPrinting, allowFillIn, allowModifyAnnotations,
 			allowModifyContents, allowPrinting, allowScreenreaders, is128bit, null);
@@ -958,6 +963,81 @@ public class PDFProvider implements IScriptable
 		ByteArrayInputStream bais = new ByteArrayInputStream(data);
 		ByteArrayInputStream foais = new ByteArrayInputStream(forOverlay);
 		return ITextTools.overlay(bais, foais, isOver, pages);
+	}
+
+	/**
+	 * Create a thumbnail from the provided PDF
+	 *
+	 * @author mvid
+	 *
+	 * @sample
+	 * //read PDF file data
+	 * var pdf = plugins.file.readFile();
+	 * //get the thumbnail (default the first page is rendered with 72 dpi resolution)
+	 * var pngImg = plugins.pdf_output.getThumbnailImage(pdf);
+	 * //save PNG image to file
+	 * var thumbnailFile = plugins.file.convertToJSFile()
+	 * plugins.file.writeFile(thumbnailFile, pngImg);
+	 *
+	 * @param data the PDF
+	 *
+	 * @return the PDF thumbnail as PNG format
+	 *
+	 * @throws Exception
+	 */
+	@ServoyClientSupport(ng = true, wc = true, sc = true)
+	public byte[] js_getThumbnailImage(byte[] data) throws Exception
+	{
+		return js_getThumbnailImage(data, 0);
+	}
+
+	/**
+	 * Create a thumbnail from the provided PDF
+	 *
+	 * @author mvid
+	 *
+	 * @sampleas js_getThumbnailImage(byte[])
+	 *
+	 * @param data the PDF
+	 * @param pageNumber PDF page to get thumbnail of. This parameter is zero based index.
+	 *
+	 * @return the PDF thumbnail as PNG format
+	 *
+	 * @throws Exception
+	 */
+	@ServoyClientSupport(ng = true, wc = true, sc = true)
+	public byte[] js_getThumbnailImage(byte[] data, int pageNumber) throws Exception
+	{
+		return js_getThumbnailImage(data, pageNumber, 72);
+	}
+
+	/**
+	 * Create a thumbnail from the provided PDF
+	 *
+	 * @author mvid
+	 *
+	 * @sampleas js_getThumbnailImage(byte[])
+	 *
+	 * @param data the PDF
+	 * @param pageNumber PDF page to get thumbnail of. This parameter is zero based index.
+	 * @param dpi resolution used to render the thumbnail image
+	 *
+	 * @return the PDF thumbnail as PNG format
+	 *
+	 * @throws Exception
+	 */
+	@ServoyClientSupport(ng = true, wc = true, sc = true)
+	public byte[] js_getThumbnailImage(byte[] data, int pageNumber, int dpi) throws Exception
+	{
+		PDDocument pdfDoc = PDDocument.load(data);
+		PDFRenderer pdfRenderer = new PDFRenderer(pdfDoc);
+		BufferedImage myImage = pdfRenderer.renderImageWithDPI(pageNumber, dpi);
+		ByteArrayOutputStream baos = new ByteArrayOutputStream(myImage.getData().getDataBuffer().getSize());
+		ImageIO.write(myImage, "png", baos);
+		baos.flush();
+		byte[] imgArray = baos.toByteArray();
+		baos.close();
+		return imgArray;
 	}
 
 

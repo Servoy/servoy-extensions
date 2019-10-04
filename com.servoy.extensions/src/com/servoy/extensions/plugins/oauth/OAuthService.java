@@ -41,6 +41,7 @@ public class OAuthService implements IScriptable, IJavaScriptType
 	private final OAuth20Service service;
 	private OAuth2AccessToken accessToken;
 	private final String state;
+	private long accessTokenExpire;
 
 	public OAuthService(OAuth20Service service, String state)
 	{
@@ -60,6 +61,7 @@ public class OAuthService implements IScriptable, IJavaScriptType
 		try
 		{
 			this.accessToken = service.getAccessToken(code);
+			this.accessTokenExpire = System.currentTimeMillis() + accessToken.getExpiresIn().intValue() * 1000;
 		}
 		catch (IOException | InterruptedException | ExecutionException e)
 		{
@@ -74,19 +76,101 @@ public class OAuthService implements IScriptable, IJavaScriptType
 		try
 		{
 			this.accessToken = service.getAccessToken(AccessTokenRequestParams.create(code).scope(scope));
+			this.accessTokenExpire = System.currentTimeMillis() + accessToken.getExpiresIn().intValue() * 1000;
 		}
 		catch (IOException | InterruptedException | ExecutionException e)
 		{
 			Debug.error("Could not set the access token.", e);
 			throw new Exception("Could not set the access token. See the log for more details");
 		}
-
 	}
 
 	@JSFunction
 	public String getAccessToken()
 	{
-		return accessToken.getAccessToken();
+		return accessToken != null ? accessToken.getAccessToken() : null;
+	}
+
+	/**
+	 * Return the refresh token.
+	 * @return the refresh token or null if it is not present
+	 * @throws Exception if the access token was not set on the service
+	 */
+	@JSFunction
+	public String getRefreshToken() throws Exception
+	{
+		if (accessToken == null) throw new Exception("Could not refresh the access token, the access token was not set on the service.");
+		return accessToken.getRefreshToken();
+	}
+
+	/**
+	 * Obtains a new access token if the OAuth api supports it.
+	 * @sample
+	 * accessToken = service.refreshToken();
+	 *
+	 * @return The new access token issued by the authorization server
+	 * @throws Exception if the access token was not set or if the api does not support refreshing the token
+	 */
+	@JSFunction
+	public String refreshToken() throws Exception
+	{
+		if (accessToken == null) throw new Exception("Could not refresh the access token, the access token was not set on the service.");
+		if (accessToken.getRefreshToken() == null || "".equals(accessToken.getRefreshToken()))
+			throw new Exception("Could not refresh the access token, the access token does not contain a refresh token.");
+		try
+		{
+			accessToken = service.refreshAccessToken(accessToken.getRefreshToken(), accessToken.getScope());
+			this.accessTokenExpire = System.currentTimeMillis() + accessToken.getExpiresIn().intValue() * 1000;
+			return accessToken.getAccessToken();
+		}
+		catch (Exception e)
+		{
+			Debug.error("Could not get a new access token", e);
+			throw new Exception("Could not get a new access token  " + e.getMessage());
+		}
+	}
+
+	/**
+	 * Returns the number of seconds left until the access token expires.
+	 * @sample
+	 *  var seconds = service.getAccessExpiresIn();
+	 *  if (seconds < 60)
+	 *  {
+	 *  	application.output("The access token is going to expire in less than 1 minute! Use service.refreshToken() to get a new one");
+	 *  }
+	 *  else
+	 *  {
+	 *  	application.output("Make some requests");
+	 *  }
+	 *
+	 * @return seconds left untol the access token expires.
+	 * @throws Exception if the access token was not set
+	 */
+	@JSFunction
+	public long getAccessExpiresIn() throws Exception
+	{
+		if (accessToken == null) throw new Exception("Could getAccessExpiresIn, the access token was not set on the service.");
+		return (accessTokenExpire - System.currentTimeMillis()) / 1000;
+	}
+
+	/**
+	 * Checks if the access token is expired.
+	 * @return true if the access token is expired, false otherwise
+	 */
+	@JSFunction
+	public boolean isAccessTokenExpired()
+	{
+		return System.currentTimeMillis() >= accessTokenExpire;
+	}
+
+	/**
+	 * Return the token lifetime in seconds.
+	 * @return the token lifetime as it was retrieved by the OAuth provider with the access token
+	 */
+	@JSFunction
+	public int getAccessTokenLifetime()
+	{
+		return accessToken.getExpiresIn().intValue();
 	}
 
 	@JSFunction
@@ -99,8 +183,8 @@ public class OAuthService implements IScriptable, IJavaScriptType
 	@JSFunction
 	public OAuthResponse executeGetRequest(String resourceURL)
 	{
-		if (accessToken == null) throw new RuntimeException("Cannot execute request. Please set the acess token first.");
 		OAuthRequest request = new OAuthRequest(Verb.GET, resourceURL);
+		checkAccessTokenExpired();
 		service.signRequest(accessToken, request);
 		try
 		{
@@ -114,13 +198,28 @@ public class OAuthService implements IScriptable, IJavaScriptType
 		return null;
 	}
 
+	protected void checkAccessTokenExpired()
+	{
+		if (accessToken == null) throw new RuntimeException("Cannot execute request. Please set the acess token first.");
+		if (isAccessTokenExpired())
+		{
+			try
+			{
+				refreshToken();
+			}
+			catch (Exception e)
+			{
+				throw new RuntimeException("Cannot execute request, access token is expired and could not refresh it");
+			}
+		}
+	}
+
 	@JSFunction
 	public OAuthResponse executeRequest(JSOAuthRequest request)
 	{
 		if (request == null) return null;
-		//TODO check if expired?
-		if (accessToken == null) throw new RuntimeException("Cannot execute request. Please set the acess token first.");
 		OAuthRequest req = request.getRequest();
+		checkAccessTokenExpired();
 		service.signRequest(accessToken, req);
 		try
 		{

@@ -28,6 +28,9 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import javax.mail.BodyPart;
 import javax.mail.MessagingException;
@@ -58,6 +61,7 @@ import com.servoy.extensions.plugins.rest_ws.RestWSPlugin.ExecFailedException;
 import com.servoy.extensions.plugins.rest_ws.RestWSPlugin.NoClientsException;
 import com.servoy.extensions.plugins.rest_ws.RestWSPlugin.NotAuthenticatedException;
 import com.servoy.extensions.plugins.rest_ws.RestWSPlugin.NotAuthorizedException;
+import com.servoy.j2db.persistence.ScriptVariable;
 import com.servoy.j2db.plugins.IClientPlugin;
 import com.servoy.j2db.plugins.IClientPluginAccess;
 import com.servoy.j2db.scripting.FunctionDefinition;
@@ -236,7 +240,16 @@ public class RestWSServlet extends HttpServlet
 		WsRequestPath wsRequestPath = parsePath(request);
 		boolean nodebug = getNodebugHeadderValue(request);
 		String solutionName = nodebug ? wsRequestPath.solutionName + ":nodebug" : wsRequestPath.solutionName;
-		IHeadlessClient client = plugin.getClient(solutionName.toString());
+		IHeadlessClient client;
+		try
+		{
+			client = plugin.getClient(solutionName.toString());
+		}
+		catch (IllegalArgumentException e)
+		{
+			// solution not found
+			throw new NoClientsException();
+		}
 		return new Pair<IHeadlessClient, String>(client, solutionName);
 	}
 
@@ -500,28 +513,29 @@ public class RestWSServlet extends HttpServlet
 			plugin.log.trace("OPTIONS");
 			wsRequestPath = parsePath(request);
 
-			client = plugin.getClient(nodebug ? wsRequestPath.solutionName + ":nodebug" : wsRequestPath.solutionName);
+			client = getClient(request).getLeft();
+
 			setApplicationUserProperties(request, client.getPluginAccess());
 			String retval = "TRACE, OPTIONS";
-			if (new FunctionDefinition(wsRequestPath.formName, WS_READ).exists(client.getPluginAccess()) == FunctionDefinition.Exist.METHOD_FOUND)
+			if (testWsMethod(client, wsRequestPath, WS_READ))
 			{
 				retval += ", GET";
 			}
 			//TODO: implement HEAD?
 			retval += ", HEAD";
-			if (new FunctionDefinition(wsRequestPath.formName, WS_CREATE).exists(client.getPluginAccess()) == FunctionDefinition.Exist.METHOD_FOUND)
+			if (testWsMethod(client, wsRequestPath, WS_CREATE))
 			{
 				retval += ", POST";
 			}
-			if (new FunctionDefinition(wsRequestPath.formName, WS_UPDATE).exists(client.getPluginAccess()) == FunctionDefinition.Exist.METHOD_FOUND)
+			if (testWsMethod(client, wsRequestPath, WS_UPDATE))
 			{
 				retval += ", PUT";
 			}
-			if (new FunctionDefinition(wsRequestPath.formName, WS_PATCH).exists(client.getPluginAccess()) == FunctionDefinition.Exist.METHOD_FOUND)
+			if (testWsMethod(client, wsRequestPath, WS_PATCH))
 			{
 				retval += ", PATCH";
 			}
-			if (new FunctionDefinition(wsRequestPath.formName, WS_DELETE).exists(client.getPluginAccess()) == FunctionDefinition.Exist.METHOD_FOUND)
+			if (testWsMethod(client, wsRequestPath, WS_DELETE))
 			{
 				retval += ", DELETE";
 			}
@@ -560,33 +574,78 @@ public class RestWSServlet extends HttpServlet
 		}
 	}
 
+	/**
+	 * @param client
+	 * @param wsRequestPath
+	 * @return
+	 */
+	private static boolean testWsMethod(IHeadlessClient client, WsRequestPath wsRequestPath, String wsMethod)
+	{
+		String context = getContext(client, wsRequestPath.scope_or_form);
+		Pair<FunctionDefinition, String[]> call = getFunctioncall(wsMethod, client.getPluginAccess(), wsRequestPath, context);
+		return call.getLeft().exists(client.getPluginAccess()) == FunctionDefinition.Exist.METHOD_FOUND;
+	}
+
 	public WsRequestPath parsePath(HttpServletRequest request)
 	{
 		String path = request.getPathInfo(); //without servlet name
 
 		if (plugin.log.isDebugEnabled()) plugin.log.debug("Request '" + path + '\'');
 
-		// parse the path: /webServiceName/mysolution/myform/arg1/arg2/...
+		// parse the path: servoy-service/webServiceName/mysolution/myform_or_scope/arg1/arg2/...
+		// parse the path: servoy-service/webServiceName/mysolution/myform_or_scope/methodname/arg1/arg2/...
+		// parse the path: servoy-service/webServiceName/mysolution/v2/myform_or_scope/arg1/arg2/...
+		// parse the path: servoy-service/webServiceName/mysolution/v2/myform_or_scope/methodname/arg1/arg2/...
 		String[] segments = path == null ? null : path.split("/");
 		if (segments == null || segments.length < 4 || !webServiceName.equals(segments[1]))
 		{
 			throw new IllegalArgumentException(path);
 		}
 
-		return new WsRequestPath(segments[2], segments[3], Utils.arraySub(segments, 4, segments.length));
+		String version = null;
+		int argumentsStart = 2;
+		// if segment 2 is a "vX", so starts with a v and then an integer then it is a version string, should be appended to the scope or form name
+		if (isVersionSegment(segments, argumentsStart))
+		{
+			version = segments[argumentsStart++];
+		}
+		String solution = segments[argumentsStart++];
+		// if segment 3 is a "vX", so starts with a v and then an integer then it is a version string, should be appended to the scope or form name
+		if (isVersionSegment(segments, argumentsStart))
+		{
+			version = segments[argumentsStart++];
+		}
+		String scope_or_form = segments[argumentsStart++];
+
+		if (version != null)
+		{
+			scope_or_form = scope_or_form + "_" + version;
+		}
+		return new WsRequestPath(solution, scope_or_form, Utils.arraySub(segments, argumentsStart, segments.length));
 	}
 
 	/**
-	 * call the service method, make the request ansd response available for the client-plugin.
+	 *
+	 * @param segments
+	 * @param index
+	 */
+	private static boolean isVersionSegment(String[] segments, int index)
+	{
+		String segment = segments[index];
+		return segment.startsWith("v") && Utils.getAsInteger(segment.substring(1), -1) != -1 && index < segments.length + 1;
+	}
+
+	/**
+	 * call the service method, make the request and response available for the client-plugin.
 	 * Throws {@link NoClientsException} when no license is available
-	 * @param methodName
+	 * @param wsMethod
 	 * @param fixedArgs
 	 * @param request
 	 * @param response
 	 * @return
 	 * @throws Exception
 	 */
-	private Object wsService(String methodName, Object[] fixedArgs, HttpServletRequest request, HttpServletResponse response, IHeadlessClient client)
+	private Object wsService(String wsMethod, Object[] fixedArgs, HttpServletRequest request, HttpServletResponse response, IHeadlessClient client)
 		throws Exception
 	{
 		RestWSClientPlugin clientPlugin = (RestWSClientPlugin)client.getPluginAccess().getPluginManager().getPlugin(IClientPlugin.class,
@@ -601,7 +660,7 @@ public class RestWSServlet extends HttpServlet
 			{
 				clientPlugin.setRequestResponse(request, response);
 			}
-			return doWsService(methodName, fixedArgs, request, response, client);
+			return doWsService(wsMethod, fixedArgs, request, response, client);
 		}
 		finally
 		{
@@ -612,7 +671,7 @@ public class RestWSServlet extends HttpServlet
 		}
 	}
 
-	private Object doWsService(String methodName, Object[] fixedArgs, HttpServletRequest request, HttpServletResponse response, IHeadlessClient client)
+	private Object doWsService(String wsMethod, Object[] fixedArgs, HttpServletRequest request, HttpServletResponse response, IHeadlessClient client)
 		throws Exception
 	{
 		// update cookies in the application from request
@@ -623,25 +682,14 @@ public class RestWSServlet extends HttpServlet
 
 		WsRequestPath wsRequestPath = parsePath(request);
 
-		Object ws_authenticate_result = checkAuthorization(request, client.getPluginAccess(), wsRequestPath.solutionName, wsRequestPath.formName);
+		Object ws_authenticate_result = checkAuthorization(request, client, wsRequestPath.solutionName, wsRequestPath.scope_or_form);
 
-		FunctionDefinition fd = new FunctionDefinition(wsRequestPath.formName, methodName);
-		Exist functionExists = fd.exists(client.getPluginAccess());
-		if (functionExists == FunctionDefinition.Exist.NO_SOLUTION)
-		{
-			throw new WebServiceException("Solution " + wsRequestPath.solutionName + " not loaded", HttpServletResponse.SC_SERVICE_UNAVAILABLE);
-		}
-		if (functionExists == FunctionDefinition.Exist.FORM_NOT_FOUND)
-		{
-			throw new WebServiceException("Form " + wsRequestPath.formName + " not found", HttpServletResponse.SC_NOT_FOUND);
-		}
-		if (functionExists != FunctionDefinition.Exist.METHOD_FOUND)
-		{
-			throw new WebServiceException("Method " + methodName + " not found" + (wsRequestPath.formName != null ? " on form " + wsRequestPath.formName : ""),
-				HttpServletResponse.SC_METHOD_NOT_ALLOWED);
-		}
+		String context = getContext(client, wsRequestPath.scope_or_form);
 
-		FunctionDefinition fd_headers = new FunctionDefinition(wsRequestPath.formName, WS_RESPONSE_HEADERS);
+		Pair<FunctionDefinition, String[]> functionCall = getExistingFunctioncall(wsMethod, request.getPathInfo(), client.getPluginAccess(), wsRequestPath,
+			context);
+
+		FunctionDefinition fd_headers = new FunctionDefinition(context, WS_RESPONSE_HEADERS);
 		if (fd_headers.exists(client.getPluginAccess()) == FunctionDefinition.Exist.METHOD_FOUND)
 		{
 			Object result = fd_headers.executeSync(client.getPluginAccess(), null);
@@ -657,10 +705,11 @@ public class RestWSServlet extends HttpServlet
 			else addHeaderToResponse(response, result, wsRequestPath);
 		}
 
+		Object[] methodArgs = functionCall.getRight();
 		Object[] args = null;
-		if (fixedArgs != null || wsRequestPath.args.length > 0 || request.getParameterMap().size() > 0)
+		if (fixedArgs != null || methodArgs.length > 0 || request.getParameterMap().size() > 0)
 		{
-			args = new Object[((fixedArgs == null) ? 0 : fixedArgs.length) + wsRequestPath.args.length +
+			args = new Object[((fixedArgs == null) ? 0 : fixedArgs.length) + methodArgs.length +
 				((request.getParameterMap().size() > 0 || ws_authenticate_result != null) ? 1 : 0)];
 			int idx = 0;
 			if (fixedArgs != null)
@@ -668,10 +717,10 @@ public class RestWSServlet extends HttpServlet
 				System.arraycopy(fixedArgs, 0, args, 0, fixedArgs.length);
 				idx += fixedArgs.length;
 			}
-			if (wsRequestPath.args.length > 0)
+			if (methodArgs.length > 0)
 			{
-				System.arraycopy(wsRequestPath.args, 0, args, idx, wsRequestPath.args.length);
-				idx += wsRequestPath.args.length;
+				System.arraycopy(methodArgs, 0, args, idx, methodArgs.length);
+				idx += methodArgs.length;
 			}
 			if (request.getParameterMap().size() > 0 || ws_authenticate_result != null)
 			{
@@ -685,22 +734,80 @@ public class RestWSServlet extends HttpServlet
 			}
 		}
 
-		if (plugin.log.isDebugEnabled()) plugin.log.debug("executeMethod('" + wsRequestPath.formName + "', '" + methodName + "', <args>)");
+		if (plugin.log.isDebugEnabled()) plugin.log.debug("executeMethod('" + context + "', '" + wsMethod + "', <args>)");
 		// DO NOT USE FunctionDefinition here! we want to be able to catch possible exceptions!
 		Object result;
 		try
 		{
-			result = client.getPluginAccess().executeMethod(wsRequestPath.formName, methodName, args, false);
+			result = client.getPluginAccess().executeMethod(context, functionCall.getLeft().getMethodName(), args, false);
 		}
 		catch (Exception e)
 		{
-			plugin.log.info("Method execution failed: executeMethod('" + wsRequestPath.formName + "', '" + methodName + "', <args>)", e);
+			plugin.log.info("Method execution failed: executeMethod('" + context + "', '" + functionCall.getLeft().getMethodName() + "', <args>)", e);
 			throw new ExecFailedException(e);
 		}
 		if (plugin.log.isDebugEnabled()) plugin.log.debug("result = " + (result == null ? "<NULL>" : ("'" + result + '\'')));
 		// flush updated cookies from the application
 		setResponseUserProperties(request, response, client.getPluginAccess());
 		return result;
+	}
+
+	/**
+	 * @param wsMethod
+	 * @param pathInfo
+	 * @param pluginAccess
+	 * @param wsRequestPath
+	 * @param context
+	 * @return
+	 * @throws WebServiceException
+	 */
+	private static Pair<FunctionDefinition, String[]> getExistingFunctioncall(String wsMethod, String pathInfo, IClientPluginAccess pluginAccess,
+		WsRequestPath wsRequestPath, String context) throws WebServiceException
+	{
+		Pair<FunctionDefinition, String[]> call = getFunctioncall(wsMethod, pluginAccess, wsRequestPath, context);
+
+		Exist functionExists = call.getLeft().exists(pluginAccess);
+		if (functionExists == FunctionDefinition.Exist.NO_SOLUTION)
+		{
+			throw new WebServiceException("Solution " + wsRequestPath.solutionName + " not loaded", HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+		}
+		if (functionExists != FunctionDefinition.Exist.METHOD_FOUND)
+		{
+			throw new WebServiceException(
+				"Path " + pathInfo + " not found" + (wsRequestPath.scope_or_form != null ? " for form or scope " + wsRequestPath.scope_or_form : ""),
+				HttpServletResponse.SC_NOT_FOUND);
+		}
+		return call;
+	}
+
+	/**
+	 * @param wsMethod
+	 * @param pluginAccess
+	 * @param wsRequestPath
+	 * @param context
+	 * @return
+	 */
+	private static Pair<FunctionDefinition, String[]> getFunctioncall(String wsMethod, IClientPluginAccess pluginAccess, WsRequestPath wsRequestPath,
+		String context)
+	{
+		return wsRequestPath.getPossibleMethods() //
+			.map(method -> new Pair<>(new FunctionDefinition(context, wsMethod + method.name), method.getArgs())) //
+			.filter(pair -> pair.getLeft().exists(pluginAccess) == FunctionDefinition.Exist.METHOD_FOUND) //
+			.findFirst() //
+			.orElseGet(() -> new Pair<>(new FunctionDefinition(context, wsMethod), wsRequestPath.args));
+	}
+
+	private static String getContext(IHeadlessClient client, String scope_or_form)
+	{
+		String[] retVal = new String[] { scope_or_form };
+		client.invokeAndWait(() -> {
+			if (client.getPluginAccess().getFormManager().getForm(scope_or_form) == null)
+			{
+				// the form is not found, test then as a scope.
+				retVal[0] = ScriptVariable.SCOPES_DOT_PREFIX + scope_or_form;
+			}
+		});
+		return retVal[0];
 	}
 
 	private void addHeaderToResponse(HttpServletResponse response, Object headerItem, WsRequestPath wsRequestPath)
@@ -734,14 +841,16 @@ public class RestWSServlet extends HttpServlet
 
 		if (!done) Debug.error(
 			"Cannot send back header value from 'ws_response_headers'; it should be either a String containing a key-value pair separated by an equal sign or an object with 'name' and 'value' in it, but it is: '" +
-				headerItem + "'. Solution/form: " + wsRequestPath.solutionName + " -> " + wsRequestPath.formName);
+				headerItem + "'. Solution/form/scope: " + wsRequestPath.solutionName + " -> " + wsRequestPath.scope_or_form);
 	}
 
-	private Object checkAuthorization(HttpServletRequest request, IClientPluginAccess client, String solutionName, String formName) throws Exception
+	private Object checkAuthorization(HttpServletRequest request, IHeadlessClient client, String solutionName, String scope_or_form) throws Exception
 	{
+		String context = getContext(client, scope_or_form);
+
 		String[] authorizedGroups = plugin.getAuthorizedGroups();
-		FunctionDefinition fd = new FunctionDefinition(formName, WS_AUTHENTICATE);
-		Exist authMethodExists = fd.exists(client);
+		FunctionDefinition fd = new FunctionDefinition(context, WS_AUTHENTICATE);
+		Exist authMethodExists = fd.exists(client.getPluginAccess());
 		if (authorizedGroups == null && authMethodExists != FunctionDefinition.Exist.METHOD_FOUND)
 		{
 			plugin.log.debug("No authorization to check, allow all access");
@@ -787,7 +896,7 @@ public class RestWSServlet extends HttpServlet
 		if (authMethodExists == FunctionDefinition.Exist.METHOD_FOUND)
 		{
 			//TODO: we should cache the (user,pass,retval) for an hour (across all rest clients), and not invoke WS_AUTHENTICATE function each time! (since authenticate might be expensive like LDAP)
-			Object retval = fd.executeSync(client, new String[] { user, password });
+			Object retval = fd.executeSync(client.getPluginAccess(), new String[] { user, password });
 			if (retval != null && !Boolean.FALSE.equals(retval) && retval != Undefined.instance)
 			{
 				return retval instanceof Boolean ? null : retval;
@@ -1460,7 +1569,7 @@ public class RestWSServlet extends HttpServlet
 	public static class WsRequestPath
 	{
 		public final String solutionName;
-		public final String formName;
+		public final String scope_or_form;
 		public final String[] args;
 
 		/**
@@ -1468,17 +1577,69 @@ public class RestWSServlet extends HttpServlet
 		 * @param formName
 		 * @param args
 		 */
-		public WsRequestPath(String solutionName, String formName, String[] args)
+		public WsRequestPath(String solutionName, String scope_or_form, String[] args)
 		{
 			this.solutionName = solutionName;
-			this.formName = formName;
+			this.scope_or_form = scope_or_form;
 			this.args = args;
+		}
+
+		public Stream<Method> getPossibleMethods()
+		{
+			if (args == null || args.length == 0) return Stream.empty();
+			return IntStream.range(0, args.length).mapToObj(i -> new Method(args, i)).sorted();
 		}
 
 		@Override
 		public String toString()
 		{
-			return "WsRequest [solutionName=" + solutionName + ", formName=" + formName + ", args=" + Arrays.toString(args) + "]";
+			return "WsRequest [solutionName=" + solutionName + ", ScopeOrForm=" + scope_or_form + ", args=" + Arrays.toString(args) + "]";
+		}
+	}
+
+	private final static class Method implements Comparable<Method>
+	{
+		public final String name;
+		private final String[] args;
+		private final int index;
+
+		Method(String[] args, int index)
+		{
+			this.args = args;
+			this.index = index;
+			this.name = "_" + IntStream.rangeClosed(0, index).mapToObj(i -> args[i]).collect(Collectors.joining("_"));
+		}
+
+		String[] getArgs()
+		{
+			if (args.length <= index + 1) return new String[0];
+			return Utils.arraySub(args, index + 1, args.length);
+		}
+
+		@Override
+		public int compareTo(Method o)
+		{
+			return o.index - index;
+		}
+
+		@Override
+		public boolean equals(Object obj)
+		{
+			if (obj == this) return true;
+			if (obj instanceof Method)
+			{
+				if (((Method)obj).index == index)
+				{
+					return Arrays.equals(args, ((Method)obj).args);
+				}
+			}
+			return false;
+		}
+
+		@Override
+		public int hashCode()
+		{
+			return index;
 		}
 	}
 

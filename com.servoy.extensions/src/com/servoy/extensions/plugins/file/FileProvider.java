@@ -857,6 +857,7 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	{
 		if (file instanceof JSFile) return (JSFile)file;
 		if (file instanceof File) return new JSFile((File)file);
+		if (file instanceof IUploadData) return new JSFile((IUploadData)file);
 		if (file != null) return new JSFile(new File(file.toString()));
 		return null;
 	}
@@ -2313,7 +2314,7 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 * var files = plugins.file.getRemoteFolderContents('/', '.txt');
 	 *
 	 * @since Servoy 5.2.1
-
+	 *
 	 * @param targetFolder
 	 * @return the array of file names
 	 */
