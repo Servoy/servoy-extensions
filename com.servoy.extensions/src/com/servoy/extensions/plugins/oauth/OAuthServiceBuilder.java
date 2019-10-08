@@ -21,8 +21,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import org.json.JSONObject;
 import org.mozilla.javascript.Function;
+import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.annotations.JSFunction;
 
 import com.github.scribejava.core.builder.ServiceBuilder;
@@ -34,7 +34,6 @@ import com.servoy.j2db.scripting.IJavaScriptType;
 import com.servoy.j2db.scripting.IScriptable;
 import com.servoy.j2db.solutionmodel.ISolutionModel;
 import com.servoy.j2db.util.Debug;
-import com.servoy.j2db.util.Utils;
 
 /**
  * @author emera
@@ -221,14 +220,14 @@ public class OAuthServiceBuilder implements IScriptable, IJavaScriptType
 							TimeUnit.SECONDS.sleep(1);
 						}
 
-						if (code != null)
+						if (code instanceof Scriptable)
 						{
-							JSONObject json = new JSONObject(Utils.getScriptableString(code));
-							if (json.has("code"))
+							Scriptable result = ((Scriptable)code);
+							if (result.has("code", result))
 							{
 								try
 								{
-									service.setAccessToken(json.optString("code"));
+									service.setAccessToken((String)result.get("code", result));
 								}
 								catch (Exception e)
 								{
@@ -239,7 +238,7 @@ public class OAuthServiceBuilder implements IScriptable, IJavaScriptType
 							{
 								//error is required by the protocol if code is not present, should not be null
 								//error_message is optional, but human readable, so we prefer that one
-								errorMessage = json.optString("error_message") != null ? json.optString("error_message") : json.optString("error");
+								errorMessage = result.has("error_message", result) ? (String)result.get("error_message", result) : (String)result.get("error", result);
 							}
 						}
 						else
