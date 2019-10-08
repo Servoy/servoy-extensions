@@ -64,8 +64,7 @@ public class OAuthServiceBuilder implements IScriptable, IJavaScriptType
 
 	/**
 	 * Configure the service with a callback function to be executed when the service is ready to use.
-	 * When a callback function is set, the redirect to the OAuth provider login page is done within the plugin.
-	 * When the code is returned by the server, the configured function is executed.
+	 * After the access token is returned by the server, this callback function is executed.
 	 * @param callback a function in a scope or form
 	 * @param timeout max number of seconds in which the callback method should be executed (with success or error message)
 	 * 			Please note that the timeout should be enough for the user to login and accept permissions.
@@ -138,10 +137,16 @@ public class OAuthServiceBuilder implements IScriptable, IJavaScriptType
 	}
 
 	/**
-	 * The deeplink method name should be provided when the OAuth provider (eg. Microsoft AD, Likedin) requires
-	 * to configure a full redirect url, such as https://example.com/<solution_name>/m/<deeplinkmethod>
-	 * It is OPTIONAL when a callback function is used.
-	 * If it is missing, then a default deeplink method is generated under the hood with the solution model.
+	 * OPTIONAL This is a way to override the default deeplink method name, which is 'deeplink_svy_oauth'.
+	 * The deeplink method is a global method that receives the code needed to obtain the access token from the OAuth provider.
+	 *
+	 * NOTE: The deeplink method name is strongly related to the redirect url configured for the application.
+	 * If the OAuth provider (eg. Microsoft AD, Likedin) requires to configure a full redirect url then it should be of the form:
+	 * https://example.com/<solution_name>/m/<deeplinkmethod> - where <deeplinkmethod> is the name configured with the service builder
+	 * https://example.com/<solution_name>/m/deeplink_svy_oauth - if the deeplink method name was not overridden
+	 *
+	 * If the deeplink method with the provided name does not exist in the solution,
+	 * then a default deeplink method is generated under the hood with the solution model.
 	 * If a global method with the provided name already exists in the solution, then it should set the access
 	 * token on the service and handle possible errors.
 	 *

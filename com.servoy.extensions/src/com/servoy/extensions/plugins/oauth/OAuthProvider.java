@@ -49,11 +49,12 @@ public class OAuthProvider implements IScriptable, IReturnedTypesProvider
 	 * Creates an OAuth service configurator.
 	 * plugins.oauth.serviceBuilder("0lqd1s0aw...")	//client/application ID
 	 * 				.clientSecret("bIk6163KHi...")		//client secret
-	 * 				.defaultScope("email")				//ask permission to get the user email
-	 * 				.state("secret123337")				//anti forgery session state, required by the Facebook api
-	 * 				.deeplink("deeplink_method")		//deeplink method name or last part of your redirect URL, see docs
-	 * 				.callback(myFunction, 30) 			//see function below, timeout is 30 seconds
-	 * 				.build(plugins.oauth.OAuthProviders.FACEBOOK);
+	 *				.defaultScope("email")				//ask permission to get the user email
+	 *				.state("secret123337")				//anti forgery session state, required by the Facebook api
+	 *				.deeplink("deeplink_method")		//OPTIONAL deeplink method name or last part of your redirect URL, see docs
+	 * 													//if missing, a global method with the name 'deeplink_svy_oauth' will be generated 
+	 *				.callback(myFunction, 30) 			//see function below, timeout is 30 seconds
+	 *				.build(plugins.oauth.OAuthProviders.FACEBOOK);
 	 *
 	 * function myFunction(result, auth_outcome) {
 	 *	if (result)
@@ -87,6 +88,7 @@ public class OAuthProvider implements IScriptable, IReturnedTypesProvider
 
 	/**
 	 * Creates an OAuth service that can be used to obtain an access token and access protected data.
+	 * This method will be deprecated in the following versions, the preferred way is plugins.oauth.serviceBuilder with a callback function.
 	 * @sample
 	 * var clientId = "";
 	 * var clientSecret = "";
