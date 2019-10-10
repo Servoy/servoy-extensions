@@ -23,12 +23,14 @@ import java.util.Set;
 import org.mozilla.javascript.annotations.JSFunction;
 
 import com.github.scribejava.core.model.Response;
+import com.servoy.j2db.documentation.ServoyDocumented;
 import com.servoy.j2db.scripting.IJavaScriptType;
 import com.servoy.j2db.scripting.IScriptable;
 
 /**
  * @author emera
  */
+@ServoyDocumented(scriptingName = "OAuthResponse")
 public class OAuthResponse implements IJavaScriptType, IScriptable
 {
 	protected final Response response;

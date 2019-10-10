@@ -25,6 +25,7 @@ import org.json.JSONObject;
 import org.mozilla.javascript.annotations.JSFunction;
 
 import com.github.scribejava.core.model.Response;
+import com.servoy.j2db.documentation.ServoyDocumented;
 import com.servoy.j2db.scripting.IJavaScriptType;
 import com.servoy.j2db.scripting.IScriptable;
 import com.servoy.j2db.util.Debug;
@@ -32,6 +33,7 @@ import com.servoy.j2db.util.Debug;
 /**
  * @author emera
  */
+@ServoyDocumented(scriptingName = "OAuthResponseJSON")
 public class OAuthResponseJSON extends OAuthResponseText implements IJavaScriptType, IScriptable
 {
 	public OAuthResponseJSON(Response response)

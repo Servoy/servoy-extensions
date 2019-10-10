@@ -172,7 +172,7 @@
 						</configuration>
 						<executions>
 							<execution>
-								<id>jslib</id>
+								<id>generate doc</id>
 								<phase>generate-resources</phase>
 								<configuration>
 									<applicationsArgs>

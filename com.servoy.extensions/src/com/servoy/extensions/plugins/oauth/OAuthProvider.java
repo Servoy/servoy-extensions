@@ -117,7 +117,7 @@ public class OAuthProvider implements IScriptable, IReturnedTypesProvider
 	 * @param scope configures the OAuth scope. This is only necessary in some APIs (like Microsoft's).
 	 * @param state configures the anti forgery session state. This is available in some APIs (like Facebook's).
 	 * @param deeplinkmethod the name of a global method, which will get the code returned by the OAuth provider
-	 * @return
+	 * @return the OAuthService.
 	 */
 	@JSFunction
 	public OAuthService getOAuthService(String provider, String clientId, String clientSecret, String scope, String state, String deeplinkmethod)
