@@ -17,13 +17,15 @@
 
 package com.servoy.extensions.plugins.oauth;
 
-import com.servoy.j2db.scripting.IPrefixedConstantsObject;
+import com.servoy.j2db.documentation.ServoyDocumented;
+import com.servoy.j2db.scripting.IConstantsObject;
 
 /**
  * Contains supported OAuth apis.
  * @author emera
  */
-public class OAuthProviders implements IPrefixedConstantsObject
+@ServoyDocumented(scriptingName = "OAuthProviders")
+public class OAuthProviders implements IConstantsObject
 {
 	//scribe-java
 	public static final String MICROSOFT_AD = "com.github.scribejava.apis.MicrosoftAzureActiveDirectory20Api";
@@ -59,9 +61,5 @@ public class OAuthProviders implements IPrefixedConstantsObject
 	//added by us
 	public static final String INTUIT = "com.servoy.extensions.plugins.oauth.apis.IntuitApi";
 
-	@Override
-	public String getPrefix()
-	{
-		return "OAuthProviders";
-	}
+
 }
