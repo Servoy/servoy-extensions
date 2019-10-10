@@ -21,12 +21,14 @@ import org.mozilla.javascript.annotations.JSFunction;
 
 import com.github.scribejava.core.model.OAuthRequest;
 import com.github.scribejava.core.model.Verb;
+import com.servoy.j2db.documentation.ServoyDocumented;
 import com.servoy.j2db.scripting.IScriptable;
 
 /**
  * Wrapper around the scribe OAuthRequest.
  * @author emera
  */
+@ServoyDocumented(publicName = "OAuthRequest", scriptingName = "OAuthRequest")
 public class JSOAuthRequest implements IScriptable
 {
 	protected final OAuthRequest request;

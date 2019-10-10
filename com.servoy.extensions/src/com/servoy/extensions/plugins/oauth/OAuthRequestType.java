@@ -18,11 +18,13 @@
 package com.servoy.extensions.plugins.oauth;
 
 import com.github.scribejava.core.model.Verb;
+import com.servoy.j2db.documentation.ServoyDocumented;
 import com.servoy.j2db.scripting.IPrefixedConstantsObject;
 
 /**
  * @author emera
  */
+@ServoyDocumented(scriptingName = "RequestType")
 public class OAuthRequestType implements IPrefixedConstantsObject
 {
 	public static final Verb GET = Verb.GET;

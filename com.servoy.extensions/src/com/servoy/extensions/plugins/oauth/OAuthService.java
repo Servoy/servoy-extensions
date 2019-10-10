@@ -28,6 +28,7 @@ import com.github.scribejava.core.model.Response;
 import com.github.scribejava.core.model.Verb;
 import com.github.scribejava.core.oauth.AccessTokenRequestParams;
 import com.github.scribejava.core.oauth.OAuth20Service;
+import com.servoy.j2db.documentation.ServoyDocumented;
 import com.servoy.j2db.scripting.IJavaScriptType;
 import com.servoy.j2db.scripting.IScriptable;
 import com.servoy.j2db.util.Debug;
@@ -35,6 +36,7 @@ import com.servoy.j2db.util.Debug;
 /**
  * @author emera
  */
+@ServoyDocumented(scriptingName = "OAuthService")
 public class OAuthService implements IScriptable, IJavaScriptType
 {
 

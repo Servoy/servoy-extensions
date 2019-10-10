@@ -17,21 +17,19 @@
 
 package com.servoy.extensions.plugins.oauth;
 
-import com.servoy.j2db.scripting.IPrefixedConstantsObject;
+import com.servoy.j2db.documentation.ServoyDocumented;
+import com.servoy.j2db.scripting.IConstantsObject;
 
 /**
  * Contains supported OAuth apis.
  * @author emera
  */
-public class OAuthProviders implements IPrefixedConstantsObject
+@ServoyDocumented(scriptingName = "OAuthProviders")
+public class OAuthProviders implements IConstantsObject
 {
 	public static final int MICROSOFT_AD = 1;
 	public static final int FACEBOOK = 2;
 	public static final int LINKEDIN = 3;
 
-	@Override
-	public String getPrefix()
-	{
-		return "OAuthProviders";
-	}
+
 }

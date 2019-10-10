@@ -74,7 +74,7 @@ public class OAuthProvider implements IScriptable, IReturnedTypesProvider
 	 * @param scope configures the OAuth scope. This is only necessary in some APIs (like Microsoft's).
 	 * @param state configures the anti forgery session state. This is available in some APIs (like Facebook's).
 	 * @param callbackmethod the name of a global method
-	 * @return
+	 * @return the OAuthService.
 	 */
 	@JSFunction
 	public OAuthService getOAuthService(int provider, String clientId, String clientSecret, String scope, String state, String callbackmethod)
