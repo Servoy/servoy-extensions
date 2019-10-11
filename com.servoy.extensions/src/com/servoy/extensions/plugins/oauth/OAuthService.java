@@ -175,29 +175,30 @@ public class OAuthService implements IScriptable, IJavaScriptType
 		return accessToken.getExpiresIn().intValue();
 	}
 
+	/**
+	 *  Created a JSOAuthRequest for with the enum of RequestType (GET,PUT,DELETE,ect) for a resource url.
+	 *
+	 * @param requestType One of the types of plugins.oath.RequestType
+	 * @param resourceURL
+	 * @return a JSOAuthRequest object
+	 */
 	@JSFunction
-	public JSOAuthRequest createRequest(Verb verb, String resourceURL)
+	public JSOAuthRequest createRequest(Verb requestType, String resourceURL)
 	{
-		return new JSOAuthRequest(verb, resourceURL);
+		return new JSOAuthRequest(requestType, resourceURL);
 	}
 
-	//just a convenience method, not really needed
+	/**
+	 * This is quick method by executiong a GET request and returning right away the OAuthResponse
+	 * So it would be the same as executeRequest(createRequest(RequestType.GET, url))
+	 * @param resourceURL
+	 * @return the OAuthResponse object
+	 */
 	@JSFunction
 	public OAuthResponse executeGetRequest(String resourceURL)
 	{
 		OAuthRequest request = new OAuthRequest(Verb.GET, resourceURL);
-		checkAccessTokenExpired();
-		service.signRequest(accessToken, request);
-		try
-		{
-			Response response = service.execute(request);
-			return ResponseFactory.create(response);
-		}
-		catch (InterruptedException | ExecutionException | IOException e)
-		{
-			Debug.error("Could not execute request " + resourceURL, e);
-		}
-		return null;
+		return execute(request);
 	}
 
 	protected void checkAccessTokenExpired()
@@ -216,11 +217,26 @@ public class OAuthService implements IScriptable, IJavaScriptType
 		}
 	}
 
+	/**
+	 * Method to execute request that are made, and configured, by  {@link #createRequest(Verb, String)}
+	 *
+	 * @param request the JSOAuthRequest objec that was created by {@link #createRequest(Verb, String)}
+	 * @return the OAuthResponse object
+	 */
 	@JSFunction
 	public OAuthResponse executeRequest(JSOAuthRequest request)
 	{
 		if (request == null) return null;
 		OAuthRequest req = request.getRequest();
+		return execute(req);
+	}
+
+	/**
+	 * @param req
+	 * @return
+	 */
+	private OAuthResponse execute(OAuthRequest req)
+	{
 		checkAccessTokenExpired();
 		service.signRequest(accessToken, req);
 		try
@@ -230,9 +246,8 @@ public class OAuthService implements IScriptable, IJavaScriptType
 		}
 		catch (InterruptedException | ExecutionException | IOException e)
 		{
-			Debug.error("Could not execute request " + request.getRequest().getUrl(), e);
+			Debug.error("Could not execute request " + req.getUrl(), e);
 		}
 		return null;
-
 	}
 }
