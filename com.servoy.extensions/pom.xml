@@ -2,6 +2,9 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
+	<prerequisites>
+		<maven>3.6.0</maven>
+	</prerequisites>
 	<groupId>com.servoy</groupId>
 	<artifactId>com.servoy.extensions</artifactId>
 	<version>8.5.0.3600_b1</version>
@@ -14,8 +17,8 @@
 		</repository>
 	</repositories>
 	<properties>
-		<tycho.version>1.4.0</tycho.version>
-		<tycho.extra.version>1.4.0</tycho.extra.version>
+		<tycho.version>1.5.0</tycho.version>
+		<tycho.extra.version>1.5.0</tycho.extra.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
@@ -67,6 +70,25 @@
 			</dependencies>
 			<build>
 				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-toolchains-plugin</artifactId>
+						<version>3.0.0</version>
+						<executions>
+							<execution>
+								<goals>
+									<goal>toolchain</goal>
+								</goals>
+							</execution>
+						</executions>
+						<configuration>
+							<toolchains>
+								<jdk>
+									<id>JavaSE-1.8</id>
+								</jdk>
+							</toolchains>
+						</configuration>
+					</plugin>
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-dependency-plugin</artifactId>
@@ -145,28 +167,8 @@
 							<dependencies>
 								<dependency>
 									<groupId>com.servoy</groupId>
-									<artifactId>com.servoy.eclipse.docgenerator.client</artifactId>
-									<type>eclipse-plugin</type>
-								</dependency>
-								<dependency>
-									<groupId>com.servoy</groupId>
-									<artifactId>com.servoy.eclipse.docgenerator</artifactId>
-									<type>eclipse-plugin</type>
-								</dependency>
-								<dependency>
-									<groupId>com.servoy</groupId>
-									<artifactId>com.servoy.eclipse.docgenerator.ui</artifactId>
-									<type>eclipse-plugin</type>
-								</dependency>
-								<dependency>
-									<groupId>com.servoy</groupId>
-									<artifactId>org.eclipse.dltk.javascript.rhino</artifactId>
-									<type>eclipse-plugin</type>
-								</dependency>
-								<dependency>
-									<groupId>org.eclipse.osgi</groupId>
-									<artifactId>org.eclipse.osgi.compatibility.state</artifactId>
-									<type>eclipse-plugin</type>
+									<artifactId>com.servoy.eclipse.docgenerator.client.feature</artifactId>
+									<type>eclipse-feature</type>
 								</dependency>
 							</dependencies>
 						</configuration>
@@ -217,7 +219,7 @@
 		<plugins>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.5.1</version>
+				<version>3.8.1</version>
 				<configuration>
 					<source>1.8</source>
 					<target>1.8</target>
@@ -432,7 +434,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
-				<version>3.0.0</version>
+				<version>3.1.1</version>
 				<executions>
 					<execution>
 						<id>copy_libs</id>
@@ -490,7 +492,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
-				<version>3.0.2</version>
+				<version>3.1.2</version>
 				<executions>
 					<execution>
 						<id>plugins_beans</id>
@@ -508,7 +510,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jarsigner-plugin</artifactId>
-				<version>1.4</version>
+				<version>3.0.0</version>
 				<executions>
 					<execution>
 						<id>sign</id>
@@ -637,9 +639,9 @@
 			<version>${scribejava.version}</version>
 		</dependency>
 		<dependency>
-    		<groupId>org.apache.pdfbox</groupId>
-    		<artifactId>pdfbox</artifactId>
-    		<version>${pdfbox.version}</version>
+			<groupId>org.apache.pdfbox</groupId>
+			<artifactId>pdfbox</artifactId>
+			<version>${pdfbox.version}</version>
 		</dependency>
 	</dependencies>
 </project>

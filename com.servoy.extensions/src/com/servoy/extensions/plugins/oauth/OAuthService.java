@@ -57,6 +57,11 @@ public class OAuthService implements IScriptable, IJavaScriptType
 		return state != null ? service.getAuthorizationUrl(state) : service.getAuthorizationUrl();
 	}
 
+	/**
+	 * Configure the oauth service with an access token using the scope that was initially set when creating the service.
+	 * @param code the authorization code used to request and access token
+	 * @throws Exception if the access token cannot be obtained
+	 */
 	@JSFunction
 	public void setAccessToken(String code) throws Exception
 	{
@@ -72,6 +77,12 @@ public class OAuthService implements IScriptable, IJavaScriptType
 		}
 	}
 
+	/**
+	 * Configure the oauth service with an access token for the specified scope.
+	 * @param code the authorization code used to request an access token
+	 * @param scope the scope for which to obtain an access token
+	 * @throws Exception if the token cannot be obtained
+	 */
 	@JSFunction
 	public void setAccessToken(String code, String scope) throws Exception
 	{
@@ -87,6 +98,10 @@ public class OAuthService implements IScriptable, IJavaScriptType
 		}
 	}
 
+	/**
+	 * Get the access token currently set on the service.
+	 * @return the access token or null if it was not set
+	 */
 	@JSFunction
 	public String getAccessToken()
 	{
@@ -175,29 +190,142 @@ public class OAuthService implements IScriptable, IJavaScriptType
 		return accessToken.getExpiresIn().intValue();
 	}
 
+	/**
+	 * Creates a JSOAuthRequest for with the enum of RequestType (GET, PUT, DELETE, etc) for a resource url.
+	 *
+	 * @sample
+	 * var request = service.createRequest(plugins.oauth.RequestType.GET, "https://api.linkedin.com/v2/me");
+	 * request.addHeader("Accept", "application/json");
+	 *
+	 * var response = service.execute(request);
+	 * if (response.getCode() == 200) {
+	 * 		var json = response.getAsJSON();
+	 *		application.output("Name is "+json.firstName);
+	 *	}
+	 * else
+	 * {
+	 * 		application.output("ERROR http status "+response.getCode());
+	 * 		application.output(response.getBody())
+	 * }
+	 *
+	 *
+	 * @param requestType one of the types of plugins.oauth.RequestType
+	 * @param resourceURL the url of the resource you want to access
+	 * @return a JSOAuthRequest object
+	 */
 	@JSFunction
-	public JSOAuthRequest createRequest(Verb verb, String resourceURL)
+	public JSOAuthRequest createRequest(Verb requestType, String resourceURL)
 	{
-		return new JSOAuthRequest(verb, resourceURL);
+		return new JSOAuthRequest(requestType, resourceURL);
 	}
 
-	//just a convenience method, not really needed
+	/**
+	 * Create a GET request for a resource.
+	 *
+	 * @sample
+	 * var getRequest = service.createGetRequest("https://api.linkedin.com/v2/me");
+	 * getRequest.addHeader("Accept", "application/json");
+	 *
+	 * var response = service.execute(getRequest);
+	 * if (response.getCode() == 200) {
+	 * 		var json = response.getAsJSON();
+	 *		application.output("Name is "+json.firstName);
+	 *	}
+	 * else
+	 * {
+	 * 		application.output("ERROR http status "+response.getCode());
+	 * 		application.output(response.getBody())
+	 * }
+	 *
+	 * @param resourceURL the url of the resource which you want to get
+	 * @return the request object
+	 */
+	@JSFunction
+	public JSOAuthRequest createGetRequest(String resourceURL)
+	{
+		return createRequest(Verb.GET, resourceURL);
+	}
+
+	/**
+	 * Create a POST request.
+	 *
+	 * @sample
+	 * var postRequest = service.createPostRequest("https://.....");
+	 * postRequest.addHeader("Content-Type", "text/plain");
+	 * postRequest.addBodyParameter("param1", "value1");
+	 * var response = service.executeRequest(postRequest);
+	 *
+	 * @param resourceURL the url where the enclosed entity will be stored
+	 * @return the request object
+	 */
+	@JSFunction
+	public JSOAuthRequest createPostRequest(String resourceURL)
+	{
+		return createRequest(Verb.POST, resourceURL);
+	}
+
+	/**
+	 * Create a PUT request.
+	 *
+	 * @sample
+	 * var putRequest = service.createPutRequest("https://graph.microsoft.com/v1.0/me/drive/root:/FolderAA/FileBB.txt:/content");
+	 * putRequest.addHeader("Content-Type", "text/plain");
+	 * putRequest.setPayload("ABC");
+	 * var response = service.executeRequest(putRequest);
+	 * if (response.getCode() == 201) {
+	 *		application.output("New file was created "+response.getBody());
+	 *	}
+	 * else
+	 * {
+	 * 		application.output("ERROR http status "+response.getCode());
+	 * 		application.output("File could not be created: "+response.getBody())
+	 * }
+	 *
+	 * @param resourceURL the url where the enclosed entity will be stored
+	 * @return the request object
+	 */
+	@JSFunction
+	public JSOAuthRequest createPutRequest(String resourceURL)
+	{
+		return createRequest(Verb.PUT, resourceURL);
+	}
+
+	/**
+	 * Create a DELETE request.
+	 *
+	 * @sample
+	 * var putRequest = service.createDeleteRequest("https://graph.microsoft.com/v1.0/me/drive/root:/FolderAA/FileBB.txt:/content");
+	 * var response = service.executeRequest(putRequest);
+	 * if (response.getCode() == 204) {
+	 *		application.output("File was deleted "+response.getBody());
+	 *	}
+	 * else
+	 * {
+	 * 		application.output('http status '+response.getCode());
+	 * 		application.output("File could not be deleted: "+response.getBody())
+	 * }
+	 *
+	 * @param resourceURL the url of the resource to be deleted
+	 * @return the request object
+	 */
+	@JSFunction
+	public JSOAuthRequest createDeleteRequest(String resourceURL)
+	{
+		return createRequest(Verb.DELETE, resourceURL);
+	}
+
+
+	/**
+	 * This is quick method by executing a GET request and returning right away the OAuthResponse
+	 * So it would be the same as executeRequest(createRequest(RequestType.GET, url))
+	 * @param resourceURL
+	 * @return the OAuthResponse object
+	 */
 	@JSFunction
 	public OAuthResponse executeGetRequest(String resourceURL)
 	{
 		OAuthRequest request = new OAuthRequest(Verb.GET, resourceURL);
-		checkAccessTokenExpired();
-		service.signRequest(accessToken, request);
-		try
-		{
-			Response response = service.execute(request);
-			return ResponseFactory.create(response);
-		}
-		catch (InterruptedException | ExecutionException | IOException e)
-		{
-			Debug.error("Could not execute request " + resourceURL, e);
-		}
-		return null;
+		return execute(request);
 	}
 
 	protected void checkAccessTokenExpired()
@@ -216,11 +344,24 @@ public class OAuthService implements IScriptable, IJavaScriptType
 		}
 	}
 
+	/**
+	 * Method to execute requests that are made, and configured by  {@link #createRequest(Verb, String)}
+	 *
+	 * @sampleas createRequest()
+	 *
+	 * @param request the JSOAuthRequest object that was created by {@link #createRequest(Verb, String)}
+	 * @return the OAuthResponse object
+	 */
 	@JSFunction
 	public OAuthResponse executeRequest(JSOAuthRequest request)
 	{
 		if (request == null) return null;
 		OAuthRequest req = request.getRequest();
+		return execute(req);
+	}
+
+	private OAuthResponse execute(OAuthRequest req)
+	{
 		checkAccessTokenExpired();
 		service.signRequest(accessToken, req);
 		try
@@ -230,9 +371,8 @@ public class OAuthService implements IScriptable, IJavaScriptType
 		}
 		catch (InterruptedException | ExecutionException | IOException e)
 		{
-			Debug.error("Could not execute request " + request.getRequest().getUrl(), e);
+			Debug.error("Could not execute request " + req.getUrl(), e);
 		}
 		return null;
-
 	}
 }

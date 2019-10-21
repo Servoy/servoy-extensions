@@ -24,7 +24,7 @@ import com.servoy.j2db.scripting.IPrefixedConstantsObject;
 /**
  * @author emera
  */
-@ServoyDocumented(scriptingName = "RequestType")
+@ServoyDocumented(publicName = "RequestType", scriptingName = "RequestType")
 public class OAuthRequestType implements IPrefixedConstantsObject
 {
 	public static final Verb GET = Verb.GET;
