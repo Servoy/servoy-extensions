@@ -1345,6 +1345,7 @@ public class RestWSServlet extends HttpServlet
 					resultContentType = "application/xml";
 					break;
 				case CONTENT_TEXT :
+				case CONTENT_OTHER : // if here still other then just send a string. could be a post without body
 					resultContentType = "text/plain";
 					break;
 
