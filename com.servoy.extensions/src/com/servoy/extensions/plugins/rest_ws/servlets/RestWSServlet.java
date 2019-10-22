@@ -995,6 +995,7 @@ public class RestWSServlet extends HttpServlet
 	private int getRequestContentType(HttpServletRequest request, String header, byte[] contents, int defaultContentType) throws UnsupportedEncodingException
 	{
 		String contentTypeHeaderValue = request.getHeader(header);
+		Debug.error("Header " + header + " value: " + contentTypeHeaderValue);
 		int contentType = getContentType(contentTypeHeaderValue);
 		if (contentType != CONTENT_OTHER) return contentType;
 		if (contents != null)
@@ -1323,6 +1324,7 @@ public class RestWSServlet extends HttpServlet
 					content = "";
 					break;
 				case CONTENT_TEXT :
+				case CONTENT_OTHER : // if here still other then just send a string. could be a post without body
 					content = result != null ? result.toString() : "";
 					break;
 				default :
