@@ -358,13 +358,14 @@ public class RestWSServlet extends HttpServlet
 		try
 		{
 			byte[] contents = getBody(request);
-			if (contents == null || contents.length == 0)
-			{
-				sendError(response, HttpServletResponse.SC_NO_CONTENT);
-				return;
-			}
+//			if (contents == null || contents.length == 0)
+//			{
+//				sendError(response, HttpServletResponse.SC_NO_CONTENT);
+//				return;
+//			}
 			int contentType = getRequestContentType(request, "Content-Type", contents, CONTENT_OTHER);
-			if (contentType == CONTENT_OTHER)
+			Debug.error("contents is : " + contents + " && contentType = " + contentType);
+			if (contentType == CONTENT_OTHER && contents != null)
 			{
 				sendError(response, HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
 				return;
