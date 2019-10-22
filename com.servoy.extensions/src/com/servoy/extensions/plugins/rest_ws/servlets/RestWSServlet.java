@@ -357,19 +357,18 @@ public class RestWSServlet extends HttpServlet
 		boolean reloadSolution = plugin.shouldReloadSolutionAfterRequest();
 		try
 		{
+			int contentType = CONTENT_OTHER;
 			byte[] contents = getBody(request);
-//			if (contents == null || contents.length == 0)
-//			{
-//				sendError(response, HttpServletResponse.SC_NO_CONTENT);
-//				return;
-//			}
-			int contentType = getRequestContentType(request, "Content-Type", contents, CONTENT_OTHER);
-			Debug.error("contents is : " + contents + " && contentType = " + contentType);
-			if (contentType == CONTENT_OTHER && contents != null)
+			if (contents != null && contents.length != 0)
 			{
-				sendError(response, HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
-				return;
+				contentType = getRequestContentType(request, "Content-Type", contents, CONTENT_OTHER);
+				if (contentType == CONTENT_OTHER && contents != null)
+				{
+					sendError(response, HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
+					return;
+				}
 			}
+			Debug.error("contents is : " + contents + " && contentType = " + contentType);
 			client = getClient(request);
 			String charset = getHeaderKey(request.getHeader("Content-Type"), "charset", CHARSET_DEFAULT);
 			Object result = wsService(WS_CREATE, new Object[] { decodeContent(request.getContentType(), contentType, contents, charset) }, request, response,
