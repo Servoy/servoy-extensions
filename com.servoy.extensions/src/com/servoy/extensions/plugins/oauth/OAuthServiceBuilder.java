@@ -28,6 +28,7 @@ import org.mozilla.javascript.annotations.JSFunction;
 import com.github.scribejava.core.builder.ServiceBuilder;
 import com.github.scribejava.core.utils.Preconditions;
 import com.servoy.base.solutionmodel.IBaseSMVariable;
+import com.servoy.j2db.documentation.ServoyDocumented;
 import com.servoy.j2db.plugins.IAllWebClientPluginAccess;
 import com.servoy.j2db.scripting.FunctionDefinition;
 import com.servoy.j2db.scripting.IJavaScriptType;
@@ -38,6 +39,7 @@ import com.servoy.j2db.util.Debug;
 /**
  * @author emera
  */
+@ServoyDocumented(scriptingName = "OAuthServiceBuilder")
 public class OAuthServiceBuilder implements IScriptable, IJavaScriptType
 {
 	private Function _callback;
@@ -238,7 +240,8 @@ public class OAuthServiceBuilder implements IScriptable, IJavaScriptType
 							{
 								//error is required by the protocol if code is not present, should not be null
 								//error_message is optional, but human readable, so we prefer that one
-								errorMessage = result.has("error_message", result) ? (String)result.get("error_message", result) : (String)result.get("error", result);
+								errorMessage = result.has("error_message", result) ? (String)result.get("error_message", result)
+									: (String)result.get("error", result);
 							}
 						}
 						else
