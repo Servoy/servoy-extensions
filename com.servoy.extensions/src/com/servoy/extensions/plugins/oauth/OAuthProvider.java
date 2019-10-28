@@ -47,26 +47,27 @@ public class OAuthProvider implements IScriptable, IReturnedTypesProvider
 
 	/**
 	 * Creates an OAuth service configurator.
-	 * plugins.oauth.serviceBuilder("0lqd1s0aw...")	//client/application ID
+	 * @sample
+	 * plugins.oauth.serviceBuilder("0lqd1s0aw...")		//client/application ID
 	 * 				.clientSecret("bIk6163KHi...")		//client secret
-	 *				.defaultScope("email")				//ask permission to get the user email
-	 *				.state("secret123337")				//anti forgery session state, required by the Facebook api
-	 *				.deeplink("deeplink_method")		//OPTIONAL deeplink method name or last part of your redirect URL, see docs
-	 * 													//if missing, a global method with the name 'deeplink_svy_oauth' will be generated 
-	 *				.callback(myFunction, 30) 			//see function below, timeout is 30 seconds
-	 *				.build(plugins.oauth.OAuthProviders.FACEBOOK);
+	 * 				.defaultScope("email")				//ask permission to get the user email
+	 * 				.state("secret123337")				//anti forgery session state, required by the Facebook api
+	 * 				.deeplink("deeplink_method")		//OPTIONAL deeplink method name or last part of your redirect URL, see docs
+	 * 													//if missing, a global method with the name 'deeplink_svy_oauth' will be generated
+	 * 				.callback(myFunction, 30) 			//see function below, timeout is 30 seconds
+	 * 				.build(plugins.oauth.OAuthProviders.FACEBOOK);
 	 *
 	 * function myFunction(result, auth_outcome) {
-	 *	if (result)
-	 *	{
-	 *		//SUCCESS
-	 *		var service = auth_outcome;
+	 * if (result)
+	 * {
+	 * 		//SUCCESS
+	 * 		var service = auth_outcome;
 	 * 		if (service.getAccessToken() == null) return;
-	 *		var response = service.executeGetRequest("https://graph.facebook.com/v2.11/me");
-	 *		if (response.getCode() == 200) {
-	 *			application.output(response.getBody());
-	 *			var json = response.getAsJSON();
-	 *			application.output("Name is "+json.name);
+	 * 		var response = service.executeGetRequest("https://graph.facebook.com/v2.11/me");
+	 * 		if (response.getCode() == 200) {
+	 * 			application.output(response.getBody());
+	 * 			var json = response.getAsJSON();
+	 * 			application.output("Name is "+json.name);
 	 *		}
 	 *		else {
 	 *			application.output('ERROR http status '+response.getCode());
@@ -74,7 +75,7 @@ public class OAuthProvider implements IScriptable, IReturnedTypesProvider
 	 *	else {
 	 *		//ERROR
 	 *		application.output("ERROR "+auth_outcome);//could not get access token, request timed out, etc..
-	 *	 }
+	 *	}
 	 *  }
 	 * }
 	 * @param clientID

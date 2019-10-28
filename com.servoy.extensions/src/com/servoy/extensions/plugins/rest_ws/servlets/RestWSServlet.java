@@ -357,18 +357,18 @@ public class RestWSServlet extends HttpServlet
 		boolean reloadSolution = plugin.shouldReloadSolutionAfterRequest();
 		try
 		{
+			int contentType = CONTENT_OTHER;
 			byte[] contents = getBody(request);
-			if (contents == null || contents.length == 0)
+			if (contents != null && contents.length != 0)
 			{
-				sendError(response, HttpServletResponse.SC_NO_CONTENT);
-				return;
+				contentType = getRequestContentType(request, "Content-Type", contents, CONTENT_OTHER);
+				if (contentType == CONTENT_OTHER && contents != null)
+				{
+					sendError(response, HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
+					return;
+				}
 			}
-			int contentType = getRequestContentType(request, "Content-Type", contents, CONTENT_OTHER);
-			if (contentType == CONTENT_OTHER)
-			{
-				sendError(response, HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
-				return;
-			}
+			Debug.error("contents is : " + contents + " && contentType = " + contentType);
 			client = getClient(request);
 			String charset = getHeaderKey(request.getHeader("Content-Type"), "charset", CHARSET_DEFAULT);
 			Object result = wsService(WS_CREATE, new Object[] { decodeContent(request.getContentType(), contentType, contents, charset) }, request, response,
@@ -995,6 +995,7 @@ public class RestWSServlet extends HttpServlet
 	private int getRequestContentType(HttpServletRequest request, String header, byte[] contents, int defaultContentType) throws UnsupportedEncodingException
 	{
 		String contentTypeHeaderValue = request.getHeader(header);
+		Debug.error("Header " + header + " value: " + contentTypeHeaderValue);
 		int contentType = getContentType(contentTypeHeaderValue);
 		if (contentType != CONTENT_OTHER) return contentType;
 		if (contents != null)
@@ -1323,6 +1324,7 @@ public class RestWSServlet extends HttpServlet
 					content = "";
 					break;
 				case CONTENT_TEXT :
+				case CONTENT_OTHER : // if here still other then just send a string. could be a post without body
 					content = result != null ? result.toString() : "";
 					break;
 				default :
@@ -1343,6 +1345,7 @@ public class RestWSServlet extends HttpServlet
 					resultContentType = "application/xml";
 					break;
 				case CONTENT_TEXT :
+				case CONTENT_OTHER : // if here still other then just send a string. could be a post without body
 					resultContentType = "text/plain";
 					break;
 
