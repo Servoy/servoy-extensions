@@ -368,7 +368,6 @@ public class RestWSServlet extends HttpServlet
 					return;
 				}
 			}
-			Debug.error("contents is : " + contents + " && contentType = " + contentType);
 			client = getClient(request);
 			String charset = getHeaderKey(request.getHeader("Content-Type"), "charset", CHARSET_DEFAULT);
 			Object result = wsService(WS_CREATE, new Object[] { decodeContent(request.getContentType(), contentType, contents, charset) }, request, response,
@@ -995,7 +994,6 @@ public class RestWSServlet extends HttpServlet
 	private int getRequestContentType(HttpServletRequest request, String header, byte[] contents, int defaultContentType) throws UnsupportedEncodingException
 	{
 		String contentTypeHeaderValue = request.getHeader(header);
-		Debug.error("Header " + header + " value: " + contentTypeHeaderValue);
 		int contentType = getContentType(contentTypeHeaderValue);
 		if (contentType != CONTENT_OTHER) return contentType;
 		if (contents != null)
