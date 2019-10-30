@@ -49,10 +49,16 @@ public class Response implements IScriptable, IJavaScriptType
 	private HttpResponse res;
 	private Object response_body = null;
 	private HttpUriRequest request;
+	private String exceptionMessage;
 
 	public Response()
 	{
 
+	}
+
+	public Response(String exceptionMessage)
+	{
+		this.exceptionMessage = exceptionMessage;
 	}
 
 	public Response(HttpResponse response, HttpUriRequest request)
@@ -253,4 +259,15 @@ public class Response implements IScriptable, IJavaScriptType
 		return false;
 	}
 
+	/**
+	 * Getter for the exception message.
+	 *
+	 * @sample
+	 * var exception = response.getException();
+	 * @return the exception message
+	 */
+	public String js_getException()
+	{
+		return this.exceptionMessage;
+	}
 }
