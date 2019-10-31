@@ -197,7 +197,7 @@ public class OAuthService implements IScriptable, IJavaScriptType
 	 * var request = service.createRequest(plugins.oauth.RequestType.GET, "https://api.linkedin.com/v2/me");
 	 * request.addHeader("Accept", "application/json");
 	 *
-	 * var response = service.execute(request);
+	 * var response = request.execute();
 	 * if (response.getCode() == 200) {
 	 * 		var json = response.getAsJSON();
 	 *		application.output("Name is "+json.firstName);
@@ -216,7 +216,7 @@ public class OAuthService implements IScriptable, IJavaScriptType
 	@JSFunction
 	public JSOAuthRequest createRequest(Verb requestType, String resourceURL)
 	{
-		return new JSOAuthRequest(requestType, resourceURL);
+		return new JSOAuthRequest(this, requestType, resourceURL);
 	}
 
 	/**
@@ -226,7 +226,7 @@ public class OAuthService implements IScriptable, IJavaScriptType
 	 * var getRequest = service.createGetRequest("https://api.linkedin.com/v2/me");
 	 * getRequest.addHeader("Accept", "application/json");
 	 *
-	 * var response = service.execute(getRequest);
+	 * var response = getRequest.execute();
 	 * if (response.getCode() == 200) {
 	 * 		var json = response.getAsJSON();
 	 *		application.output("Name is "+json.firstName);
@@ -253,7 +253,7 @@ public class OAuthService implements IScriptable, IJavaScriptType
 	 * var postRequest = service.createPostRequest("https://.....");
 	 * postRequest.addHeader("Content-Type", "text/plain");
 	 * postRequest.addBodyParameter("param1", "value1");
-	 * var response = service.executeRequest(postRequest);
+	 * var response = postRequest.execute();
 	 *
 	 * @param resourceURL the url where the enclosed entity will be stored
 	 * @return the request object
@@ -271,7 +271,7 @@ public class OAuthService implements IScriptable, IJavaScriptType
 	 * var putRequest = service.createPutRequest("https://graph.microsoft.com/v1.0/me/drive/root:/FolderAA/FileBB.txt:/content");
 	 * putRequest.addHeader("Content-Type", "text/plain");
 	 * putRequest.setPayload("ABC");
-	 * var response = service.executeRequest(putRequest);
+	 * var response = putRequest.execute();
 	 * if (response.getCode() == 201) {
 	 *		application.output("New file was created "+response.getBody());
 	 *	}
@@ -295,7 +295,7 @@ public class OAuthService implements IScriptable, IJavaScriptType
 	 *
 	 * @sample
 	 * var putRequest = service.createDeleteRequest("https://graph.microsoft.com/v1.0/me/drive/root:/FolderAA/FileBB.txt:/content");
-	 * var response = service.executeRequest(putRequest);
+	 * var response = putRequest.execute();
 	 * if (response.getCode() == 204) {
 	 *		application.output("File was deleted "+response.getBody());
 	 *	}
@@ -347,7 +347,21 @@ public class OAuthService implements IScriptable, IJavaScriptType
 	/**
 	 * Method to execute requests that are made, and configured by  {@link #createRequest(Verb, String)}
 	 *
-	 * @sampleas createRequest()
+	 * @sample
+	 * var request = service.createRequest(plugins.oauth.RequestType.GET, "https://api.linkedin.com/v2/me");
+	 * request.addHeader("Accept", "application/json");
+	 *
+	 * var response = service.executeRequest(request);
+	 * if (response.getCode() == 200) {
+	 * 		var json = response.getAsJSON();
+	 *		application.output("Name is "+json.firstName);
+	 *	}
+	 * else
+	 * {
+	 * 		application.output("ERROR http status "+response.getCode());
+	 * 		application.output(response.getBody())
+	 * }
+	 *
 	 *
 	 * @param request the JSOAuthRequest object that was created by {@link #createRequest(Verb, String)}
 	 * @return the OAuthResponse object
@@ -360,7 +374,7 @@ public class OAuthService implements IScriptable, IJavaScriptType
 		return execute(req);
 	}
 
-	private OAuthResponse execute(OAuthRequest req)
+	OAuthResponse execute(OAuthRequest req)
 	{
 		checkAccessTokenExpired();
 		service.signRequest(accessToken, req);
