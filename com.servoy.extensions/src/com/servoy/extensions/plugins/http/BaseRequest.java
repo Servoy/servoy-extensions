@@ -148,7 +148,7 @@ public abstract class BaseRequest implements IScriptable, IJavaScriptType
 		catch (Exception ex)
 		{
 			logError(ex, userName, null, null);
-			return null;
+			return new Response(ex.getMessage());
 		}
 	}
 
@@ -171,7 +171,7 @@ public abstract class BaseRequest implements IScriptable, IJavaScriptType
 		catch (Exception ex)
 		{
 			logError(ex, userName, workstation, domain);
-			return null;
+			return new Response(ex.getMessage());
 		}
 	}
 
