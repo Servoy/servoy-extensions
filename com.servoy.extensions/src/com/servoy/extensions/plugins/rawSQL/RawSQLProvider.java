@@ -27,7 +27,6 @@ import com.servoy.j2db.util.DataSourceUtils;
 import com.servoy.j2db.util.Debug;
 import com.servoy.j2db.util.ServoyException;
 import com.servoy.j2db.util.UUID;
-import com.servoy.j2db.util.Utils;
 
 /**
  * Rawsql plugin scriptable.
@@ -428,17 +427,10 @@ public class RawSQLProvider implements IScriptable
 		try
 		{
 			ServerMapping serverMapping = getServerMapping(serverName);
-			if (serverMapping.transactionID != null)
-			{
-				// flush data locally within the transaction
-				plugin.getClientPluginAccess().getDatabaseManager().notifyDataChange(
-					DataSourceUtils.createDBTableDataSource(serverMapping.localServername, tableName), pksDataset, action);
-			}
-			if (!Utils.equalObjects(serverMapping.remoteServername, serverMapping.localServername) || serverMapping.transactionID == null)
-			{
-				plugin.getClientPluginAccess().getDatabaseManager().notifyDataChange(
-					DataSourceUtils.createDBTableDataSource(serverMapping.remoteServername, tableName), pksDataset, action);
-			}
+			// flush data locally
+			plugin.getClientPluginAccess().getDatabaseManager().notifyDataChange(
+				DataSourceUtils.createDBTableDataSource(serverMapping.localServername, tableName), pksDataset, action);
+			// notifySelf = false so that the client id is sent as well (needed for tenant id)
 			return getSQLService().notifyDataChange(plugin.getClientPluginAccess().getClientID(), false, serverMapping.remoteServername, tableName, pksDataset,
 				action, serverMapping.transactionID);
 		}
