@@ -66,7 +66,6 @@ import com.servoy.j2db.dataprocessing.IFoundSet;
 import com.servoy.j2db.dataprocessing.IFoundSetInternal;
 import com.servoy.j2db.dataprocessing.IRecord;
 import com.servoy.j2db.dataprocessing.ISwingFoundSet;
-import com.servoy.j2db.documentation.ServoyDocumented;
 import com.servoy.j2db.plugins.IClientPluginAccess;
 import com.servoy.j2db.plugins.IRuntimeWindow;
 import com.servoy.j2db.plugins.ISmartRuntimeWindow;
@@ -81,12 +80,11 @@ import com.servoy.j2db.util.Utils;
 
 /**
  * Class representing the smart client db tree view
- * 
+ *
  * @author gboros
  */
-@ServoyDocumented(category = ServoyDocumented.BEANS, publicName = "DB Tree View")
-public class SwingDBTreeView extends EnableScrollPanel implements TreeSelectionListener, TreeExpansionListener, ITreeViewScriptMethods, IComponent,
-	TableModelListener, ItemListener
+public class SwingDBTreeView extends EnableScrollPanel
+	implements TreeSelectionListener, TreeExpansionListener, ITreeViewScriptMethods, IComponent, TableModelListener, ItemListener
 {
 	private static final long serialVersionUID = 1L;
 
@@ -200,7 +198,7 @@ public class SwingDBTreeView extends EnableScrollPanel implements TreeSelectionL
 
 //	public void paintComponent(Graphics g)
 //	{
-//		
+//
 //		System.out.println("Swing tree : paintComponent : " + resizeNode);
 //		js_refresh();
 //		super.paintComponent(g);
@@ -901,7 +899,8 @@ public class SwingDBTreeView extends EnableScrollPanel implements TreeSelectionL
 			Point windowLocation = null;
 			if (runtimeWindow instanceof ISmartRuntimeWindow) windowLocation = ((ISmartRuntimeWindow)runtimeWindow).getWindow().getLocationOnScreen();
 			Point treeLocation = tree.getLocationOnScreen();
-			final Point treeLocationToWindow = new Point((int)(treeLocation.getX() - windowLocation.getX()), (int)(treeLocation.getY() - windowLocation.getY()));
+			final Point treeLocationToWindow = new Point((int)(treeLocation.getX() - windowLocation.getX()),
+				(int)(treeLocation.getY() - windowLocation.getY()));
 
 			if (e.getClickCount() == 1)
 			{
@@ -949,7 +948,7 @@ public class SwingDBTreeView extends EnableScrollPanel implements TreeSelectionL
 
 	/*
 	 * Tree node selection listener
-	 * 
+	 *
 	 * @see javax.swing.event.TreeSelectionListener#valueChanged(javax.swing.event.TreeSelectionEvent)
 	 */
 	public void valueChanged(TreeSelectionEvent e)
@@ -1019,7 +1018,8 @@ public class SwingDBTreeView extends EnableScrollPanel implements TreeSelectionL
 				String returnProvider = bindingInfo.getReturnDataproviderOnRightClick(un);
 
 				String[] server_table = DataSourceUtils.getDBServernameTablename(un.getFoundSet().getDataSource());
-				Object[] args = new Object[] { r.getValue(returnProvider), (server_table == null ? null : server_table[1]), Integer.valueOf(x), Integer.valueOf(y), arg };
+				Object[] args = new Object[] { r.getValue(returnProvider), (server_table == null ? null : server_table[1]), Integer.valueOf(x), Integer.valueOf(
+					y), arg };
 
 				FunctionDefinition f = bindingInfo.getMethodToCallOnRightClick((FoundSetTreeModel.UserNode)tn);
 				if (f != null)
@@ -1041,7 +1041,8 @@ public class SwingDBTreeView extends EnableScrollPanel implements TreeSelectionL
 				String returnProvider = bindingInfo.getReturnDataproviderOnDoubleClick(un);
 
 				String[] server_table = DataSourceUtils.getDBServernameTablename(un.getFoundSet().getDataSource());
-				Object[] args = new Object[] { r.getValue(returnProvider), (server_table == null ? null : server_table[1]), Integer.valueOf(x), Integer.valueOf(y), arg };
+				Object[] args = new Object[] { r.getValue(returnProvider), (server_table == null ? null : server_table[1]), Integer.valueOf(x), Integer.valueOf(
+					y), arg };
 
 				FunctionDefinition f = bindingInfo.getMethodToCallOnDoubleClick((FoundSetTreeModel.UserNode)tn);
 				if (f != null)
@@ -1063,7 +1064,8 @@ public class SwingDBTreeView extends EnableScrollPanel implements TreeSelectionL
 				String returnProvider = bindingInfo.getReturnDataproviderOnClick(un);
 
 				String[] server_table = DataSourceUtils.getDBServernameTablename(un.getFoundSet().getDataSource());
-				Object[] args = new Object[] { r.getValue(returnProvider), (server_table == null ? null : server_table[1]), Integer.valueOf(x), Integer.valueOf(y), arg };
+				Object[] args = new Object[] { r.getValue(returnProvider), (server_table == null ? null : server_table[1]), Integer.valueOf(x), Integer.valueOf(
+					y), arg };
 
 				FunctionDefinition f = bindingInfo.getMethodToCallOnClick((FoundSetTreeModel.UserNode)tn);
 				if (f != null)
@@ -1076,7 +1078,7 @@ public class SwingDBTreeView extends EnableScrollPanel implements TreeSelectionL
 
 	/**
 	 * Create list of TreeNode items from pk ids
-	 * 
+	 *
 	 * @param nodePath pk ids
 	 * @return TreeNode items
 	 */
@@ -1186,7 +1188,7 @@ public class SwingDBTreeView extends EnableScrollPanel implements TreeSelectionL
 
 	/*
 	 * Tree node checkbox state listener
-	 * 
+	 *
 	 * @see java.awt.event.ItemListener#itemStateChanged(java.awt.event.ItemEvent)
 	 */
 	public void itemStateChanged(ItemEvent e)
@@ -1222,8 +1224,8 @@ public class SwingDBTreeView extends EnableScrollPanel implements TreeSelectionL
 //	public void js_activateBinding(Binding binding)
 //	{
 //		// TODO Auto-generated method stub
-//	}	
-//	
+//	}
+//
 //	public void js_removeBinding(Binding binding)
 //	{
 //		// TODO Auto-generated method stub
@@ -1253,7 +1255,7 @@ public class SwingDBTreeView extends EnableScrollPanel implements TreeSelectionL
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see com.servoy.extensions.beans.dbtreeview.ITreeViewScriptMethods#js_setOnDrag(org.mozilla.javascript.Function)
 	 */
 	public void js_setOnDrag(Function fOnDrag)
@@ -1263,7 +1265,7 @@ public class SwingDBTreeView extends EnableScrollPanel implements TreeSelectionL
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see com.servoy.extensions.beans.dbtreeview.ITreeViewScriptMethods#js_setOnDragEnd(org.mozilla.javascript.Function)
 	 */
 	public void js_setOnDragEnd(Function fOnDragEnd)
@@ -1273,7 +1275,7 @@ public class SwingDBTreeView extends EnableScrollPanel implements TreeSelectionL
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see com.servoy.extensions.beans.dbtreeview.ITreeViewScriptMethods#js_setOnDragOver(org.mozilla.javascript.Function)
 	 */
 	public void js_setOnDragOver(Function fOnDragOver)
@@ -1283,7 +1285,7 @@ public class SwingDBTreeView extends EnableScrollPanel implements TreeSelectionL
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see com.servoy.extensions.beans.dbtreeview.ITreeViewScriptMethods#js_setOnDrop(org.mozilla.javascript.Function)
 	 */
 	public void js_setOnDrop(Function fOnDrop)
@@ -1293,7 +1295,7 @@ public class SwingDBTreeView extends EnableScrollPanel implements TreeSelectionL
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see com.servoy.extensions.beans.dbtreeview.ITreeView#setStyleClass(java.lang.String)
 	 */
 	public void setStyleClass(String styleClass)
@@ -1303,7 +1305,7 @@ public class SwingDBTreeView extends EnableScrollPanel implements TreeSelectionL
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see com.servoy.extensions.beans.dbtreeview.ITreeView#getStyleClass()
 	 */
 	public String getStyleClass()
@@ -1313,7 +1315,7 @@ public class SwingDBTreeView extends EnableScrollPanel implements TreeSelectionL
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see com.servoy.extensions.beans.dbtreeview.ITreeView#isTransparent()
 	 */
 	public boolean isTransparent()
@@ -1323,7 +1325,7 @@ public class SwingDBTreeView extends EnableScrollPanel implements TreeSelectionL
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see com.servoy.extensions.beans.dbtreeview.ITreeView#setTransparent(boolean)
 	 */
 	public void setTransparent(boolean transparent)
@@ -1333,7 +1335,7 @@ public class SwingDBTreeView extends EnableScrollPanel implements TreeSelectionL
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see com.servoy.extensions.beans.dbtreeview.ITreeView#getBorderType()
 	 */
 	public Border getBorderType()
@@ -1343,7 +1345,7 @@ public class SwingDBTreeView extends EnableScrollPanel implements TreeSelectionL
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see com.servoy.extensions.beans.dbtreeview.ITreeView#setBorderType(javax.swing.border.Border)
 	 */
 	public void setBorderType(Border border)
