@@ -490,6 +490,59 @@
 				</executions>
 			</plugin>
 			<plugin>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<version>1.8</version>
+				<executions>
+					<execution>
+						<id>sign maven jars</id>
+						<phase>package</phase>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<configuration>
+							<target>
+							<parallel>
+								<exec
+											dir="${project.build.directory}/plugins_beans/plugins/pdf_output/"
+											executable="pack200"
+											output="${project.build.directory}/fontbox_repack200b.txt"
+											failonerror="true">
+											<arg value="-J-Xmx512m" />
+											<arg value="-r" />
+											<!-- This may break some features <arg value="-O" /> -->
+											<arg
+												value="${project.build.directory}/plugins_beans/plugins/pdf_output/fontbox.jar" />
+								</exec>
+								<exec
+											dir="${project.build.directory}/plugins_beans/plugins/pdf_output/"
+											executable="pack200"
+											output="${project.build.directory}/pdfbox_repack200b.txt"
+											failonerror="true">
+											<arg value="-J-Xmx512m" />
+											<arg value="-r" />
+											<!-- This may break some features <arg value="-O" /> -->
+											<arg
+												value="${project.build.directory}/plugins_beans/plugins/pdf_output/pdfbox.jar" />
+								</exec>
+						 	</parallel>
+							<parallel>
+								<signjar keystore="${jarsigner.keystore}"
+											jar="${project.build.directory}/plugins_beans/plugins/pdf_output/fontbox.jar"
+											alias="ServoyClient" storepass="${jarsigner.storepass}"
+											tsaurl="http://sha256timestamp.ws.symantec.com/sha256/timestamp"
+											sigalg="SHA256withRSA" digestalg="SHA-256" />
+								<signjar keystore="${jarsigner.keystore}"
+											jar="${project.build.directory}/plugins_beans/plugins/pdf_output/pdfbox.jar"
+											alias="ServoyClient" storepass="${jarsigner.storepass}"
+											tsaurl="http://sha256timestamp.ws.symantec.com/sha256/timestamp"
+											sigalg="SHA256withRSA" digestalg="SHA-256" />
+							</parallel>
+							</target>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
 				<version>3.1.2</version>

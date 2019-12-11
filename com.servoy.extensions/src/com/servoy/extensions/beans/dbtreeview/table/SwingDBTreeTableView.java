@@ -50,7 +50,6 @@ import com.servoy.base.scripting.annotations.ServoyClientSupport;
 import com.servoy.extensions.beans.dbtreeview.FoundSetTreeModel;
 import com.servoy.extensions.beans.dbtreeview.SwingDBTree;
 import com.servoy.extensions.beans.dbtreeview.SwingDBTreeView;
-import com.servoy.j2db.documentation.ServoyDocumented;
 import com.servoy.j2db.plugins.IClientPluginAccess;
 import com.servoy.j2db.plugins.IRuntimeWindow;
 import com.servoy.j2db.plugins.ISmartRuntimeWindow;
@@ -59,10 +58,9 @@ import com.servoy.j2db.util.UIUtils;
 
 /**
  * Class representing the smart client db tree table view
- * 
+ *
  * @author gboros
  */
-@ServoyDocumented(category = ServoyDocumented.BEANS, publicName = "DB Tree Table View", extendsComponent = "DB Tree View")
 @ServoyClientSupport(ng = false, wc = true, sc = true)
 public class SwingDBTreeTableView extends SwingDBTreeView implements ITreeTableScriptMethods
 {
@@ -172,7 +170,7 @@ public class SwingDBTreeTableView extends SwingDBTreeView implements ITreeTableS
 	{
 		super(application);
 		this.dbTreeTableView = dbTreeTableView;
-		// set the viewport to table		
+		// set the viewport to table
 		setViewportView(treeTable = new SwingDBTreeTable(this, application));
 
 		tree.setOpaque(false);
@@ -282,7 +280,7 @@ public class SwingDBTreeTableView extends SwingDBTreeView implements ITreeTableS
 
 //	private void resizeTreeColumn()
 //	{
-//		treeTable.getTableHeader().getColumnModel().getColumn(0).setPreferredWidth((int)this.tree.getPreferredSize().getWidth());		
+//		treeTable.getTableHeader().getColumnModel().getColumn(0).setPreferredWidth((int)this.tree.getPreferredSize().getWidth());
 //	}
 
 	@Override
@@ -356,7 +354,7 @@ public class SwingDBTreeTableView extends SwingDBTreeView implements ITreeTableS
 
 	/*
 	 * Tree node checkbox state listener
-	 * 
+	 *
 	 * @see java.awt.event.ItemListener#itemStateChanged(java.awt.event.ItemEvent)
 	 */
 	@Override
@@ -438,7 +436,7 @@ public class SwingDBTreeTableView extends SwingDBTreeView implements ITreeTableS
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see com.servoy.extensions.beans.dbtreeview.ITreeViewScriptMethods#js_setOnDrag(org.mozilla.javascript.Function)
 	 */
 	@Override
@@ -449,7 +447,7 @@ public class SwingDBTreeTableView extends SwingDBTreeView implements ITreeTableS
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see com.servoy.extensions.beans.dbtreeview.ITreeViewScriptMethods#js_setOnDragEnd(org.mozilla.javascript.Function)
 	 */
 	@Override
@@ -460,7 +458,7 @@ public class SwingDBTreeTableView extends SwingDBTreeView implements ITreeTableS
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see com.servoy.extensions.beans.dbtreeview.ITreeViewScriptMethods#js_setOnDragOver(org.mozilla.javascript.Function)
 	 */
 	@Override
@@ -471,7 +469,7 @@ public class SwingDBTreeTableView extends SwingDBTreeView implements ITreeTableS
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see com.servoy.extensions.beans.dbtreeview.ITreeViewScriptMethods#js_setOnDrop(org.mozilla.javascript.Function)
 	 */
 	@Override
@@ -491,7 +489,8 @@ public class SwingDBTreeTableView extends SwingDBTreeView implements ITreeTableS
 			Point windowLocation = null;
 			if (runtimeWindow instanceof ISmartRuntimeWindow) windowLocation = ((ISmartRuntimeWindow)runtimeWindow).getWindow().getLocationOnScreen();
 			Point treeLocation = treeTable.getLocationOnScreen();
-			final Point treeLocationToWindow = new Point((int)(treeLocation.getX() - windowLocation.getX()), (int)(treeLocation.getY() - windowLocation.getY()));
+			final Point treeLocationToWindow = new Point((int)(treeLocation.getX() - windowLocation.getX()),
+				(int)(treeLocation.getY() - windowLocation.getY()));
 
 			if (e.getClickCount() == 1)
 			{
