@@ -18,6 +18,7 @@
 package com.servoy.extensions.plugins.oauth;
 
 import com.github.scribejava.core.model.Verb;
+import com.servoy.base.scripting.annotations.ServoyClientSupport;
 import com.servoy.j2db.documentation.ServoyDocumented;
 import com.servoy.j2db.scripting.IPrefixedConstantsObject;
 
@@ -25,6 +26,7 @@ import com.servoy.j2db.scripting.IPrefixedConstantsObject;
  * @author emera
  */
 @ServoyDocumented(publicName = "RequestType", scriptingName = "RequestType")
+@ServoyClientSupport(ng = true, wc = false, sc = false)
 public class OAuthRequestType implements IPrefixedConstantsObject
 {
 	public static final Verb GET = Verb.GET;
