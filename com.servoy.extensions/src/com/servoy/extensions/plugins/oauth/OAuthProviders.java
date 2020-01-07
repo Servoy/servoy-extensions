@@ -17,6 +17,7 @@
 
 package com.servoy.extensions.plugins.oauth;
 
+import com.servoy.base.scripting.annotations.ServoyClientSupport;
 import com.servoy.j2db.documentation.ServoyDocumented;
 import com.servoy.j2db.scripting.IConstantsObject;
 
@@ -25,6 +26,7 @@ import com.servoy.j2db.scripting.IConstantsObject;
  * @author emera
  */
 @ServoyDocumented(scriptingName = "OAuthProviders")
+@ServoyClientSupport(ng = true, wc = false, sc = false)
 public class OAuthProviders implements IConstantsObject
 {
 	//scribe-java

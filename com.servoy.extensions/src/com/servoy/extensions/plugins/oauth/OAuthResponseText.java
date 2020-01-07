@@ -22,6 +22,7 @@ import java.io.IOException;
 import org.mozilla.javascript.annotations.JSFunction;
 
 import com.github.scribejava.core.model.Response;
+import com.servoy.base.scripting.annotations.ServoyClientSupport;
 import com.servoy.j2db.documentation.ServoyDocumented;
 import com.servoy.j2db.scripting.IJavaScriptType;
 import com.servoy.j2db.scripting.IScriptable;
@@ -31,6 +32,7 @@ import com.servoy.j2db.util.Debug;
  * @author emera
  */
 @ServoyDocumented(scriptingName = "OAuthResponseText")
+@ServoyClientSupport(ng = true, wc = false, sc = false)
 public class OAuthResponseText extends OAuthResponse implements IJavaScriptType, IScriptable
 {
 	public OAuthResponseText(Response response)

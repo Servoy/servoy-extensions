@@ -27,6 +27,7 @@ import org.mozilla.javascript.annotations.JSFunction;
 
 import com.github.scribejava.core.builder.ServiceBuilder;
 import com.github.scribejava.core.utils.Preconditions;
+import com.servoy.base.scripting.annotations.ServoyClientSupport;
 import com.servoy.base.solutionmodel.IBaseSMVariable;
 import com.servoy.j2db.documentation.ServoyDocumented;
 import com.servoy.j2db.plugins.IAllWebClientPluginAccess;
@@ -40,6 +41,7 @@ import com.servoy.j2db.util.Debug;
  * @author emera
  */
 @ServoyDocumented(scriptingName = "OAuthServiceBuilder")
+@ServoyClientSupport(ng = true, wc = false, sc = false)
 public class OAuthServiceBuilder implements IScriptable, IJavaScriptType
 {
 	private Function _callback;

@@ -21,6 +21,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 
 import com.github.scribejava.core.model.Response;
+import com.servoy.base.scripting.annotations.ServoyClientSupport;
 import com.servoy.j2db.documentation.ServoyDocumented;
 import com.servoy.j2db.scripting.IJavaScriptType;
 import com.servoy.j2db.scripting.IScriptable;
@@ -30,6 +31,7 @@ import com.servoy.j2db.util.Debug;
  * @author emera
  */
 @ServoyDocumented(scriptingName = "OAuthResponseBinary")
+@ServoyClientSupport(ng = true, wc = false, sc = false)
 public class OAuthResponseBinary extends OAuthResponse implements IJavaScriptType, IScriptable
 {
 	private byte[] content;
