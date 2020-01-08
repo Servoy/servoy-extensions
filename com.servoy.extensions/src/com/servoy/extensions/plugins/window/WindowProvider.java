@@ -576,6 +576,7 @@ public class WindowProvider implements IReturnedTypesProvider, IScriptable
 	 *
 	 * @param full
 	 */
+	@ServoyClientSupport(ng = false, wc = false, sc = true)
 	public void js_setFullScreen(boolean full)
 	{
 		if (plugin.isSwingClient())
@@ -620,6 +621,7 @@ public class WindowProvider implements IReturnedTypesProvider, IScriptable
 	 * @deprecated Replaced by {@link Menu#setVisible(boolean)}.
 	 */
 	@Deprecated
+	@ServoyClientSupport(ng = false, wc = false, sc = true)
 	public void js_setMenuVisible(boolean v)
 	{
 		getMenubar(null).js_setVisible(v);
@@ -629,6 +631,7 @@ public class WindowProvider implements IReturnedTypesProvider, IScriptable
 	 * @deprecated Replaced by {@link #setToolBarAreaVisible(boolean)}.
 	 */
 	@Deprecated
+	@ServoyClientSupport(ng = false, wc = false, sc = true)
 	public void js_setToolBarVisible(boolean v)
 	{
 		js_setToolBarAreaVisible(v);
@@ -643,6 +646,7 @@ public class WindowProvider implements IReturnedTypesProvider, IScriptable
 	 *
 	 * @param visible
 	 */
+	@ServoyClientSupport(ng = false, wc = false, sc = true)
 	public void js_setToolBarAreaVisible(boolean visible)
 	{
 		if (plugin.isSwingClient())
@@ -669,6 +673,7 @@ public class WindowProvider implements IReturnedTypesProvider, IScriptable
 	 *
 	 * @param visible
 	 */
+	@ServoyClientSupport(ng = false, wc = false, sc = true)
 	public void js_setStatusBarVisible(boolean visible)
 	{
 		if (plugin.isSwingClient())
@@ -710,6 +715,7 @@ public class WindowProvider implements IReturnedTypesProvider, IScriptable
 	 * @param dataproviderID the dataprovider of scope to fill
 	 *
 	 */
+	@ServoyClientSupport(ng = true, wc = true, sc = true)
 	public void js_showFormPopup(IComponent elementToShowRelatedTo, IForm form, Object scope, String dataproviderID)
 	{
 		js_showFormPopup(elementToShowRelatedTo, form, scope, dataproviderID, -1, -1);
@@ -872,6 +878,7 @@ public class WindowProvider implements IReturnedTypesProvider, IScriptable
 	 * @deprecated Replaced by {@link #createPopupMenu(Object[])}.
 	 */
 	@Deprecated
+	@ServoyClientSupport(ng = false, wc = true, sc = true)
 	public void js_showPopupMenu(Object[] vargs) throws PluginException
 	{
 		if (vargs.length == 3)
@@ -909,6 +916,7 @@ public class WindowProvider implements IReturnedTypesProvider, IScriptable
 	 * @deprecated Replaced by Menu class functionality.
 	 */
 	@Deprecated
+	@ServoyClientSupport(ng = false, wc = true, sc = true)
 	public RadioButton js_createRadioButtonMenuItem(Object[] vargs) throws PluginException
 	{
 		return (RadioButton)createMenuItem(null, vargs, IMenuItem.MENU_ITEM_RADIO);
@@ -919,6 +927,7 @@ public class WindowProvider implements IReturnedTypesProvider, IScriptable
 	 * @return JToolBar
 	 */
 	@Deprecated
+	@ServoyClientSupport(ng = false, wc = false, sc = true)
 	public JToolBar js_addServoyToolBar(JComponent pane, String name) throws Exception
 	{
 		return ToolBar.addServoyToolBar(plugin.getClientPluginAccess(), pane, name);
@@ -928,6 +937,7 @@ public class WindowProvider implements IReturnedTypesProvider, IScriptable
 	 * @deprecated Replaced by {@link #removeToolBar(String)}.
 	 */
 	@Deprecated
+	@ServoyClientSupport(ng = false, wc = false, sc = true)
 	public void js_removeServoyToolBar(JComponent pane, String name) throws Exception
 	{
 		ToolBar.removeServoyToolBar(pane, name);
@@ -959,6 +969,7 @@ public class WindowProvider implements IReturnedTypesProvider, IScriptable
 	 *
 	 * @param name the name by which this toolbar is identified in code. If display name is missing, name will be used as displayName as well.
 	 */
+	@ServoyClientSupport(ng = false, wc = false, sc = true)
 	public ToolBar js_addToolBar(String name) throws Exception
 	{
 		return js_addToolBar(name, name);
@@ -972,6 +983,7 @@ public class WindowProvider implements IReturnedTypesProvider, IScriptable
 	 * @param name the name by which this toolbar is identified in code. If display name is missing, name will be used as displayName as well.
 	 * @param row the row inside the toolbar panel where this toolbar is to be added.
 	 */
+	@ServoyClientSupport(ng = false, wc = false, sc = true)
 	public ToolBar js_addToolBar(String name, int row) throws Exception
 	{
 		return js_addToolBar(name, name, row);
@@ -985,6 +997,7 @@ public class WindowProvider implements IReturnedTypesProvider, IScriptable
 	 * @param name the name by which this toolbar is identified in code. If display name is missing, name will be used as displayName as well.
 	 * @param displayname the name by which this toolbar will be identified in the UI. (for example in the toolbar panel's context menu)
 	 */
+	@ServoyClientSupport(ng = false, wc = false, sc = true)
 	public ToolBar js_addToolBar(String name, String displayname) throws Exception
 	{
 		return js_addToolBar(name, displayname, -1);
@@ -999,6 +1012,7 @@ public class WindowProvider implements IReturnedTypesProvider, IScriptable
 	 * @param displayname the name by which this toolbar will be identified in the UI. (for example in the toolbar panel's context menu)
 	 * @param row the row inside the toolbar panel where this toolbar is to be added.
 	 */
+	@ServoyClientSupport(ng = false, wc = false, sc = true)
 	public ToolBar js_addToolBar(String name, String displayname, int row) throws Exception
 	{
 		IClientPluginAccess clientAccess = plugin.getClientPluginAccess();
@@ -1037,6 +1051,7 @@ public class WindowProvider implements IReturnedTypesProvider, IScriptable
 	 * @param window
 	 * @param name the name by which this toolbar is identified in code. If display name is missing, name will be used as displayName as well.
 	 */
+	@ServoyClientSupport(ng = false, wc = false, sc = true)
 	public ToolBar js_addToolBar(JSWindow window, String name) throws Exception
 	{
 		return js_addToolBar(window, name, name);
@@ -1051,6 +1066,7 @@ public class WindowProvider implements IReturnedTypesProvider, IScriptable
 	 * @param name the name by which this toolbar is identified in code. If display name is missing, name will be used as displayName as well.
 	 * @param row the row inside the toolbar panel where this toolbar is to be added.
 	 */
+	@ServoyClientSupport(ng = false, wc = false, sc = true)
 	public ToolBar js_addToolBar(JSWindow window, String name, int row) throws Exception
 	{
 		return js_addToolBar(window, name, name, row);
@@ -1065,6 +1081,7 @@ public class WindowProvider implements IReturnedTypesProvider, IScriptable
 	 * @param name the name by which this toolbar is identified in code
 	 * @param displayname the name by which this toolbar will be identified in the UI. (for example in the toolbar panel's context menu)
 	 */
+	@ServoyClientSupport(ng = false, wc = false, sc = true)
 	public ToolBar js_addToolBar(JSWindow window, String name, String displayname) throws Exception
 	{
 		return js_addToolBar(window, name, displayname, -1);
@@ -1080,6 +1097,7 @@ public class WindowProvider implements IReturnedTypesProvider, IScriptable
 	 * @param displayname the name by which this toolbar will be identified in the UI. (for example in the toolbar panel's context menu)
 	 * @param row the row inside the toolbar panel where this toolbar is to be added.
 	 */
+	@ServoyClientSupport(ng = false, wc = false, sc = true)
 	public ToolBar js_addToolBar(JSWindow window, String name, String displayname, int row) throws Exception
 	{
 		if (window == null) return js_addToolBar(name, displayname, row);
@@ -1116,6 +1134,7 @@ public class WindowProvider implements IReturnedTypesProvider, IScriptable
 	 *
 	 * @param name
 	 */
+	@ServoyClientSupport(ng = false, wc = false, sc = true)
 	public ToolBar js_getToolBar(String name) throws Exception
 	{
 		IClientPluginAccess clientAccess = plugin.getClientPluginAccess();
@@ -1145,6 +1164,7 @@ public class WindowProvider implements IReturnedTypesProvider, IScriptable
 	 * @param window
 	 * @param name
 	 */
+	@ServoyClientSupport(ng = false, wc = false, sc = true)
 	public ToolBar js_getToolBar(JSWindow window, String name) throws Exception
 	{
 		if (window == null) return js_getToolBar(name);
@@ -1177,6 +1197,7 @@ public class WindowProvider implements IReturnedTypesProvider, IScriptable
 	 *
 	 * @param name
 	 */
+	@ServoyClientSupport(ng = false, wc = false, sc = true)
 	public void js_removeToolBar(String name) throws Exception
 	{
 		if (plugin.isSwingClient())
@@ -1221,6 +1242,7 @@ public class WindowProvider implements IReturnedTypesProvider, IScriptable
 	 * @param window
 	 * @param name
 	 */
+	@ServoyClientSupport(ng = false, wc = false, sc = true)
 	public void js_removeToolBar(JSWindow window, String name) throws Exception
 	{
 		if (window.getImpl() instanceof ISmartRuntimeWindow)
@@ -1256,6 +1278,7 @@ public class WindowProvider implements IReturnedTypesProvider, IScriptable
 	 * // show the message
 	 * plugins.dialogs.showInfoDialog("toolbar names", message);
 	 */
+	@ServoyClientSupport(ng = false, wc = false, sc = true)
 	public String[] js_getToolbarNames()
 	{
 		return plugin.getClientPluginAccess().getToolbarPanel().getToolBarNames();
@@ -1287,6 +1310,7 @@ public class WindowProvider implements IReturnedTypesProvider, IScriptable
 	 * plugins.dialogs.showInfoDialog("toolbar names", message);
 	 * @param window
 	 */
+	@ServoyClientSupport(ng = false, wc = false, sc = true)
 	public String[] js_getToolbarNames(JSWindow window)
 	{
 		if (window == null) return js_getToolbarNames();
@@ -1320,6 +1344,7 @@ public class WindowProvider implements IReturnedTypesProvider, IScriptable
 	 * menuMain.text = "New Menu in Main Menubar";
 	 * menuMain.addMenuItem("another entry", feedback);
 	 */
+	@ServoyClientSupport(ng = false, wc = false, sc = true)
 	public MenuBar js_getMenuBar()
 	{
 		return getMenubar(null);
@@ -1331,6 +1356,7 @@ public class WindowProvider implements IReturnedTypesProvider, IScriptable
 	 *
 	 * @param windowName the name of the window
 	 */
+	@ServoyClientSupport(ng = false, wc = false, sc = true)
 	public MenuBar js_getMenuBar(String windowName)
 	{
 		return getMenubar(windowName);
@@ -1340,6 +1366,7 @@ public class WindowProvider implements IReturnedTypesProvider, IScriptable
 	 * @deprecated Replaced by {@link MenuBar#getMenuCount()}.
 	 */
 	@Deprecated
+	@ServoyClientSupport(ng = false, wc = false, sc = true)
 	public int js_getMenuCount()
 	{
 		return getMenubar(null).js_getMenuCount();
@@ -1349,6 +1376,7 @@ public class WindowProvider implements IReturnedTypesProvider, IScriptable
 	 * @deprecated Replaced by {@link MenuBar#getMenuIndexByText(String)}.
 	 */
 	@Deprecated
+	@ServoyClientSupport(ng = false, wc = false, sc = true)
 	public int js_getMenuIndexByText(String name)
 	{
 		return getMenubar(null).js_getMenuIndexByText(name);
@@ -1358,6 +1386,7 @@ public class WindowProvider implements IReturnedTypesProvider, IScriptable
 	 * @deprecated Replaced by {@link MenuBar#removeAllMenus()}.
 	 */
 	@Deprecated
+	@ServoyClientSupport(ng = false, wc = false, sc = true)
 	public Menu js_removeAllMenus() throws PluginException
 	{
 		getMenubar(null).js_removeAllMenus();
@@ -1368,6 +1397,7 @@ public class WindowProvider implements IReturnedTypesProvider, IScriptable
 	 * @deprecated Replaced by {@link MenuBar#removeMenu(Object[])}.
 	 */
 	@Deprecated
+	@ServoyClientSupport(ng = false, wc = false, sc = true)
 	public void js_removeMenu(Object[] index) throws PluginException
 	{
 		getMenubar(null).js_removeMenu(index);
@@ -1377,6 +1407,7 @@ public class WindowProvider implements IReturnedTypesProvider, IScriptable
 	 * @deprecated Replaced by {@link MenuBar#reset()}.
 	 */
 	@Deprecated
+	@ServoyClientSupport(ng = false, wc = false, sc = true)
 	public void js_resetMenuBar()
 	{
 		getMenubar(null).js_reset();
@@ -1386,6 +1417,7 @@ public class WindowProvider implements IReturnedTypesProvider, IScriptable
 	 * @deprecated Replaced by {@link MenuBar#validate()}.
 	 */
 	@Deprecated
+	@ServoyClientSupport(ng = false, wc = false, sc = true)
 	public void js_validateMenuBar()
 	{
 		getMenubar(null).js_validate();
@@ -1395,6 +1427,7 @@ public class WindowProvider implements IReturnedTypesProvider, IScriptable
 	 * @deprecated Replaced by {@link MenuBar#addMenu()}.
 	 */
 	@Deprecated
+	@ServoyClientSupport(ng = false, wc = false, sc = true)
 	public Menu js_addMenu() throws PluginException
 	{
 		return getMenubar(null).js_addMenu();
@@ -1406,6 +1439,7 @@ public class WindowProvider implements IReturnedTypesProvider, IScriptable
 	 * @deprecated Replaced by {@link MenuBar#addMenu()}.
 	 */
 	@Deprecated
+	@ServoyClientSupport(ng = false, wc = false, sc = true)
 	public Menu js_addMenu(int index) throws Exception
 	{
 		return getMenubar(null).js_addMenu(index);
@@ -1415,6 +1449,7 @@ public class WindowProvider implements IReturnedTypesProvider, IScriptable
 	 * @deprecated Replaced by {@link MenuBar#getMenu(int)}.
 	 */
 	@Deprecated
+	@ServoyClientSupport(ng = false, wc = false, sc = true)
 	public Menu js_getMenu(int index) throws Exception
 	{
 		return getMenubar(null).js_getMenu(index);
@@ -1424,6 +1459,7 @@ public class WindowProvider implements IReturnedTypesProvider, IScriptable
 	 * @deprecated Replaced by {@link #createPopupMenu()}.
 	 */
 	@Deprecated
+	@ServoyClientSupport(ng = false, wc = true, sc = true)
 	public Popup js_setMouseOverPopup(Object[] args) throws PluginException
 	{
 		return new Popup(plugin.getClientPluginAccess(), getMenuHandler(), createTriggeredPopup(args, IMenuHandler.TRIGGER_MOUSEOVER));
@@ -1433,6 +1469,7 @@ public class WindowProvider implements IReturnedTypesProvider, IScriptable
 	 * @deprecated Replaced by {@link #createPopupMenu()}.
 	 */
 	@Deprecated
+	@ServoyClientSupport(ng = false, wc = true, sc = true)
 	public Popup js_setPopup() throws Exception
 	{
 		return js_setPopup(null);
@@ -1444,6 +1481,7 @@ public class WindowProvider implements IReturnedTypesProvider, IScriptable
 	 * @deprecated Replaced by {@link #createPopupMenu()}.
 	 */
 	@Deprecated
+	@ServoyClientSupport(ng = false, wc = true, sc = true)
 	public Popup js_setPopup(Object[] args) throws Exception
 	{
 		return new Popup(plugin.getClientPluginAccess(), getMenuHandler(), createTriggeredPopup(args, IMenuHandler.TRIGGER_RIGHTCLICK));
@@ -1453,6 +1491,7 @@ public class WindowProvider implements IReturnedTypesProvider, IScriptable
 	 * @deprecated Replaced by Menu class functionality.
 	 */
 	@Deprecated
+	@ServoyClientSupport(ng = false, wc = true, sc = true)
 	public MenuItem js_createMenuItem(Object[] vargs) throws PluginException
 	{
 		return (MenuItem)createMenuItem(null, vargs, IMenuItem.MENU_ITEM_BUTTON);
@@ -1462,6 +1501,7 @@ public class WindowProvider implements IReturnedTypesProvider, IScriptable
 	 * @deprecated Replaced by Menu class functionality.
 	 */
 	@Deprecated
+	@ServoyClientSupport(ng = false, wc = true, sc = true)
 	public CheckBox js_createCheckboxMenuItem(Object[] vargs) throws PluginException
 	{
 		return (CheckBox)createMenuItem(null, vargs, IMenuItem.MENU_ITEM_CHECK);
@@ -1693,6 +1733,7 @@ public class WindowProvider implements IReturnedTypesProvider, IScriptable
 	 * // maximize the window
 	 * plugins.window.maximize("windowName");
 	 */
+	@ServoyClientSupport(ng = false, wc = false, sc = true)
 	public void js_maximize()
 	{
 		js_maximize(null);
@@ -1704,6 +1745,7 @@ public class WindowProvider implements IReturnedTypesProvider, IScriptable
 	 *
 	 * @param windowName
 	 */
+	@ServoyClientSupport(ng = false, wc = false, sc = true)
 	public void js_maximize(final String windowName)
 	{
 		if (plugin.isSwingClient())
