@@ -104,7 +104,7 @@ public class FoundSetTreeModel extends DefaultTreeModel
 				child = createChildNode(root, rootFs, i);
 			}
 			//check child item to detect dir/leaf status (need this for icon display)
-			Enumeration<DefaultMutableTreeNode> childEnum = root.children();
+			Enumeration<TreeNode> childEnum = root.children();
 			while (childEnum.hasMoreElements())
 				childEnum.nextElement().isLeaf();
 			addListenerToFoundSet(rootFs);
