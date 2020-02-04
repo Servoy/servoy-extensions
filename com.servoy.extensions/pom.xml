@@ -30,6 +30,8 @@
 		<doc.version>1.5.0</doc.version>
 		<pdfbox.version>2.0.16</pdfbox.version>
 		<fontbox.version>2.0.16</fontbox.version>
+		<jwt.version>3.9.0</jwt.version>
+		<fasterxml.version>2.10.2</fasterxml.version>
 	</properties>
 
 	<profiles>
@@ -335,6 +337,7 @@
 										<fileset
 											file="${project.basedir}/resources/images/images.jar.jnlp" />
 									</copy>
+									<makejar srcdir="jwt"/>
 									<makejar srcdir="mail"
 										includes=",META-INF/services/com.servoy.j2db.plugins.IPlugin" />
 									<makejar srcdir="openid" />
@@ -482,6 +485,38 @@
 									<overWrite>true</overWrite>
 									<outputDirectory>${project.build.directory}/plugins_beans/plugins/pdf_output</outputDirectory>
 									<destFileName>fontbox.jar</destFileName>
+								</artifactItem>
+								<artifactItem>
+									<groupId>com.auth0</groupId>
+    								<artifactId>java-jwt</artifactId>
+    								<version>${jwt.version}</version>
+									<overWrite>true</overWrite>
+									<outputDirectory>${project.build.directory}/plugins_beans/plugins/jwt</outputDirectory>
+									<destFileName>java-jwt.jar</destFileName>
+								</artifactItem>
+								<artifactItem>
+									<groupId>com.fasterxml.jackson.core</groupId>
+    								<artifactId>jackson-databind</artifactId>
+    								<version>${fasterxml.version}</version>
+									<overWrite>true</overWrite>
+									<outputDirectory>${project.build.directory}/plugins_beans/plugins/jwt</outputDirectory>
+									<destFileName>jackson-databind.jar</destFileName>
+								</artifactItem>
+								<artifactItem>
+									<groupId>com.fasterxml.jackson.core</groupId>
+   									<artifactId>jackson-annotations</artifactId>
+   									<version>${fasterxml.version}</version>
+									<overWrite>true</overWrite>
+									<outputDirectory>${project.build.directory}/plugins_beans/plugins/jwt</outputDirectory>
+									<destFileName>jackson-annotations.jar</destFileName>
+								</artifactItem>
+								<artifactItem>
+									<groupId>com.fasterxml.jackson.core</groupId>
+    								<artifactId>jackson-core</artifactId>
+    								<version>${fasterxml.version}</version>
+									<overWrite>true</overWrite>
+									<outputDirectory>${project.build.directory}/plugins_beans/plugins/jwt</outputDirectory>
+									<destFileName>jackson-core.jar</destFileName>
 								</artifactItem>
 							</artifactItems>
 						</configuration>
@@ -694,6 +729,26 @@
 			<groupId>org.apache.pdfbox</groupId>
 			<artifactId>pdfbox</artifactId>
 			<version>${pdfbox.version}</version>
+		</dependency>
+		<dependency>
+   			<groupId>com.auth0</groupId>
+    		<artifactId>java-jwt</artifactId>
+    		<version>${jwt.version}</version>
+		</dependency>
+		<dependency>
+    		<groupId>com.fasterxml.jackson.core</groupId>
+    		<artifactId>jackson-databind</artifactId>
+    		<version>${fasterxml.version}</version>
+		</dependency>
+		<dependency>
+    		<groupId>com.fasterxml.jackson.core</groupId>
+   			<artifactId>jackson-annotations</artifactId>
+   			<version>${fasterxml.version}</version>
+		</dependency>
+		<dependency>
+    		<groupId>com.fasterxml.jackson.core</groupId>
+    		<artifactId>jackson-core</artifactId>
+    		<version>${fasterxml.version}</version>
 		</dependency>
 	</dependencies>
 </project>
