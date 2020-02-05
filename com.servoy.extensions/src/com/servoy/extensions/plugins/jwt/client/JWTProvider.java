@@ -59,12 +59,28 @@ public class JWTProvider implements IScriptable
 		}
 	}
 
+	/**
+	 * Create a JSON Web Token
+	 * @param payload a json containing the data,
+	 * 		e.g. {'some': 'data', 'somemore': 'data2'}
+	 * @return a string representing the encrypted data
+	 * 		or null if the token cannot be generated
+	 */
 	@JSFunction
 	public String create(Object payload)
 	{
 		return create(payload, null);
 	}
 
+	/**
+	 * Create a JSON Web Token
+	 * @param payload a json containing the data,
+	 * 		e.g. {'some': 'data', 'somemore': 'data2'}
+	 * @param expiresAt the date when the created token expires,
+	 * 		after the expired date the token won't be verified
+	 * @return a string representing the encrypted data
+	 * 		or null if the token cannot be generated
+	 */
 	@JSFunction
 	public String create(Object payload, Date expiresAt)
 	{
@@ -96,6 +112,11 @@ public class JWTProvider implements IScriptable
 		return null;
 	}
 
+	/**
+	 * Verifiy a JWT.
+	 * @param token a JSON Web Token
+	 * @return the payload or null if the token can't be verified
+	 */
 	@JSFunction
 	public JSONObject verify(String token)
 	{
