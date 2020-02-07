@@ -118,7 +118,7 @@ public class JWTProvider implements IScriptable
 	 * @return the payload or null if the token can't be verified
 	 */
 	@JSFunction
-	public JSONObject verify(String token)
+	public Object verify(String token)
 	{
 		createJWTService();
 		if (jwtService != null)
