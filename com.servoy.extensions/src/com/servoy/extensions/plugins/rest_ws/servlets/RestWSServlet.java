@@ -706,7 +706,7 @@ public class RestWSServlet extends HttpServlet
 
 		Object[] methodArgs = functionCall.getRight();
 		Object[] args = null;
-		if (fixedArgs != null || methodArgs.length > 0 || request.getParameterMap().size() > 0)
+		if (fixedArgs != null || methodArgs.length > 0 || request.getParameterMap().size() > 0 || ws_authenticate_result != null)
 		{
 			args = new Object[((fixedArgs == null) ? 0 : fixedArgs.length) + methodArgs.length +
 				((request.getParameterMap().size() > 0 || ws_authenticate_result != null) ? 1 : 0)];
