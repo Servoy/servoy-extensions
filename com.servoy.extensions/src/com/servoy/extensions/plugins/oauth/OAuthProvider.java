@@ -135,7 +135,7 @@ public class OAuthProvider implements IScriptable, IReturnedTypesProvider
 	{
 		String redirectURL = getPluginAccess().getServerURL().toString();
 		redirectURL += (!redirectURL.endsWith("/") ? "/" + SOLUTIONS_PATH : SOLUTIONS_PATH);
-		redirectURL += getPluginAccess().getSolutionName() + "/m/" + callbackmethod;
+		redirectURL += getPluginAccess().getMainSolutionName() + "/m/" + callbackmethod;
 		return redirectURL;
 	}
 
