@@ -18,6 +18,7 @@
 package com.servoy.extensions.plugins.jwt.client;
 
 import java.beans.PropertyChangeEvent;
+import java.net.URL;
 import java.util.Properties;
 
 import javax.swing.Icon;
@@ -25,6 +26,7 @@ import javax.swing.ImageIcon;
 
 import com.servoy.j2db.plugins.IClientPlugin;
 import com.servoy.j2db.plugins.IClientPluginAccess;
+import com.servoy.j2db.plugins.IIconProvider;
 import com.servoy.j2db.plugins.PluginException;
 import com.servoy.j2db.scripting.IScriptable;
 
@@ -32,7 +34,7 @@ import com.servoy.j2db.scripting.IScriptable;
  * JWT client plugin.
  * @author emera
  */
-public class JWTPlugin implements IClientPlugin
+public class JWTPlugin implements IClientPlugin, IIconProvider
 {
 	static final String PLUGIN_NAME = "jwt";
 	private IClientPluginAccess access;
@@ -108,5 +110,11 @@ public class JWTPlugin implements IClientPlugin
 	IClientPluginAccess getClientPluginAccess()
 	{
 		return access;
+	}
+
+	@Override
+	public URL getIconUrl()
+	{
+		return this.getClass().getResource("images/jwt.png"); //$NON-NLS-1$
 	}
 }

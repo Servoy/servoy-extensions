@@ -17,6 +17,7 @@
 package com.servoy.extensions.plugins.rawSQL;
 
 import java.beans.PropertyChangeEvent;
+import java.net.URL;
 import java.util.Properties;
 
 import javax.swing.Icon;
@@ -24,6 +25,7 @@ import javax.swing.ImageIcon;
 
 import com.servoy.j2db.plugins.IClientPlugin;
 import com.servoy.j2db.plugins.IClientPluginAccess;
+import com.servoy.j2db.plugins.IIconProvider;
 import com.servoy.j2db.plugins.PluginException;
 import com.servoy.j2db.preference.PreferencePanel;
 import com.servoy.j2db.scripting.IScriptable;
@@ -33,7 +35,7 @@ import com.servoy.j2db.scripting.IScriptable;
  *
  * @author jblok
  */
-public class RawSQLPlugin implements IClientPlugin
+public class RawSQLPlugin implements IClientPlugin, IIconProvider
 {
 	public static final String PLUGIN_NAME = "rawSQL"; //$NON-NLS-1$
 
@@ -122,5 +124,11 @@ public class RawSQLPlugin implements IClientPlugin
 	public void propertyChange(PropertyChangeEvent evt)
 	{
 		// ignore
+	}
+
+	@Override
+	public URL getIconUrl()
+	{
+		return this.getClass().getResource("images/raw_sql.png"); //$NON-NLS-1$
 	}
 }

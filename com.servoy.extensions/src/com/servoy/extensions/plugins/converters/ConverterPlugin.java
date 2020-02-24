@@ -17,6 +17,7 @@
 package com.servoy.extensions.plugins.converters;
 
 import java.beans.PropertyChangeEvent;
+import java.net.URL;
 import java.util.Properties;
 
 import javax.swing.Icon;
@@ -27,6 +28,7 @@ import com.servoy.j2db.dataprocessing.IUIConverter;
 import com.servoy.j2db.plugins.IClientPlugin;
 import com.servoy.j2db.plugins.IClientPluginAccess;
 import com.servoy.j2db.plugins.IColumnConverterProvider;
+import com.servoy.j2db.plugins.IIconProvider;
 import com.servoy.j2db.plugins.IUIConverterProvider;
 import com.servoy.j2db.plugins.PluginException;
 import com.servoy.j2db.preference.PreferencePanel;
@@ -34,11 +36,11 @@ import com.servoy.j2db.scripting.IScriptable;
 
 /**
  * Plugin for GlobalMethodConverter converters.
- * 
+ *
  * @author pianas
  *
  */
-public class ConverterPlugin implements IClientPlugin, IColumnConverterProvider, IUIConverterProvider
+public class ConverterPlugin implements IClientPlugin, IColumnConverterProvider, IUIConverterProvider, IIconProvider
 {
 	private IColumnConverter[] columnConverters;
 	private IUIConverter[] uiConverters;
@@ -115,5 +117,11 @@ public class ConverterPlugin implements IClientPlugin, IColumnConverterProvider,
 			uiConverters = new IUIConverter[] { new GlobalMethodConverter(this) };
 		}
 		return uiConverters;
+	}
+
+	@Override
+	public URL getIconUrl()
+	{
+		return this.getClass().getResource("images/converter.gif"); //$NON-NLS-1$
 	}
 }

@@ -25,6 +25,7 @@ import javax.swing.ImageIcon;
 
 import com.servoy.j2db.plugins.IClientPlugin;
 import com.servoy.j2db.plugins.IClientPluginAccess;
+import com.servoy.j2db.plugins.IIconProvider;
 import com.servoy.j2db.plugins.IPlugin;
 import com.servoy.j2db.plugins.PluginException;
 import com.servoy.j2db.preference.PreferencePanel;
@@ -36,7 +37,7 @@ import com.servoy.j2db.util.Debug;
  *
  * @author rgansevles
  */
-public class WindowPlugin implements IClientPlugin
+public class WindowPlugin implements IClientPlugin, IIconProvider
 {
 	public static final String PLUGIN_NAME = "window"; //$NON-NLS-1$
 
@@ -148,5 +149,11 @@ public class WindowPlugin implements IClientPlugin
 	{
 		return getClientPluginAccess().getApplicationType() == IClientPluginAccess.CLIENT ||
 			getClientPluginAccess().getApplicationType() == IClientPluginAccess.RUNTIME;
+	}
+
+	@Override
+	public URL getIconUrl()
+	{
+		return this.getClass().getResource("images/window.png"); //$NON-NLS-1$
 	}
 }

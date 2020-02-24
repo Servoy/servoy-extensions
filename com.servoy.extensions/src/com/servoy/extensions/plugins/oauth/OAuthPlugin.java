@@ -18,6 +18,7 @@
 package com.servoy.extensions.plugins.oauth;
 
 import java.beans.PropertyChangeEvent;
+import java.net.URL;
 import java.util.Properties;
 
 import javax.swing.Icon;
@@ -26,6 +27,7 @@ import javax.swing.ImageIcon;
 import com.servoy.base.scripting.annotations.ServoyClientSupport;
 import com.servoy.j2db.plugins.IClientPlugin;
 import com.servoy.j2db.plugins.IClientPluginAccess;
+import com.servoy.j2db.plugins.IIconProvider;
 import com.servoy.j2db.plugins.PluginException;
 import com.servoy.j2db.scripting.IScriptable;
 
@@ -33,7 +35,7 @@ import com.servoy.j2db.scripting.IScriptable;
  * @author emera
  */
 @ServoyClientSupport(ng = true, wc = false, sc = false)
-public class OAuthPlugin implements IClientPlugin
+public class OAuthPlugin implements IClientPlugin, IIconProvider
 {
 	public static final String PLUGIN_NAME = "oauth"; //$NON-NLS-1$
 
@@ -104,5 +106,11 @@ public class OAuthPlugin implements IClientPlugin
 		{
 			return null;
 		}
+	}
+
+	@Override
+	public URL getIconUrl()
+	{
+		return this.getClass().getResource("images/oauth.png"); //$NON-NLS-1$
 	}
 }

@@ -17,6 +17,7 @@
 package com.servoy.extensions.plugins.serialize;
 
 import java.beans.PropertyChangeEvent;
+import java.net.URL;
 import java.util.Properties;
 
 import javax.swing.Icon;
@@ -26,12 +27,13 @@ import com.servoy.j2db.dataprocessing.IColumnConverter;
 import com.servoy.j2db.plugins.IClientPlugin;
 import com.servoy.j2db.plugins.IClientPluginAccess;
 import com.servoy.j2db.plugins.IColumnConverterProvider;
+import com.servoy.j2db.plugins.IIconProvider;
 import com.servoy.j2db.plugins.PluginException;
 import com.servoy.j2db.preference.PreferencePanel;
 import com.servoy.j2db.scripting.IScriptable;
 import com.servoy.j2db.util.serialize.JSONSerializerWrapper;
 
-public class SerializePlugin implements IClientPlugin, IColumnConverterProvider
+public class SerializePlugin implements IClientPlugin, IColumnConverterProvider, IIconProvider
 {
 	public static final String PLUGIN_NAME = "serialize"; //$NON-NLS-1$
 
@@ -146,6 +148,12 @@ public class SerializePlugin implements IClientPlugin, IColumnConverterProvider
 			serializerWrapper = new JSONSerializerWrapper(false);
 		}
 		return serializerWrapper;
+	}
+
+	@Override
+	public URL getIconUrl()
+	{
+		return this.getClass().getResource("images/serialize.png"); //$NON-NLS-1$
 	}
 
 }

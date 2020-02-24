@@ -20,6 +20,7 @@ import java.awt.Component;
 import java.awt.GraphicsEnvironment;
 import java.awt.event.ComponentListener;
 import java.beans.PropertyChangeEvent;
+import java.net.URL;
 import java.util.Properties;
 
 import javax.swing.Icon;
@@ -32,6 +33,7 @@ import javax.swing.SwingUtilities;
 import com.servoy.j2db.Messages;
 import com.servoy.j2db.plugins.IClientPlugin;
 import com.servoy.j2db.plugins.IClientPluginAccess;
+import com.servoy.j2db.plugins.IIconProvider;
 import com.servoy.j2db.plugins.PluginException;
 import com.servoy.j2db.preference.PreferencePanel;
 import com.servoy.j2db.scripting.IScriptable;
@@ -40,7 +42,7 @@ import com.servoy.j2db.util.Utils;
 /**
  * @author jcompagner
  */
-public class AgentPlugin implements IClientPlugin
+public class AgentPlugin implements IClientPlugin, IIconProvider
 {
 	public static final String PLUGIN_NAME = "agent"; //$NON-NLS-1$
 
@@ -156,5 +158,11 @@ public class AgentPlugin implements IClientPlugin
 	public void propertyChange(PropertyChangeEvent evt)
 	{
 		// ignore
+	}
+
+	@Override
+	public URL getIconUrl()
+	{
+		return this.getClass().getResource("images/agent.png"); //$NON-NLS-1$
 	}
 }

@@ -17,6 +17,7 @@
 package com.servoy.extensions.plugins.dialog;
 
 import java.beans.PropertyChangeEvent;
+import java.net.URL;
 import java.util.Properties;
 
 import javax.swing.Icon;
@@ -25,6 +26,7 @@ import javax.swing.ImageIcon;
 import com.servoy.j2db.Messages;
 import com.servoy.j2db.plugins.IClientPlugin;
 import com.servoy.j2db.plugins.IClientPluginAccess;
+import com.servoy.j2db.plugins.IIconProvider;
 import com.servoy.j2db.plugins.PluginException;
 import com.servoy.j2db.preference.PreferencePanel;
 import com.servoy.j2db.scripting.IScriptable;
@@ -33,7 +35,7 @@ import com.servoy.j2db.scripting.IScriptable;
  * DialogPlugin class
  * @author jblok
  */
-public class DialogPlugin implements IClientPlugin
+public class DialogPlugin implements IClientPlugin, IIconProvider
 {
 	public static final String PLUGIN_NAME = "dialogs"; //$NON-NLS-1$
 
@@ -127,5 +129,11 @@ public class DialogPlugin implements IClientPlugin
 	public void propertyChange(PropertyChangeEvent evt)
 	{
 		// ignore
+	}
+
+	@Override
+	public URL getIconUrl()
+	{
+		return this.getClass().getResource("images/dialogs.png"); //$NON-NLS-1$
 	}
 }

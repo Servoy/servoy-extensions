@@ -1,6 +1,7 @@
 package com.servoy.extensions.plugins.clientmanager;
 
 import java.beans.PropertyChangeEvent;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -10,12 +11,13 @@ import javax.swing.ImageIcon;
 
 import com.servoy.j2db.plugins.IClientPlugin;
 import com.servoy.j2db.plugins.IClientPluginAccess;
+import com.servoy.j2db.plugins.IIconProvider;
 import com.servoy.j2db.plugins.PluginException;
 import com.servoy.j2db.preference.PreferencePanel;
 import com.servoy.j2db.scripting.IScriptable;
 import com.servoy.j2db.util.Debug;
 
-public class ClientManagerPlugin implements IClientPlugin
+public class ClientManagerPlugin implements IClientPlugin, IIconProvider
 {
 	public static final String PLUGIN_NAME = "clientmanager"; //$NON-NLS-1$
 
@@ -117,5 +119,11 @@ public class ClientManagerPlugin implements IClientPlugin
 	public IClientPluginAccess getClientPluginAccess()
 	{
 		return access;
+	}
+
+	@Override
+	public URL getIconUrl()
+	{
+		return this.getClass().getResource("images/clientmanager.png"); //$NON-NLS-1$
 	}
 }

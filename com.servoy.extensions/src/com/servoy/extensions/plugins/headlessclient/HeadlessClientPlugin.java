@@ -17,6 +17,7 @@
 package com.servoy.extensions.plugins.headlessclient;
 
 import java.beans.PropertyChangeEvent;
+import java.net.URL;
 import java.util.Properties;
 
 import javax.swing.Icon;
@@ -24,12 +25,13 @@ import javax.swing.ImageIcon;
 
 import com.servoy.j2db.plugins.IClientPlugin;
 import com.servoy.j2db.plugins.IClientPluginAccess;
+import com.servoy.j2db.plugins.IIconProvider;
 import com.servoy.j2db.plugins.PluginException;
 import com.servoy.j2db.preference.PreferencePanel;
 import com.servoy.j2db.scripting.IScriptable;
 import com.servoy.j2db.util.serialize.JSONConverter;
 
-public class HeadlessClientPlugin implements IClientPlugin
+public class HeadlessClientPlugin implements IClientPlugin, IIconProvider
 {
 	public static final String PLUGIN_NAME = "headlessclient"; //$NON-NLS-1$
 
@@ -103,5 +105,11 @@ public class HeadlessClientPlugin implements IClientPlugin
 			jsonConverter = new JSONConverter(access.getDatabaseManager());
 		}
 		return jsonConverter;
+	}
+
+	@Override
+	public URL getIconUrl()
+	{
+		return this.getClass().getResource("images/headlessclient.png"); //$NON-NLS-1$
 	}
 }

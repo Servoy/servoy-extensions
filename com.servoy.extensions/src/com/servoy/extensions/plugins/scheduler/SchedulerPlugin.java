@@ -17,6 +17,7 @@
 package com.servoy.extensions.plugins.scheduler;
 
 import java.beans.PropertyChangeEvent;
+import java.net.URL;
 import java.util.Properties;
 
 import javax.swing.Icon;
@@ -24,6 +25,7 @@ import javax.swing.ImageIcon;
 
 import com.servoy.j2db.plugins.IClientPlugin;
 import com.servoy.j2db.plugins.IClientPluginAccess;
+import com.servoy.j2db.plugins.IIconProvider;
 import com.servoy.j2db.plugins.PluginException;
 import com.servoy.j2db.preference.PreferencePanel;
 import com.servoy.j2db.scripting.IScriptable;
@@ -31,7 +33,7 @@ import com.servoy.j2db.scripting.IScriptable;
 /**
  * @author jcompagner
  */
-public class SchedulerPlugin implements IClientPlugin
+public class SchedulerPlugin implements IClientPlugin, IIconProvider
 {
 	public static final String PLUGIN_NAME = "scheduler"; //$NON-NLS-1$
 
@@ -151,6 +153,12 @@ public class SchedulerPlugin implements IClientPlugin
 			schedulerProvider.stopScheduler();
 			schedulerProvider = null;
 		}
+	}
+
+	@Override
+	public URL getIconUrl()
+	{
+		return this.getClass().getResource("images/scheduler.png"); //$NON-NLS-1$
 	}
 
 }

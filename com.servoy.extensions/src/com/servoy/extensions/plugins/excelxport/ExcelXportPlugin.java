@@ -19,6 +19,7 @@ package com.servoy.extensions.plugins.excelxport;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
+import java.net.URL;
 import java.util.Properties;
 
 import javax.swing.Icon;
@@ -31,6 +32,7 @@ import com.servoy.j2db.Messages;
 import com.servoy.j2db.plugins.ClientPluginAccessProvider;
 import com.servoy.j2db.plugins.IClientPlugin;
 import com.servoy.j2db.plugins.IClientPluginAccess;
+import com.servoy.j2db.plugins.IIconProvider;
 import com.servoy.j2db.plugins.PluginException;
 import com.servoy.j2db.preference.PreferencePanel;
 import com.servoy.j2db.scripting.IScriptable;
@@ -39,7 +41,7 @@ import com.servoy.j2db.smart.ISmartClientPluginAccess;
 /**
  * @author jblok
  */
-public class ExcelXportPlugin implements IClientPlugin, ActionListener
+public class ExcelXportPlugin implements IClientPlugin, ActionListener, IIconProvider
 {
 	public static final String PLUGIN_NAME = "excelxport"; //$NON-NLS-1$
 
@@ -176,5 +178,16 @@ public class ExcelXportPlugin implements IClientPlugin, ActionListener
 		{
 			en.setEnabled(true);//restore for new solution
 		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.servoy.j2db.plugins.IIconProvider#getIconUrl()
+	 */
+	@Override
+	public URL getIconUrl()
+	{
+		return this.getClass().getResource("images/excelexport.png"); //$NON-NLS-1$
 	}
 }

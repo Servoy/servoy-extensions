@@ -17,6 +17,7 @@
 package com.servoy.extensions.plugins.xmlreader;
 
 import java.beans.PropertyChangeEvent;
+import java.net.URL;
 import java.util.Properties;
 
 import javax.swing.Icon;
@@ -24,6 +25,7 @@ import javax.swing.ImageIcon;
 
 import com.servoy.j2db.plugins.IClientPlugin;
 import com.servoy.j2db.plugins.IClientPluginAccess;
+import com.servoy.j2db.plugins.IIconProvider;
 import com.servoy.j2db.plugins.PluginException;
 import com.servoy.j2db.preference.PreferencePanel;
 import com.servoy.j2db.scripting.IScriptable;
@@ -31,7 +33,7 @@ import com.servoy.j2db.scripting.IScriptable;
 /**
  * @author jcompagner
  */
-public class XmlReaderPlugin implements IClientPlugin
+public class XmlReaderPlugin implements IClientPlugin, IIconProvider
 {
 	public static final String PLUGIN_NAME = "XmlReader"; //$NON-NLS-1$
 
@@ -106,6 +108,12 @@ public class XmlReaderPlugin implements IClientPlugin
 	 */
 	public void propertyChange(PropertyChangeEvent evt)
 	{
+	}
+
+	@Override
+	public URL getIconUrl()
+	{
+		return this.getClass().getResource("images/xml_reader.png"); //$NON-NLS-1$
 	}
 
 }

@@ -27,11 +27,12 @@ import com.servoy.j2db.dataprocessing.IColumnValidator;
 import com.servoy.j2db.plugins.IClientPlugin;
 import com.servoy.j2db.plugins.IClientPluginAccess;
 import com.servoy.j2db.plugins.IColumnValidatorProvider;
+import com.servoy.j2db.plugins.IIconProvider;
 import com.servoy.j2db.plugins.PluginException;
 import com.servoy.j2db.preference.PreferencePanel;
 import com.servoy.j2db.scripting.IScriptable;
 
-public class ValidatorPlugin implements IClientPlugin, IColumnValidatorProvider
+public class ValidatorPlugin implements IClientPlugin, IColumnValidatorProvider, IIconProvider
 {
 	private IClientPluginAccess application;
 	private IColumnValidator[] validators;
@@ -40,7 +41,8 @@ public class ValidatorPlugin implements IClientPlugin, IColumnValidatorProvider
 	{
 		if (validators == null)
 		{
-			validators = new IColumnValidator[] { new GlobalMethodValidator(application), new EmailValidator(), new RegexValidator(), new NumberRangeValidator(), new SizeValidator(), new IdentValidator() };
+			validators = new IColumnValidator[] { new GlobalMethodValidator(
+				application), new EmailValidator(), new RegexValidator(), new NumberRangeValidator(), new SizeValidator(), new IdentValidator() };
 		}
 		return validators;
 	}
@@ -104,5 +106,11 @@ public class ValidatorPlugin implements IClientPlugin, IColumnValidatorProvider
 
 	public void propertyChange(PropertyChangeEvent evt)
 	{
+	}
+
+	@Override
+	public URL getIconUrl()
+	{
+		return this.getClass().getResource("images/validators.gif"); //$NON-NLS-1$
 	}
 }

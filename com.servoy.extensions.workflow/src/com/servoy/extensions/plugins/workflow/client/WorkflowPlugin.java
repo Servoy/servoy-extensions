@@ -18,6 +18,7 @@
 package com.servoy.extensions.plugins.workflow.client;
 
 import java.beans.PropertyChangeEvent;
+import java.net.URL;
 import java.util.Properties;
 
 import javax.swing.Icon;
@@ -25,6 +26,7 @@ import javax.swing.ImageIcon;
 
 import com.servoy.j2db.plugins.IClientPlugin;
 import com.servoy.j2db.plugins.IClientPluginAccess;
+import com.servoy.j2db.plugins.IIconProvider;
 import com.servoy.j2db.plugins.PluginException;
 import com.servoy.j2db.scripting.IScriptable;
 
@@ -33,7 +35,7 @@ import com.servoy.j2db.scripting.IScriptable;
  * 
  * @author jblok
  */
-public class WorkflowPlugin implements IClientPlugin
+public class WorkflowPlugin implements IClientPlugin, IIconProvider
 {
 	public static final String PLUGIN_NAME = "workflow"; //$NON-NLS-1$
 	
@@ -103,4 +105,9 @@ public class WorkflowPlugin implements IClientPlugin
  	{
  		// ignore
  	}
+
+	@Override
+	public URL getIconUrl() {
+		return this.getClass().getResource("images/flow.gif"); //$NON-NLS-1$
+	}
 }

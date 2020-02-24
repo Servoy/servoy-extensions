@@ -17,6 +17,7 @@
 package com.servoy.extensions.plugins.mail.client;
 
 import java.beans.PropertyChangeEvent;
+import java.net.URL;
 import java.util.Properties;
 
 import javax.swing.Icon;
@@ -25,6 +26,7 @@ import javax.swing.ImageIcon;
 import com.servoy.j2db.Messages;
 import com.servoy.j2db.plugins.IClientPlugin;
 import com.servoy.j2db.plugins.IClientPluginAccess;
+import com.servoy.j2db.plugins.IIconProvider;
 import com.servoy.j2db.plugins.PluginException;
 import com.servoy.j2db.preference.PreferencePanel;
 import com.servoy.j2db.scripting.IScriptable;
@@ -32,7 +34,7 @@ import com.servoy.j2db.scripting.IScriptable;
 /**
  * @author jblok
  */
-public class MailPlugin implements IClientPlugin
+public class MailPlugin implements IClientPlugin, IIconProvider
 {
 	public static final String PLUGIN_NAME = "mail"; //$NON-NLS-1$
 
@@ -113,6 +115,12 @@ public class MailPlugin implements IClientPlugin
 	public void propertyChange(PropertyChangeEvent evt)
 	{
 		// ignore
+	}
+
+	@Override
+	public URL getIconUrl()
+	{
+		return this.getClass().getResource("images/mail.png"); //$NON-NLS-1$
 	}
 
 }
