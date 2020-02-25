@@ -18,6 +18,7 @@
 package com.servoy.extensions.plugins.openid;
 
 import java.beans.PropertyChangeEvent;
+import java.net.URL;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -27,6 +28,7 @@ import javax.swing.ImageIcon;
 
 import com.servoy.j2db.plugins.IClientPlugin;
 import com.servoy.j2db.plugins.IClientPluginAccess;
+import com.servoy.j2db.plugins.IIconProvider;
 import com.servoy.j2db.plugins.IServerAccess;
 import com.servoy.j2db.plugins.IServerPlugin;
 import com.servoy.j2db.plugins.PluginException;
@@ -36,7 +38,7 @@ import com.servoy.j2db.scripting.IScriptable;
 /**
 * @author jblok
 */
-public class OpenIDPlugin implements IClientPlugin, IServerPlugin //implements both to indicate is webclient/serverclient only
+public class OpenIDPlugin implements IClientPlugin, IServerPlugin, IIconProvider //implements both to indicate is webclient/serverclient only
 {
 	public static final String PLUGIN_NAME = "openid"; //$NON-NLS-1$
 
@@ -142,5 +144,11 @@ public class OpenIDPlugin implements IClientPlugin, IServerPlugin //implements b
 	public void propertyChange(PropertyChangeEvent evt)
 	{
 		// ignore
+	}
+
+	@Override
+	public URL getIconUrl()
+	{
+		return this.getClass().getResource("images/openid.png"); //$NON-NLS-1$
 	}
 }

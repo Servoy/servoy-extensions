@@ -17,6 +17,7 @@
 package com.servoy.extensions.plugins.pdf_output;
 
 import java.beans.PropertyChangeEvent;
+import java.net.URL;
 import java.util.Properties;
 
 import javax.print.PrintServiceLookup;
@@ -26,6 +27,7 @@ import javax.swing.ImageIcon;
 import com.servoy.j2db.Messages;
 import com.servoy.j2db.plugins.IClientPlugin;
 import com.servoy.j2db.plugins.IClientPluginAccess;
+import com.servoy.j2db.plugins.IIconProvider;
 import com.servoy.j2db.plugins.PluginException;
 import com.servoy.j2db.preference.PreferencePanel;
 import com.servoy.j2db.scripting.IScriptable;
@@ -33,7 +35,7 @@ import com.servoy.j2db.scripting.IScriptable;
 /**
  * @author jblok
  */
-public class PDFPlugin implements IClientPlugin
+public class PDFPlugin implements IClientPlugin, IIconProvider
 {
 	public static final String PLUGIN_NAME = "pdf_output"; //$NON-NLS-1$
 
@@ -131,6 +133,12 @@ public class PDFPlugin implements IClientPlugin
 	public void propertyChange(PropertyChangeEvent evt)
 	{
 		// ignore
+	}
+
+	@Override
+	public URL getIconUrl()
+	{
+		return this.getClass().getResource("images/pdf_output.png"); //$NON-NLS-1$
 	}
 
 }

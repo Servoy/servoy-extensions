@@ -25,11 +25,12 @@ import javax.swing.ImageIcon;
 
 import com.servoy.j2db.plugins.IClientPlugin;
 import com.servoy.j2db.plugins.IClientPluginAccess;
+import com.servoy.j2db.plugins.IIconProvider;
 import com.servoy.j2db.plugins.PluginException;
 import com.servoy.j2db.preference.PreferencePanel;
 import com.servoy.j2db.scripting.IScriptable;
 
-public class UDPPlugin implements IClientPlugin
+public class UDPPlugin implements IClientPlugin, IIconProvider
 {
 	public static final String PLUGIN_NAME = "udp"; //$NON-NLS-1$
 
@@ -127,5 +128,11 @@ public class UDPPlugin implements IClientPlugin
 		{
 			impl.js_stopSocket();
 		}
+	}
+
+	@Override
+	public URL getIconUrl()
+	{
+		return this.getClass().getResource("images/udp.png"); //$NON-NLS-1$
 	}
 }

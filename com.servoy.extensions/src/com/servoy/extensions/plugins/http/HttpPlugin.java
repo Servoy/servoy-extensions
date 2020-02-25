@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Properties;
 import java.util.concurrent.Executor;
@@ -34,6 +35,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 
 import com.servoy.j2db.plugins.IClientPlugin;
 import com.servoy.j2db.plugins.IClientPluginAccess;
+import com.servoy.j2db.plugins.IIconProvider;
 import com.servoy.j2db.plugins.PluginException;
 import com.servoy.j2db.preference.PreferencePanel;
 import com.servoy.j2db.scripting.IScriptable;
@@ -42,7 +44,7 @@ import com.servoy.j2db.util.serialize.JSONConverter;
 /**
  * @author jblok
  */
-public class HttpPlugin implements IClientPlugin
+public class HttpPlugin implements IClientPlugin, IIconProvider
 {
 	public static final String PLUGIN_NAME = "http"; //$NON-NLS-1$
 
@@ -222,6 +224,12 @@ public class HttpPlugin implements IClientPlugin
 	public Executor getExecutor()
 	{
 		return executor;
+	}
+
+	@Override
+	public URL getIconUrl()
+	{
+		return this.getClass().getResource("images/http.png"); //$NON-NLS-1$
 	}
 
 }

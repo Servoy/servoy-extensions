@@ -27,6 +27,7 @@ import javax.swing.ImageIcon;
 
 import com.servoy.j2db.plugins.IClientPlugin;
 import com.servoy.j2db.plugins.IClientPluginAccess;
+import com.servoy.j2db.plugins.IIconProvider;
 import com.servoy.j2db.plugins.PluginException;
 import com.servoy.j2db.preference.PreferencePanel;
 import com.servoy.j2db.scripting.IScriptable;
@@ -36,7 +37,7 @@ import com.servoy.j2db.scripting.IScriptable;
  *
  * @author rgansevles
  */
-public class RestWSClientPlugin implements IClientPlugin
+public class RestWSClientPlugin implements IClientPlugin, IIconProvider
 {
 	public static final String PLUGIN_NAME = "rest_ws";
 
@@ -116,5 +117,11 @@ public class RestWSClientPlugin implements IClientPlugin
 	HttpServletResponse getResponse()
 	{
 		return response;
+	}
+
+	@Override
+	public URL getIconUrl()
+	{
+		return this.getClass().getResource("images/rest_ws.png");
 	}
 }

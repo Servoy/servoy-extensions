@@ -17,6 +17,7 @@
 package com.servoy.extensions.plugins.file;
 
 import java.beans.PropertyChangeEvent;
+import java.net.URL;
 import java.util.Properties;
 
 import javax.swing.Icon;
@@ -25,6 +26,7 @@ import javax.swing.ImageIcon;
 import com.servoy.j2db.Messages;
 import com.servoy.j2db.plugins.IClientPlugin;
 import com.servoy.j2db.plugins.IClientPluginAccess;
+import com.servoy.j2db.plugins.IIconProvider;
 import com.servoy.j2db.plugins.PluginException;
 import com.servoy.j2db.preference.PreferencePanel;
 import com.servoy.j2db.scripting.IScriptable;
@@ -34,7 +36,7 @@ import com.servoy.j2db.scripting.IScriptable;
  *
  * @author jcompagner
  */
-public class FilePlugin implements IClientPlugin
+public class FilePlugin implements IClientPlugin, IIconProvider
 {
 	public static final String PLUGIN_NAME = "file"; //$NON-NLS-1$
 
@@ -119,5 +121,16 @@ public class FilePlugin implements IClientPlugin
 		{
 			fileProvider.deleteTrackedFiles();
 		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.servoy.j2db.plugins.IIconProvider#getIconUrl()
+	 */
+	@Override
+	public URL getIconUrl()
+	{
+		return this.getClass().getResource("images/file.png"); //$NON-NLS-1$
 	}
 }

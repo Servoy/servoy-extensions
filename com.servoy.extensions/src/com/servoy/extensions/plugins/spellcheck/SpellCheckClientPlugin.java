@@ -43,6 +43,7 @@ import javax.swing.text.JTextComponent;
 
 import com.servoy.j2db.plugins.IClientPlugin;
 import com.servoy.j2db.plugins.IClientPluginAccess;
+import com.servoy.j2db.plugins.IIconProvider;
 import com.servoy.j2db.plugins.IRuntimeWindow;
 import com.servoy.j2db.plugins.ISmartRuntimeWindow;
 import com.servoy.j2db.plugins.PluginException;
@@ -56,7 +57,7 @@ import com.servoy.j2db.util.toolbar.IToolbarPanel;
 import com.servoy.j2db.util.toolbar.Toolbar;
 import com.servoy.j2db.util.toolbar.ToolbarButton;
 
-public class SpellCheckClientPlugin implements IClientPlugin, ActionListener
+public class SpellCheckClientPlugin implements IClientPlugin, ActionListener, IIconProvider
 {
 	public static final String PLUGIN_NAME = "spellcheck"; //$NON-NLS-1$
 
@@ -420,6 +421,12 @@ public class SpellCheckClientPlugin implements IClientPlugin, ActionListener
 			DataField df = (DataField)checkedComponent;
 			if (!(df.getFormatter().equals(initialFormatter))) df.setFormatter(initialFormatter);
 		}
+	}
+
+	@Override
+	public URL getIconUrl()
+	{
+		return this.getClass().getResource("images/spellcheck.png"); //$NON-NLS-1$
 	}
 
 }
