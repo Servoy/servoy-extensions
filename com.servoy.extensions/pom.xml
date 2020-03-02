@@ -7,7 +7,7 @@
 	</prerequisites>
 	<groupId>com.servoy</groupId>
 	<artifactId>com.servoy.extensions</artifactId>
-	<version>2020.3.0.3560_rc</version>
+	<version>2020.6.0.3580_rc</version>
 	<repositories>
 		<repository>
 			<id>developer_repo</id>
