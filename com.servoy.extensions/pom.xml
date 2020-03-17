@@ -316,6 +316,7 @@
 									<copy overwrite="true"
 										todir="${project.build.directory}/plugins_beans/plugins/jakarta-poi">
 										<fileset file="${project.basedir}/lib/jakarta-poi.jar" />
+										<fileset file="${project.basedir}/lib/commons-math3.jar" />
 									</copy>
 									<makejar srcdir="file" />
 									<makejar srcdir="headlessclient" />
