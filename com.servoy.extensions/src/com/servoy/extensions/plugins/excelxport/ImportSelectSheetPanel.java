@@ -35,7 +35,6 @@ import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.usermodel.Cell;
 
 import com.servoy.j2db.Messages;
 import com.servoy.j2db.util.StringComparator;
@@ -280,7 +279,7 @@ class SheetTableModel extends AbstractTableModel
 			{
 				switch (cell.getCellType())
 				{
-					case Cell.CELL_TYPE_NUMERIC :
+					case NUMERIC :
 						Number d = new Double(cell.getNumericCellValue());
 						if (((int)d.doubleValue()) == Math.ceil(d.doubleValue()))
 						{

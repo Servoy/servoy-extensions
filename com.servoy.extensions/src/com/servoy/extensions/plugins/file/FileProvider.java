@@ -1038,7 +1038,9 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	}
 
 	/**
-	 * Creates a folder on disk. Returns true if the folder is successfully created, false if any error occurs.
+	 * Creates the folder by the given pathname, including anynecessary but nonexistent parent folders.
+	 * Note that if this operation fails it may have succeeded in creating some of the necessary parent folders.
+	 * Will return true if it could make this folder or if the folder did already exist.
 	 *
 	 * @sample
 	 * var d = plugins.file.convertToJSFile("newfolder");
