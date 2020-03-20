@@ -9,8 +9,10 @@
    </information>
    <resources>
       <jar href="/plugins/excelxport.jar" download="eager" part="xport" version="%%version%%"/>
-      <jar href="/plugins/jakarta-poi/jakarta-poi.jar" part="poi" download="%%loadmethod%%" version="3.15"/>
+      <jar href="/plugins/jakarta-poi/jakarta-poi.jar" part="poi" download="%%loadmethod%%" version="4.1.1"/>
       <package name="org.apache.poi.*" part="poi" recursive="true"/>
+      <jar href="/plugins/jakarta-poi/commons-math3.jar" part="commons-math3" download="%%loadmethod%%" version="3.6.1"/>
+      <package name="org.apache.commons.math3.*" part="commons-math3" recursive="true"/>
    </resources>
    <component-desc/>
 	<security>
