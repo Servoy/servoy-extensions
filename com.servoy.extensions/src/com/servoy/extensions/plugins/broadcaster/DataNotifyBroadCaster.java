@@ -81,6 +81,7 @@ public class DataNotifyBroadCaster implements IServerPlugin
 		return props;
 	}
 
+	@SuppressWarnings("nls")
 	@Override
 	public void initialize(IServerAccess app) throws PluginException
 	{
@@ -186,7 +187,7 @@ public class DataNotifyBroadCaster implements IServerPlugin
 			}
 			catch (Exception e)
 			{
-				throw new PluginException("can't start the connection to the message server", e);
+				Debug.error("Error in databroadcaster plugin, can't initialize a connection, please check hostname/username/password", e);
 			}
 		}
 	}
