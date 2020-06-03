@@ -330,7 +330,9 @@ public abstract class BaseRequest implements IScriptable, IJavaScriptType
 	/**
 	 * Execute the request method asynchronous using windows authentication.
 	 * Success callback method will be called when response is received. Response is sent as parameter in callback followed by any 'callbackExtraArgs' that were given.
-	 * If no response is received (request errors out), the errorCallbackMethod is called with exception message as parameter followed by any 'callbackExtraArgs' that were given.
+	 * This Response can be a response with a different status code then just 200, it could also be 500, which is still a valid response from the server, this won't go into the error callback.
+	 * So you need to test the Reponse.getStatusCode() for that to know if everything did go OK.
+	 * If no response is received (request errors out, network errors), the errorCallbackMethod is called with exception message as parameter followed by any 'callbackExtraArgs' that were given.
 	 *
 	 * @sample
 	 * method.executeAsyncRequest('username','password','mycomputername','domain',globals.successCallback,globals.errorCallback, [callIDInt])
@@ -399,6 +401,10 @@ public abstract class BaseRequest implements IScriptable, IJavaScriptType
 						{
 							Debug.log("Callback for request: " + method.getURI() + " was given: " + successFunctionDef + " but the client was already closed");
 						}
+					}
+					else
+					{
+						response.js_close();
 					}
 				}
 				catch (final Exception ex)
