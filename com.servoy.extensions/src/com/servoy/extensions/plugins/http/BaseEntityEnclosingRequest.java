@@ -20,11 +20,8 @@ package com.servoy.extensions.plugins.http;
 import java.io.File;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
@@ -47,7 +44,7 @@ import org.apache.http.protocol.HTTP;
 
 import com.servoy.extensions.plugins.file.JSFile;
 import com.servoy.j2db.util.Debug;
-import com.servoy.j2db.util.Pair;
+import com.servoy.j2db.util.MimeTypes;
 import com.servoy.j2db.util.Utils;
 
 /**
@@ -55,11 +52,11 @@ import com.servoy.j2db.util.Utils;
  */
 public class BaseEntityEnclosingRequest extends BaseRequest
 {
-	private String content;
-	private String mimeType = ContentType.TEXT_PLAIN.getMimeType();
+	private String bodyContent;
+	private String bodyMimeType = ContentType.TEXT_PLAIN.getMimeType();
 	protected String charset = HTTP.UTF_8;
 
-	private Map<Pair<String, String>, Object> files;
+	private List<FileInfo> files;
 	private List<NameValuePair> params;
 
 
@@ -76,7 +73,7 @@ public class BaseEntityEnclosingRequest extends BaseRequest
 
 	protected final void clearFiles()
 	{
-		files = new HashMap<Pair<String, String>, Object>();
+		files = new ArrayList<FileInfo>();
 	}
 
 	/**
@@ -89,7 +86,7 @@ public class BaseEntityEnclosingRequest extends BaseRequest
 	 */
 	public void js_setBodyContent(String content)
 	{
-		this.content = content;
+		this.bodyContent = content;
 	}
 
 	/**
@@ -103,8 +100,8 @@ public class BaseEntityEnclosingRequest extends BaseRequest
 	 */
 	public void js_setBodyContent(String content, String mimeType)
 	{
-		this.content = content;
-		this.mimeType = mimeType;
+		this.bodyContent = content;
+		this.bodyMimeType = mimeType;
 	}
 
 
@@ -136,27 +133,31 @@ public class BaseEntityEnclosingRequest extends BaseRequest
 			{
 				entity = new UrlEncodedFormEntity(params, charset);
 			}
-			else if (!Utils.stringIsEmpty(content))
+			else if (!Utils.stringIsEmpty(bodyContent))
 			{
-				entity = new StringEntity(content, ContentType.create(mimeType, charset));
-				content = null;
+				entity = new StringEntity(bodyContent, ContentType.create(bodyMimeType, charset));
+				bodyContent = null;
 			}
 		}
 		else if (files.size() == 1 && (params == null || params.size() == 0))
 		{
-			Object f = files.values().iterator().next();
-			if (f instanceof File)
+			FileInfo info = files.get(0);
+			if (info.file instanceof File)
 			{
-				entity = new FileEntity((File)f, ContentType.create("binary/octet-stream")); //$NON-NLS-1$
+				File f = (File)info.file;
+				String contentType = info.mimeType != null ? info.mimeType : MimeTypes.getContentType(Utils.readFile(f, 32), f.getName());
+				entity = new FileEntity(f, ContentType.create(contentType != null ? contentType : "binary/octet-stream")); //$NON-NLS-1$
 			}
-			else if (f instanceof JSFile)
+			else if (info.file instanceof JSFile)
 			{
-				entity = new InputStreamEntity(((JSFile)f).getAbstractFile().getInputStream(), ((JSFile)f).js_size(),
-					ContentType.create("binary/octet-stream")); //$NON-NLS-1$
+				JSFile f = (JSFile)info.file;
+				String contentType = info.mimeType != null ? info.mimeType : f.js_getContentType();
+				entity = new InputStreamEntity(f.getAbstractFile().getInputStream(), f.js_size(),
+					ContentType.create(contentType != null ? contentType : "binary/octet-stream")); //$NON-NLS-1$
 			}
 			else
 			{
-				Debug.error("could not add file to post request unknown type: " + f);
+				Debug.error("could not add file to post request unknown type: " + info);
 			}
 		}
 		else
@@ -165,21 +166,25 @@ public class BaseEntityEnclosingRequest extends BaseRequest
 			builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
 
 			// For File parameters
-			for (Entry<Pair<String, String>, Object> e : files.entrySet())
+			for (FileInfo info : files)
 			{
-				Object file = e.getValue();
+				Object file = info.file;
 				if (file instanceof File)
 				{
-					builder.addPart(e.getKey().getLeft(), new FileBody((File)file));
+					String contentType = info.mimeType != null ? info.mimeType
+						: MimeTypes.getContentType(Utils.readFile((File)file, 32), ((File)file).getName());
+					builder.addPart(info.parameterName,
+						new FileBody((File)file, contentType != null ? ContentType.create(contentType) : ContentType.DEFAULT_BINARY));
 				}
 				else if (file instanceof JSFile)
 				{
-					builder.addPart(e.getKey().getLeft(), new ByteArrayBody(Utils.getBytesFromInputStream(((JSFile)file).getAbstractFile().getInputStream()),
-						ContentType.create("binary/octet-stream"), ((JSFile)file).js_getName()));
+					String contentType = info.mimeType != null ? info.mimeType : ((JSFile)file).js_getContentType();
+					builder.addPart(info.parameterName, new ByteArrayBody(Utils.getBytesFromInputStream(((JSFile)file).getAbstractFile().getInputStream()),
+						ContentType.create(contentType != null ? contentType : "binary/octet-stream"), ((JSFile)file).js_getName()));
 				}
 				else
 				{
-					Debug.error("could not add file to post request unknown type: " + file);
+					Debug.error("could not add file to post request unknown type: " + info);
 				}
 			}
 			// add the parameters
@@ -202,7 +207,8 @@ public class BaseEntityEnclosingRequest extends BaseRequest
 
 
 	/**
-	 * Add a file to the post.
+	 *  Add a file to the post will try to get the correct mime type from the file name or the first bytes.
+	 *  If you add a single file then this will be a single file post, so not a mutli part.
 	 *
 	 * @sample
 	 * poster.addFile('myFileParamName','manual.doc','c:/temp/manual_01a.doc')
@@ -225,7 +231,7 @@ public class BaseEntityEnclosingRequest extends BaseRequest
 			File f = new File(fileLocation);
 			if (f.exists())
 			{
-				files.put(new Pair<String, String>(parameterName, fileName), f);
+				files.add(new FileInfo(parameterName, fileName, f, null));
 				return true;
 			}
 		}
@@ -233,7 +239,42 @@ public class BaseEntityEnclosingRequest extends BaseRequest
 	}
 
 	/**
-	 * Add a file to the post.
+	 * Add a file to the post with a given mime type, could also be used to force the default 'application/octet-stream' on it,
+	 * because this plugin will try to guess the correect mime type for the given file (based on the name or the bytes)
+	 * If you add a single file then this will be a single file post, so not a mutli part.
+	 *
+	 * @sample
+	 * poster.addFile('myFileParamName','manual.doc','c:/temp/manual_01a.doc', 'application/msword')
+	 * poster.addFile(null,'postXml.xml','c:/temp/postXml.xml', 'text/xml') // sets the xml to post
+	 *
+	 * var f = plugins.file.convertToJSFile('./somefile02.txt')
+	 * if (f && f.exists()) poster.addFile('myTxtFileParamName','somefile.txt', f, 'text/plain')
+	 *
+	 * f = plugins.file.convertToJSFile('./anotherfile_v2b.txt')
+	 * if (f && f.exists()) poster.addFile('myOtherTxtFileParamName', f, 'text/plain')
+	 *
+	 * @param parameterName
+	 * @param fileName
+	 * @param fileLocation
+	 * @param mimeType The mime type that must be used could be the real default ('application/octet-stream') if the files one (by name or by its first bytes) is not good.
+	 */
+	public boolean js_addFile(String parameterName, String fileName, String fileLocation, String mimeType)
+	{
+		if (fileLocation != null)
+		{
+			File f = new File(fileLocation);
+			if (f.exists())
+			{
+				files.add(new FileInfo(parameterName, fileName, f, mimeType));
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Add a file to the post will try to get the correct mime type from the file name or the first bytes.
+	 * If you add a single file then this will be a single file post, so not a mutli part.
 	 *
 	 * @sample
 	 * poster.addFile('myFileParamName','manual.doc','c:/temp/manual_01a.doc')
@@ -252,14 +293,45 @@ public class BaseEntityEnclosingRequest extends BaseRequest
 	{
 		if (jsFile instanceof JSFile && ((JSFile)jsFile).js_exists())
 		{
-			files.put(new Pair<String, String>(parameterName, ((JSFile)jsFile).js_getName()), jsFile);
+			files.add(new FileInfo(parameterName, ((JSFile)jsFile).js_getName(), jsFile, null));
 			return true;
 		}
 		return false;
 	}
 
 	/**
-	 * Add a file to the post.
+	 * Add a file to the post with a given mime type, could also be used to force the default 'application/octet-stream' on it,
+	 * because this plugin will try to guess the correect mime type for the given file (based on the name or the bytes)
+	 * If you add a single file then this will be a single file post, so not a mutli part.
+	 *
+	 * @sample
+	 * poster.addFile('myFileParamName','manual.doc','c:/temp/manual_01a.doc', 'application/msword')
+	 * poster.addFile(null,'postXml.xml','c:/temp/postXml.xml', 'text/xml') // sets the xml to post
+	 *
+	 * var f = plugins.file.convertToJSFile('./somefile02.txt')
+	 * if (f && f.exists()) poster.addFile('myTxtFileParamName','somefile.txt', f, 'text/plain')
+	 *
+	 * f = plugins.file.convertToJSFile('./anotherfile_v2b.txt')
+	 * if (f && f.exists()) poster.addFile('myOtherTxtFileParamName', f, 'text/plain')
+	 *
+	 * @param parameterName
+	 * @param jsFile
+	 * @param mimeType The mime type that must be used could be the real default ('application/octet-stream') if the files one (by name or by its first bytes) is not good.
+	 */
+	public boolean js_addFile(String parameterName, Object jsFile, String mimeType)
+	{
+		if (jsFile instanceof JSFile && ((JSFile)jsFile).js_exists())
+		{
+			files.add(new FileInfo(parameterName, ((JSFile)jsFile).js_getName(), jsFile, mimeType));
+			return true;
+		}
+		return false;
+	}
+
+
+	/**
+	 * Add a file to the post will try to get the correct mime type from the file name or the first bytes.
+	 * If you add a single file then this will be a single file post, so not a mutli part.
 	 *
 	 * @sample
 	 * poster.addFile('myFileParamName','manual.doc','c:/temp/manual_01a.doc')
@@ -279,7 +351,37 @@ public class BaseEntityEnclosingRequest extends BaseRequest
 	{
 		if (jsFile instanceof JSFile && ((JSFile)jsFile).js_exists())
 		{
-			files.put(new Pair<String, String>(parameterName, fileName), jsFile);
+			files.add(new FileInfo(parameterName, fileName, jsFile, null));
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * Add a file to the post with a given mime type, could also be used to force the default 'application/octet-stream' on it,
+	 * because this plugin will try to guess the correect mime type for the given file (based on the name or the bytes)
+	 * If you add a single file then this will be a single file post, so not a mutli part.
+	 *
+	 * @sample
+	 * poster.addFile('myFileParamName','manual.doc','c:/temp/manual_01a.doc', 'application/msword')
+	 * poster.addFile(null,'postXml.xml','c:/temp/postXml.xml', 'text/xml') // sets the xml to post
+	 *
+	 * var f = plugins.file.convertToJSFile('./somefile02.txt')
+	 * if (f && f.exists()) poster.addFile('myTxtFileParamName','somefile.txt', f, 'text/plain')
+	 *
+	 * f = plugins.file.convertToJSFile('./anotherfile_v2b.txt')
+	 * if (f && f.exists()) poster.addFile('myOtherTxtFileParamName', f, 'text/plain')
+	 *
+	 * @param parameterName
+	 * @param fileName
+	 * @param jsFile
+	 * @param mimeType The mime type that must be used could be the real default ('application/octet-stream') if the files one (by name or by its first bytes) is not good.
+	 */
+	public boolean js_addFile(String parameterName, String fileName, Object jsFile, String mimeType)
+	{
+		if (jsFile instanceof JSFile && ((JSFile)jsFile).js_exists())
+		{
+			files.add(new FileInfo(parameterName, fileName, jsFile, mimeType));
 			return true;
 		}
 		return false;
