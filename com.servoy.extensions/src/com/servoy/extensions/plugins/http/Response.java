@@ -254,7 +254,7 @@ public class Response implements IScriptable, IJavaScriptType
 		}
 		catch (IOException e)
 		{
-			Debug.error("close error with " + request.getURI(), e); //$NON-NLS-1$
+			Debug.trace("close error with " + request.getURI(), e); //$NON-NLS-1$
 		}
 		return false;
 	}
