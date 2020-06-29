@@ -418,6 +418,8 @@ public abstract class AbstractMenu implements IScriptable, IJavaScriptType
 	 * //menu.addMenuItem("item with icon", feedback_item, pic_bytes);
 	 * // add an item with a mnemonic
 	 * menu.addMenuItem("item with mnemonic", feedback_item, "media:///yourimage.gif", "i");
+	 * //add an entry with fontawesome icon. Only supported in NGClient!
+	 * menu.addMenuItem("an entry", this.feedback, 'fas fa-trash-alt');
 	 * // add a disabled item
 	 * menu.addMenuItem("disabled item", feedback_item, "media:///yourimage.gif", "d", false);
 	 * // add an item with text aligned to the right
@@ -431,7 +433,7 @@ public abstract class AbstractMenu implements IScriptable, IJavaScriptType
 	 *
 	 * @param name the menu item text; this can be also html if enclosed between html tags
 	 * @param feedback_item the feedback function
-	 * @param icon the menu item icon (can be an image URL or the image content byte array)
+	 * @param icon the menu item icon (can be an image URL or the image content byte array).In NGClient we also support fontawesome class.
 	 * @param mnemonic the menu item mnemonic
 	 * @param enabled the enabled state of the menu item
 	 * @param align the alignment type
