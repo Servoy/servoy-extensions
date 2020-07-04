@@ -19,10 +19,11 @@ package com.servoy.extensions.plugins.scheduler;
 import java.util.Arrays;
 
 import org.quartz.CronTrigger;
+import org.quartz.DisallowConcurrentExecution;
+import org.quartz.Job;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
-import org.quartz.StatefulJob;
 
 import com.servoy.j2db.plugins.IClientPluginAccess;
 import com.servoy.j2db.util.Debug;
@@ -30,14 +31,15 @@ import com.servoy.j2db.util.Debug;
 /**
  * @author jcompagner
  */
-public class ExecuteScriptMethodJob implements StatefulJob
+@DisallowConcurrentExecution
+public class ExecuteScriptMethodJob implements Job
 {
 	@SuppressWarnings("nls")
 	public void execute(JobExecutionContext jobContext) throws JobExecutionException
 	{
-		final String name = jobContext.getJobDetail().getName();
+		final String name = jobContext.getJobDetail().getKey().getName();
 		JobDataMap jdm = jobContext.getJobDetail().getJobDataMap();
-		Object o = jdm.get("methodcontext"); //$NON-NLS-1$
+		Object o = jdm.get("methodcontext");
 		final String methodcontext;
 		if (o instanceof String)
 		{
