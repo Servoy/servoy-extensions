@@ -1093,6 +1093,35 @@ public class PDFProvider implements IScriptable
 	public byte[] js_overlayText(byte[] data, String text, int locationX, int locationY, boolean isOver, int fontSize, String font, String hexColor)
 		throws Exception
 	{
+		return js_overlayText(data, text, locationX, locationY, isOver, fontSize, font, hexColor, 45);
+	}
+
+	/**
+	 * Add text over every page at a 45 degree angle
+	 *
+	 * @author Scott Buttler
+	 * Adapted from the PDF Pro plugin with full approval from the author
+	 *
+	 * @sampleas js_overlayText(byte[], String)
+	 *
+	 * @param data the PDF
+	 * @param text the text to use for the overlay
+	 * @param locationX the x location of the overlay
+	 * @param locationY the y location of the overlay
+	 * @param isOver whether to put the overlay over the content
+	 * @param fontSize the font size to use
+	 * @param font the font to use
+	 * @param hexColor the font color to use
+	 * @param angle the angle of the overlay
+	 *
+	 * @return the PDF with added overlay
+	 *
+	 * @throws Exception
+	 */
+	@ServoyClientSupport(ng = true, wc = true, sc = true)
+	public byte[] js_overlayText(byte[] data, String text, int locationX, int locationY, boolean isOver, int fontSize, String font, String hexColor, int angle)
+		throws Exception
+	{
 		if (data == null || ITextTools.isNullOrEmpty(text) || ITextTools.isNullOrEmpty(font) || ITextTools.isNullOrEmpty(hexColor))
 		{
 			throw new IllegalArgumentException("Missing argument"); //$NON-NLS-1$
@@ -1101,7 +1130,7 @@ public class PDFProvider implements IScriptable
 		Color myColor = Color.decode(hexColor);
 
 		ByteArrayInputStream bais = new ByteArrayInputStream(data);
-		return ITextTools.overlayText(bais, text, locationX, locationY, isOver, fontSize, font, myColor);
+		return ITextTools.overlayText(bais, text, locationX, locationY, isOver, fontSize, font, myColor, angle);
 	}
 
 }
