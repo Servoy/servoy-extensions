@@ -11,8 +11,8 @@
 	    <lib>
         	<id>org.quartz</id> <!-- most relevant package name in the jar file (no useful MANIFEST.MF listed id available here) -->
        		<path>application_server/plugins/scheduler/quartz.jar</path>
-      		<version>1.8.4</version>
-       		<min-version>1.8.4</min-version>
+      		<version>2.3.2</version>
+       		<min-version>2.3.2</min-version>
     	</lib>
 	</dependencies>
 	<info>

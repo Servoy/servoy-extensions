@@ -9,7 +9,7 @@
    </information>
    <resources>
       <jar href="/plugins/scheduler.jar" download="eager" part="scheduler" version="%%version%%"/>
-      <jar href="/plugins/scheduler/quartz.jar" download="%%loadmethod%%" part="quartz" version="1.0"/>
+      <jar href="/plugins/scheduler/quartz.jar" download="%%loadmethod%%" part="quartz" version="2.3.2"/>
       <jar href="/lib/commons-logging.jar" download="%%loadmethod%%" part="logging" version="1.0"/>
       <package name="org.quartz.*" part="quartz" recursive="true"/>
       <package name="org.apache.commons.logging.*" part="logging" recursive="true"/>
