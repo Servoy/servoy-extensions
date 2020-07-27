@@ -19,9 +19,10 @@ package com.servoy.extensions.plugins.validators;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.servoy.j2db.dataprocessing.IColumnValidator;
+import com.servoy.j2db.dataprocessing.IColumnValidator2;
 import com.servoy.j2db.dataprocessing.IPropertyDescriptor;
 import com.servoy.j2db.dataprocessing.IPropertyDescriptorProvider;
+import com.servoy.j2db.dataprocessing.IValidationObject;
 import com.servoy.j2db.dataprocessing.PropertyDescriptor;
 import com.servoy.j2db.persistence.ArgumentType;
 import com.servoy.j2db.persistence.IMethodArgument;
@@ -32,7 +33,7 @@ import com.servoy.j2db.plugins.IMethodTemplatesProvider;
 import com.servoy.j2db.util.Debug;
 import com.servoy.j2db.util.Utils;
 
-public class GlobalMethodValidator implements IColumnValidator, IPropertyDescriptorProvider, IMethodTemplatesProvider
+public class GlobalMethodValidator implements IPropertyDescriptorProvider, IMethodTemplatesProvider, IColumnValidator2
 {
 	public static final String GLOBAL_METHOD_NAME_PROPERTY = "globalMethodName"; //$NON-NLS-1$
 
@@ -62,21 +63,27 @@ public class GlobalMethodValidator implements IColumnValidator, IPropertyDescrip
 
 	public void validate(Map<String, String> props, Object arg) throws IllegalArgumentException
 	{
+		validate(props, props, null, null, null);
+	}
+
+	@Override
+	public void validate(Map<String, String> props, Object value, String dataprovider, IValidationObject validationObject, Object state)
+	{
 		if (props != null)
 		{
 			String globalMethodName = props.get(GLOBAL_METHOD_NAME_PROPERTY);
 			if (globalMethodName != null && globalMethodName.trim().length() != 0)
 			{
-				Object value = new Boolean(false);
+				Object retValue = new Boolean(false);
 				try
 				{
-					value = clientPluginAccess.executeMethod(null, globalMethodName, new Object[] { arg }, false);
+					retValue = clientPluginAccess.executeMethod(null, globalMethodName, new Object[] { value, dataprovider, validationObject, state }, false);
 				}
 				catch (Exception e)
 				{
 					Debug.error(e);
 				}
-				if (!Utils.getAsBoolean(value))
+				if (!Utils.getAsBoolean(retValue))
 				{
 					throw new IllegalArgumentException();
 				}
@@ -96,7 +103,8 @@ public class GlobalMethodValidator implements IColumnValidator, IPropertyDescrip
 	{
 		if (GLOBAL_METHOD_NAME_PROPERTY.equals(property))
 		{
-			return new PropertyDescriptor("Global method to use as a validator, signature: (object)", IPropertyDescriptor.GLOBAL_METHOD); //$NON-NLS-1$
+			return new PropertyDescriptor("Global method to use as a validator, signature: (object, dp, validationObject, state)", //$NON-NLS-1$
+				IPropertyDescriptor.GLOBAL_METHOD);
 		}
 		return null;
 	}
@@ -108,13 +116,21 @@ public class GlobalMethodValidator implements IColumnValidator, IPropertyDescrip
 	{
 	}
 
+	@SuppressWarnings("nls")
 	public Map<String, IMethodTemplate> getMethodTemplates(IMethodTemplatesFactory methodTemplatesFactory)
 	{
 		Map<String, IMethodTemplate> methodTemplates = new HashMap<String, IMethodTemplate>();
 
 		methodTemplates.put(GLOBAL_METHOD_NAME_PROPERTY, methodTemplatesFactory.createMethodTemplate("globalValidator",
-			"Called for performing validation on a value before storing it into the database.", ArgumentType.Boolean, "the result of the validation.",
-			new IMethodArgument[] { methodTemplatesFactory.createMethodArgument("value", ArgumentType.Object, "The value to be validated.") }, "return true;",
+			"Called for performing validation on a value before storing it into the database. Avoid using the return value or throwing an error, Use the JSValidationObject to report the warning",
+			ArgumentType.Boolean, "the result of the validation. (try to always return true, and use the JSValidationObject",
+			new IMethodArgument[] { methodTemplatesFactory.createMethodArgument("value", ArgumentType.Object,
+				"The value to be validated."), methodTemplatesFactory.createMethodArgument("dataproviderid", ArgumentType.String,
+					"The dataprovider name that is being validated (to use for reporting and problem)."), methodTemplatesFactory.createMethodArgument(
+						"validationObject", ArgumentType.valueOf("JSValidationObject"),
+						"The validation object to report problems on."), methodTemplatesFactory.createMethodArgument("state", ArgumentType.Object,
+							"The optional state object given by the caller.") },
+			"return true;",
 			true));
 
 		return methodTemplates;

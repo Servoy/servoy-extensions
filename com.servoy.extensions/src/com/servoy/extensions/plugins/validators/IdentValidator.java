@@ -19,15 +19,18 @@ package com.servoy.extensions.plugins.validators;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.servoy.j2db.dataprocessing.IColumnValidator;
+import com.servoy.j2db.dataprocessing.IColumnValidator2;
+import com.servoy.j2db.dataprocessing.IValidationObject;
 import com.servoy.j2db.persistence.IColumnTypes;
+import com.servoy.j2db.util.ILogLevel;
 import com.servoy.j2db.util.docvalidator.IdentDocumentValidator;
 
-public class IdentValidator implements IColumnValidator
+@SuppressWarnings("nls")
+public class IdentValidator implements IColumnValidator2
 {
-	public Map getDefaultProperties()
+	public Map<String, String> getDefaultProperties()
 	{
-		Map props = new HashMap();
+		Map<String, String> props = new HashMap<>();
 		return props;
 	}
 
@@ -41,9 +44,19 @@ public class IdentValidator implements IColumnValidator
 		return new int[] { IColumnTypes.TEXT };
 	}
 
-	public void validate(Map props, Object arg) throws IllegalArgumentException
+	@Override
+	public void validate(Map<String, String> props, Object value, String dataprovider, IValidationObject validationObject, Object state)
 	{
-		if (arg instanceof String && IdentDocumentValidator.isJavaIdentifier(arg.toString())) return;
-		throw new IllegalArgumentException();
+		if (value instanceof String && !IdentDocumentValidator.isJavaIdentifier(value.toString()))
+		{
+			if (validationObject != null)
+				validationObject.report("i18n:servoy.validator.identifier", dataprovider, ILogLevel.ERROR, state,
+					new Object[] { value, dataprovider });
+			else throw new IllegalArgumentException();
+		}
+	}
+
+	public void validate(Map<String, String> props, Object arg) throws IllegalArgumentException
+	{
 	}
 }
