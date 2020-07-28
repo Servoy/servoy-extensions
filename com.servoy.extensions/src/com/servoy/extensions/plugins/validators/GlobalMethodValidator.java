@@ -19,6 +19,8 @@ package com.servoy.extensions.plugins.validators;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.mozilla.javascript.Undefined;
+
 import com.servoy.j2db.dataprocessing.IColumnValidator2;
 import com.servoy.j2db.dataprocessing.IPropertyDescriptor;
 import com.servoy.j2db.dataprocessing.IPropertyDescriptorProvider;
@@ -83,7 +85,7 @@ public class GlobalMethodValidator implements IPropertyDescriptorProvider, IMeth
 				{
 					Debug.error(e);
 				}
-				if (!Utils.getAsBoolean(retValue))
+				if (!Undefined.isUndefined(retValue) && !Utils.getAsBoolean(retValue))
 				{
 					throw new IllegalArgumentException();
 				}
@@ -123,14 +125,14 @@ public class GlobalMethodValidator implements IPropertyDescriptorProvider, IMeth
 
 		methodTemplates.put(GLOBAL_METHOD_NAME_PROPERTY, methodTemplatesFactory.createMethodTemplate("globalValidator",
 			"Called for performing validation on a value before storing it into the database. Avoid using the return value or throwing an error, Use the JSValidationObject to report the warning",
-			ArgumentType.Boolean, "the result of the validation. (try to always return true, and use the JSValidationObject",
+			null, null,
 			new IMethodArgument[] { methodTemplatesFactory.createMethodArgument("value", ArgumentType.Object,
 				"The value to be validated."), methodTemplatesFactory.createMethodArgument("dataproviderid", ArgumentType.String,
 					"The dataprovider name that is being validated (to use for reporting and problem)."), methodTemplatesFactory.createMethodArgument(
 						"validationObject", ArgumentType.valueOf("JSValidationObject"),
 						"The validation object to report problems on."), methodTemplatesFactory.createMethodArgument("state", ArgumentType.Object,
 							"The optional state object given by the caller.") },
-			"return true;",
+			"// validate the value and report on the validationObject.report()",
 			true));
 
 		return methodTemplates;
