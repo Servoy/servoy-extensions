@@ -20,7 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.servoy.j2db.dataprocessing.IColumnValidator2;
-import com.servoy.j2db.dataprocessing.IValidationObject;
+import com.servoy.j2db.dataprocessing.IRecordMarkers;
 import com.servoy.j2db.persistence.IColumnTypes;
 import com.servoy.j2db.util.ILogLevel;
 import com.servoy.j2db.util.Utils;
@@ -48,7 +48,7 @@ public class SizeValidator implements IColumnValidator2
 	}
 
 	@Override
-	public void validate(Map<String, String> props, Object value, String dataprovider, IValidationObject validationObject, Object state)
+	public void validate(Map<String, String> props, Object value, String dataprovider, IRecordMarkers validationObject, Object state)
 	{
 		int length = Utils.getAsInteger(props.get(LENGTH_PROPERTY));
 		int valueLength = (value instanceof byte[]) ? ((byte[])value).length : (value instanceof String) ? ((String)value).length() : 0;

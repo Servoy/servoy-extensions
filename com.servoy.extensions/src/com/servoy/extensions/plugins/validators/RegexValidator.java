@@ -21,7 +21,7 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 import com.servoy.j2db.dataprocessing.IColumnValidator2;
-import com.servoy.j2db.dataprocessing.IValidationObject;
+import com.servoy.j2db.dataprocessing.IRecordMarkers;
 import com.servoy.j2db.persistence.IColumnTypes;
 import com.servoy.j2db.util.ILogLevel;
 
@@ -48,7 +48,7 @@ public class RegexValidator implements IColumnValidator2
 	}
 
 	@Override
-	public void validate(Map<String, String> props, Object value, String dataprovider, IValidationObject validationObject, Object state)
+	public void validate(Map<String, String> props, Object value, String dataprovider, IRecordMarkers validationObject, Object state)
 	{
 		if (value == null || value.toString().trim().length() == 0) return;
 

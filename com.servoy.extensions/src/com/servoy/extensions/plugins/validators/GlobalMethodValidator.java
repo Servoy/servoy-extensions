@@ -24,7 +24,7 @@ import org.mozilla.javascript.Undefined;
 import com.servoy.j2db.dataprocessing.IColumnValidator2;
 import com.servoy.j2db.dataprocessing.IPropertyDescriptor;
 import com.servoy.j2db.dataprocessing.IPropertyDescriptorProvider;
-import com.servoy.j2db.dataprocessing.IValidationObject;
+import com.servoy.j2db.dataprocessing.IRecordMarkers;
 import com.servoy.j2db.dataprocessing.PropertyDescriptor;
 import com.servoy.j2db.persistence.ArgumentType;
 import com.servoy.j2db.persistence.IMethodArgument;
@@ -69,7 +69,7 @@ public class GlobalMethodValidator implements IPropertyDescriptorProvider, IMeth
 	}
 
 	@Override
-	public void validate(Map<String, String> props, Object value, String dataprovider, IValidationObject validationObject, Object state)
+	public void validate(Map<String, String> props, Object value, String dataprovider, IRecordMarkers validationObject, Object state)
 	{
 		if (props != null)
 		{

@@ -20,7 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.servoy.j2db.dataprocessing.IColumnValidator2;
-import com.servoy.j2db.dataprocessing.IValidationObject;
+import com.servoy.j2db.dataprocessing.IRecordMarkers;
 import com.servoy.j2db.persistence.IColumnTypes;
 import com.servoy.j2db.util.ILogLevel;
 import com.servoy.j2db.util.docvalidator.IdentDocumentValidator;
@@ -45,7 +45,7 @@ public class IdentValidator implements IColumnValidator2
 	}
 
 	@Override
-	public void validate(Map<String, String> props, Object value, String dataprovider, IValidationObject validationObject, Object state)
+	public void validate(Map<String, String> props, Object value, String dataprovider, IRecordMarkers validationObject, Object state)
 	{
 		if (value instanceof String && !IdentDocumentValidator.isJavaIdentifier(value.toString()))
 		{
