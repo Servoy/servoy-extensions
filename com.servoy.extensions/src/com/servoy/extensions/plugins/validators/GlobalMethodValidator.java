@@ -124,13 +124,13 @@ public class GlobalMethodValidator implements IPropertyDescriptorProvider, IMeth
 		Map<String, IMethodTemplate> methodTemplates = new HashMap<String, IMethodTemplate>();
 
 		methodTemplates.put(GLOBAL_METHOD_NAME_PROPERTY, methodTemplatesFactory.createMethodTemplate("globalValidator",
-			"Called for performing validation on a value before storing it into the database. Avoid using the return value or throwing an error, Use the JSValidationObject to report the warning",
+			"Called for performing validation on a value before storing it into the database. Avoid using the return value or throwing an error, Use the JSRecordMarkers object to report the warning",
 			null, null,
 			new IMethodArgument[] { methodTemplatesFactory.createMethodArgument("value", ArgumentType.Object,
 				"The value to be validated."), methodTemplatesFactory.createMethodArgument("dataproviderid", ArgumentType.String,
 					"The dataprovider name that is being validated (to use for reporting and problem)."), methodTemplatesFactory.createMethodArgument(
-						"validationObject", ArgumentType.valueOf("JSValidationObject"),
-						"The validation object to report problems on."), methodTemplatesFactory.createMethodArgument("state", ArgumentType.Object,
+						"recordMarkers", ArgumentType.valueOf("JSRecordMarkers"),
+						"The recordMarkers object to report problems on."), methodTemplatesFactory.createMethodArgument("state", ArgumentType.Object,
 							"The optional state object given by the caller.") },
 			"// validate the value and report on the validationObject.report()",
 			true));
