@@ -130,8 +130,8 @@ public class GlobalMethodValidator implements IPropertyDescriptorProvider, IMeth
 				"The value to be validated."), methodTemplatesFactory.createMethodArgument("dataproviderid", ArgumentType.String,
 					"The dataprovider name that is being validated (to use for reporting and problem)."), methodTemplatesFactory.createMethodArgument(
 						"recordMarkers", ArgumentType.valueOf("JSRecordMarkers"),
-						"The recordMarkers object to report problems on."), methodTemplatesFactory.createMethodArgument("state", ArgumentType.Object,
-							"The optional state object given by the caller.") },
+						"The recordMarkers object to report problems on."), methodTemplatesFactory.createMethodArgument("customObject", ArgumentType.Object,
+							"The optional customObject given by the caller.") },
 			"// validate the value and report on the validationObject.report()",
 			true));
 
