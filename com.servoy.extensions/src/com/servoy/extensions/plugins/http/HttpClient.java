@@ -59,6 +59,11 @@ public class HttpClient implements IScriptable, IJavaScriptType
 
 	public HttpClient(HttpPlugin httpPlugin)
 	{
+		this(httpPlugin, null);
+	}
+
+	public HttpClient(HttpPlugin httpPlugin, HttpClientConfig config)
+	{
 		this.httpPlugin = httpPlugin;
 
 		HttpClientBuilder builder = HttpClientBuilder.create();
@@ -72,7 +77,8 @@ public class HttpClient implements IScriptable, IJavaScriptType
 		try
 		{
 			final AllowedCertTrustStrategy allowedCertTrustStrategy = new AllowedCertTrustStrategy();
-			SSLContext sslContext = SSLContexts.custom().loadTrustMaterial(allowedCertTrustStrategy).build();
+			SSLContext sslContext = SSLContexts.custom().loadTrustMaterial(allowedCertTrustStrategy).useProtocol(config != null ? config.protocol : null)
+				.build();
 
 			SSLConnectionSocketFactory socketFactory = new CertificateSSLSocketFactoryHandler(sslContext, allowedCertTrustStrategy, httpPlugin);
 			builder.setSSLSocketFactory(socketFactory);
