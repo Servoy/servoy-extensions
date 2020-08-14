@@ -1245,7 +1245,7 @@ public class RestWSServlet extends HttpServlet
 			args.add(jsmap);
 		}
 
-		return args;
+		return args.toArray();
 	}
 
 	private boolean getNodebugHeadderValue(HttpServletRequest request)
