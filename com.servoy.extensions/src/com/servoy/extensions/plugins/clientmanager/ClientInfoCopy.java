@@ -38,6 +38,7 @@ public class ClientInfoCopy implements IClientInformation, Serializable
 	private final int applicationType;
 	private final String openSolutionName;
 	private final Date lastAccessedTime;
+	private final String statusLine;
 	private final Date idleTime;
 	private final Date loginTime;
 	private final String[] clientInfos;
@@ -56,6 +57,7 @@ public class ClientInfoCopy implements IClientInformation, Serializable
 		idleTime = info.getIdleTime();
 		loginTime = info.getLoginTime();
 		clientInfos = info.getClientInfos();
+		statusLine = info.getStatusLine();
 
 	}
 
@@ -123,6 +125,12 @@ public class ClientInfoCopy implements IClientInformation, Serializable
 	public Date getLastAccessedTime()
 	{
 		return lastAccessedTime;
+	}
+
+	@Override
+	public String getStatusLine()
+	{
+		return statusLine;
 	}
 
 	@Override
