@@ -46,6 +46,7 @@ public class JSClientInformation implements IScriptable
 	 * 	application.output('	Open solution: ' + client.getOpenSolutionName());
 	 * 	application.output('	User login time and date: ' + client.getLoginTime());
 	 * 	application.output('	User idle since: ' + client.getIdleTime());
+	 * application.output('	Status line: ' + client.getStatusLine());
 	 * }
 	 *
 	 * @see com.servoy.j2db.scripting.info.APPLICATION_TYPES
@@ -176,11 +177,24 @@ public class JSClientInformation implements IScriptable
 	/**
 	 * Gets the last date and time when a user has physically accessed the application. NGClient only!
 	 * @return a date object or null if the client doesn't support this
+	 *
+	 * @sampleas js_getApplicationType()
 	 */
-	@ServoyClientSupport(sc = false, wc = false, ng = true, mc = false)
 	public Date js_getLastAccessedTime()
 	{
 		return clientInformation.getLastAccessedTime();
+	}
+
+	/**
+	 * This returns the status line of a NGClient (other clients don't have a value for this)
+	 *
+	 * @return a string that is the status line as reported on the admin page.
+	 *
+	 * @sampleas js_getApplicationType()
+	 */
+	public String js_getStatusLine()
+	{
+		return clientInformation.getStatusLine();
 	}
 
 	@Override
