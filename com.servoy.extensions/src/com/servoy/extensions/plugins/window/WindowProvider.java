@@ -838,7 +838,7 @@ public class WindowProvider implements IReturnedTypesProvider, IScriptable
 	/**
 	 * Show a form as popup panel, where the closeFormPopup can pass return a value to a dataprovider in the specified scope. Can show relative to a component or at specified coordinates.
 	 * Show on specified location and backdrop is only supported in NGClient.
-	 * By setting the @param doNotCloseOnFocusOut as true, one can ensure that the popup will not be closed when clicking outside this popup.
+	 * By setting the @param doNotCloseOnClickOutside as true, one can ensure that the popup will not be closed when clicking outside this popup.
 	 *
 	 * @sample
 	 * // Show a form as popup panel, where the closeFormPopup can pass return a value to a dataprovider in the specified scope.
@@ -855,11 +855,11 @@ public class WindowProvider implements IReturnedTypesProvider, IScriptable
 	 * @param x popup x location
 	 * @param y popup y location
 	 * @param showBackdrop whatever to show a dimmed backdrop under the popup
-	 * @param doNotCloseOnFocusOut whether to close on not close the popup on focus out
+	 * @param doNotCloseOnClickOutside whether to close on not close the popup on clicking outside
 	 */
 	@ServoyClientSupport(ng = true, wc = false, sc = false)
 	public void js_showFormPopup(IComponent elementToShowRelatedTo, IForm form, Object scope, String dataproviderID, int width, int height, int x, int y,
-		boolean showBackdrop, boolean doNotCloseOnFocusOut)
+		boolean showBackdrop, boolean doNotCloseOnClickOutside)
 	{
 		//ng only, just for the docs
 	}
