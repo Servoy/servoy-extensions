@@ -17,16 +17,16 @@
 package com.servoy.extensions.plugins.rawSQL;
 
 import java.util.Collection;
+import java.util.UUID;
+
+import org.springframework.jdbc.datasource.DataSourceUtils;
 
 import com.servoy.j2db.dataprocessing.IDataSet;
 import com.servoy.j2db.dataprocessing.JSDataSet;
 import com.servoy.j2db.documentation.ServoyDocumented;
 import com.servoy.j2db.plugins.ClientPluginAccessProvider;
 import com.servoy.j2db.scripting.IScriptable;
-import com.servoy.j2db.util.DataSourceUtils;
-import com.servoy.j2db.util.Debug;
 import com.servoy.j2db.util.ServoyException;
-import com.servoy.j2db.util.UUID;
 
 /**
  * Rawsql plugin scriptable.
@@ -413,14 +413,15 @@ public class RawSQLProvider implements IScriptable
 	 * //var action = SQL_ACTION_TYPES.INSERT_ACTION //pks inserted
 	 * //var action = SQL_ACTION_TYPES.UPDATE_ACTION //pks updates
 	 * var pksdataset = databaseManager.convertToDataSet(new Array(12,15,16,21))
-	 * var ok = plugins.rawSQL.notifyDataChange(databaseManager.getDataSourceServerName(controller.getDataSource()), 'employees', pksdataset,action)
+	 * var ok = plugins.rawSQL.notifyDataChange(databaseManager.getDataSourceServerName(controller.getDataSource()), 'employees', pksdataset,action,notifySelf)
 	 *
 	 * @param serverName
 	 * @param tableName
 	 * @param pksDataset
 	 * @param action
+	 * @param notifySelf
 	 */
-	public boolean js_notifyDataChange(String serverName, String tableName, IDataSet pksDataset, int action)
+	public boolean js_notifyDataChange(String serverName, String tableName, IDataSet pksDataset, int action, boolean notifySelf)
 	{
 		if (pksDataset == null || pksDataset.getRowCount() == 0) return false; //make sure developer does not call this without knowing this would be the same as flushAllClientsCache function
 
@@ -431,7 +432,8 @@ public class RawSQLProvider implements IScriptable
 			plugin.getClientPluginAccess().getDatabaseManager().notifyDataChange(
 				DataSourceUtils.createDBTableDataSource(serverMapping.localServername, tableName), pksDataset, action);
 			// notifySelf = false so that the client id is sent as well (needed for tenant id)
-			return getSQLService().notifyDataChange(plugin.getClientPluginAccess().getClientID(), false, serverMapping.remoteServername, tableName, pksDataset,
+			return getSQLService().notifyDataChange(plugin.getClientPluginAccess().getClientID(), notifySelf ? notifySelf : false, serverMapping.remoteServername,
+				tableName, pksDataset,
 				action, serverMapping.transactionID);
 		}
 		catch (Exception ex)
