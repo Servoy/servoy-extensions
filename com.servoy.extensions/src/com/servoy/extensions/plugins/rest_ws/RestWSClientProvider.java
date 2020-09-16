@@ -90,4 +90,15 @@ public class RestWSClientProvider implements IScriptable
 			throw new IllegalStateException("Not running request");
 		}
 	}
+
+	/**
+	 * Allow or block sending the user properties as response header values.
+	 * By default the response headers contain the user properties.
+	 * @param send
+	 */
+	@JSFunction
+	public void sendResponseUserPropertiesHeaders(boolean send)
+	{
+		plugin.setSendUserPropertiesHeaders(send);
+	}
 }

@@ -45,6 +45,7 @@ public class RestWSClientPlugin implements IClientPlugin, IIconProvider
 
 	private HttpServletRequest request;
 	private HttpServletResponse response;
+	private boolean sendUserPropertiesHeaders = true;
 
 	public void load() throws PluginException
 	{
@@ -123,5 +124,15 @@ public class RestWSClientPlugin implements IClientPlugin, IIconProvider
 	public URL getIconUrl()
 	{
 		return this.getClass().getResource("images/rest_ws.png");
+	}
+
+	void setSendUserPropertiesHeaders(boolean send)
+	{
+		sendUserPropertiesHeaders = send;
+	}
+
+	public boolean isSendUserPropertiesHeaders()
+	{
+		return sendUserPropertiesHeaders;
 	}
 }
