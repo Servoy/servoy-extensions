@@ -19,17 +19,20 @@ package com.servoy.extensions.plugins.validators;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.servoy.j2db.dataprocessing.IColumnValidator;
+import com.servoy.j2db.dataprocessing.IColumnValidator2;
+import com.servoy.j2db.dataprocessing.IRecordMarkers;
 import com.servoy.j2db.persistence.IColumnTypes;
+import com.servoy.j2db.util.ILogLevel;
 import com.servoy.j2db.util.Utils;
 
-public class SizeValidator implements IColumnValidator
+@SuppressWarnings("nls")
+public class SizeValidator implements IColumnValidator2
 {
 	private static final String LENGTH_PROPERTY = "length";
 
-	public Map getDefaultProperties()
+	public Map<String, String> getDefaultProperties()
 	{
-		Map props = new HashMap();
+		Map<String, String> props = new HashMap<>();
 		props.put(LENGTH_PROPERTY, "");
 		return props;
 	}
@@ -41,19 +44,25 @@ public class SizeValidator implements IColumnValidator
 
 	public int[] getSupportedColumnTypes()
 	{
-		return new int[]{IColumnTypes.TEXT,IColumnTypes.MEDIA};
+		return new int[] { IColumnTypes.TEXT, IColumnTypes.MEDIA };
 	}
 
-	public void validate(Map props, Object arg) throws IllegalArgumentException
+	@Override
+	public void validate(Map<String, String> props, Object value, String dataprovider, IRecordMarkers validationObject, Object state)
 	{
 		int length = Utils.getAsInteger(props.get(LENGTH_PROPERTY));
-		if (arg instanceof byte[] && ((byte[])arg).length > length)
+		int valueLength = (value instanceof byte[]) ? ((byte[])value).length : (value instanceof String) ? ((String)value).length() : 0;
+		if (valueLength > length)
 		{
-			throw new IllegalArgumentException();
+			if (validationObject != null)
+				validationObject.report("i18n:servoy.validator.size", dataprovider, ILogLevel.ERROR, state,
+					new Object[] { dataprovider, Integer.valueOf(valueLength), Integer.valueOf(length) });
+			else throw new IllegalArgumentException();
 		}
-		else if (arg instanceof String && ((String)arg).length() > length)
-		{
-			throw new IllegalArgumentException();
-		}
+	}
+
+	public void validate(Map<String, String> props, Object arg) throws IllegalArgumentException
+	{
+		validate(props, props, null, null, null);
 	}
 }

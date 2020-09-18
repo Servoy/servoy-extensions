@@ -16,15 +16,27 @@
  */
 package com.servoy.extensions.plugins.scheduler;
 
+import static org.quartz.CronScheduleBuilder.cronSchedule;
+import static org.quartz.JobBuilder.newJob;
+import static org.quartz.JobKey.jobKey;
+import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
+import static org.quartz.TriggerBuilder.newTrigger;
+import static org.quartz.impl.matchers.GroupMatcher.groupEquals;
+
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Date;
 
 import org.mozilla.javascript.Function;
+import org.quartz.CronExpression;
 import org.quartz.CronTrigger;
 import org.quartz.JobDetail;
+import org.quartz.JobKey;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.SimpleTrigger;
+import org.quartz.Trigger;
+import org.quartz.TriggerBuilder;
 
 import com.servoy.j2db.Messages;
 import com.servoy.j2db.documentation.ServoyDocumented;
@@ -68,14 +80,7 @@ public class SchedulerProvider implements IScriptable
 				else
 				{
 					String id = plugin.getClientPluginAccess().getClientID();
-					String[] jobNames = scheduler.getJobNames(id);
-					if (jobNames != null && jobNames.length > 0)
-					{
-						for (String element : jobNames)
-						{
-							scheduler.deleteJob(element, id);
-						}
-					}
+					scheduler.deleteJobs(new ArrayList<>(scheduler.getJobKeys(groupEquals(id))));
 				}
 			}
 			catch (SchedulerException e)
@@ -198,17 +203,14 @@ public class SchedulerProvider implements IScriptable
 
 		synchronized (schedulerLock)
 		{
-			String id = plugin.getClientPluginAccess().getClientID();
-			JobDetail jobDetail = new JobDetail(jobname, id, ExecuteScriptMethodJob.class);
-			jobDetail.getJobDataMap().put("scheduler", this); //$NON-NLS-1$
-			FunctionDefinition functionDef = new FunctionDefinition(method);
-			jobDetail.getJobDataMap().put("methodname", functionDef.getMethodName()); //$NON-NLS-1$
-			jobDetail.getJobDataMap().put("methodcontext", functionDef.getContextName()); //$NON-NLS-1$
-			jobDetail.getJobDataMap().put("args", arguments); //$NON-NLS-1$
-			jobDetail.getJobDataMap().put("access", plugin.getClientPluginAccess()); //$NON-NLS-1$
+			JobDetail jobDetail = createJob(jobname, method, arguments);
 
-			SimpleTrigger trigger = new SimpleTrigger(jobname, id, startDate, endDate, repeatCount == -1 ? SimpleTrigger.REPEAT_INDEFINITELY : repeatCount,
-				repeatInterval);
+			SimpleTrigger trigger = createTrigger(jobDetail, startDate, endDate)
+				.withSchedule(simpleSchedule()
+					.withRepeatCount(repeatCount == -1 ? SimpleTrigger.REPEAT_INDEFINITELY : repeatCount)
+					.withIntervalInMilliseconds(repeatInterval))
+				.build();
+
 			try
 			{
 				scheduler.scheduleJob(jobDetail, trigger);
@@ -258,7 +260,7 @@ public class SchedulerProvider implements IScriptable
 		try
 		{
 			String id = plugin.getClientPluginAccess().getClientID();
-			return scheduler.getJobNames(id);
+			return scheduler.getJobKeys(groupEquals(id)).stream().map(JobKey::getName).toArray(String[]::new);
 		}
 		catch (SchedulerException e)
 		{
@@ -271,7 +273,7 @@ public class SchedulerProvider implements IScriptable
 	 * Adds a cron job to the scheduler. A cron job must have at least one minute between each execution (otherwise it won't execute).
 	 *
 	 * @sample
-	 * // see: http://www.quartz-scheduler.org/documentation/quartz-2.1.x/tutorials/tutorial-lesson-06.html for more info
+	 * // see: http://www.quartz-scheduler.org/documentation/quartz-2.3.0/tutorials/tutorial-lesson-06.html for more info
 	 * // add a job that runs every 20 minutes after the hour (0,20,40)
 	 * plugins.scheduler.addCronJob('20mins','0 0/20 * * * ?',method)
 	 * // add a job that runs every day at 23:30 between now and 5 days from now
@@ -283,7 +285,7 @@ public class SchedulerProvider implements IScriptable
 	 * @param cronTimings
 	 * @param method
 	 *
-	 * @link http://www.quartz-scheduler.org/docs/tutorials/crontrigger.html
+	 * @link http://www.quartz-scheduler.org/documentation/quartz-2.3.0/tutorials/tutorial-lesson-06.html
 	 */
 	public void js_addCronJob(String jobname, String cronTimings, Function method)
 	{
@@ -336,18 +338,14 @@ public class SchedulerProvider implements IScriptable
 
 		synchronized (schedulerLock)
 		{
-			String id = plugin.getClientPluginAccess().getClientID();
-			JobDetail jobDetail = new JobDetail(jobname, id, ExecuteScriptMethodJob.class);
-			jobDetail.getJobDataMap().put("scheduler", this); //$NON-NLS-1$
-			FunctionDefinition functionDef = new FunctionDefinition(method);
-			jobDetail.getJobDataMap().put("methodname", functionDef.getMethodName()); //$NON-NLS-1$
-			jobDetail.getJobDataMap().put("methodcontext", functionDef.getContextName()); //$NON-NLS-1$
-			jobDetail.getJobDataMap().put("args", arguments); //$NON-NLS-1$
-			jobDetail.getJobDataMap().put("access", plugin.getClientPluginAccess()); //$NON-NLS-1$
+			JobDetail jobDetail = createJob(jobname, method, arguments);
+
 			try
 			{
+				CronTrigger cronTrigger = createTrigger(jobDetail, startDate, endDate)
+					.withSchedule(cronSchedule(new CronExpression(cronTimings)))
+					.build();
 
-				CronTrigger cronTrigger = new CronTrigger(jobname, id, jobname, id, startDate, endDate, cronTimings);
 				scheduler.scheduleJob(jobDetail, cronTrigger);
 			}
 			catch (ParseException e)
@@ -363,6 +361,31 @@ public class SchedulerProvider implements IScriptable
 		}
 	}
 
+	private JobDetail createJob(String jobname, Function method, Object[] arguments)
+	{
+		String id = plugin.getClientPluginAccess().getClientID();
+
+		JobDetail jobDetail = newJob(ExecuteScriptMethodJob.class)
+			.withIdentity(jobKey(jobname, id))
+			.build();
+
+		jobDetail.getJobDataMap().put("scheduler", this); //$NON-NLS-1$
+		FunctionDefinition functionDef = new FunctionDefinition(method);
+		jobDetail.getJobDataMap().put("methodname", functionDef.getMethodName()); //$NON-NLS-1$
+		jobDetail.getJobDataMap().put("methodcontext", functionDef.getContextName()); //$NON-NLS-1$
+		jobDetail.getJobDataMap().put("args", arguments); //$NON-NLS-1$
+		jobDetail.getJobDataMap().put("access", plugin.getClientPluginAccess()); //$NON-NLS-1$
+		return jobDetail;
+	}
+
+	private TriggerBuilder<Trigger> createTrigger(JobDetail jobDetail, Date startDate, Date endDate)
+	{
+		return newTrigger()
+			.forJob(jobDetail)
+			.startAt(startDate == null ? new Date() : startDate)
+			.endAt(endDate);
+	}
+
 
 	private void testScheduler()
 	{
@@ -372,8 +395,6 @@ public class SchedulerProvider implements IScriptable
 			{
 				try
 				{
-					//				SchedulerFactory schedFact = new org.quartz.impl.StdSchedulerFactory();
-					//				scheduler = schedFact.getScheduler();
 					scheduler = org.quartz.impl.StdSchedulerFactory.getDefaultScheduler();
 					scheduler.start();
 				}
@@ -402,7 +423,7 @@ public class SchedulerProvider implements IScriptable
 			try
 			{
 				String id = plugin.getClientPluginAccess().getClientID();
-				return scheduler.deleteJob(jobname, id);
+				return scheduler.deleteJob(jobKey(jobname, id));
 			}
 			catch (SchedulerException e)
 			{

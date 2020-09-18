@@ -18,17 +18,20 @@ package com.servoy.extensions.plugins.validators;
 
 import java.util.Map;
 
-import com.servoy.j2db.dataprocessing.IColumnValidator;
+import com.servoy.j2db.dataprocessing.IColumnValidator2;
+import com.servoy.j2db.dataprocessing.IRecordMarkers;
 import com.servoy.j2db.persistence.IColumnTypes;
+import com.servoy.j2db.util.ILogLevel;
 import com.servoy.j2db.util.Utils;
 
-public class EmailValidator implements IColumnValidator
+public class EmailValidator implements IColumnValidator2
 {
-	public Map getDefaultProperties()
+	public Map<String, String> getDefaultProperties()
 	{
 		return null;
 	}
 
+	@SuppressWarnings("nls")
 	public String getName()
 	{
 		return "servoy.EmailValidator";
@@ -39,13 +42,23 @@ public class EmailValidator implements IColumnValidator
 		return new int[] { IColumnTypes.TEXT };
 	}
 
-	public void validate(Map props, Object arg) throws IllegalArgumentException
+	@SuppressWarnings("nls")
+	@Override
+	public void validate(Map<String, String> props, Object arg, String dataprovider, IRecordMarkers validationObject, Object state)
 	{
 		if (arg == null || arg.toString().trim().length() == 0) return;
 
 		if (!Utils.isValidEmailAddress(arg.toString()))
 		{
-			throw new IllegalArgumentException();
+			if (validationObject != null)
+				validationObject.report("i18n:servoy.validator.email", dataprovider, ILogLevel.ERROR, state, new String[] { arg.toString(), dataprovider });
+			else throw new IllegalArgumentException();
 		}
+
+	}
+
+	public void validate(Map<String, String> props, Object arg) throws IllegalArgumentException
+	{
+		validate(props, arg, null, null, null);
 	}
 }

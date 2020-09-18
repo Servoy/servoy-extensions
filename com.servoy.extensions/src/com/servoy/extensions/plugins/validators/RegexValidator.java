@@ -20,16 +20,19 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import com.servoy.j2db.dataprocessing.IColumnValidator;
+import com.servoy.j2db.dataprocessing.IColumnValidator2;
+import com.servoy.j2db.dataprocessing.IRecordMarkers;
 import com.servoy.j2db.persistence.IColumnTypes;
+import com.servoy.j2db.util.ILogLevel;
 
-public class RegexValidator implements IColumnValidator
+@SuppressWarnings("nls")
+public class RegexValidator implements IColumnValidator2
 {
 	private static final String REGEX_PROPERTY = "regex";
 
-	public Map getDefaultProperties()
+	public Map<String, String> getDefaultProperties()
 	{
-		Map props = new HashMap();
+		Map<String, String> props = new HashMap<>();
 		props.put(REGEX_PROPERTY, "");
 		return props;
 	}
@@ -41,17 +44,26 @@ public class RegexValidator implements IColumnValidator
 
 	public int[] getSupportedColumnTypes()
 	{
-		return new int[]{IColumnTypes.TEXT};
+		return new int[] { IColumnTypes.TEXT };
 	}
 
-	public void validate(Map props, Object arg) throws IllegalArgumentException
+	@Override
+	public void validate(Map<String, String> props, Object value, String dataprovider, IRecordMarkers validationObject, Object state)
 	{
-		if (arg == null || arg.toString().trim().length() == 0) return;
-		
-		String regex = (String)props.get(REGEX_PROPERTY);
-		if (!Pattern.compile(regex, Pattern.CASE_INSENSITIVE).matcher(arg.toString()).matches())
+		if (value == null || value.toString().trim().length() == 0) return;
+
+		String regex = props.get(REGEX_PROPERTY);
+		if (!Pattern.compile(regex, Pattern.CASE_INSENSITIVE).matcher(value.toString()).matches())
 		{
-			throw new IllegalArgumentException();
+			if (validationObject != null)
+				validationObject.report("i18n:servoy.validator.regexp", dataprovider, ILogLevel.ERROR, state,
+					new String[] { value.toString(), regex, dataprovider });
+			else throw new IllegalArgumentException();
 		}
+	}
+
+	public void validate(Map<String, String> props, Object arg) throws IllegalArgumentException
+	{
+		validate(props, arg, null, null, null);
 	}
 }

@@ -270,10 +270,36 @@ public class HttpProvider implements IReturnedTypesProvider, IScriptable
 	}
 
 	/**
+	 * Create an http client (like a web browser with session binding) usable todo multiple request/posts in same server session.
+	 * Make sure you call client.close() on it after you used this client object to clean up resources.
+	 *
+	 * @param config httpclient config
+	 * @sample
+	 * var client = plugins.http.createNewHttpClient(config);
+	 */
+	public HttpClient js_createNewHttpClient(HttpClientConfig config)
+	{
+		HttpClient httpClient = new HttpClient(httpPlugin, config);
+		httpPlugin.clientCreated(httpClient);
+		return httpClient;
+	}
+
+	/**
+	 * Create a http client config
+	 *
+	 * @sample
+	 * var config = plugins.http.createNewHttpClientConfig();
+	 */
+	public HttpClientConfig js_createNewHttpClientConfig()
+	{
+		return new HttpClientConfig();
+	}
+
+	/**
 	 * @see com.servoy.j2db.scripting.IScriptObject#getAllReturnedTypes()
 	 */
 	public Class< ? >[] getAllReturnedTypes()
 	{
-		return new Class[] { PatchRequest.class, PostRequest.class, PutRequest.class, GetRequest.class, DeleteRequest.class, OptionsRequest.class, HeadRequest.class, TraceRequest.class, Cookie.class, Response.class, HttpClient.class, HTTP_STATUS.class };
+		return new Class[] { PatchRequest.class, PostRequest.class, PutRequest.class, GetRequest.class, DeleteRequest.class, OptionsRequest.class, HeadRequest.class, TraceRequest.class, Cookie.class, Response.class, HttpClient.class, HttpClientConfig.class, HTTP_STATUS.class };
 	}
 }
