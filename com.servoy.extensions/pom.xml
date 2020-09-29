@@ -316,7 +316,8 @@
 									<copy overwrite="true"
 										todir="${project.build.directory}/plugins_beans/plugins/jakarta-poi">
 										<fileset file="${project.basedir}/lib/jakarta-poi.jar" />
-										<fileset file="${project.basedir}/lib/commons-math3.jar" />
+										<fileset
+											file="${project.basedir}/lib/commons-math3.jar" />
 									</copy>
 									<makejar srcdir="file" />
 									<makejar srcdir="headlessclient" />
@@ -338,7 +339,7 @@
 										<fileset
 											file="${project.basedir}/resources/images/images.jar.jnlp" />
 									</copy>
-									<makejar srcdir="jwt"/>
+									<makejar srcdir="jwt" />
 									<makejar srcdir="mail"
 										includes=",META-INF/services/com.servoy.j2db.plugins.IPlugin" />
 									<makejar srcdir="openid" />
@@ -489,32 +490,32 @@
 								</artifactItem>
 								<artifactItem>
 									<groupId>com.auth0</groupId>
-    								<artifactId>java-jwt</artifactId>
-    								<version>${jwt.version}</version>
+									<artifactId>java-jwt</artifactId>
+									<version>${jwt.version}</version>
 									<overWrite>true</overWrite>
 									<outputDirectory>${project.build.directory}/plugins_beans/plugins/jwt</outputDirectory>
 									<destFileName>java-jwt.jar</destFileName>
 								</artifactItem>
 								<artifactItem>
 									<groupId>com.fasterxml.jackson.core</groupId>
-    								<artifactId>jackson-databind</artifactId>
-    								<version>${fasterxml.version}</version>
+									<artifactId>jackson-databind</artifactId>
+									<version>${fasterxml.version}</version>
 									<overWrite>true</overWrite>
 									<outputDirectory>${project.build.directory}/plugins_beans/plugins/jwt</outputDirectory>
 									<destFileName>jackson-databind.jar</destFileName>
 								</artifactItem>
 								<artifactItem>
 									<groupId>com.fasterxml.jackson.core</groupId>
-   									<artifactId>jackson-annotations</artifactId>
-   									<version>${fasterxml.version}</version>
+									<artifactId>jackson-annotations</artifactId>
+									<version>${fasterxml.version}</version>
 									<overWrite>true</overWrite>
 									<outputDirectory>${project.build.directory}/plugins_beans/plugins/jwt</outputDirectory>
 									<destFileName>jackson-annotations.jar</destFileName>
 								</artifactItem>
 								<artifactItem>
 									<groupId>com.fasterxml.jackson.core</groupId>
-    								<artifactId>jackson-core</artifactId>
-    								<version>${fasterxml.version}</version>
+									<artifactId>jackson-core</artifactId>
+									<version>${fasterxml.version}</version>
 									<overWrite>true</overWrite>
 									<outputDirectory>${project.build.directory}/plugins_beans/plugins/jwt</outputDirectory>
 									<destFileName>jackson-core.jar</destFileName>
@@ -536,42 +537,42 @@
 						</goals>
 						<configuration>
 							<target>
-							<parallel>
-								<exec
-											dir="${project.build.directory}/plugins_beans/plugins/pdf_output/"
-											executable="pack200"
-											output="${project.build.directory}/fontbox_repack200b.txt"
-											failonerror="true">
-											<arg value="-J-Xmx512m" />
-											<arg value="-r" />
-											<!-- This may break some features <arg value="-O" /> -->
-											<arg
-												value="${project.build.directory}/plugins_beans/plugins/pdf_output/fontbox.jar" />
-								</exec>
-								<exec
-											dir="${project.build.directory}/plugins_beans/plugins/pdf_output/"
-											executable="pack200"
-											output="${project.build.directory}/pdfbox_repack200b.txt"
-											failonerror="true">
-											<arg value="-J-Xmx512m" />
-											<arg value="-r" />
-											<!-- This may break some features <arg value="-O" /> -->
-											<arg
-												value="${project.build.directory}/plugins_beans/plugins/pdf_output/pdfbox.jar" />
-								</exec>
-						 	</parallel>
-							<parallel>
-								<signjar keystore="${jarsigner.keystore}"
-											jar="${project.build.directory}/plugins_beans/plugins/pdf_output/fontbox.jar"
-											alias="ServoyClient" storepass="${jarsigner.storepass}"
-											tsaurl="http://sha256timestamp.ws.symantec.com/sha256/timestamp"
-											sigalg="SHA256withRSA" digestalg="SHA-256" />
-								<signjar keystore="${jarsigner.keystore}"
-											jar="${project.build.directory}/plugins_beans/plugins/pdf_output/pdfbox.jar"
-											alias="ServoyClient" storepass="${jarsigner.storepass}"
-											tsaurl="http://sha256timestamp.ws.symantec.com/sha256/timestamp"
-											sigalg="SHA256withRSA" digestalg="SHA-256" />
-							</parallel>
+								<parallel>
+									<exec
+										dir="${project.build.directory}/plugins_beans/plugins/pdf_output/"
+										executable="pack200"
+										output="${project.build.directory}/fontbox_repack200b.txt"
+										failonerror="true">
+										<arg value="-J-Xmx512m" />
+										<arg value="-r" />
+										<!-- This may break some features <arg value="-O" /> -->
+										<arg
+											value="${project.build.directory}/plugins_beans/plugins/pdf_output/fontbox.jar" />
+									</exec>
+									<exec
+										dir="${project.build.directory}/plugins_beans/plugins/pdf_output/"
+										executable="pack200"
+										output="${project.build.directory}/pdfbox_repack200b.txt"
+										failonerror="true">
+										<arg value="-J-Xmx512m" />
+										<arg value="-r" />
+										<!-- This may break some features <arg value="-O" /> -->
+										<arg
+											value="${project.build.directory}/plugins_beans/plugins/pdf_output/pdfbox.jar" />
+									</exec>
+								</parallel>
+								<parallel>
+									<signjar keystore="${jarsigner.keystore}"
+										jar="${project.build.directory}/plugins_beans/plugins/pdf_output/fontbox.jar"
+										alias="ServoyClient" storepass="${jarsigner.storepass}"
+										tsaurl="http://sha256timestamp.ws.symantec.com/sha256/timestamp"
+										sigalg="SHA256withRSA" digestalg="SHA-256" />
+									<signjar keystore="${jarsigner.keystore}"
+										jar="${project.build.directory}/plugins_beans/plugins/pdf_output/pdfbox.jar"
+										alias="ServoyClient" storepass="${jarsigner.storepass}"
+										tsaurl="http://sha256timestamp.ws.symantec.com/sha256/timestamp"
+										sigalg="SHA256withRSA" digestalg="SHA-256" />
+								</parallel>
 							</target>
 						</configuration>
 					</execution>
@@ -732,24 +733,29 @@
 			<version>${pdfbox.version}</version>
 		</dependency>
 		<dependency>
-   			<groupId>com.auth0</groupId>
-    		<artifactId>java-jwt</artifactId>
-    		<version>${jwt.version}</version>
+			<groupId>com.auth0</groupId>
+			<artifactId>java-jwt</artifactId>
+			<version>${jwt.version}</version>
 		</dependency>
 		<dependency>
-    		<groupId>com.fasterxml.jackson.core</groupId>
-    		<artifactId>jackson-databind</artifactId>
-    		<version>${fasterxml.version}</version>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>${fasterxml.version}</version>
 		</dependency>
 		<dependency>
-    		<groupId>com.fasterxml.jackson.core</groupId>
-   			<artifactId>jackson-annotations</artifactId>
-   			<version>${fasterxml.version}</version>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-annotations</artifactId>
+			<version>${fasterxml.version}</version>
 		</dependency>
 		<dependency>
-    		<groupId>com.fasterxml.jackson.core</groupId>
-    		<artifactId>jackson-core</artifactId>
-    		<version>${fasterxml.version}</version>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-core</artifactId>
+			<version>${fasterxml.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-fileupload</groupId>
+			<artifactId>commons-fileupload</artifactId>
+			<version>1.4</version>
 		</dependency>
 	</dependencies>
 </project>
