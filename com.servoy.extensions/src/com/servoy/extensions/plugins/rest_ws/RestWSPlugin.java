@@ -71,6 +71,7 @@ public class RestWSPlugin implements IServerPlugin
 	private static final String ACTION_GROW = "grow";
 	private static final String AUTHORIZED_GROUPS_PROPERTY = "rest_ws_plugin_authorized_groups";
 	private static final String RELOAD_SOLUTION_AFTER_REQUEST_PROPERTY = "rest_ws_reload_solution_after_request";
+	private static final String USE_JSUPLOAD_OBJECTS_FOR_BINARY_DATA_PROPERTY = "rest_ws_use_jsupload_for_binary_data";
 	private static final Boolean RELOAD_SOLUTION_AFTER_REQUEST_DEFAULT = Boolean.TRUE;
 
 	public static final String WEBSERVICE_NAME = "rest_ws";
@@ -81,6 +82,7 @@ public class RestWSPlugin implements IServerPlugin
 	private JSONSerializerWrapper serializerWrapper;
 	private GenericKeyedObjectPool<String, IHeadlessClient> clientPool = null;
 	private Boolean shouldReloadSolutionAfterRequest;
+	private Boolean useJSUploadForBinaryData;
 	private IServerAccess application;
 
 
@@ -112,6 +114,9 @@ public class RestWSPlugin implements IServerPlugin
 			CLIENT_POOL_SIZE_PROPERTY + "', but will shrink back to that value when clients in the pool become idle.");
 		req.put(AUTHORIZED_GROUPS_PROPERTY,
 			"Only authenticated users in the listed groups (comma-separated) have access, when left empty unauthorised access is allowed");
+		req.put(USE_JSUPLOAD_OBJECTS_FOR_BINARY_DATA_PROPERTY,
+			"Convert binary uploads (multipart or pure byte uploads) to a JSUpload that is cached on disk if they are bigger then a threshold (servoy.ng_web_client.tempfile.threshold property), default 'true'");
+
 
 		// RELOAD_SOLUTION_AFTER_REQUEST_PROPERTY is discouraged so we do not show it in the admin page plugin properties
 
@@ -124,6 +129,7 @@ public class RestWSPlugin implements IServerPlugin
 
 	public void unload() throws PluginException
 	{
+		useJSUploadForBinaryData = null;
 		shouldReloadSolutionAfterRequest = null;
 		serializerWrapper = null;
 		// TODO: clear client pool
@@ -176,6 +182,15 @@ public class RestWSPlugin implements IServerPlugin
 		}
 
 		return shouldReloadSolutionAfterRequest.booleanValue();
+	}
+
+	public boolean useJSUploadForBinaryData()
+	{
+		if (useJSUploadForBinaryData == null)
+		{
+			useJSUploadForBinaryData = Boolean.valueOf(application.getSettings().getProperty(USE_JSUPLOAD_OBJECTS_FOR_BINARY_DATA_PROPERTY, "true"));
+		}
+		return useJSUploadForBinaryData.booleanValue();
 	}
 
 	synchronized KeyedObjectPool<String, IHeadlessClient> getClientPool()

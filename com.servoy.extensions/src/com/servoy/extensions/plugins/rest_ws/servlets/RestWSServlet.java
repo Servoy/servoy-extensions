@@ -16,8 +16,7 @@
  */
 package com.servoy.extensions.plugins.rest_ws.servlets;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -25,16 +24,16 @@ import java.io.Writer;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import javax.mail.BodyPart;
-import javax.mail.MessagingException;
-import javax.mail.internet.MimeMultipart;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.Cookie;
@@ -43,6 +42,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
 
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.FileUploadException;
+import org.apache.commons.fileupload.disk.DiskFileItemFactory;
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.commons.io.FileCleaningTracker;
+import org.apache.commons.io.IOUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.json.JSONArray;
@@ -67,6 +72,7 @@ import com.servoy.j2db.plugins.IClientPluginAccess;
 import com.servoy.j2db.scripting.FunctionDefinition;
 import com.servoy.j2db.scripting.FunctionDefinition.Exist;
 import com.servoy.j2db.scripting.JSMap;
+import com.servoy.j2db.scripting.JSUpload;
 import com.servoy.j2db.server.shared.IHeadlessClient;
 import com.servoy.j2db.util.Debug;
 import com.servoy.j2db.util.HTTPUtils;
@@ -143,10 +149,37 @@ public class RestWSServlet extends HttpServlet
 
 	private final String webServiceName;
 
+	private final FileCleaningTracker FILE_CLEANING_TRACKER = new FileCleaningTracker();
+	private final DiskFileItemFactory diskFileItemFactory;
+
 	public RestWSServlet(String webServiceName, RestWSPlugin restWSPlugin)
 	{
 		this.webServiceName = webServiceName;
 		this.plugin = restWSPlugin;
+
+		String uploadDir = plugin.getServerAccess().getSettings().getProperty("servoy.ng_web_client.temp.uploadir");
+		File fileUploadDir = null;
+		if (uploadDir != null)
+		{
+			fileUploadDir = new File(uploadDir);
+			if (!fileUploadDir.exists() && !fileUploadDir.mkdirs())
+			{
+				fileUploadDir = null;
+				Debug.error("Couldn't use the property 'servoy.ng_web_client.temp.uploadir' value: '" + uploadDir +
+					"', directory could not be created or doesn't exists");
+			}
+		}
+		int tempFileThreshold = Utils.getAsInteger(plugin.getServerAccess().getSettings().getProperty("servoy.ng_web_client.tempfile.threshold", "50"), false) *
+			1000;
+		diskFileItemFactory = new DiskFileItemFactory(tempFileThreshold, fileUploadDir);
+		diskFileItemFactory.setFileCleaningTracker(FILE_CLEANING_TRACKER);
+	}
+
+	@Override
+	public void destroy()
+	{
+		FILE_CLEANING_TRACKER.exitWhenFinished();
+		super.destroy();
 	}
 
 	@Override
@@ -357,20 +390,30 @@ public class RestWSServlet extends HttpServlet
 		boolean reloadSolution = plugin.shouldReloadSolutionAfterRequest();
 		try
 		{
+			FileItem contents = null;
 			int contentType = CONTENT_OTHER;
-			byte[] contents = getBody(request);
-			if (contents != null && contents.length != 0)
+			// if it is a mult part don't read in the body, thats done later on by file-upload
+			if (ServletFileUpload.isMultipartContent(request))
 			{
-				contentType = getRequestContentType(request, "Content-Type", contents, CONTENT_OTHER);
-				if (contentType == CONTENT_OTHER && contents != null)
+				contentType = CONTENT_MULTIPART;
+			}
+			else
+			{
+				contents = getBody(request);
+				if (contents != null && contents.getSize() != 0)
 				{
-					sendError(response, HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
-					return;
+					contentType = getRequestContentType(request, "Content-Type", contents, CONTENT_OTHER);
+					if (contentType == CONTENT_OTHER && contents != null)
+					{
+						sendError(response, HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
+						return;
+					}
 				}
 			}
 			client = getClient(request);
 			String charset = getHeaderKey(request.getHeader("Content-Type"), "charset", CHARSET_DEFAULT);
-			Object result = wsService(WS_CREATE, new Object[] { decodeContent(request.getContentType(), contentType, contents, charset) }, request, response,
+			Object result = wsService(WS_CREATE, new Object[] { decodeContent(request.getContentType(), contentType, contents, charset, request) }, request,
+				response,
 				client.getLeft());
 			HTTPUtils.setNoCacheHeaders(response);
 			if (result != null && result != Undefined.instance)
@@ -404,21 +447,32 @@ public class RestWSServlet extends HttpServlet
 		boolean reloadSolution = plugin.shouldReloadSolutionAfterRequest();
 		try
 		{
-			byte[] contents = getBody(request);
-			if (contents == null || contents.length == 0)
+			FileItem contents = null;
+			int contentType = CONTENT_OTHER;
+			// if it is a mult part don't read in the body, thats done later on by file-upload
+			if (ServletFileUpload.isMultipartContent(request))
 			{
-				sendError(response, HttpServletResponse.SC_NO_CONTENT);
-				return;
+				contentType = CONTENT_MULTIPART;
 			}
-			int contentType = getRequestContentType(request, "Content-Type", contents, CONTENT_OTHER);
-			if (contentType == CONTENT_OTHER)
+			else
 			{
-				sendError(response, HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
-				return;
+				contents = getBody(request);
+				if (contents == null || contents.getSize() == 0)
+				{
+					sendError(response, HttpServletResponse.SC_NO_CONTENT);
+					return;
+				}
+				contentType = getRequestContentType(request, "Content-Type", contents, CONTENT_OTHER);
+				if (contentType == CONTENT_OTHER)
+				{
+					sendError(response, HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
+					return;
+				}
 			}
 			client = getClient(request);
 			String charset = getHeaderKey(request.getHeader("Content-Type"), "charset", CHARSET_DEFAULT);
-			Object result = wsService(WS_UPDATE, new Object[] { decodeContent(request.getContentType(), contentType, contents, charset) }, request, response,
+			Object result = wsService(WS_UPDATE, new Object[] { decodeContent(request.getContentType(), contentType, contents, charset, request) }, request,
+				response,
 				client.getLeft());
 			if (Boolean.FALSE.equals(result))
 			{
@@ -455,21 +509,32 @@ public class RestWSServlet extends HttpServlet
 		boolean reloadSolution = plugin.shouldReloadSolutionAfterRequest();
 		try
 		{
-			byte[] contents = getBody(request);
-			if (contents == null || contents.length == 0)
+			FileItem contents = null;
+			int contentType = CONTENT_OTHER;
+			// if it is a mult part don't read in the body, thats done later on by file-upload
+			if (ServletFileUpload.isMultipartContent(request))
 			{
-				sendError(response, HttpServletResponse.SC_NO_CONTENT);
-				return;
+				contentType = CONTENT_MULTIPART;
 			}
-			int contentType = getRequestContentType(request, "Content-Type", contents, CONTENT_OTHER);
-			if (contentType == CONTENT_OTHER)
+			else
 			{
-				sendError(response, HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
-				return;
+				contents = getBody(request);
+				if (contents == null || contents.getSize() == 0)
+				{
+					sendError(response, HttpServletResponse.SC_NO_CONTENT);
+					return;
+				}
+				contentType = getRequestContentType(request, "Content-Type", contents, CONTENT_OTHER);
+				if (contentType == CONTENT_OTHER)
+				{
+					sendError(response, HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
+					return;
+				}
 			}
 			client = getClient(request);
 			String charset = getHeaderKey(request.getHeader("Content-Type"), "charset", CHARSET_DEFAULT);
-			Object result = wsService(WS_PATCH, new Object[] { decodeContent(request.getContentType(), contentType, contents, charset) }, request, response,
+			Object result = wsService(WS_PATCH, new Object[] { decodeContent(request.getContentType(), contentType, contents, charset, request) }, request,
+				response,
 				client.getLeft());
 			if (Boolean.FALSE.equals(result))
 			{
@@ -936,21 +1001,21 @@ public class RestWSServlet extends HttpServlet
 		throw new NotAuthorizedException("User not authorized");
 	}
 
-	private byte[] getBody(HttpServletRequest request) throws IOException
+	private FileItem getBody(HttpServletRequest request) throws IOException
 	{
-		try (InputStream is = request.getInputStream())
-		{
-			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		return createFileItem(request.getInputStream());
+	}
 
-			byte[] buffer = new byte[128];
-			int length;
-			while ((length = is.read(buffer)) >= 0)
-			{
-				baos.write(buffer, 0, length);
-			}
-
-			return baos.toByteArray();
-		}
+	/**
+	 * @param servletInputStream
+	 * @return
+	 * @throws IOException
+	 */
+	private FileItem createFileItem(InputStream inputStream) throws IOException
+	{
+		FileItem fileItem = diskFileItemFactory.createItem(null, null, false, "restws_" + UUID.randomUUID().toString().replace("-", "_"));
+		IOUtils.copy(inputStream, fileItem.getOutputStream());
+		return fileItem;
 	}
 
 	private int getContentType(String headerValue)
@@ -992,14 +1057,25 @@ public class RestWSServlet extends HttpServlet
 		return CONTENT_OTHER;
 	}
 
-	private int getRequestContentType(HttpServletRequest request, String header, byte[] contents, int defaultContentType) throws UnsupportedEncodingException
+	private int getRequestContentType(HttpServletRequest request, String header, FileItem contents, int defaultContentType) throws UnsupportedEncodingException
 	{
 		String contentTypeHeaderValue = request.getHeader(header);
 		int contentType = getContentType(contentTypeHeaderValue);
 		if (contentType != CONTENT_OTHER) return contentType;
 		if (contents != null)
 		{
-			String stringContent = new String(contents, getHeaderKey(request.getHeader("Content-Type"), "charset", CHARSET_DEFAULT));
+			String stringContent = "";
+			try (InputStream inputStream = contents.getInputStream())
+			{
+				// only read in the first 512 bytes.
+				byte[] bytes = new byte[512];
+				inputStream.read(bytes);
+				stringContent = new String(bytes, getHeaderKey(request.getHeader("Content-Type"), "charset", CHARSET_DEFAULT));
+			}
+			catch (IOException e)
+			{
+				// ignore and return default
+			}
 			return guessContentType(stringContent, defaultContentType);
 		}
 		return defaultContentType;
@@ -1138,98 +1214,97 @@ public class RestWSServlet extends HttpServlet
 		}
 	}
 
-	private Object decodeContent(String contentTypeStr, int contentType, byte[] contents, String charset) throws Exception
+	private Object decodeContent(String contentTypeStr, int contentType, FileItem contents, String charset, HttpServletRequest request) throws Exception
 	{
 		switch (contentType)
 		{
 			case CONTENT_JSON :
-				return plugin.getJSONSerializer().fromJSON(new String(contents, charset));
+				return plugin.getJSONSerializer().fromJSON(contents.getString(charset));
 
 			case CONTENT_XML :
-				return plugin.getJSONSerializer().fromJSON(XML.toJSONObject(new String(contents, charset)));
+				return plugin.getJSONSerializer().fromJSON(XML.toJSONObject(contents.getString(charset)));
 
 			case CONTENT_MULTIPART :
-				return getMultipartContent(contentTypeStr, contents);
+				return getMultipartContent(request);
 
 			case CONTENT_FORMPOST :
-				return parseQueryString(new String(contents, charset));
+				return parseQueryString(contents.getString(charset));
 
 			case CONTENT_BINARY :
-				return contents;
+				return plugin.useJSUploadForBinaryData() ? new JSUpload(contents, Collections.emptyMap()) : contents.get();
 
 			case CONTENT_TEXT :
-				return new String(contents, charset);
+				return contents.getString(charset);
 
 			case CONTENT_OTHER :
-				return contents;
+				return plugin.useJSUploadForBinaryData() ? new JSUpload(contents, Collections.emptyMap()) : contents.get();
 		}
 
 		// should not happen, content type was checked before
 		throw new IllegalStateException();
 	}
 
-	private Object getMultipartContent(String contentTypeStr, byte[] contents) throws MessagingException, IOException, Exception
+	private Object getMultipartContent(HttpServletRequest request) throws FileUploadException
 	{
-		javax.mail.internet.MimeMultipart m = new MimeMultipart(new ServletMultipartDataSource(new ByteArrayInputStream(contents), contentTypeStr));
-		Object[] partArray = new Object[m.getCount()];
-		for (int i = 0; i < m.getCount(); i++)
+		ServletFileUpload upload = new ServletFileUpload(diskFileItemFactory);
+		upload.setHeaderEncoding("UTF-8");
+		long maxUpload = Utils.getAsLong(plugin.getServerAccess().getSettings().getProperty("servoy.webclient.maxuploadsize", "0"), false);
+		if (maxUpload > 0) upload.setFileSizeMax(maxUpload * 1000);
+		Iterator<FileItem> iterator = upload.parseRequest(request).iterator();
+		ArrayList<JSMap<String, Object>> parts = new ArrayList<JSMap<String, Object>>();
+		Map<String, String> formFields = new JSMap<>();
+		while (iterator.hasNext())
 		{
-			BodyPart bodyPart = m.getBodyPart(i);
-			JSMap<String, Object> partObj = new JSMap<String, Object>();
-			//filename
-			if (bodyPart.getFileName() != null) partObj.put("fileName", bodyPart.getFileName());
-			String partContentType = "";
-			//charset
-			if (bodyPart.getContentType() != null) partContentType = bodyPart.getContentType();
-
-			String _charset = getHeaderKey(partContentType, "charset", "");
-			partContentType = partContentType.replaceAll("(.*?);\\s*\\w+=.*", "$1");
-			//contentType
-			if (partContentType.length() > 0)
+			FileItem item = iterator.next();
+			if (item.isFormField())
 			{
-				partObj.put("contentType", partContentType);
-			}
-			if (_charset.length() > 0)
-			{
-				partObj.put("charset", _charset);
+				formFields.put(item.getFieldName(), item.getString());
 			}
 			else
 			{
-				_charset = "UTF-8"; // still use a valid default encoding in case it's not specified for reading it - it is ok that it will not be reported to JS I guess (this happens almost all the time)
-			}
-			InputStream contentStream = bodyPart.getInputStream();
-			try
-			{
-				if (contentStream.available() > 0)
+				JSMap<String, Object> partObj = new JSMap<String, Object>();
+				parts.add(partObj);
+				//filename
+				if (item.getName() != null) partObj.put("fileName", item.getName());
+				String partContentType = "";
+				//charset
+				if (item.getContentType() != null) partContentType = item.getContentType();
+				String _charset = getHeaderKey(partContentType, "charset", "");
+				partContentType = partContentType.replaceAll("(.*?);\\s*\\w+=.*", "$1");
+				//contentType
+				if (partContentType.length() > 0)
 				{
-					//Get content value
-					Object decodedBodyPart = decodeContent(partContentType, getContentType(partContentType), Utils.getBytesFromInputStream(contentStream),
-						_charset);
-					contentStream.close();
-					partObj.put("value", decodedBodyPart);
+					partObj.put("contentType", partContentType);
 				}
-			}
-			finally
-			{
-				contentStream.close();
-			}
+				if (_charset.length() > 0)
+				{
+					partObj.put("charset", _charset);
+				}
+				else
+				{
+					_charset = "UTF-8"; // still use a valid default encoding in case it's not specified for reading it - it is ok that it will not be reported to JS I guess (this happens almost all the time)
+				}
 
-			// Get name header
-			String nameHeader = "";
-			String[] nameHeaders = bodyPart.getHeader("Content-Disposition");
-			if (nameHeaders != null)
-			{
-				for (String bodyName : nameHeaders)
+				partObj.put("value", plugin.useJSUploadForBinaryData() ? new JSUpload(item, formFields) : item.get());
+				formFields = new JSMap<>();
+
+				// Get name header
+				String nameHeader = "";
+				Iterator<String> nameHeaders = item.getHeaders().getHeaders("Content-Disposition");
+				if (nameHeaders != null)
 				{
-					String name = getHeaderKey(bodyName, "name", "");
-					if (name.length() > 0) nameHeader = name;
-					break;
+					while (nameHeaders.hasNext())
+					{
+						String name = getHeaderKey(nameHeaders.next(), "name", "");
+						if (name.length() > 0) nameHeader = name;
+						break;
+					}
 				}
+				if (nameHeader.length() > 0) partObj.put("name", nameHeader);
 			}
-			if (nameHeader.length() > 0) partObj.put("name", nameHeader);
-			partArray[i] = partObj;
 		}
-		return partArray;
+
+		return parts.toArray();
 	}
 
 	private Object parseQueryString(String queryString)
