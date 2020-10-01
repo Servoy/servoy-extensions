@@ -18,6 +18,7 @@
 package com.servoy.extensions.plugins.file;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.rmi.RemoteException;
 import java.util.UUID;
 
@@ -25,7 +26,7 @@ import com.servoy.j2db.util.Debug;
 
 /**
  * Implementation of an {@link IAbstractFile} for remote (server-side) files<br/>
- * 
+ *
  * @author jcompagner
  * @author Servoy Stuff
  * @since Servoy 5.2
@@ -184,7 +185,7 @@ public class RemoteFile extends AbstractFile
 		{
 			return renameTo(upload.getAbsolutePath());
 		}
-		throw new UnsupportedMethodException("You can only rename to a remote file or a remote String path"); //$NON-NLS-1$	
+		throw new UnsupportedMethodException("You can only rename to a remote file or a remote String path"); //$NON-NLS-1$
 	}
 
 	@Override
@@ -348,7 +349,7 @@ public class RemoteFile extends AbstractFile
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see com.servoy.extensions.plugins.file.IAbstractFile#setBytes(byte[], boolean)
 	 */
 	public boolean setBytes(byte[] bytes, boolean createFile)
@@ -385,6 +386,12 @@ public class RemoteFile extends AbstractFile
 			}
 		}
 		return false;
+	}
+
+	@Override
+	public InputStream getInputStream() throws IOException
+	{
+		return new RemoteFileInputStream(service, clientId, data);
 	}
 
 
