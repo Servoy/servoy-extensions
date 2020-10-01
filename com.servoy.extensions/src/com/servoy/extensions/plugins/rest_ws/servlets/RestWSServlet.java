@@ -69,6 +69,7 @@ import com.servoy.extensions.plugins.rest_ws.RestWSPlugin.NotAuthorizedException
 import com.servoy.j2db.persistence.ScriptVariable;
 import com.servoy.j2db.plugins.IClientPlugin;
 import com.servoy.j2db.plugins.IClientPluginAccess;
+import com.servoy.j2db.plugins.IFile;
 import com.servoy.j2db.scripting.FunctionDefinition;
 import com.servoy.j2db.scripting.FunctionDefinition.Exist;
 import com.servoy.j2db.scripting.JSMap;
@@ -1368,6 +1369,21 @@ public class RestWSServlet extends HttpServlet
 			bytes = (byte[])result;
 			resultContentType = getBytesContentType(request, bytes);
 		}
+		else if (result instanceof IFile)
+		{
+			resultContentType = ((IFile)result).getContentType();
+			bytes = null;
+
+			response.setHeader("Content-Type", resultContentType);
+			response.setContentLengthLong(((IFile)result).getSize());
+
+			try (ServletOutputStream os = response.getOutputStream(); InputStream is = ((IFile)result).getInputStream())
+			{
+				IOUtils.copyLarge(is, os);
+				os.flush();
+			}
+			return;
+		}
 		else
 		{
 			int contentType = getRequestContentType(request, "Accept", null, defaultContentType);
@@ -1430,18 +1446,19 @@ public class RestWSServlet extends HttpServlet
 
 			resultContentType = resultContentType + ";charset=" + charset;
 
-			response.setHeader("Content-Type", resultContentType);
-
 			bytes = content.getBytes(charset);
 
 		}
-
-		response.setContentLength(bytes.length);
-
-		try (ServletOutputStream outputStream = response.getOutputStream())
+		if (bytes != null)
 		{
-			outputStream.write(bytes);
-			outputStream.flush();
+			response.setHeader("Content-Type", resultContentType);
+			response.setContentLength(bytes.length);
+
+			try (ServletOutputStream outputStream = response.getOutputStream())
+			{
+				outputStream.write(bytes);
+				outputStream.flush();
+			}
 		}
 	}
 
