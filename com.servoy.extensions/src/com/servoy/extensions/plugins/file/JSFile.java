@@ -18,6 +18,7 @@ package com.servoy.extensions.plugins.file;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Date;
 
 import com.servoy.j2db.documentation.ServoyDocumented;
@@ -499,4 +500,21 @@ public class JSFile implements IScriptable, IJavaScriptType, IFile
 		return file.getFile();
 	}
 
+	@Override
+	public InputStream getInputStream() throws IOException
+	{
+		return file.getInputStream();
+	}
+
+	@Override
+	public String getContentType()
+	{
+		return file.getContentType();
+	}
+
+	@Override
+	public long getSize()
+	{
+		return file.size();
+	}
 }
