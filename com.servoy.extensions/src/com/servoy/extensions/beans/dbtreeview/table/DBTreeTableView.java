@@ -29,7 +29,7 @@ import com.servoy.j2db.plugins.IClientPluginAccess;
 
 /**
  * DB Tree Table View bean main class
- * 
+ *
  * @author gboros
  */
 public class DBTreeTableView extends DBTreeView
@@ -49,6 +49,12 @@ public class DBTreeTableView extends DBTreeView
 	protected IWicketTree getWicketDBTreeView(Object[] cargs, IClientPluginAccess application)
 	{
 		return new InmethodDBTreeTableView(cargs[0].toString(), application, new ArrayList(), this);
+	}
+
+	@Override
+	public Class< ? > getDocsClass()
+	{
+		return ScriptableDBTreeTableView.class;
 	}
 
 	public static Class[] getAllReturnedTypes()
