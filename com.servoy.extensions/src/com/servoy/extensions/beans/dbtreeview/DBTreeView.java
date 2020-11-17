@@ -27,7 +27,7 @@ import javax.swing.border.Border;
 import javax.swing.text.html.CSS;
 
 import com.servoy.j2db.IApplication;
-import com.servoy.j2db.IServoyBeanFactory;
+import com.servoy.j2db.IServoyBeanFactory2;
 import com.servoy.j2db.plugins.IClientPluginAccess;
 import com.servoy.j2db.ui.IComponent;
 import com.servoy.j2db.util.Debug;
@@ -36,11 +36,11 @@ import com.servoy.j2db.util.IStyleSheet;
 
 /**
  * DB Tree View bean main class
- * 
+ *
  * @author jblok
  */
 @SuppressWarnings("nls")
-public class DBTreeView implements IServoyBeanFactory, Serializable, ITreeView
+public class DBTreeView implements IServoyBeanFactory2, Serializable, ITreeView
 {
 	private static final long serialVersionUID = 1L;
 	public static final String ELEMENT_TYPE = "DBTREEVIEW";
@@ -82,6 +82,12 @@ public class DBTreeView implements IServoyBeanFactory, Serializable, ITreeView
 		if (location != null) t.setLocation(location);
 		if (size != null) t.setSize(size);
 		return t;
+	}
+
+	@Override
+	public Class< ? > getDocsClass()
+	{
+		return ScriptableDBTreeView.class;
 	}
 
 	protected IWicketTree getWicketDBTreeView(Object[] cargs, IClientPluginAccess application)
@@ -189,7 +195,7 @@ public class DBTreeView implements IServoyBeanFactory, Serializable, ITreeView
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see com.servoy.extensions.beans.dbtreeview.ITreeView#setStyleClass(java.lang.String)
 	 */
 	public void setStyleClass(String styleClass)
@@ -199,7 +205,7 @@ public class DBTreeView implements IServoyBeanFactory, Serializable, ITreeView
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see com.servoy.extensions.beans.dbtreeview.ITreeView#getStyleClass()
 	 */
 	public String getStyleClass()
@@ -260,7 +266,7 @@ public class DBTreeView implements IServoyBeanFactory, Serializable, ITreeView
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see com.servoy.extensions.beans.dbtreeview.ITreeView#isTransparent()
 	 */
 	public boolean isTransparent()
@@ -270,7 +276,7 @@ public class DBTreeView implements IServoyBeanFactory, Serializable, ITreeView
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see com.servoy.extensions.beans.dbtreeview.ITreeView#setTransparent(boolean)
 	 */
 	public void setTransparent(boolean transparent)
@@ -280,7 +286,7 @@ public class DBTreeView implements IServoyBeanFactory, Serializable, ITreeView
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see com.servoy.extensions.beans.dbtreeview.ITreeView#getBorderType()
 	 */
 	public Border getBorderType()
@@ -290,7 +296,7 @@ public class DBTreeView implements IServoyBeanFactory, Serializable, ITreeView
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see com.servoy.extensions.beans.dbtreeview.ITreeView#setBorderType(javax.swing.border.Border)
 	 */
 	public void setBorderType(Border border)
