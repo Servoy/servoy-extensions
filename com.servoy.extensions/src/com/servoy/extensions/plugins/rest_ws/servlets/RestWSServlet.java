@@ -21,7 +21,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
 import java.nio.charset.Charset;
+import java.nio.charset.CoderResult;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -1071,9 +1074,17 @@ public class RestWSServlet extends HttpServlet
 				// only read in the first 512 bytes.
 				byte[] bytes = new byte[512];
 				inputStream.read(bytes);
-				stringContent = new String(bytes, getHeaderKey(request.getHeader("Content-Type"), "charset", CHARSET_DEFAULT));
+				String charset = getHeaderKey(request.getHeader("Content-Type"), "charset", CHARSET_DEFAULT);
+				Charset cs = Charset.forName(charset);
+				CharBuffer cb = CharBuffer.allocate(512);
+				CoderResult decode = cs.newDecoder().decode(ByteBuffer.wrap(bytes), cb, false);
+				if (decode == CoderResult.OVERFLOW || decode == CoderResult.UNDERFLOW)
+				{
+					cb.flip();
+					stringContent = cb.toString();
+				}
 			}
-			catch (IOException e)
+			catch (Exception e)
 			{
 				// ignore and return default
 			}
@@ -1259,7 +1270,24 @@ public class RestWSServlet extends HttpServlet
 			FileItem item = iterator.next();
 			if (item.isFormField())
 			{
-				formFields.put(item.getFieldName(), item.getString());
+				String contentType = item.getContentType();
+				String charset = getHeaderKey(contentType, "charset", null);
+				if (charset == null) charset = getHeaderKey(request.getContentType(), "charset", null);
+				if (charset != null)
+				{
+					try
+					{
+						formFields.put(item.getFieldName(), item.getString(charset));
+					}
+					catch (UnsupportedEncodingException e)
+					{
+						formFields.put(item.getFieldName(), item.getString());
+					}
+				}
+				else
+				{
+					formFields.put(item.getFieldName(), item.getString());
+				}
 			}
 			else
 			{
