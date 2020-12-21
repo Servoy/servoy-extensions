@@ -27,7 +27,7 @@ import javax.swing.border.Border;
 import javax.swing.text.html.CSS;
 
 import com.servoy.j2db.IApplication;
-import com.servoy.j2db.IServoyBeanFactory2;
+import com.servoy.j2db.IServoyBeanFactory;
 import com.servoy.j2db.plugins.IClientPluginAccess;
 import com.servoy.j2db.ui.IComponent;
 import com.servoy.j2db.util.Debug;
@@ -40,7 +40,7 @@ import com.servoy.j2db.util.IStyleSheet;
  * @author jblok
  */
 @SuppressWarnings("nls")
-public class DBTreeView implements IServoyBeanFactory2, Serializable, ITreeView
+public class DBTreeView implements IServoyBeanFactory, Serializable, ITreeView
 {
 	private static final long serialVersionUID = 1L;
 	public static final String ELEMENT_TYPE = "DBTREEVIEW";
@@ -82,12 +82,6 @@ public class DBTreeView implements IServoyBeanFactory2, Serializable, ITreeView
 		if (location != null) t.setLocation(location);
 		if (size != null) t.setSize(size);
 		return t;
-	}
-
-	@Override
-	public Class< ? > getDocsClass()
-	{
-		return ScriptableDBTreeView.class;
 	}
 
 	protected IWicketTree getWicketDBTreeView(Object[] cargs, IClientPluginAccess application)
