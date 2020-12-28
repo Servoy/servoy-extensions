@@ -21,7 +21,7 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import com.servoy.j2db.IServoyBeanFactory2;
+import com.servoy.j2db.IServoyBeanFactory;
 import com.servoy.j2db.plugins.IClientPluginAccess;
 import com.servoy.j2db.ui.IComponent;
 import com.servoy.j2db.util.Debug;
@@ -31,7 +31,7 @@ import com.servoy.j2db.util.ExtendableURLClassLoader;
  * @author lvostinar
  *
  */
-public class JFXPanel implements IServoyBeanFactory2
+public class JFXPanel implements IServoyBeanFactory
 {
 	@Override
 	public String getName()
@@ -87,13 +87,6 @@ public class JFXPanel implements IServoyBeanFactory2
 			return new EmptyJFXPanel();
 		}
 
-	}
-
-	@Override
-	public Class< ? > getDocsClass()
-	{
-		//it doesn't have docs
-		return EmptyJFXPanel.class;
 	}
 
 	private static boolean isJavaFXAvailable(ClassLoader classLoader)
