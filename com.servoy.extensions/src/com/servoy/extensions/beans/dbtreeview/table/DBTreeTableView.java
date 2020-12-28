@@ -51,12 +51,6 @@ public class DBTreeTableView extends DBTreeView
 		return new InmethodDBTreeTableView(cargs[0].toString(), application, new ArrayList(), this);
 	}
 
-	@Override
-	public Class< ? > getDocsClass()
-	{
-		return ScriptableDBTreeTableView.class;
-	}
-
 	public static Class[] getAllReturnedTypes()
 	{
 		return new Class[] { Binding.class, Column.class, RelationInfo.class };
