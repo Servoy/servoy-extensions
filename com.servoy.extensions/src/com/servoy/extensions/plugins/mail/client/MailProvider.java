@@ -501,6 +501,7 @@ public class MailProvider implements IReturnedTypesProvider, IScriptable
 
 	/**
 	 * Send a mail, if you make the msgText start with <html> the message will be sent in html (and you can use all html formatting).
+	 * If you want to have a different reply address than from, you can specify this with the from parameter by adding another email after it.
 	 *
 	 * @sample
 	 * var msgText = 'plain msg<html>styled html msg<img src="%%embedded%%"></html>';
@@ -510,8 +511,8 @@ public class MailProvider implements IReturnedTypesProvider, IScriptable
 	 * 	plugins.dialogs.showWarningDialog('Alert','Failed to send mail','OK');
 	 * }
 	 *
-	 * @param to A string containing 1 or multiple addresses seperated by a comma.
-	 * @param from A string containing an address and an optional reply address, seperated by a comma.
+	 * @param to A string containing 1 or multiple addresses separated by a comma.
+	 * @param from A string containing an address and an optional reply address, separated by a comma.
 	 * @param subject The subject of the mail
 	 * @param msgText The message text
 	 */
@@ -522,6 +523,7 @@ public class MailProvider implements IReturnedTypesProvider, IScriptable
 
 	/**
 	 * Send a mail, if you make the msgText start with <html> the message will be sent in html (and you can use all html formatting).
+	 * If you want to have a different reply address than from, you can specify this with the from parameter by adding another email after it.
 	 *
 	 * @sample
 	 * var msgText = 'plain msg<html>styled html msg<img src="%%embedded%%"></html>';
@@ -531,11 +533,11 @@ public class MailProvider implements IReturnedTypesProvider, IScriptable
 	 * 	plugins.dialogs.showWarningDialog('Alert','Failed to send mail','OK');
 	 * }
 	 *
-	 * @param to A string containing 1 or multiple addresses seperated by a comma.
-	 * @param from A string containing an address and an optional reply address, seperated by a comma.
+	 * @param to A string containing 1 or multiple addresses separated by a comma.
+	 * @param from A string containing an address and an optional reply address, separated by a comma.
 	 * @param subject The subject of the mail
 	 * @param msgText The message text
-	 * @param cc One or more addresses seperated by a comma
+	 * @param cc One or more addresses separated by a comma
 	 */
 	public boolean js_sendMail(String to, String from, String subject, String msgText, String cc)
 	{
@@ -544,6 +546,7 @@ public class MailProvider implements IReturnedTypesProvider, IScriptable
 
 	/**
 	 * Send a mail, if you make the msgText start with <html> the message will be sent in html (and you can use all html formatting).
+	 * If you want to have a different reply address than from, you can specify this with the from parameter by adding another email after it.
 	 *
 	 * @sample
 	 * var msgText = 'plain msg<html>styled html msg<img src="%%embedded%%"></html>';
@@ -554,12 +557,12 @@ public class MailProvider implements IReturnedTypesProvider, IScriptable
 	 * }
 	 *
 	 *
-	 * @param to A string containing 1 or multiple addresses seperated by a comma.
-	 * @param from A string containing an address and an optional reply address, seperated by a comma.
+	 * @param to A string containing 1 or multiple addresses separated by a comma.
+	 * @param from A string containing an address and an optional reply address, separated by a comma.
 	 * @param subject The subject of the mail
 	 * @param msgText The message text
-	 * @param cc One or more addresses seperated by a comma
-	 * @param bcc One or more addresses seperated by a comma
+	 * @param cc One or more addresses separated by a comma
+	 * @param bcc One or more addresses separated by a comma
 	 */
 	public boolean js_sendMail(String to, String from, String subject, String msgText, String cc, String bcc)
 	{
@@ -568,6 +571,7 @@ public class MailProvider implements IReturnedTypesProvider, IScriptable
 
 	/**
 	 * Send a mail, if you make the msgText start with <html> the message will be sent in html (and you can use all html formatting).
+	 * If you want to have a different reply address than from, you can specify this with the from parameter by adding another email after it.
 	 *
 	 * @sample
 	 * var attachment1 = plugins.mail.createBinaryAttachment('embedded',plugins.file.readFile('c:/temp/a_logo.gif'));
@@ -579,12 +583,12 @@ public class MailProvider implements IReturnedTypesProvider, IScriptable
 	 * 	plugins.dialogs.showWarningDialog('Alert','Failed to send mail','OK');
 	 * }
 	 *
-	 * @param to A string containing 1 or multiple addresses seperated by a comma.
-	 * @param from A string containing an address and an optional reply address, seperated by a comma.
+	 * @param to A string containing 1 or multiple addresses separated by a comma.
+	 * @param from A string containing an address and an optional reply address, separated by a comma.
 	 * @param subject The subject of the mail
 	 * @param msgText The message text
-	 * @param cc One or more addresses seperated by a comma
-	 * @param bcc One or more addresses seperated by a comma
+	 * @param cc One or more addresses separated by a comma
+	 * @param bcc One or more addresses separated by a comma
 	 * @param attachments The attachments
 	 */
 	public boolean js_sendMail(String to, String from, String subject, String msgText, String cc, String bcc, Attachment[] attachments)
@@ -594,6 +598,7 @@ public class MailProvider implements IReturnedTypesProvider, IScriptable
 
 	/**
 	 * Send a mail, if you make the msgText start with <html> the message will be sent in html (and you can use all html formatting).
+	 * If you want to have a different reply address than from, you can specify this with the from parameter by adding another email after it.
 	 *
 	 * @sample
 	 * var attachment1 = plugins.mail.createBinaryAttachment('embedded',plugins.file.readFile('c:/temp/a_logo.gif'));
@@ -610,12 +615,12 @@ public class MailProvider implements IReturnedTypesProvider, IScriptable
 	 * }
 	 *
 	 *
-	 * @param to A string containing 1 or multiple addresses seperated by a comma.
-	 * @param from A string containing an address and an optional reply address, seperated by a comma.
+	 * @param to A string containing 1 or multiple addresses separated by a comma.
+	 * @param from A string containing an address and an optional reply address, separated by a comma.
 	 * @param subject The subject of the mail
 	 * @param msgText The message text
-	 * @param cc One or more addresses seperated by a comma
-	 * @param bcc One or more addresses seperated by a comma
+	 * @param cc One or more addresses separated by a comma
+	 * @param bcc One or more addresses separated by a comma
 	 * @param attachments The attachments
 	 * @param overrideProperties An array of properties
 	 */
@@ -627,6 +632,7 @@ public class MailProvider implements IReturnedTypesProvider, IScriptable
 
 	/**
 	 * Send a mail, if you make the msgText start with <html> the message will be sent in html (and you can use all html formatting).
+	 * If you want to have a different reply address than from, you can specify this with the from parameter by adding another email after it.
 	 *
 	 * @sample
 	 * var attachment1 = plugins.mail.createBinaryAttachment('embedded',plugins.file.readFile('c:/temp/a_logo.gif'));
@@ -639,12 +645,12 @@ public class MailProvider implements IReturnedTypesProvider, IScriptable
 	 * 	plugins.dialogs.showWarningDialog('Alert','Failed to send mail','OK');
 	 * }
 	 *
-	 * @param to A string containing 1 or multiple addresses seperated by a comma.
-	 * @param from A string containing an address and an optional reply address, seperated by a comma.
+	 * @param to A string containing 1 or multiple addresses separated by a comma.
+	 * @param from A string containing an address and an optional reply address, separated by a comma.
 	 * @param subject The subject of the mail
 	 * @param msgText The message text
-	 * @param cc One or more addresses seperated by a comma
-	 * @param bcc One or more addresses seperated by a comma
+	 * @param cc One or more addresses separated by a comma
+	 * @param bcc One or more addresses separated by a comma
 	 * @param attachments The attachments
 	 * @param smtpHost The smtp host
 	 */
@@ -655,6 +661,7 @@ public class MailProvider implements IReturnedTypesProvider, IScriptable
 
 	/**
 	 * Send a mail, if you make the msgText start with <html> the message will be sent in html (and you can use all html formatting).
+	 * If you want to have a different reply address than from, you can specify this with the from parameter by adding another email after it.
 	 *
 	 * @sample
 	 * var attachment = plugins.mail.createBinaryAttachment('embedded',plugins.file.readFile('c:/temp/a_logo.gif'));
@@ -665,12 +672,12 @@ public class MailProvider implements IReturnedTypesProvider, IScriptable
 	 * 	plugins.dialogs.showWarningDialog('Alert','Failed to send mail','OK');
 	 * }
 	 *
-	 * @param to A string containing 1 or multiple addresses seperated by a comma.
-	 * @param from A string containing an address and an optional reply address, seperated by a comma.
+	 * @param to A string containing 1 or multiple addresses separated by a comma.
+	 * @param from A string containing an address and an optional reply address, separated by a comma.
 	 * @param subject The subject of the mail
 	 * @param msgText The message text
-	 * @param cc One or more addresses seperated by a comma
-	 * @param bcc One or more addresses seperated by a comma
+	 * @param cc One or more addresses separated by a comma
+	 * @param bcc One or more addresses separated by a comma
 	 * @param attachment A single attachment
 	 */
 	public boolean js_sendMail(String to, String from, String subject, String msgText, String cc, String bcc, Attachment attachment)
@@ -680,6 +687,7 @@ public class MailProvider implements IReturnedTypesProvider, IScriptable
 
 	/**
 	 * Send a mail, if you make the msgText start with <html> the message will be sent in html (and you can use all html formatting).
+	 * If you want to have a different reply address than from, you can specify this with the from parameter by adding another email after it.
 	 *
 	 * @sample
 	 * var attachment = plugins.mail.createBinaryAttachment('embedded',plugins.file.readFile('c:/temp/a_logo.gif'));
@@ -694,12 +702,12 @@ public class MailProvider implements IReturnedTypesProvider, IScriptable
 	 * 	plugins.dialogs.showWarningDialog('Alert','Failed to send mail','OK');
 	 * }
 	 *
-	 * @param to A string containing 1 or multiple addresses seperated by a comma.
-	 * @param from A string containing an address and an optional reply address, seperated by a comma.
+	 * @param to A string containing 1 or multiple addresses separated by a comma.
+	 * @param from A string containing an address and an optional reply address, separated by a comma.
 	 * @param subject The subject of the mail
 	 * @param msgText The message text
-	 * @param cc One or more addresses seperated by a comma
-	 * @param bcc One or more addresses seperated by a comma
+	 * @param cc One or more addresses separated by a comma
+	 * @param bcc One or more addresses separated by a comma
 	 * @param attachment A single attachment
 	 * @param overrideProperties An array of properties
 	 */
@@ -711,6 +719,7 @@ public class MailProvider implements IReturnedTypesProvider, IScriptable
 
 	/**
 	 * Send a mail, if you make the msgText start with <html> the message will be sent in html (and you can use all html formatting).
+	 * If you want to have a different reply address than from, you can specify this with the from parameter by adding another email after it.
 	 *
 	 * @sample
 	 * var attachment = plugins.mail.createBinaryAttachment('embedded',plugins.file.readFile('c:/temp/a_logo.gif'));
@@ -722,12 +731,12 @@ public class MailProvider implements IReturnedTypesProvider, IScriptable
 	 * 	plugins.dialogs.showWarningDialog('Alert','Failed to send mail','OK');
 	 * }
 	 *
-	 * @param to A string containing 1 or multiple addresses seperated by a comma.
-	 * @param from A string containing an address and an optional reply address, seperated by a comma.
+	 * @param to A string containing 1 or multiple addresses separated by a comma.
+	 * @param from A string containing an address and an optional reply address, separated by a comma.
 	 * @param subject The subject of the mail
 	 * @param msgText The message text
-	 * @param cc One or more addresses seperated by a comma
-	 * @param bcc One or more addresses seperated by a comma
+	 * @param cc One or more addresses separated by a comma
+	 * @param bcc One or more addresses separated by a comma
 	 * @param attachment A single attachment
 	 * @param smtpHost The smtp host
 	 */
