@@ -21,6 +21,9 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -36,12 +39,14 @@ import com.servoy.j2db.util.Utils;
  */
 public class FileServlet extends HttpServlet
 {
+	private final static ConcurrentMap<UUID, File> registeredFiles = new ConcurrentHashMap<>();
+
 	private final FileServerPlugin fileServerPlugin;
 	private final IServerAccess app;
 
 	/**
 	 * @param fileServerPlugin
-	 * @param app 
+	 * @param app
 	 */
 	public FileServlet(FileServerPlugin fileServerPlugin, IServerAccess app)
 	{
@@ -49,20 +54,39 @@ public class FileServlet extends HttpServlet
 		this.app = app;
 	}
 
+	@SuppressWarnings("nls")
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
 	{
 		String pathInfo = req.getPathInfo();
 		if (pathInfo.startsWith("/file/"))
 		{
+			String filePath = pathInfo.substring(5);
+			String uuidString = filePath.substring(1);
+			File file = null;
+			if (uuidString != null && uuidString.split("-").length == 5)
+			{
+				file = registeredFiles.get(UUID.fromString(uuidString));
 
-			RemoteFileData remoteFileData = fileServerPlugin.getRemoteFileData(app.getServerLocalClientID(), pathInfo.substring(5));
-			File file = remoteFileData.getFile();
+			}
+			if (file == null)
+			{
+				RemoteFileData remoteFileData = fileServerPlugin.getRemoteFileData(app.getServerLocalClientID(), filePath);
+				file = remoteFileData.getFile();
+			}
 			if (file != null && file.exists() && file.isFile())
 			{
 				String contentType = AbstractFile.getContentType(file);
 				if (contentType != null) resp.setContentType(contentType);
 				resp.setContentLength((int)file.length());
+				String contentDisposition = req.getParameter("c");
+				if (contentDisposition != null)
+				{
+					contentDisposition = contentDisposition.equals("i") ? "inline" : "attachment";
+					resp.setHeader("Content-Disposition",
+						contentDisposition + "; filename=\"" + file.getName() + "\"; filename*=UTF-8''" + Rfc5987Util.encode(file.getName(), "UTF8") + "");
+				}
+
 				BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file));
 				try
 				{
@@ -82,6 +106,17 @@ public class FileServlet extends HttpServlet
 		{
 			resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
 		}
+	}
 
+	static UUID registerFile(File file)
+	{
+		UUID uuid = UUID.randomUUID();
+		registeredFiles.put(uuid, file);
+		return uuid;
+	}
+
+	static void unregisterFile(UUID uuid)
+	{
+		registeredFiles.remove(uuid);
 	}
 }
