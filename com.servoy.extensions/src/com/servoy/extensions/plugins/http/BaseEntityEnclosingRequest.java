@@ -207,8 +207,10 @@ public class BaseEntityEnclosingRequest extends BaseRequest
 
 
 	/**
-	 *  Add a file to the post will try to get the correct mime type from the file name or the first bytes.
-	 *  If you add a single file then this will be a single file post, so not a mutli part.
+	 * Add a file to the post; it will try to get the correct mime type from the file name or the first bytes.
+	 *
+	 * If you add a single file then this will be a single file (so not a multi-part) post. If you want/need multi-part
+	 * then you have to either add multiple files or a file and at least a parameter via addParameter(...).
 	 *
 	 * @sample
 	 * poster.addFile('myFileParamName','manual.doc','c:/temp/manual_01a.doc')
@@ -239,9 +241,11 @@ public class BaseEntityEnclosingRequest extends BaseRequest
 	}
 
 	/**
-	 * Add a file to the post with a given mime type, could also be used to force the default 'application/octet-stream' on it,
-	 * because this plugin will try to guess the correect mime type for the given file (based on the name or the bytes)
-	 * If you add a single file then this will be a single file post, so not a mutli part.
+	 * Add a file to the post with a given mime type; could also be used to force the default 'application/octet-stream' on it,
+	 * because this plugin will try to guess the correct mime type for the given file otherwise (based on the name or the bytes).
+	 *
+	 * If you add a single file then this will be a single file (so not a multi-part) post. If you want/need multi-part
+	 * then you have to either add multiple files or both a file and one or more parameters using addParameter(...).
 	 *
 	 * @sample
 	 * poster.addFile('myFileParamName','manual.doc','c:/temp/manual_01a.doc', 'application/msword')
@@ -273,8 +277,10 @@ public class BaseEntityEnclosingRequest extends BaseRequest
 	}
 
 	/**
-	 * Add a file to the post will try to get the correct mime type from the file name or the first bytes.
-	 * If you add a single file then this will be a single file post, so not a mutli part.
+	 * Add a file to the post; it will try to get the correct mime type from the file name or the first bytes.
+	 *
+	 * If you add a single file then this will be a single file (so not a multi-part) post. If you want/need multi-part
+	 * then you have to either add multiple files or both a file and one or more parameters using addParameter(...).
 	 *
 	 * @sample
 	 * poster.addFile('myFileParamName','manual.doc','c:/temp/manual_01a.doc')
@@ -300,9 +306,11 @@ public class BaseEntityEnclosingRequest extends BaseRequest
 	}
 
 	/**
-	 * Add a file to the post with a given mime type, could also be used to force the default 'application/octet-stream' on it,
-	 * because this plugin will try to guess the correect mime type for the given file (based on the name or the bytes)
-	 * If you add a single file then this will be a single file post, so not a mutli part.
+	 * Add a file to the post with a given mime type; could also be used to force the default 'application/octet-stream' on it,
+	 * because this plugin will try to guess the correct mime type for the given file otherwise (based on the name or the bytes).
+	 *
+	 * If you add a single file then this will be a single file (so not a multi-part) post. If you want/need multi-part
+	 * then you have to either add multiple files or both a file and one or more parameters using addParameter(...).
 	 *
 	 * @sample
 	 * poster.addFile('myFileParamName','manual.doc','c:/temp/manual_01a.doc', 'application/msword')
@@ -330,8 +338,10 @@ public class BaseEntityEnclosingRequest extends BaseRequest
 
 
 	/**
-	 * Add a file to the post will try to get the correct mime type from the file name or the first bytes.
-	 * If you add a single file then this will be a single file post, so not a mutli part.
+	 * Add a file to the post; it will try to get the correct mime type from the file name or the first bytes.
+	 *
+	 * If you add a single file then this will be a single file (so not a multi-part) post. If you want/need multi-part
+	 * then you have to either add multiple files or both a file and one or more parameters using addParameter(...).
 	 *
 	 * @sample
 	 * poster.addFile('myFileParamName','manual.doc','c:/temp/manual_01a.doc')
@@ -358,9 +368,11 @@ public class BaseEntityEnclosingRequest extends BaseRequest
 	}
 
 	/**
-	 * Add a file to the post with a given mime type, could also be used to force the default 'application/octet-stream' on it,
-	 * because this plugin will try to guess the correect mime type for the given file (based on the name or the bytes)
-	 * If you add a single file then this will be a single file post, so not a mutli part.
+	 * Add a file to the post with a given mime type; could also be used to force the default 'application/octet-stream' on it,
+	 * because this plugin will try to guess the correct mime type for the given file otherwise (based on the name or the bytes).
+	 *
+	 * If you add a single file then this will be a single file (so not a multi-part) post. If you want/need multi-part
+	 * then you have to either add multiple files or both a file and one or more parameters using addParameter(...).
 	 *
 	 * @sample
 	 * poster.addFile('myFileParamName','manual.doc','c:/temp/manual_01a.doc', 'application/msword')
@@ -389,6 +401,8 @@ public class BaseEntityEnclosingRequest extends BaseRequest
 
 	/**
 	 * Add a parameter to the post.
+	 *
+	 * If there is also at least one file added to this request using addFile(...) then a multi-part post will be generated.
 	 *
 	 * @sample
 	 * poster.addParameter('name','value')
