@@ -84,7 +84,10 @@ public class Response implements IScriptable, IJavaScriptType
 	}
 
 	/**
-	 * Gets the status code of the response, the list of the possible values is in HTTP_STATUS constants.
+	 * Gets the status code of the response, the list of the possible values is in HTTP_STATUS constants.<br/><br/>
+	 *
+	 * In case there was an exception executing the request, please ignore/do not use this value (it will be 0).
+	 * You can check that situation using response.getException().
 	 *
 	 * @sample
 	 * var status = response.getStatusCode();// compare with HTTP_STATUS constants
@@ -132,7 +135,7 @@ public class Response implements IScriptable, IJavaScriptType
 			}
 			catch (Exception e)
 			{
-				Debug.error("Error in when getting response body  for: " + request.getURI(), e); //$NON-NLS-1$
+				Debug.error("Error when getting response body for: " + (request != null ? request.getURI() : "unknown request"), e); //$NON-NLS-1$
 				response_body = "";
 			}
 		}
@@ -168,7 +171,7 @@ public class Response implements IScriptable, IJavaScriptType
 			}
 			catch (IOException e)
 			{
-				Debug.error("Error when getting media data  for: " + request.getURI(), e); //$NON-NLS-1$
+				Debug.error("Error when getting media data  for: " + (request != null ? request.getURI() : "unknown request"), e); //$NON-NLS-1$
 			}
 		}
 		return response_body instanceof byte[] ? (byte[])response_body : null;
@@ -224,7 +227,7 @@ public class Response implements IScriptable, IJavaScriptType
 		}
 		catch (Exception e)
 		{
-			Debug.error("Error when getting response headers for: " + request.getURI(), e); //$NON-NLS-1$
+			Debug.error("Error when getting response headers for: " + (request != null ? request.getURI() : "unknown request"), e); //$NON-NLS-1$
 		}
 		return null;
 	}
@@ -254,7 +257,7 @@ public class Response implements IScriptable, IJavaScriptType
 		}
 		catch (IOException e)
 		{
-			Debug.trace("close error with " + request.getURI(), e); //$NON-NLS-1$
+			Debug.trace("close error with " + (request != null ? request.getURI() : "unknown request"), e); //$NON-NLS-1$
 		}
 		return false;
 	}

@@ -58,7 +58,7 @@ public class BaseEntityEnclosingRequest extends BaseRequest
 
 	private List<FileInfo> files;
 	private List<NameValuePair> params;
-
+	private boolean forceMultipart = false;
 
 	public BaseEntityEnclosingRequest()
 	{
@@ -127,7 +127,8 @@ public class BaseEntityEnclosingRequest extends BaseRequest
 	protected HttpEntity buildEntity() throws Exception
 	{
 		HttpEntity entity = null;
-		if (files.size() == 0)
+
+		if (files.size() == 0 && !forceMultipart)
 		{
 			if (params != null)
 			{
@@ -139,7 +140,7 @@ public class BaseEntityEnclosingRequest extends BaseRequest
 				bodyContent = null;
 			}
 		}
-		else if (files.size() == 1 && (params == null || params.size() == 0))
+		else if (files.size() == 1 && (params == null || params.size() == 0) && !forceMultipart)
 		{
 			FileInfo info = files.get(0);
 			if (info.file instanceof File)
@@ -205,9 +206,25 @@ public class BaseEntityEnclosingRequest extends BaseRequest
 		return entity;
 	}
 
+	/**
+	 * Force this request to prepare a "Content-Type: multipart/form-data" formatted message
+	 * even if only one file or only a number of parameter were added to it.<br/><br/>
+	 *
+	 * It is useful because some servers require this (they only support multipart - even if you don't need to send multiple things).
+	 * Before Servoy 2021.03 you could force it to send multipart by adding a dummy parameter together with a single file (or the other way around) - if the server didn't object to that dummy content...<br/><br/>
+	 *
+	 * Default value: false. (if you only add one file or only parameters it will not generate a multipart request)
+	 *
+	 * @since 2021.03
+	 * @param forceMultipart if true, this request will send a multipart/form-data message even if you only add one file or only parameters. If false (default) it will send multipart only in case of multiple files or one file plus at least one parameter.
+	 */
+	public void js_forceMultipart(boolean forceMultipart)
+	{
+		this.forceMultipart = forceMultipart;
+	}
 
 	/**
-	 * Add a file to the post; it will try to get the correct mime type from the file name or the first bytes.
+	 * Add a file to the post; it will try to get the correct mime type from the file name or the first bytes.<br/><br/>
 	 *
 	 * If you add a single file then this will be a single file (so not a multi-part) post. If you want/need multi-part
 	 * then you have to either add multiple files or a file and at least a parameter via addParameter(...).
@@ -242,7 +259,7 @@ public class BaseEntityEnclosingRequest extends BaseRequest
 
 	/**
 	 * Add a file to the post with a given mime type; could also be used to force the default 'application/octet-stream' on it,
-	 * because this plugin will try to guess the correct mime type for the given file otherwise (based on the name or the bytes).
+	 * because this plugin will try to guess the correct mime type for the given file otherwise (based on the name or the bytes).<br/><br/>
 	 *
 	 * If you add a single file then this will be a single file (so not a multi-part) post. If you want/need multi-part
 	 * then you have to either add multiple files or both a file and one or more parameters using addParameter(...).
@@ -277,7 +294,7 @@ public class BaseEntityEnclosingRequest extends BaseRequest
 	}
 
 	/**
-	 * Add a file to the post; it will try to get the correct mime type from the file name or the first bytes.
+	 * Add a file to the post; it will try to get the correct mime type from the file name or the first bytes.<br/><br/>
 	 *
 	 * If you add a single file then this will be a single file (so not a multi-part) post. If you want/need multi-part
 	 * then you have to either add multiple files or both a file and one or more parameters using addParameter(...).
@@ -307,7 +324,7 @@ public class BaseEntityEnclosingRequest extends BaseRequest
 
 	/**
 	 * Add a file to the post with a given mime type; could also be used to force the default 'application/octet-stream' on it,
-	 * because this plugin will try to guess the correct mime type for the given file otherwise (based on the name or the bytes).
+	 * because this plugin will try to guess the correct mime type for the given file otherwise (based on the name or the bytes).<br/><br/>
 	 *
 	 * If you add a single file then this will be a single file (so not a multi-part) post. If you want/need multi-part
 	 * then you have to either add multiple files or both a file and one or more parameters using addParameter(...).
@@ -338,7 +355,7 @@ public class BaseEntityEnclosingRequest extends BaseRequest
 
 
 	/**
-	 * Add a file to the post; it will try to get the correct mime type from the file name or the first bytes.
+	 * Add a file to the post; it will try to get the correct mime type from the file name or the first bytes.<br/><br/>
 	 *
 	 * If you add a single file then this will be a single file (so not a multi-part) post. If you want/need multi-part
 	 * then you have to either add multiple files or both a file and one or more parameters using addParameter(...).
@@ -369,7 +386,7 @@ public class BaseEntityEnclosingRequest extends BaseRequest
 
 	/**
 	 * Add a file to the post with a given mime type; could also be used to force the default 'application/octet-stream' on it,
-	 * because this plugin will try to guess the correct mime type for the given file otherwise (based on the name or the bytes).
+	 * because this plugin will try to guess the correct mime type for the given file otherwise (based on the name or the bytes).<br/><br/>
 	 *
 	 * If you add a single file then this will be a single file (so not a multi-part) post. If you want/need multi-part
 	 * then you have to either add multiple files or both a file and one or more parameters using addParameter(...).
@@ -400,7 +417,7 @@ public class BaseEntityEnclosingRequest extends BaseRequest
 	}
 
 	/**
-	 * Add a parameter to the post.
+	 * Add a parameter to the post.<br/><br/>
 	 *
 	 * If there is also at least one file added to this request using addFile(...) then a multi-part post will be generated.
 	 *
