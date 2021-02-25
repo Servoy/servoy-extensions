@@ -128,24 +128,18 @@ public class JWTProvider implements IScriptable
 	@JSFunction
 	public Object verify(String token)
 	{
-		Debug.warn("JWT verifying token : " + token);
-		Debug.warn("Testing to create the service : " + token);
 		createJWTService();
 		if (jwtService != null)
 		{
 			try
 			{
-				Debug.warn("Calling verify on the the service : " + token);
-				JSONObject payload = jwtService.verify(token);
-				Debug.warn("Returning the payload" + payload + " for : " + token);
-				return payload;
+				return jwtService.verify(token);
 			}
-			catch (Throwable e)
+			catch (Exception e)
 			{
 				Debug.error(e);
 			}
 		}
-		Debug.warn("No service returning null : " + token);
 		return null;
 	}
 }
