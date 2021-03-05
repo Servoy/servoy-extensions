@@ -30,6 +30,7 @@ import javax.net.ssl.SSLPeerUnverifiedException;
 import org.apache.http.client.CookieStore;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.config.RequestConfig.Builder;
+import org.apache.http.config.SocketConfig;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -73,7 +74,7 @@ public class HttpClient implements IScriptable, IJavaScriptType
 
 		cookieStore = new BasicCookieStore();
 		builder.setDefaultCookieStore(cookieStore);
-
+		builder.setDefaultSocketConfig(SocketConfig.custom().setSoKeepAlive(true).build());
 		try
 		{
 			final AllowedCertTrustStrategy allowedCertTrustStrategy = new AllowedCertTrustStrategy();
