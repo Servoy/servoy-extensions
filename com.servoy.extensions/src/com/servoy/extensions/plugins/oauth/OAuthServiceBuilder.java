@@ -37,7 +37,6 @@ import com.servoy.j2db.scripting.FunctionDefinition;
 import com.servoy.j2db.scripting.IJavaScriptType;
 import com.servoy.j2db.scripting.IScriptable;
 import com.servoy.j2db.solutionmodel.ISolutionModel;
-import com.servoy.j2db.util.Debug;
 
 /**
  * @author emera
@@ -61,7 +60,7 @@ public class OAuthServiceBuilder implements IScriptable, IJavaScriptType
 	private static final String DEFAULT_GET_FUNCTION = "function getSvyOAuthCode(){ return svy_authCode; }";
 	private static final String DEFAULT_DEEPLINK_FUNCTION_BODY = "(a,b){ svy_authCode = b; }";
 	private static final String DEEPLINK_METHOD_NAME = "deeplink_svy_oauth";
-	private static final Logger log = LoggerFactory.getLogger(OAuthServiceBuilder.class.getCanonicalName());
+	private static final Logger log = LoggerFactory.getLogger("plugin.oauth");
 
 	public OAuthServiceBuilder(OAuthProvider provider, String clientID)
 	{
@@ -247,7 +246,7 @@ public class OAuthServiceBuilder implements IScriptable, IJavaScriptType
 								catch (Exception e)
 								{
 									errorMessage = "Could not set the oauth code";
-									Debug.error("Could not set the oauth code " + e.getMessage(), e);
+									log.error("Could not set the oauth code " + e.getMessage(), e);
 								}
 							}
 							else
@@ -296,19 +295,19 @@ public class OAuthServiceBuilder implements IScriptable, IJavaScriptType
 				}
 				catch (Exception e)
 				{
-					Debug.error(e);
+					log.error(e.getMessage());
 				}
 			});
 
 			if (!((IAllWebClientPluginAccess)provider.getPluginAccess()).showURL(authURL, "_self", null))
 			{
-				Debug.error("Could not redirect to the login page.");
+				log.error("Could not redirect to the login page.");
 			}
 			redirectToAuthUrlTime = System.currentTimeMillis();
 		}
 		catch (Exception e)
 		{
-			Debug.error(e);
+			log.error(e.getMessage());
 			return null;
 		}
 		return service;

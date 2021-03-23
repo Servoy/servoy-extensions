@@ -21,6 +21,8 @@ import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 
 import org.mozilla.javascript.annotations.JSFunction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.github.scribejava.core.model.OAuth2AccessToken;
 import com.github.scribejava.core.model.OAuthRequest;
@@ -32,7 +34,6 @@ import com.servoy.base.scripting.annotations.ServoyClientSupport;
 import com.servoy.j2db.documentation.ServoyDocumented;
 import com.servoy.j2db.scripting.IJavaScriptType;
 import com.servoy.j2db.scripting.IScriptable;
-import com.servoy.j2db.util.Debug;
 
 /**
  * @author emera
@@ -41,6 +42,7 @@ import com.servoy.j2db.util.Debug;
 @ServoyClientSupport(ng = true, wc = false, sc = false)
 public class OAuthService implements IScriptable, IJavaScriptType
 {
+	private static final Logger log = LoggerFactory.getLogger("plugin.oauth");
 
 	private final OAuth20Service service;
 	private OAuth2AccessToken accessToken;
@@ -74,7 +76,7 @@ public class OAuthService implements IScriptable, IJavaScriptType
 		}
 		catch (IOException | InterruptedException | ExecutionException e)
 		{
-			Debug.error("Could not set the access token.", e);
+			log.error("Could not set the access token.", e);
 			throw new Exception("Could not set the access token. See the log for more details");
 		}
 	}
@@ -95,7 +97,7 @@ public class OAuthService implements IScriptable, IJavaScriptType
 		}
 		catch (IOException | InterruptedException | ExecutionException e)
 		{
-			Debug.error("Could not set the access token.", e);
+			log.error("Could not set the access token.", e);
 			throw new Exception("Could not set the access token. See the log for more details");
 		}
 	}
@@ -144,7 +146,7 @@ public class OAuthService implements IScriptable, IJavaScriptType
 		}
 		catch (Exception e)
 		{
-			Debug.error("Could not get a new access token", e);
+			log.error("Could not get a new access token", e);
 			throw new Exception("Could not get a new access token  " + e.getMessage());
 		}
 	}
@@ -387,7 +389,7 @@ public class OAuthService implements IScriptable, IJavaScriptType
 		}
 		catch (InterruptedException | ExecutionException | IOException e)
 		{
-			Debug.error("Could not execute request " + req.getUrl(), e);
+			log.error("Could not execute request " + req.getUrl(), e);
 		}
 		return null;
 	}
