@@ -24,6 +24,8 @@ import java.util.concurrent.TimeUnit;
 import org.mozilla.javascript.Function;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.annotations.JSFunction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.github.scribejava.core.builder.ServiceBuilder;
 import com.github.scribejava.core.utils.Preconditions;
@@ -59,6 +61,7 @@ public class OAuthServiceBuilder implements IScriptable, IJavaScriptType
 	private static final String DEFAULT_GET_FUNCTION = "function getSvyOAuthCode(){ return svy_authCode; }";
 	private static final String DEFAULT_DEEPLINK_FUNCTION_BODY = "(a,b){ svy_authCode = b; }";
 	private static final String DEEPLINK_METHOD_NAME = "deeplink_svy_oauth";
+	private static final Logger log = LoggerFactory.getLogger(OAuthServiceBuilder.class.getCanonicalName());
 
 	public OAuthServiceBuilder(OAuthProvider provider, String clientID)
 	{
@@ -193,7 +196,7 @@ public class OAuthServiceBuilder implements IScriptable, IJavaScriptType
 		}
 		String deeplink_name = _deeplink == null ? DEEPLINK_METHOD_NAME : _deeplink;
 		builder.callback(provider.getRedirectURL(deeplink_name));
-		Debug.log("Redirect url " + provider.getRedirectURL(deeplink_name));
+		if (log.isDebugEnabled()) log.debug("Redirect url " + provider.getRedirectURL(deeplink_name));
 
 		OAuthService service = new OAuthService(builder.build(OAuthProvider.getApiInstance(api, _tenant)), _state);
 		return _callback != null ? buildWithCallback(generateGlobalMethods, deeplink_name, service) : service;
@@ -212,7 +215,7 @@ public class OAuthServiceBuilder implements IScriptable, IJavaScriptType
 		try
 		{
 			String authURL = service.getAuthorizationURL();
-			Debug.log("authorization url " + authURL);
+			if (log.isDebugEnabled()) log.debug("authorization url " + authURL);
 			ExecutorService executor = Executors.newFixedThreadPool(1);
 			executor.submit(() -> {
 				try
@@ -234,11 +237,12 @@ public class OAuthServiceBuilder implements IScriptable, IJavaScriptType
 							{
 								try
 								{
-									Debug.log("Received code in " + (System.currentTimeMillis() - redirectToAuthUrlTime) / 1000 +
+									if (log.isDebugEnabled()) log.debug("Received code in " + (System.currentTimeMillis() - redirectToAuthUrlTime) / 1000 +
 										"s since the beginning of the request.");
 									service.setAccessToken((String)result.get("code", result));
-									Debug.log("Received access token in  " + (System.currentTimeMillis() - redirectToAuthUrlTime) / 1000 +
-										"s since the beginning of the request.");
+									if (log.isDebugEnabled())
+										log.debug("Received access token in  " + (System.currentTimeMillis() - redirectToAuthUrlTime) / 1000 +
+											"s since the beginning of the request.");
 								}
 								catch (Exception e)
 								{
@@ -277,8 +281,12 @@ public class OAuthServiceBuilder implements IScriptable, IJavaScriptType
 					executor.shutdown();
 
 					FunctionDefinition fd = new FunctionDefinition(_callback);
-					Debug.log(
-						"Callback function called in " + (System.currentTimeMillis() - redirectToAuthUrlTime) / 1000 + "s since the beginning of the request.");
+					if (log.isDebugEnabled())
+					{
+						log.debug(
+							"Callback function called in " + (System.currentTimeMillis() - redirectToAuthUrlTime) / 1000 +
+								"s since the beginning of the request.");
+					}
 					fd.executeAsync(provider.getPluginAccess(),
 						new Object[] { errorMessage != null ? Boolean.FALSE : Boolean.TRUE, errorMessage != null ? errorMessage : service });
 				}
