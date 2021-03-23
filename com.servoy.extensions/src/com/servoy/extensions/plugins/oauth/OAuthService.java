@@ -42,7 +42,7 @@ import com.servoy.j2db.scripting.IScriptable;
 @ServoyClientSupport(ng = true, wc = false, sc = false)
 public class OAuthService implements IScriptable, IJavaScriptType
 {
-	private static final Logger log = LoggerFactory.getLogger("plugin.oauth");
+	public static final Logger log = LoggerFactory.getLogger("plugin.oauth");
 
 	private final OAuth20Service service;
 	private OAuth2AccessToken accessToken;

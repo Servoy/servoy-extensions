@@ -20,9 +20,6 @@ package com.servoy.extensions.plugins.oauth;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.github.scribejava.core.model.Response;
 import com.servoy.base.scripting.annotations.ServoyClientSupport;
 import com.servoy.j2db.documentation.ServoyDocumented;
@@ -36,7 +33,6 @@ import com.servoy.j2db.scripting.IScriptable;
 @ServoyClientSupport(ng = true, wc = false, sc = false)
 public class OAuthResponseBinary extends OAuthResponse implements IJavaScriptType, IScriptable
 {
-	private static final Logger log = LoggerFactory.getLogger("plugin.oauth");
 	private byte[] content;
 
 	public OAuthResponseBinary(Response response)
@@ -55,7 +51,7 @@ public class OAuthResponseBinary extends OAuthResponse implements IJavaScriptTyp
 		}
 		catch (Exception e)
 		{
-			log.error(e.getMessage());
+			OAuthService.log.error(e.getMessage());
 		}
 	}
 
