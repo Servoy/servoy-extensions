@@ -29,6 +29,7 @@ import com.servoy.j2db.scripting.IScriptable;
 public class HttpClientConfig implements IScriptable, IJavaScriptType
 {
 	String protocol;
+	int keepAliveDuration = -1;
 
 	public HttpClientConfig()
 	{
@@ -50,5 +51,23 @@ public class HttpClientConfig implements IScriptable, IJavaScriptType
 	public void js_setProtocol(String protocol)
 	{
 		this.protocol = protocol;
+	}
+
+	/**
+	 * Gets/Sets keep alive duration in seconds for a connection, default is -1 (no duration specified).
+	 *
+	 * @sample
+	 * var config = plugins.http.createNewHttpClientConfig();
+	 * config.keepAliveDuration = 5;
+	 * var client = plugins.http.createNewHttpClient(config);
+	 */
+	public int js_getKeepAliveDuration()
+	{
+		return keepAliveDuration;
+	}
+
+	public void js_setKeepAliveDuration(int duration)
+	{
+		this.keepAliveDuration = duration;
 	}
 }

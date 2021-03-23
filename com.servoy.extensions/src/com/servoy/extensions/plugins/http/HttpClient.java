@@ -27,15 +27,19 @@ import java.util.List;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLPeerUnverifiedException;
 
+import org.apache.http.HttpResponse;
 import org.apache.http.client.CookieStore;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.config.RequestConfig.Builder;
 import org.apache.http.config.SocketConfig;
+import org.apache.http.conn.ConnectionKeepAliveStrategy;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.DefaultConnectionKeepAliveStrategy;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.cookie.BasicClientCookie;
+import org.apache.http.protocol.HttpContext;
 import org.apache.http.ssl.SSLContexts;
 
 import com.servoy.j2db.documentation.ServoyDocumented;
@@ -88,7 +92,23 @@ public class HttpClient implements IScriptable, IJavaScriptType
 		{
 			Debug.error("Can't set up ssl socket factory", ex); //$NON-NLS-1$
 		}
+		if (config != null && config.keepAliveDuration >= 0)
+		{
+			builder.setKeepAliveStrategy(new ConnectionKeepAliveStrategy()
+			{
+				@Override
+				public long getKeepAliveDuration(HttpResponse response, HttpContext context)
+				{
+					long duration = DefaultConnectionKeepAliveStrategy.INSTANCE.getKeepAliveDuration(response, context);
+					if (duration >= 0)
+					{
+						return duration;
+					}
+					return config.keepAliveDuration * 1000;
+				}
 
+			});
+		}
 		client = builder.build();
 	}
 
