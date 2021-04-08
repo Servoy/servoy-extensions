@@ -257,7 +257,7 @@ public class HeadlessServerPlugin implements IHeadlessServer, IServerPlugin
 	{
 		if (methodName != null)
 		{
-			synchronized (methodCalls) // Terracotta READ lock
+			synchronized (methodCalls)
 			{
 				MethodCall methodCall = methodCalls.get(clientKey);
 				if (methodCall == null || !(methodCall.callingClientId.equals(callingClientId) && methodCall.methodName.equals(methodName)))
@@ -294,7 +294,7 @@ public class HeadlessServerPlugin implements IHeadlessServer, IServerPlugin
 	{
 		if (methodName != null)
 		{
-			synchronized (methodCalls) // Terracotta READ lock
+			synchronized (methodCalls)
 			{
 				MethodCall methodCall = methodCalls.get(clientKey);
 				if (methodCall == null || !(methodCall.callingClientId.equals(callingClientId) && methodCall.methodName.equals(methodName)))
@@ -340,13 +340,13 @@ public class HeadlessServerPlugin implements IHeadlessServer, IServerPlugin
 					try
 					{
 						methodCalls.wait();
-						methodCalls.put(clientKey, dummy);
 					}
 					catch (InterruptedException e)
 					{
 						Debug.error(e);
 					}
 				}
+				methodCalls.put(clientKey, dummy);
 			}
 		}
 		try
