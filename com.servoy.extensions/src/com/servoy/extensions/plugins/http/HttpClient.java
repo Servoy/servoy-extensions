@@ -109,6 +109,10 @@ public class HttpClient implements IScriptable, IJavaScriptType
 
 			});
 		}
+		if (config != null && config.userAgent != null)
+		{
+			builder.setUserAgent(config.userAgent);
+		}
 		client = builder.build();
 	}
 

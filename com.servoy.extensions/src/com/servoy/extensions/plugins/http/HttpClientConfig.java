@@ -30,6 +30,7 @@ public class HttpClientConfig implements IScriptable, IJavaScriptType
 {
 	String protocol;
 	int keepAliveDuration = -1;
+	String userAgent;
 
 	public HttpClientConfig()
 	{
@@ -69,5 +70,15 @@ public class HttpClientConfig implements IScriptable, IJavaScriptType
 	public void js_setKeepAliveDuration(int duration)
 	{
 		this.keepAliveDuration = duration;
+	}
+
+	public void js_setUserAgent(String user_agent)
+	{
+		this.userAgent = user_agent;
+	}
+
+	public String js_getUserAgent()
+	{
+		return userAgent;
 	}
 }
