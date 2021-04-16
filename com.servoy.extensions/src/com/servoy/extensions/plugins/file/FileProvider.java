@@ -38,8 +38,10 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Timer;
 import java.util.UUID;
 
@@ -50,12 +52,14 @@ import javax.swing.filechooser.FileSystemView;
 
 import org.mozilla.javascript.Function;
 import org.mozilla.javascript.NativeArray;
+import org.mozilla.javascript.annotations.JSFunction;
 
 import com.servoy.base.scripting.annotations.ServoyClientSupport;
 import com.servoy.j2db.IApplication;
 import com.servoy.j2db.Messages;
 import com.servoy.j2db.documentation.ServoyDocumented;
 import com.servoy.j2db.plugins.IClientPluginAccess;
+import com.servoy.j2db.plugins.IFile;
 import com.servoy.j2db.plugins.IMediaUploadCallback;
 import com.servoy.j2db.plugins.IRuntimeWindow;
 import com.servoy.j2db.plugins.ISmartRuntimeWindow;
@@ -73,7 +77,7 @@ import com.servoy.j2db.util.FileChooserUtils;
 @ServoyDocumented(publicName = FilePlugin.PLUGIN_NAME, scriptingName = "plugins." + FilePlugin.PLUGIN_NAME)
 public class FileProvider implements IReturnedTypesProvider, IScriptable
 {
-
+	private final Set<UUID> streamedFiles = new HashSet<>();
 	protected final FilePlugin plugin;
 	private final Map<String, File> tempFiles = new HashMap<String, File>(); //check this map when saving (txt/binary) files
 	private static final JSFile[] EMPTY = new JSFile[0];
@@ -1343,7 +1347,8 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 * @param encoding
 	 * @return
 	 */
-	protected boolean writeTXT(Object f, String data, String encoding, @SuppressWarnings("unused") String contentType)
+	protected boolean writeTXT(Object f, String data, String encoding, @SuppressWarnings("unused")
+	String contentType)
 	{
 		try
 		{
@@ -1565,7 +1570,8 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 		return writeFile(file, data, mimeType);
 	}
 
-	protected boolean writeFile(Object f, byte[] data, @SuppressWarnings("unused") String mimeType)
+	protected boolean writeFile(Object f, byte[] data, @SuppressWarnings("unused")
+	String mimeType)
 	{
 		if (data == null) return false;
 		try
@@ -2917,8 +2923,9 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 		if (file.getAbstractFile() instanceof RemoteFile)
 		{
 			if (!file.js_exists()) throw new RuntimeException("File " + file.js_getName() + " does not exist on the server");
-			URL serverURL = plugin.getClientPluginAccess().getServerURL();
-			return new URL(serverURL.toURI().toString() + "/servoy-service/file" + file.js_getAbsolutePath()).toURI().toString(); //$NON-NLS-1$
+			String serverURL = plugin.getClientPluginAccess().getServerURL().toURI().toString();
+			serverURL = serverURL.endsWith("/") ? serverURL : serverURL + '/';
+			return new URL(serverURL + "servoy-service/file" + file.js_getAbsolutePath()).toURI().toString(); //$NON-NLS-1$
 		}
 		throw new RuntimeException("File " + file.js_getName() + " is not a remote file");
 	}
@@ -2933,6 +2940,91 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	public String js_getUrlForRemoteFile(String file) throws Exception
 	{
 		return js_getUrlForRemoteFile(js_convertToRemoteJSFile(file));
+	}
+
+	/**
+	 * Stream the given file(path) to the browser with content-disposition:attachment
+	 * This will not load in the file fully into memory but only stream it right from disk.
+	 * This can be any filepath on the server, but only the simple file name is exposed as the content disposition header filename.
+	 * This will throw an exception if anything goes wrong, like the given file is not valid/found.
+	 *
+	 * @param file A path string, JSFile or RemoteFile
+	 */
+	@JSFunction
+	@ServoyClientSupport(ng = true, wc = false, sc = false)
+	public void streamFile(Object file) throws Exception
+	{
+		streamFile(file, "attachment"); //$NON-NLS-1$
+	}
+
+	/**
+	 * String the given file(path) to the browser you can provide the content disposition how this should be send (inline or as an attachment)
+	 * This will not load in the file fully into memory but only stream it right from disk.
+	 * This can be any filepath on the server, but only the simple file name is exposed.
+	 * This will throw an exception if anything goes wrong, like the given file is not valid/found.
+	 *
+	 * @param file A path string, JSFile or RemoteFile
+	 * @param contentDisposition can be 'inline' or 'attachment'
+	 */
+	@SuppressWarnings("nls")
+	@JSFunction
+	@ServoyClientSupport(ng = true, wc = false, sc = false)
+	public void streamFile(Object file, String contentDisposition) throws Exception
+	{
+		streamFile(file, contentDisposition, null);
+	}
+
+	/**
+	 * String the given file(path) to the browser you can provide the content disposition how this should be send (inline or as an attachment)
+	 * This will not load in the file fully into memory but only stream it right from disk.
+	 * This can be any filepath on the server, but only the simple file name is exposed.
+	 * This will throw an exception if anything goes wrong, like the given file is not valid/found.
+	 * Give the browser target if you want to open the file inside another tab, most usefull in 'inline' content disposition mode.
+	 *
+	 * @param file A path string, JSFile or RemoteFile
+	 * @param contentDisposition can be 'inline' or 'attachment'
+	 * @param browserTarget _blank or a specific name to open this in a differnt tab (really only usefull in inline mode)
+	 */
+	@SuppressWarnings("nls")
+	@JSFunction
+	@ServoyClientSupport(ng = true, wc = false, sc = false)
+	public void streamFile(Object file, String contentDisposition, String browserTarget) throws Exception
+	{
+		// first handle if it is a remote file
+		if (file instanceof JSFile && ((JSFile)file).getAbstractFile() instanceof RemoteFile)
+		{
+			String url = js_getUrlForRemoteFile((JSFile)file);
+			if ("attachment".equals(contentDisposition)) url += "?c=a";
+			else if ("inline".equals(contentDisposition)) url += "?c=i";
+			plugin.getClientPluginAccess().showUrl(url, browserTarget == null ? "_self" : browserTarget);
+			return;
+		}
+
+		File realFile = null;
+		if (file instanceof IFile)
+		{
+			realFile = ((IFile)file).getFile();
+		}
+		else if (file instanceof String)
+		{
+			realFile = new File((String)file);
+		}
+		if (realFile != null && realFile.exists())
+		{
+			UUID uuid = FileServlet.registerFile(realFile);
+			streamedFiles.add(uuid);
+
+			String serverURL = plugin.getClientPluginAccess().getServerURL().toURI().toString();
+			serverURL = serverURL.endsWith("/") ? serverURL : serverURL + '/';
+			String url = serverURL + "servoy-service/file/" + uuid.toString();
+			if ("attachment".equals(contentDisposition)) url += "?c=a";
+			else if ("inline".equals(contentDisposition)) url += "?c=i";
+			plugin.getClientPluginAccess().showUrl(url, browserTarget == null ? "_self" : browserTarget);
+		}
+		else
+		{
+			throw new RuntimeException("Can stream " + file + " because the file does not exists");
+		}
 	}
 
 	/**
@@ -2973,6 +3065,8 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 		{
 			timer.cancel();
 		}
+		streamedFiles.forEach(uuid -> FileServlet.unregisterFile(uuid));
+		streamedFiles.clear();
 	}
 
 	private final class FromServerWorker implements Runnable

@@ -35,7 +35,6 @@ import com.servoy.j2db.scripting.FunctionDefinition;
 import com.servoy.j2db.scripting.IJavaScriptType;
 import com.servoy.j2db.scripting.IScriptable;
 import com.servoy.j2db.solutionmodel.ISolutionModel;
-import com.servoy.j2db.util.Debug;
 
 /**
  * @author emera
@@ -51,6 +50,7 @@ public class OAuthServiceBuilder implements IScriptable, IJavaScriptType
 	private int _timeout;
 	private String _deeplink;
 	private final OAuthProvider provider;
+	private long redirectToAuthUrlTime;
 
 	private static final String GET_CODE_METHOD = "getSvyOAuthCode";
 	private static final String SVY_AUTH_CODE_VAR = "svy_authCode";
@@ -192,6 +192,7 @@ public class OAuthServiceBuilder implements IScriptable, IJavaScriptType
 		}
 		String deeplink_name = _deeplink == null ? DEEPLINK_METHOD_NAME : _deeplink;
 		builder.callback(provider.getRedirectURL(deeplink_name));
+		if (OAuthService.log.isDebugEnabled()) OAuthService.log.debug("Redirect url " + provider.getRedirectURL(deeplink_name));
 
 		OAuthService service = new OAuthService(builder.build(OAuthProvider.getApiInstance(api, _tenant)), _state);
 		return _callback != null ? buildWithCallback(generateGlobalMethods, deeplink_name, service) : service;
@@ -210,6 +211,7 @@ public class OAuthServiceBuilder implements IScriptable, IJavaScriptType
 		try
 		{
 			String authURL = service.getAuthorizationURL();
+			if (OAuthService.log.isDebugEnabled()) OAuthService.log.debug("authorization url " + authURL);
 			ExecutorService executor = Executors.newFixedThreadPool(1);
 			executor.submit(() -> {
 				try
@@ -231,11 +233,18 @@ public class OAuthServiceBuilder implements IScriptable, IJavaScriptType
 							{
 								try
 								{
+									if (OAuthService.log.isDebugEnabled())
+										OAuthService.log.debug("Received code in " + (System.currentTimeMillis() - redirectToAuthUrlTime) / 1000 +
+											"s since the beginning of the request.");
 									service.setAccessToken((String)result.get("code", result));
+									if (OAuthService.log.isDebugEnabled())
+										OAuthService.log.debug("Received access token in  " + (System.currentTimeMillis() - redirectToAuthUrlTime) / 1000 +
+											"s since the beginning of the request.");
 								}
 								catch (Exception e)
 								{
 									errorMessage = "Could not set the oauth code";
+									OAuthService.log.error("Could not set the oauth code " + e.getMessage(), e);
 								}
 							}
 							else
@@ -269,6 +278,12 @@ public class OAuthServiceBuilder implements IScriptable, IJavaScriptType
 					executor.shutdown();
 
 					FunctionDefinition fd = new FunctionDefinition(_callback);
+					if (OAuthService.log.isDebugEnabled())
+					{
+						OAuthService.log.debug(
+							"Callback function called in " + (System.currentTimeMillis() - redirectToAuthUrlTime) / 1000 +
+								"s since the beginning of the request.");
+					}
 					fd.executeAsync(provider.getPluginAccess(),
 						new Object[] { errorMessage != null ? Boolean.FALSE : Boolean.TRUE, errorMessage != null ? errorMessage : service });
 				}
@@ -278,18 +293,19 @@ public class OAuthServiceBuilder implements IScriptable, IJavaScriptType
 				}
 				catch (Exception e)
 				{
-					Debug.error(e);
+					OAuthService.log.error(e.getMessage());
 				}
 			});
 
 			if (!((IAllWebClientPluginAccess)provider.getPluginAccess()).showURL(authURL, "_self", null))
 			{
-				Debug.error("Could not redirect to the login page.");
+				OAuthService.log.error("Could not redirect to the login page.");
 			}
+			redirectToAuthUrlTime = System.currentTimeMillis();
 		}
 		catch (Exception e)
 		{
-			Debug.error(e);
+			OAuthService.log.error(e.getMessage());
 			return null;
 		}
 		return service;

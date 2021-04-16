@@ -29,7 +29,6 @@ import com.servoy.base.scripting.annotations.ServoyClientSupport;
 import com.servoy.j2db.documentation.ServoyDocumented;
 import com.servoy.j2db.scripting.IJavaScriptType;
 import com.servoy.j2db.scripting.IScriptable;
-import com.servoy.j2db.util.Debug;
 
 /**
  * @author emera
@@ -66,7 +65,7 @@ public class OAuthResponseJSON extends OAuthResponseText implements IJavaScriptT
 		}
 		catch (JSONException | IOException e)
 		{
-			Debug.error(e);
+			OAuthService.log.error(e.getMessage());
 		}
 		return json;
 	}

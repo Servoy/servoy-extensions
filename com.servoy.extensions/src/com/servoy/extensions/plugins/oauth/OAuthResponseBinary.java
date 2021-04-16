@@ -25,7 +25,6 @@ import com.servoy.base.scripting.annotations.ServoyClientSupport;
 import com.servoy.j2db.documentation.ServoyDocumented;
 import com.servoy.j2db.scripting.IJavaScriptType;
 import com.servoy.j2db.scripting.IScriptable;
-import com.servoy.j2db.util.Debug;
 
 /**
  * @author emera
@@ -52,7 +51,7 @@ public class OAuthResponseBinary extends OAuthResponse implements IJavaScriptTyp
 		}
 		catch (Exception e)
 		{
-			Debug.error(e);
+			OAuthService.log.error(e.getMessage());
 		}
 	}
 

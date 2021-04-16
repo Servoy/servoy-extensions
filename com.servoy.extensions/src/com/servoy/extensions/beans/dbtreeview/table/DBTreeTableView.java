@@ -29,7 +29,7 @@ import com.servoy.j2db.plugins.IClientPluginAccess;
 
 /**
  * DB Tree Table View bean main class
- * 
+ *
  * @author gboros
  */
 public class DBTreeTableView extends DBTreeView

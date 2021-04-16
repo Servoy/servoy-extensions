@@ -38,6 +38,7 @@ import com.servoy.j2db.scripting.IScriptable;
 public class OAuthProvider implements IScriptable, IReturnedTypesProvider
 {
 	private static final String SOLUTIONS_PATH = "solutions/";
+	private static final String SOLUTION_PATH = "solution/";
 	private final OAuthPlugin plugin;
 
 	public OAuthProvider(OAuthPlugin oAuthPlugin)
@@ -134,7 +135,10 @@ public class OAuthProvider implements IScriptable, IReturnedTypesProvider
 	String getRedirectURL(String callbackmethod)
 	{
 		String redirectURL = getPluginAccess().getServerURL().toString();
-		redirectURL += (!redirectURL.endsWith("/") ? "/" + SOLUTIONS_PATH : SOLUTIONS_PATH);
+		String path = getPluginAccess().getRuntimeProperties().containsKey("NG2") && (Boolean)getPluginAccess().getRuntimeProperties().get("NG2")
+			? SOLUTION_PATH
+			: SOLUTIONS_PATH;
+		redirectURL += (!redirectURL.endsWith("/") ? "/" + path : path);
 		redirectURL += getPluginAccess().getMainSolutionName() + "/m/" + callbackmethod;
 		return redirectURL;
 	}
