@@ -80,13 +80,13 @@ public class HttpClientConfig implements IScriptable, IJavaScriptType
 	 * config.userAgent = "Mozilla/5.0 Firefox/26.0";
 	 * var client = plugins.http.createNewHttpClient(config);
 	 */
-	public void js_setUserAgent(String user_agent)
-	{
-		this.userAgent = user_agent;
-	}
-
 	public String js_getUserAgent()
 	{
 		return userAgent;
+	}
+
+	public void js_setUserAgent(String user_agent)
+	{
+		this.userAgent = user_agent;
 	}
 }
