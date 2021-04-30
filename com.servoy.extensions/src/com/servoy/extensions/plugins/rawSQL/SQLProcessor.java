@@ -103,7 +103,7 @@ public class SQLProcessor implements ISQLService, IServerPlugin
 		Statement ps = null;
 		try
 		{
-			connection = application.getDBServerConnection(server, tid);
+			connection = application.getDBServerConnection(server, tid, clientId);
 			if (connection != null)
 			{
 				if (questiondata == null || questiondata.length == 0)
