@@ -36,7 +36,8 @@ Export-Package: com.servoy.extensions.plugins.workflow.impl,
 Require-Bundle: j2db_server,
  servoy_shared,
  servoy_headless_client,
- com.sun.mail.javax.mail;bundle-version="1.4.5"
+ com.sun.mail.javax.mail;bundle-version="1.4.5",
+ javax.persistence-api;bundle-version="2.2.0"
 Bundle-ActivationPolicy: lazy
 Import-Package: org.osgi.framework,
  org.osgi.util.tracker;version="1.5.1"

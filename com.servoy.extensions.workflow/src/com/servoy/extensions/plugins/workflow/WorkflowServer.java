@@ -28,6 +28,8 @@ import java.util.Set;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 
+import org.hibernate.HibernateException;
+import org.hibernate.MappingException;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Environment;
 import org.jbpm.api.Configuration;
@@ -442,17 +444,16 @@ public class WorkflowServer implements IWorkflowPluginService
 			{
 				Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
 				
-				SessionFactory sessionFactory =null ; // RAGTEST 
-//						new org.hibernate.cfg.Configuration()
-//				.setProperty(Environment.DATASOURCE,jndi_datasource)
-//				.setProperty(Environment.DIALECT, jbpm_server.getDialectClassName())
-//                .addResource("jbpm.execution.hbm.xml",Configuration.class.getClassLoader())
-//                .addResource("jbpm.history.hbm.xml",Configuration.class.getClassLoader())
-//                .addResource("jbpm.identity.hbm.xml",Configuration.class.getClassLoader())
-//                .addResource("jbpm.repository.hbm.xml",Configuration.class.getClassLoader())
-//                .addResource("jbpm.task.hbm.xml",Configuration.class.getClassLoader())
-//                .configure(getClass().getResource("/jbpm.hibernate.cfg.xml"))
-//                .buildSessionFactory();
+				SessionFactory sessionFactory = new org.hibernate.cfg.Configuration()
+				.setProperty(Environment.DATASOURCE,jndi_datasource)
+				.setProperty(Environment.DIALECT, jbpm_server.getDialectClassName())
+                .addResource("jbpm.execution.hbm.xml",Configuration.class.getClassLoader())
+                .addResource("jbpm.history.hbm.xml",Configuration.class.getClassLoader())
+                .addResource("jbpm.identity.hbm.xml",Configuration.class.getClassLoader())
+                .addResource("jbpm.repository.hbm.xml",Configuration.class.getClassLoader())
+                .addResource("jbpm.task.hbm.xml",Configuration.class.getClassLoader())
+                .configure(getClass().getResource("/jbpm.hibernate.cfg.xml"))
+                .buildSessionFactory();
 				
 			    Configuration conf = new Configuration();
 			    conf.setHibernateSessionFactory(sessionFactory);
