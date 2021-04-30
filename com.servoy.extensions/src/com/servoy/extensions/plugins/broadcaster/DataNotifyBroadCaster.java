@@ -25,6 +25,8 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.UUID;
 
+import javax.net.ssl.SSLContext;
+
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
@@ -106,6 +108,29 @@ public class DataNotifyBroadCaster implements IServerPlugin
 			if (shutdownTimeout != null) factory.setShutdownTimeout(Utils.getAsInteger(shutdownTimeout));
 			String channelRpcTimeout = app.getSettings().getProperty("amqpbroadcaster.rpctimeout");
 			if (channelRpcTimeout != null) factory.setChannelRpcTimeout(Utils.getAsInteger(channelRpcTimeout));
+
+
+			String tlsProtocols = app.getSettings().getProperty("amqpbroadcaster.tlsprotocols");
+			if (!Utils.stringIsEmpty(tlsProtocols))
+			{
+				try
+				{
+					SSLContext c = SSLContext.getInstance(tlsProtocols);
+					c.init(null, null, null);
+
+					factory.useSslProtocol(c);
+
+					if (Boolean.valueOf(app.getSettings().getProperty("amqpbroadcaster.hostnameverification", "false")).booleanValue())
+					{
+						factory.enableHostnameVerification();
+					}
+				}
+				catch (Exception e)
+				{
+					Debug.error("Couldn't instantiate a SSLContext with the protocol: " + tlsProtocols + " (amqpbroadcaster.tlsprotocols)", e);
+				}
+			}
+
 
 			String exchangeName = app.getSettings().getProperty("amqpbroadcaster.exchange", EXCHANGE_NAME);
 			String routingKey = app.getSettings().getProperty("amqpbroadcaster.routingkey", ROUTING_KEY);
@@ -192,6 +217,7 @@ public class DataNotifyBroadCaster implements IServerPlugin
 		}
 	}
 
+	@SuppressWarnings("nls")
 	@Override
 	public Map<String, String> getRequiredPropertyNames()
 	{
@@ -208,6 +234,9 @@ public class DataNotifyBroadCaster implements IServerPlugin
 		req.put("amqpbroadcaster.handshaketimeout", "Set the handshake timeout of the AMQP (RabbitMQ) connection (default value 10000 - 10 seconds)");
 		req.put("amqpbroadcaster.shutdowntimeout", "Set the shutdown timeout of the AMQP (RabbitMQ) connection (default value 10000 - 10 seconds)");
 		req.put("amqpbroadcaster.rpctimeout", "Set the rpc continuation timeout of the AMQP (RabbitMQ) channel (default value 10 minutes)");
+		req.put("amqpbroadcaster.tlsprotocols", "When set this will enabled tls communication over the given protocol like TLSv1.2 or TLSv1.3");
+		req.put("amqpbroadcaster.hostnameverification",
+			"When set to true this will enable the hostname verification for the TLS conncetions (TLS must be enabled) (default false)");
 		return req;
 	}
 
