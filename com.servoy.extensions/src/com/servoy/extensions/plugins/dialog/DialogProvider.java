@@ -105,7 +105,8 @@ public class DialogProvider implements IScriptable, IMobileDialogProvider
 	}
 
 	/**
-	 * @clonedesc showWarningDialog(String,String,String[])
+	 * Shows a message dialog with the specified title, message and a customizable set of buttons.
+	 * Returns pressed button text, in case window is closed without pressing any button return value depends on client type.
 	 *
 	 * @sample
 	 * //show dialog
@@ -116,26 +117,25 @@ public class DialogProvider implements IScriptable, IMobileDialogProvider
 	 *
 	 * @return pressed button text
 	 */
-	@JSFunction
-	@ServoyClientSupport(ng = true, mc = true, wc = true, sc = true)
 	public String showWarningDialog(String dialogTitle, String dialogMessage)
 	{
 		return showWarningDialog(dialogTitle, dialogMessage, (String[])null);
 	}
 
 	/**
-	 * @clonedesc showErrorDialog(String,String,String[])
-	 *
-	 * @sample
-	 * //show dialog
-	 * var thePressedButton = plugins.dialogs.showWarningDialog('Title', 'Value not allowed','OK');
-	 *
-	 * @param dialogTitle Dialog title.
-	 * @param dialogMessage Dialog message.
-	 * @param buttonsText Array of button texts.
-	 *
-	 * @return pressed button text
-	 */
+	* Shows a message dialog with the specified title, message and a customizable set of buttons.
+	* Returns pressed button text, in case window is closed without pressing any button return value depends on client type.
+	*
+	* @sample
+	* //show dialog
+	* var thePressedButton = plugins.dialogs.showWarningDialog('Title', 'Value not allowed','OK');
+	*
+	* @param dialogTitle Dialog title.
+	* @param dialogMessage Dialog message.
+	* @param buttonsText Array of button texts.
+	*
+	* @return pressed button text
+	*/
 	@JSFunction
 	@ServoyClientSupport(ng = true, mc = false, wc = true, sc = true)
 	public String showWarningDialog(String dialogTitle, String dialogMessage, String... buttonsText)
@@ -221,17 +221,18 @@ public class DialogProvider implements IScriptable, IMobileDialogProvider
 	}
 
 	/**
-	 * @clonedesc showQuestionDialog(String,String,String[])
+	 * Shows a message dialog with the specified title, message and a customizable set of buttons.
+	 * Returns pressed button text, in case window is closed without pressing any button return value depends on client type.
 	 *
-	 * @sampleas showQuestionDialog(String,String,String[])
+	 * @sample
+	 * //show dialog
+	 * var thePressedButton = plugins.dialogs.showQuestionDialog('Title', 'Value not allowed');
 	 *
 	 * @param dialogTitle Dialog title.
 	 * @param dialogMessage Dialog message.
 	 *
 	 * @return pressed button text
 	 */
-	@JSFunction
-	@ServoyClientSupport(ng = true, mc = true, wc = true, sc = true)
 	public String showQuestionDialog(String dialogTitle, String dialogMessage)
 	{
 		return showQuestionDialog(dialogTitle, dialogMessage, (String[])null);
