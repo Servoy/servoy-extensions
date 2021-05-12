@@ -18,13 +18,22 @@
 package com.servoy.extensions.plugins.broadcaster;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.security.KeyManagementException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableKeyException;
+import java.security.cert.CertificateException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.UUID;
 
+import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 
 import com.rabbitmq.client.AMQP;
@@ -109,16 +118,55 @@ public class DataNotifyBroadCaster implements IServerPlugin
 			String channelRpcTimeout = app.getSettings().getProperty("amqpbroadcaster.rpctimeout");
 			if (channelRpcTimeout != null) factory.setChannelRpcTimeout(Utils.getAsInteger(channelRpcTimeout));
 
-
+			String keystorePath = app.getSettings().getProperty("amqpbroadcaster.keystore.path");
+			String keystorePassword = app.getSettings().getProperty("amqpbroadcaster.keystore.password");
 			String tlsProtocols = app.getSettings().getProperty("amqpbroadcaster.tlsprotocols");
-			if (!Utils.stringIsEmpty(tlsProtocols))
+
+			if (!Utils.stringIsEmpty(keystorePath) && (!Utils.stringIsEmpty(keystorePassword)))
 			{
 				try
 				{
-					SSLContext c = SSLContext.getInstance(tlsProtocols);
-					c.init(null, null, null);
+					File keystoreFile = new File(keystorePath);
+					if (keystoreFile.exists())
+					{
+						if (Utils.stringIsEmpty(tlsProtocols)) tlsProtocols = "TLS";
+						SSLContext ctx = SSLContext.getInstance(tlsProtocols);
+						KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
+						String keyStoreType = keystorePath.toLowerCase().endsWith(".jks") ? "JKS" : "PKCS12";
+						KeyStore sslKeyStore = KeyStore.getInstance(keyStoreType);
+						try (FileInputStream is = new FileInputStream(keystoreFile))
+						{
+							sslKeyStore.load(is, keystorePassword.toCharArray());
+							kmf.init(sslKeyStore, keystorePassword.toCharArray());
+							ctx.init(kmf.getKeyManagers(), null, null);
 
-					factory.useSslProtocol(c);
+							if (Boolean.valueOf(app.getSettings().getProperty("amqpbroadcaster.hostnameverification", "false")).booleanValue())
+							{
+								factory.enableHostnameVerification();
+							}
+						}
+						catch (IOException | CertificateException | UnrecoverableKeyException | KeyManagementException e)
+						{
+							Debug.error("Couldnt read in the keystore file or init the SSLContext for keystore: " + keystorePath, e);
+						}
+					}
+					else
+					{
+						Debug.error("Couldnt read in the keystore file " + keystorePath + " file doesn't exists");
+					}
+				}
+				catch (NoSuchAlgorithmException | KeyStoreException e)
+				{
+					Debug.error("Couldn't instantiate a SSLContext with the protocol: " + tlsProtocols + " (amqpbroadcaster.tlsprotocols)", e);
+				}
+			}
+			else if (!Utils.stringIsEmpty(tlsProtocols))
+			{
+				try
+				{
+					Debug.warn("Rabbit broadcaster will enable TLS for the protocols " + tlsProtocols +
+						" without a keystore, because now keystore path and password where set");
+					factory.useSslProtocol(tlsProtocols);
 
 					if (Boolean.valueOf(app.getSettings().getProperty("amqpbroadcaster.hostnameverification", "false")).booleanValue())
 					{
@@ -234,7 +282,11 @@ public class DataNotifyBroadCaster implements IServerPlugin
 		req.put("amqpbroadcaster.handshaketimeout", "Set the handshake timeout of the AMQP (RabbitMQ) connection (default value 10000 - 10 seconds)");
 		req.put("amqpbroadcaster.shutdowntimeout", "Set the shutdown timeout of the AMQP (RabbitMQ) connection (default value 10000 - 10 seconds)");
 		req.put("amqpbroadcaster.rpctimeout", "Set the rpc continuation timeout of the AMQP (RabbitMQ) channel (default value 10 minutes)");
-		req.put("amqpbroadcaster.tlsprotocols", "When set this will enabled tls communication over the given protocol like TLSv1.2 or TLSv1.3");
+		req.put("amqpbroadcaster.keystore.path",
+			"The path on the system that points to a the keystore to enable TLS communication, a .JKS file will use the JKS keystore format, else it will use PKCS12 format");
+		req.put("amqpbroadcaster.keystore.password", "The password to access/read the keystore and key of the amqpbroadcaster.keystore.path");
+		req.put("amqpbroadcaster.tlsprotocols",
+			"When set this will enabled TLS communication over the given protocol like TLSv1.2 or TLSv1.3. WARNING: Without a keystore this will not verify the certificates only enable tls communication");
 		req.put("amqpbroadcaster.hostnameverification",
 			"When set to true this will enable the hostname verification for the TLS conncetions (TLS must be enabled) (default false)");
 		return req;
