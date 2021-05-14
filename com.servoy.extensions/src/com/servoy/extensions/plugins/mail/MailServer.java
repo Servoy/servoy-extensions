@@ -132,6 +132,7 @@ public class MailServer implements IMailService, IServerPlugin
 		req.put("mail.smtp.connectiontimeout", "Socket connection timeout value in milliseconds. Default is infinite timeout.");
 		req.put("mail.smtp.timeout", "Socket I/O timeout value in milliseconds. Default is infinite timeout.");
 		req.put("mail.smtp.ssl.enable", "Use SSL (true/false), defaults to false .");
+		req.put("mail.smtp.starttls.enable", "Use START/TLS (true/false), defaults to false .");
 		req.put("mail.mime.charset",
 			"Specify the name of the charset to use for mail encoding (leave emtpy for system default), see http://java.sun.com/j2se/1.4.2/docs/api/java/nio/charset/Charset.html forinfo which charset names are usable");
 		req.put("mail.development.override.address",
