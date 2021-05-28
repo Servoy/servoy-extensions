@@ -416,7 +416,7 @@ public class RestWSServlet extends HttpServlet
 			}
 			client = getClient(request);
 			String charset = getHeaderKey(request.getHeader("Content-Type"), "charset", CHARSET_DEFAULT);
-			Object result = wsService(WS_CREATE, new Object[] { decodeContent(request.getContentType(), contentType, contents, charset, request) }, request,
+			Object result = wsService(WS_CREATE, new Object[] { decodeContent(contentType, contents, charset, request) }, request,
 				response,
 				client.getLeft());
 			HTTPUtils.setNoCacheHeaders(response);
@@ -475,7 +475,7 @@ public class RestWSServlet extends HttpServlet
 			}
 			client = getClient(request);
 			String charset = getHeaderKey(request.getHeader("Content-Type"), "charset", CHARSET_DEFAULT);
-			Object result = wsService(WS_UPDATE, new Object[] { decodeContent(request.getContentType(), contentType, contents, charset, request) }, request,
+			Object result = wsService(WS_UPDATE, new Object[] { decodeContent(contentType, contents, charset, request) }, request,
 				response,
 				client.getLeft());
 			if (Boolean.FALSE.equals(result))
@@ -537,7 +537,7 @@ public class RestWSServlet extends HttpServlet
 			}
 			client = getClient(request);
 			String charset = getHeaderKey(request.getHeader("Content-Type"), "charset", CHARSET_DEFAULT);
-			Object result = wsService(WS_PATCH, new Object[] { decodeContent(request.getContentType(), contentType, contents, charset, request) }, request,
+			Object result = wsService(WS_PATCH, new Object[] { decodeContent(contentType, contents, charset, request) }, request,
 				response,
 				client.getLeft());
 			if (Boolean.FALSE.equals(result))
@@ -1007,17 +1007,18 @@ public class RestWSServlet extends HttpServlet
 
 	private FileItem getBody(HttpServletRequest request) throws IOException
 	{
-		return createFileItem(request.getInputStream());
+		return createFileItem(request.getInputStream(), request.getContentType());
 	}
 
 	/**
+	 * @param contentType
 	 * @param servletInputStream
 	 * @return
 	 * @throws IOException
 	 */
-	private FileItem createFileItem(InputStream inputStream) throws IOException
+	private FileItem createFileItem(InputStream inputStream, String contentType) throws IOException
 	{
-		FileItem fileItem = diskFileItemFactory.createItem(null, null, false, "restws_" + UUID.randomUUID().toString().replace("-", "_"));
+		FileItem fileItem = diskFileItemFactory.createItem(null, contentType, false, "restws_" + UUID.randomUUID().toString().replace("-", "_"));
 		IOUtils.copy(inputStream, fileItem.getOutputStream());
 		return fileItem;
 	}
@@ -1061,7 +1062,7 @@ public class RestWSServlet extends HttpServlet
 		return CONTENT_OTHER;
 	}
 
-	private int getRequestContentType(HttpServletRequest request, String header, FileItem contents, int defaultContentType) throws UnsupportedEncodingException
+	private int getRequestContentType(HttpServletRequest request, String header, FileItem contents, int defaultContentType)
 	{
 		String contentTypeHeaderValue = request.getHeader(header);
 		int contentType = getContentType(contentTypeHeaderValue);
@@ -1226,7 +1227,7 @@ public class RestWSServlet extends HttpServlet
 		}
 	}
 
-	private Object decodeContent(String contentTypeStr, int contentType, FileItem contents, String charset, HttpServletRequest request) throws Exception
+	private Object decodeContent(int contentType, FileItem contents, String charset, HttpServletRequest request) throws Exception
 	{
 		switch (contentType)
 		{
