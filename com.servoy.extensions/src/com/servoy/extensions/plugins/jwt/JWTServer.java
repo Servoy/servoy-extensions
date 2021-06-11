@@ -24,8 +24,10 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.mozilla.javascript.NativeArray;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTCreator.Builder;
@@ -153,6 +155,17 @@ public class JWTServer implements IServerPlugin, IJWTService
 					if (value instanceof Integer) builder.withClaim(key, (Integer)value);
 					if (value instanceof Long) builder.withClaim(key, (Long)value);
 					if (value instanceof String) builder.withClaim(key, (String)value);
+					if (value instanceof NativeArray)
+					{
+						if (isNumbersArray((NativeArray)value))
+						{
+							builder.withArrayClaim(key, convertToLongArray(value));
+						}
+						else
+						{
+							builder.withArrayClaim(key, convertToStringArray(value));
+						}
+					}
 				}
 			}
 			if (expire != null)
@@ -168,6 +181,42 @@ public class JWTServer implements IServerPlugin, IJWTService
 		return null;
 	}
 
+	private Long[] convertToLongArray(Object value)
+	{
+		NativeArray array = (NativeArray)value;
+		int size = Long.valueOf(array.getLength()).intValue();
+		Long[] result = new Long[size];
+		for (int i = 0; i < size; i++)
+		{
+			result[i] = array.get(i) == null ? null : ((Number)array.get(i)).longValue();
+		}
+		return result;
+	}
+
+	private String[] convertToStringArray(Object value)
+	{
+		NativeArray array = (NativeArray)value;
+		int size = Long.valueOf(array.getLength()).intValue();
+		String[] result = new String[size];
+		for (int i = 0; i < size; i++)
+		{
+			result[i] = array.get(i) == null ? null : array.get(i).toString();
+		}
+		return result;
+	}
+
+	private boolean isNumbersArray(NativeArray value)
+	{
+		boolean numberFound = false;
+		for (int i = 0; i < value.getLength(); i++)
+		{
+			numberFound = numberFound || value.get(i) instanceof Number;
+			if (value.get(i) == null || value.get(i) instanceof Number) continue;
+			return false;
+		}
+		return numberFound;
+	}
+
 	@Override
 	public JSONObject verify(String token) throws RemoteException
 	{
@@ -181,7 +230,21 @@ public class JWTServer implements IServerPlugin, IJWTService
 			}
 			DecodedJWT jwt = verifier.verify(token);
 			String payload = new String(Utils.decodeBASE64(jwt.getPayload()));
-			return new JSONObject(payload);
+			JSONObject result = new JSONObject(payload);
+			for (String key : result.keySet())
+			{
+				if (result.get(key) instanceof JSONArray)
+				{
+					JSONArray json = result.getJSONArray(key);
+					Object[] array = new Object[json.length()];
+					for (int i = 0; i < json.length(); i++)
+					{
+						array[i] = json.get(i);
+					}
+					result.put(key, new NativeArray(array));
+				}
+			}
+			return result;
 		}
 		catch (JWTVerificationException | JSONException e)
 		{
