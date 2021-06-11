@@ -24,7 +24,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Properties;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.mozilla.javascript.NativeArray;
@@ -207,14 +206,11 @@ public class JWTServer implements IServerPlugin, IJWTService
 
 	private boolean isNumbersArray(NativeArray value)
 	{
-		boolean numberFound = false;
 		for (int i = 0; i < value.getLength(); i++)
 		{
-			numberFound = numberFound || value.get(i) instanceof Number;
-			if (value.get(i) == null || value.get(i) instanceof Number) continue;
-			return false;
+			if (value.get(i) != null && !(value.get(i) instanceof Number)) return false;
 		}
-		return numberFound;
+		return true;
 	}
 
 	@Override
@@ -230,21 +226,7 @@ public class JWTServer implements IServerPlugin, IJWTService
 			}
 			DecodedJWT jwt = verifier.verify(token);
 			String payload = new String(Utils.decodeBASE64(jwt.getPayload()));
-			JSONObject result = new JSONObject(payload);
-			for (String key : result.keySet())
-			{
-				if (result.get(key) instanceof JSONArray)
-				{
-					JSONArray json = result.getJSONArray(key);
-					Object[] array = new Object[json.length()];
-					for (int i = 0; i < json.length(); i++)
-					{
-						array[i] = json.get(i);
-					}
-					result.put(key, new NativeArray(array));
-				}
-			}
-			return result;
+			return new JSONObject(payload);
 		}
 		catch (JWTVerificationException | JSONException e)
 		{
