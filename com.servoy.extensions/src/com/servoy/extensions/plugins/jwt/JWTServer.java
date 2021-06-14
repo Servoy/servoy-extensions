@@ -33,6 +33,7 @@ import com.auth0.jwt.JWTCreator.Builder;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.servoy.j2db.plugins.IServerAccess;
 import com.servoy.j2db.plugins.IServerPlugin;
@@ -227,6 +228,10 @@ public class JWTServer implements IServerPlugin, IJWTService
 			DecodedJWT jwt = verifier.verify(token);
 			String payload = new String(Utils.decodeBASE64(jwt.getPayload()));
 			return new JSONObject(payload);
+		}
+		catch (TokenExpiredException e)
+		{
+			Debug.trace(e);
 		}
 		catch (JWTVerificationException | JSONException e)
 		{
