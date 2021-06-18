@@ -28,7 +28,7 @@
 		<scribejava.version>6.5.1</scribejava.version>
 		<amqp.version>5.7.0</amqp.version>
 		<doc.version>1.5.0</doc.version>
-		<pdfbox.version>2.0.16</pdfbox.version>
+		<pdfbox.version>2.0.24</pdfbox.version>
 		<fontbox.version>2.0.16</fontbox.version>
 		<jwt.version>3.9.0</jwt.version>
 		<fasterxml.version>2.12.1</fasterxml.version>
@@ -621,7 +621,7 @@
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpclient</artifactId>
-			<version>4.5.2</version>
+			<version>4.5.13</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>

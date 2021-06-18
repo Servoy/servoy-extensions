@@ -26,12 +26,14 @@ import java.util.Properties;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.mozilla.javascript.NativeArray;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTCreator.Builder;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.servoy.j2db.plugins.IServerAccess;
 import com.servoy.j2db.plugins.IServerPlugin;
@@ -153,6 +155,17 @@ public class JWTServer implements IServerPlugin, IJWTService
 					if (value instanceof Integer) builder.withClaim(key, (Integer)value);
 					if (value instanceof Long) builder.withClaim(key, (Long)value);
 					if (value instanceof String) builder.withClaim(key, (String)value);
+					if (value instanceof NativeArray)
+					{
+						if (isNumbersArray((NativeArray)value))
+						{
+							builder.withArrayClaim(key, convertToLongArray(value));
+						}
+						else
+						{
+							builder.withArrayClaim(key, convertToStringArray(value));
+						}
+					}
 				}
 			}
 			if (expire != null)
@@ -166,6 +179,39 @@ public class JWTServer implements IServerPlugin, IJWTService
 			Debug.error("Could not create the JWT token", e);
 		}
 		return null;
+	}
+
+	private Long[] convertToLongArray(Object value)
+	{
+		NativeArray array = (NativeArray)value;
+		int size = Long.valueOf(array.getLength()).intValue();
+		Long[] result = new Long[size];
+		for (int i = 0; i < size; i++)
+		{
+			result[i] = array.get(i) == null ? null : ((Number)array.get(i)).longValue();
+		}
+		return result;
+	}
+
+	private String[] convertToStringArray(Object value)
+	{
+		NativeArray array = (NativeArray)value;
+		int size = Long.valueOf(array.getLength()).intValue();
+		String[] result = new String[size];
+		for (int i = 0; i < size; i++)
+		{
+			result[i] = array.get(i) == null ? null : array.get(i).toString();
+		}
+		return result;
+	}
+
+	private boolean isNumbersArray(NativeArray value)
+	{
+		for (int i = 0; i < value.getLength(); i++)
+		{
+			if (value.get(i) != null && !(value.get(i) instanceof Number)) return false;
+		}
+		return true;
 	}
 
 	@Override
@@ -182,6 +228,10 @@ public class JWTServer implements IServerPlugin, IJWTService
 			DecodedJWT jwt = verifier.verify(token);
 			String payload = new String(Utils.decodeBASE64(jwt.getPayload()));
 			return new JSONObject(payload);
+		}
+		catch (TokenExpiredException e)
+		{
+			Debug.trace(e);
 		}
 		catch (JWTVerificationException | JSONException e)
 		{

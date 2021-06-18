@@ -1347,8 +1347,7 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 * @param encoding
 	 * @return
 	 */
-	protected boolean writeTXT(Object f, String data, String encoding, @SuppressWarnings("unused")
-	String contentType)
+	protected boolean writeTXT(Object f, String data, String encoding, @SuppressWarnings("unused") String contentType)
 	{
 		try
 		{
@@ -1570,8 +1569,7 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 		return writeFile(file, data, mimeType);
 	}
 
-	protected boolean writeFile(Object f, byte[] data, @SuppressWarnings("unused")
-	String mimeType)
+	protected boolean writeFile(Object f, byte[] data, @SuppressWarnings("unused") String mimeType)
 	{
 		if (data == null) return false;
 		try
@@ -1879,7 +1877,7 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 			sb.append(line);
 			sb.append('\n');
 		}
-		sb.setLength(sb.length() - 1); // remove newline
+		if (sb.length() > 0) sb.setLength(sb.length() - 1); // remove newline
 		br.close();
 		return sb.toString();
 	}
