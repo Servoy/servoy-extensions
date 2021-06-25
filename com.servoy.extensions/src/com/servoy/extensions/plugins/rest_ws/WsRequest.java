@@ -17,6 +17,8 @@
 
 package com.servoy.extensions.plugins.rest_ws;
 
+import static java.util.Arrays.stream;
+
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -28,6 +30,7 @@ import java.util.Map;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.fileupload.FileItem;
 import org.mozilla.javascript.annotations.JSFunction;
 import org.mozilla.javascript.annotations.JSGetter;
 import org.mozilla.javascript.annotations.JSSetter;
@@ -47,6 +50,7 @@ import com.servoy.j2db.scripting.JSMap;
 public class WsRequest implements IScriptable, IJavaScriptType
 {
 	private static final WsCookie[] NO_COOKIES = new WsCookie[0];
+	private static final WsContents[] NO_CONTENTS = new WsContents[0];
 
 	private final RestWSClientPlugin plugin;
 
@@ -438,8 +442,7 @@ public class WsRequest implements IScriptable, IJavaScriptType
 	* This method returns an empty array if no cookies were sent.
 	*
 	* @return		an array of all the <code>Cookies</code>
-	*			included with this request, or <code>null</code>
-	*			if the request has no cookies
+	*			included with this request
 	*/
 	@JSFunction
 	public WsCookie[] getCookies()
@@ -450,13 +453,31 @@ public class WsRequest implements IScriptable, IJavaScriptType
 			return NO_COOKIES;
 		}
 
-		WsCookie[] wscookies = new WsCookie[cookies.length];
-		for (int i = 0; i < cookies.length; i++)
+		return stream(cookies).map(WsCookie::new).toArray(WsCookie[]::new);
+
+	}
+
+	/** Get raw the contents of the request.
+	 *
+	 * In case of multipart request, all uploaded items are listed separately.
+	 * In case of a request with a single body, the contents array consists of one item, the body.
+	 *
+	 * This method returns an empty array if the request has no contents.
+	 * @sample
+	 * var request = plugins.rest_ws.getRequest();
+	 * var contents = request.getContents();
+	 * @return		an array of WsContents objects.
+	 */
+	@JSFunction
+	public WsContents[] getContents()
+	{
+		List<FileItem> contents = plugin.getContents();
+		if (contents == null || contents.isEmpty())
 		{
-			wscookies[i] = new WsCookie(cookies[i]);
+			return NO_CONTENTS;
 		}
 
-		return wscookies;
+		return contents.stream().map(WsContents::new).toArray(WsContents[]::new);
 	}
 
 	/**

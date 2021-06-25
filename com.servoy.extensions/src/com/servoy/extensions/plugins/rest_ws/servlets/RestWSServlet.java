@@ -16,6 +16,10 @@
  */
 package com.servoy.extensions.plugins.rest_ws.servlets;
 
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.emptyMap;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,7 +31,6 @@ import java.nio.charset.Charset;
 import java.nio.charset.CoderResult;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -117,6 +120,17 @@ import com.servoy.j2db.util.Utils;
 @SuppressWarnings("nls")
 public class RestWSServlet extends HttpServlet
 {
+	private enum ContentType
+	{
+		OTHER,
+		JSON,
+		XML,
+		BINARY,
+		MULTIPART,
+		TEXT,
+		FORMPOST
+	}
+
 	// solution method names
 	private static final String WS_UPDATE = "ws_update";
 	private static final String WS_PATCH = "ws_patch";
@@ -129,15 +143,7 @@ public class RestWSServlet extends HttpServlet
 	private static final String WS_USER_PROPERTIES_HEADER = "servoy.userproperties";
 	private static final String WS_USER_PROPERTIES_COOKIE_PREFIX = "servoy.userproperty.";
 
-	private static final int CONTENT_OTHER = 0;
-	private static final int CONTENT_JSON = 1;
-	private static final int CONTENT_XML = 2;
-	private static final int CONTENT_BINARY = 3;
-	private static final int CONTENT_MULTIPART = 4;
-	private static final int CONTENT_TEXT = 5;
-	private static final int CONTENT_FORMPOST = 6;
-
-	private static final int CONTENT_DEFAULT = CONTENT_JSON;
+	private static final ContentType CONTENT_DEFAULT = ContentType.JSON;
 	private static final String CHARSET_DEFAULT = "UTF-8";
 
 	/**
@@ -153,7 +159,7 @@ public class RestWSServlet extends HttpServlet
 
 	private final String webServiceName;
 
-	private final FileCleaningTracker FILE_CLEANING_TRACKER = new FileCleaningTracker();
+	private final FileCleaningTracker fileCleaningTracker = new FileCleaningTracker();
 	private final DiskFileItemFactory diskFileItemFactory;
 
 	public RestWSServlet(String webServiceName, RestWSPlugin restWSPlugin)
@@ -176,13 +182,13 @@ public class RestWSServlet extends HttpServlet
 		int tempFileThreshold = Utils.getAsInteger(plugin.getServerAccess().getSettings().getProperty("servoy.ng_web_client.tempfile.threshold", "50"), false) *
 			1000;
 		diskFileItemFactory = new DiskFileItemFactory(tempFileThreshold, fileUploadDir);
-		diskFileItemFactory.setFileCleaningTracker(FILE_CLEANING_TRACKER);
+		diskFileItemFactory.setFileCleaningTracker(fileCleaningTracker);
 	}
 
 	@Override
 	public void destroy()
 	{
-		FILE_CLEANING_TRACKER.exitWhenFinished();
+		fileCleaningTracker.exitWhenFinished();
 		super.destroy();
 	}
 
@@ -238,7 +244,7 @@ public class RestWSServlet extends HttpServlet
 		{
 			plugin.log.trace("GET");
 			client = getClient(request);
-			Object result = wsService(WS_READ, null, request, response, client.getLeft());
+			Object result = wsService(WS_READ, null, emptyList(), request, response, client.getLeft());
 			if (result == null)
 			{
 				sendError(response, HttpServletResponse.SC_NOT_FOUND);
@@ -362,7 +368,7 @@ public class RestWSServlet extends HttpServlet
 			plugin.log.trace("DELETE");
 
 			client = getClient(request);
-			if (Boolean.FALSE.equals(wsService(WS_DELETE, null, request, response, client.getLeft())))
+			if (Boolean.FALSE.equals(wsService(WS_DELETE, null, emptyList(), request, response, client.getLeft())))
 			{
 				sendError(response, HttpServletResponse.SC_NOT_FOUND);
 			}
@@ -394,35 +400,20 @@ public class RestWSServlet extends HttpServlet
 		boolean reloadSolution = plugin.shouldReloadSolutionAfterRequest();
 		try
 		{
-			FileItem contents = null;
-			int contentType = CONTENT_OTHER;
-			// if it is a mult part don't read in the body, thats done later on by file-upload
-			if (ServletFileUpload.isMultipartContent(request))
+			Pair<List<FileItem>, ContentType> contents = getContents(request);
+			if (contents == null)
 			{
-				contentType = CONTENT_MULTIPART;
+				sendError(response, HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
+				return;
 			}
-			else
-			{
-				contents = getBody(request);
-				if (contents != null && contents.getSize() != 0)
-				{
-					contentType = getRequestContentType(request, "Content-Type", contents, CONTENT_OTHER);
-					if (contentType == CONTENT_OTHER && contents != null)
-					{
-						sendError(response, HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
-						return;
-					}
-				}
-			}
+
 			client = getClient(request);
-			String charset = getHeaderKey(request.getHeader("Content-Type"), "charset", CHARSET_DEFAULT);
-			Object result = wsService(WS_CREATE, new Object[] { decodeContent(contentType, contents, charset, request) }, request,
-				response,
-				client.getLeft());
+			Object result = wsService(WS_CREATE, new Object[] { decodeContent(contents.getRight(), contents.getLeft(), request) }, contents.getLeft(),
+				request, response, client.getLeft());
 			HTTPUtils.setNoCacheHeaders(response);
 			if (result != null && result != Undefined.instance)
 			{
-				sendResult(request, response, result, contentType);
+				sendResult(request, response, result, contents.getRight());
 			}
 		}
 		catch (ExecFailedException e)
@@ -451,40 +442,28 @@ public class RestWSServlet extends HttpServlet
 		boolean reloadSolution = plugin.shouldReloadSolutionAfterRequest();
 		try
 		{
-			FileItem contents = null;
-			int contentType = CONTENT_OTHER;
-			// if it is a mult part don't read in the body, thats done later on by file-upload
-			if (ServletFileUpload.isMultipartContent(request))
+			Pair<List<FileItem>, ContentType> contents = getContents(request);
+			if (contents == null)
 			{
-				contentType = CONTENT_MULTIPART;
+				sendError(response, HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
+				return;
 			}
-			else
+			if (contents.getLeft().isEmpty())
 			{
-				contents = getBody(request);
-				if (contents == null || contents.getSize() == 0)
-				{
-					sendError(response, HttpServletResponse.SC_NO_CONTENT);
-					return;
-				}
-				contentType = getRequestContentType(request, "Content-Type", contents, CONTENT_OTHER);
-				if (contentType == CONTENT_OTHER)
-				{
-					sendError(response, HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
-					return;
-				}
+				sendError(response, HttpServletResponse.SC_NO_CONTENT);
+				return;
 			}
+
 			client = getClient(request);
-			String charset = getHeaderKey(request.getHeader("Content-Type"), "charset", CHARSET_DEFAULT);
-			Object result = wsService(WS_UPDATE, new Object[] { decodeContent(contentType, contents, charset, request) }, request,
-				response,
-				client.getLeft());
+			Object result = wsService(WS_UPDATE, new Object[] { decodeContent(contents.getRight(), contents.getLeft(), request) }, contents.getLeft(),
+				request, response, client.getLeft());
 			if (Boolean.FALSE.equals(result))
 			{
 				sendError(response, HttpServletResponse.SC_NOT_FOUND);
 			}
 			else
 			{
-				sendResult(request, response, result, contentType);
+				sendResult(request, response, result, contents.getRight());
 			}
 			HTTPUtils.setNoCacheHeaders(response);
 		}
@@ -513,40 +492,28 @@ public class RestWSServlet extends HttpServlet
 		boolean reloadSolution = plugin.shouldReloadSolutionAfterRequest();
 		try
 		{
-			FileItem contents = null;
-			int contentType = CONTENT_OTHER;
-			// if it is a mult part don't read in the body, thats done later on by file-upload
-			if (ServletFileUpload.isMultipartContent(request))
+			Pair<List<FileItem>, ContentType> contents = getContents(request);
+			if (contents == null)
 			{
-				contentType = CONTENT_MULTIPART;
+				sendError(response, HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
+				return;
 			}
-			else
+			if (contents.getLeft().isEmpty())
 			{
-				contents = getBody(request);
-				if (contents == null || contents.getSize() == 0)
-				{
-					sendError(response, HttpServletResponse.SC_NO_CONTENT);
-					return;
-				}
-				contentType = getRequestContentType(request, "Content-Type", contents, CONTENT_OTHER);
-				if (contentType == CONTENT_OTHER)
-				{
-					sendError(response, HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
-					return;
-				}
+				sendError(response, HttpServletResponse.SC_NO_CONTENT);
+				return;
 			}
+
 			client = getClient(request);
-			String charset = getHeaderKey(request.getHeader("Content-Type"), "charset", CHARSET_DEFAULT);
-			Object result = wsService(WS_PATCH, new Object[] { decodeContent(contentType, contents, charset, request) }, request,
-				response,
-				client.getLeft());
+			Object result = wsService(WS_PATCH, new Object[] { decodeContent(contents.getRight(), contents.getLeft(), request) }, contents.getLeft(),
+				request, response, client.getLeft());
 			if (Boolean.FALSE.equals(result))
 			{
 				sendError(response, HttpServletResponse.SC_NOT_FOUND);
 			}
 			else
 			{
-				sendResult(request, response, result, contentType);
+				sendResult(request, response, result, contents.getRight());
 			}
 			HTTPUtils.setNoCacheHeaders(response);
 		}
@@ -708,12 +675,14 @@ public class RestWSServlet extends HttpServlet
 	 * Throws {@link NoClientsException} when no license is available
 	 * @param wsMethod
 	 * @param fixedArgs
+	 * @param contents
 	 * @param request
 	 * @param response
 	 * @return
 	 * @throws Exception
 	 */
-	private Object wsService(String wsMethod, Object[] fixedArgs, HttpServletRequest request, HttpServletResponse response, IHeadlessClient client)
+	private Object wsService(String wsMethod, Object[] fixedArgs, List<FileItem> contents, HttpServletRequest request, HttpServletResponse response,
+		IHeadlessClient client)
 		throws Exception
 	{
 		RestWSClientPlugin clientPlugin = (RestWSClientPlugin)client.getPluginAccess().getPluginManager().getPlugin(IClientPlugin.class,
@@ -726,7 +695,7 @@ public class RestWSServlet extends HttpServlet
 			}
 			else
 			{
-				clientPlugin.setRequestResponse(request, response);
+				clientPlugin.setRequestResponseContents(request, response, contents);
 			}
 			return doWsService(wsMethod, fixedArgs, request, response, client, clientPlugin.isSendUserPropertiesHeaders());
 		}
@@ -734,7 +703,7 @@ public class RestWSServlet extends HttpServlet
 		{
 			if (clientPlugin != null)
 			{
-				clientPlugin.setRequestResponse(null, null);
+				clientPlugin.setRequestResponseContents(null, null, null);
 			}
 		}
 	}
@@ -1023,54 +992,54 @@ public class RestWSServlet extends HttpServlet
 		return fileItem;
 	}
 
-	private int getContentType(String headerValue)
+	private ContentType getContentType(String headerValue)
 	{
 		if (headerValue != null)
 		{
 			String header = headerValue.toLowerCase();
 			if (header.indexOf("json") >= 0)
 			{
-				return CONTENT_JSON;
+				return ContentType.JSON;
 			}
 			if (header.indexOf("vnd.openxmlformats-officedocument") >= 0)
 			{
 				//  note: this content type contains 'xml' but is not XML.
-				return CONTENT_BINARY;
+				return ContentType.BINARY;
 			}
 			if (header.indexOf("xml") >= 0)
 			{
-				return CONTENT_XML;
+				return ContentType.XML;
 			}
 			if (header.indexOf("text") >= 0)
 			{
-				return CONTENT_TEXT;
+				return ContentType.TEXT;
 			}
 			if (header.indexOf("multipart") >= 0)
 			{
-				return CONTENT_MULTIPART;
+				return ContentType.MULTIPART;
 			}
 			if (header.indexOf("application/x-www-form-urlencoded") >= 0)
 			{
-				return CONTENT_FORMPOST;
+				return ContentType.FORMPOST;
 			}
 			if (header.indexOf("octet-stream") >= 0 || header.indexOf("application") >= 0)
 			{
-				return CONTENT_BINARY;
+				return ContentType.BINARY;
 			}
 		}
 
-		return CONTENT_OTHER;
+		return ContentType.OTHER;
 	}
 
-	private int getRequestContentType(HttpServletRequest request, String header, FileItem contents, int defaultContentType)
+	private ContentType getRequestContentType(HttpServletRequest request, String header, FileItem body, ContentType defaultContentType)
 	{
 		String contentTypeHeaderValue = request.getHeader(header);
-		int contentType = getContentType(contentTypeHeaderValue);
-		if (contentType != CONTENT_OTHER) return contentType;
-		if (contents != null)
+		ContentType contentType = getContentType(contentTypeHeaderValue);
+		if (contentType != ContentType.OTHER) return contentType;
+		if (body != null)
 		{
 			String stringContent = "";
-			try (InputStream inputStream = contents.getInputStream())
+			try (InputStream inputStream = body.getInputStream())
 			{
 				// only read in the first 512 bytes.
 				byte[] bytes = new byte[512];
@@ -1094,18 +1063,18 @@ public class RestWSServlet extends HttpServlet
 		return defaultContentType;
 	}
 
-	private int guessContentType(String stringContent, int defaultContentType)
+	private ContentType guessContentType(String stringContent, ContentType defaultContentType)
 	{
 		if (stringContent != null && stringContent.length() > 0)
 		{
 			// start guessing....
 			if (stringContent.charAt(0) == '<')
 			{
-				return CONTENT_XML;
+				return ContentType.XML;
 			}
 			if (stringContent.charAt(0) == '{')
 			{
-				return CONTENT_JSON;
+				return ContentType.JSON;
 			}
 		}
 		return defaultContentType;
@@ -1227,53 +1196,89 @@ public class RestWSServlet extends HttpServlet
 		}
 	}
 
-	private Object decodeContent(int contentType, FileItem contents, String charset, HttpServletRequest request) throws Exception
+	private Object decodeContent(ContentType contentType, List<FileItem> contents, HttpServletRequest request) throws Exception
 	{
+		if (contentType == ContentType.MULTIPART)
+		{
+			return getMultipartContent(contents, getHeaderKey(request.getContentType(), "charset", null));
+		}
+
+		if (contents.isEmpty())
+		{
+			return null;
+		}
+
+		FileItem body = contents.get(0);
+		String charset = getHeaderKey(request.getHeader("Content-Type"), "charset", CHARSET_DEFAULT);
+
 		switch (contentType)
 		{
-			case CONTENT_JSON :
-				return plugin.getJSONSerializer().fromJSON(contents.getString(charset));
+			case JSON :
+				return plugin.getJSONSerializer().fromJSON(body.getString(charset));
 
-			case CONTENT_XML :
-				return plugin.getJSONSerializer().fromJSON(XML.toJSONObject(contents.getString(charset)));
+			case XML :
+				return plugin.getJSONSerializer().fromJSON(XML.toJSONObject(body.getString(charset)));
 
-			case CONTENT_MULTIPART :
-				return getMultipartContent(request);
+			case FORMPOST :
+				return parseQueryString(body.getString(charset));
 
-			case CONTENT_FORMPOST :
-				return parseQueryString(contents.getString(charset));
+			case BINARY :
+				return plugin.useJSUploadForBinaryData() ? new JSUpload(body, emptyMap()) : body.get();
 
-			case CONTENT_BINARY :
-				return plugin.useJSUploadForBinaryData() ? new JSUpload(contents, Collections.emptyMap()) : contents.get();
+			case TEXT :
+				return body.getString(charset);
 
-			case CONTENT_TEXT :
-				return contents.getString(charset);
+			case OTHER :
+				return plugin.useJSUploadForBinaryData() ? new JSUpload(body, emptyMap()) : body.get();
 
-			case CONTENT_OTHER :
-				return plugin.useJSUploadForBinaryData() ? new JSUpload(contents, Collections.emptyMap()) : contents.get();
+			default :
+				break;
 		}
 
 		// should not happen, content type was checked before
 		throw new IllegalStateException();
 	}
 
-	private Object getMultipartContent(HttpServletRequest request) throws FileUploadException
+	private Pair<List<FileItem>, ContentType> getContents(HttpServletRequest request) throws FileUploadException, IOException
+	{
+		if (ServletFileUpload.isMultipartContent(request))
+		{
+			return new Pair<>(getFileItemsMultipartRequest(request), ContentType.MULTIPART);
+		}
+
+		FileItem body = getBody(request);
+		if (body.getSize() == 0)
+		{
+			return new Pair<>(emptyList(), ContentType.OTHER);
+		}
+		ContentType contentType = getRequestContentType(request, "Content-Type", body, ContentType.OTHER);
+		if (contentType == ContentType.OTHER)
+		{
+			return null;
+		}
+
+		return new Pair<>(asList(body), contentType);
+	}
+
+	private List<FileItem> getFileItemsMultipartRequest(HttpServletRequest request) throws FileUploadException
 	{
 		ServletFileUpload upload = new ServletFileUpload(diskFileItemFactory);
 		upload.setHeaderEncoding("UTF-8");
 		long maxUpload = Utils.getAsLong(plugin.getServerAccess().getSettings().getProperty("servoy.webclient.maxuploadsize", "0"), false);
 		if (maxUpload > 0) upload.setFileSizeMax(maxUpload * 1000);
-		Iterator<FileItem> iterator = upload.parseRequest(request).iterator();
-		ArrayList<JSMap<String, Object>> parts = new ArrayList<JSMap<String, Object>>();
+		return upload.parseRequest(request);
+	}
+
+	private Object[] getMultipartContent(List<FileItem> contents, String requestCharset)
+	{
+		List<JSMap<String, Object>> parts = new ArrayList<>();
 		Map<String, String> formFields = new JSMap<>();
-		while (iterator.hasNext())
+		for (FileItem item : contents)
 		{
-			FileItem item = iterator.next();
 			if (item.isFormField())
 			{
-				String contentType = item.getContentType();
-				String charset = getHeaderKey(contentType, "charset", null);
-				if (charset == null) charset = getHeaderKey(request.getContentType(), "charset", null);
+				String charset = getHeaderKey(item.getContentType(), "charset", null);
+				if (charset == null) charset = requestCharset;
 				if (charset != null)
 				{
 					try
@@ -1370,7 +1375,7 @@ public class RestWSServlet extends HttpServlet
 		return request.getHeader(WS_NODEBUG_HEADER) != null;
 	}
 
-	private void sendResult(HttpServletRequest request, HttpServletResponse response, Object result, int defaultContentType) throws Exception
+	private void sendResult(HttpServletRequest request, HttpServletResponse response, Object result, ContentType defaultContentType) throws Exception
 	{
 		byte[] bytes;
 
@@ -1415,8 +1420,8 @@ public class RestWSServlet extends HttpServlet
 		}
 		else
 		{
-			int contentType = getRequestContentType(request, "Accept", null, defaultContentType);
-			if (contentType == CONTENT_BINARY)
+			ContentType contentType = getRequestContentType(request, "Accept", null, defaultContentType);
+			if (contentType == ContentType.BINARY)
 			{
 				plugin.log.error("Request for binary data was made, but the return data is not a byte array; return data is " + result);
 				sendError(response, HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
@@ -1427,7 +1432,7 @@ public class RestWSServlet extends HttpServlet
 
 			switch (contentType)
 			{
-				case CONTENT_JSON :
+				case JSON :
 					String callback = request.getParameter("callback");
 					if (callback != null && !callback.equals(""))
 					{
@@ -1435,15 +1440,15 @@ public class RestWSServlet extends HttpServlet
 					}
 					break;
 
-				case CONTENT_XML :
+				case XML :
 					content = "<?xml version=\"1.0\" encoding=\"" + charset + "\"?>\n" + content;
 					break;
-				case CONTENT_MULTIPART :
-				case CONTENT_FORMPOST :
+				case MULTIPART :
+				case FORMPOST :
 					content = "";
 					break;
-				case CONTENT_TEXT :
-				case CONTENT_OTHER : // if here still other then just send a string. could be a post without body
+				case TEXT :
+				case OTHER : // if here still other then just send a string. could be a post without body
 					content = result != null ? result.toString() : "";
 					break;
 				default :
@@ -1454,17 +1459,17 @@ public class RestWSServlet extends HttpServlet
 			switch (contentType)
 			{
 				// multipart requests cannot respond multipart responses so treat response as json
-				case CONTENT_MULTIPART :
-				case CONTENT_FORMPOST :
-				case CONTENT_JSON :
+				case MULTIPART :
+				case FORMPOST :
+				case JSON :
 					resultContentType = "application/json";
 					break;
 
-				case CONTENT_XML :
+				case XML :
 					resultContentType = "application/xml";
 					break;
-				case CONTENT_TEXT :
-				case CONTENT_OTHER : // if here still other then just send a string. could be a post without body
+				case TEXT :
+				case OTHER : // if here still other then just send a string. could be a post without body
 					resultContentType = "text/plain";
 					break;
 
@@ -1500,7 +1505,7 @@ public class RestWSServlet extends HttpServlet
 	 * @return
 	 * @throws Exception
 	 */
-	private String getContent(HttpServletResponse response, Object result, boolean interpretResult, int contentType) throws Exception
+	private String getContent(HttpServletResponse response, Object result, boolean interpretResult, ContentType contentType) throws Exception
 	{
 		if (result == null)
 		{
@@ -1509,14 +1514,14 @@ public class RestWSServlet extends HttpServlet
 
 		if (result instanceof XMLObject)
 		{
-			if (contentType == CONTENT_JSON)
+			if (contentType == ContentType.JSON)
 			{
 				return XML.toJSONObject(result.toString()).toString();
 			}
 			return result.toString();
 		}
 
-		if (contentType == CONTENT_XML)
+		if (contentType == ContentType.XML)
 		{
 			if (result instanceof JSONObject || result instanceof JSONArray)
 			{
@@ -1651,14 +1656,14 @@ public class RestWSServlet extends HttpServlet
 		}
 		else
 		{
-			int contentType = guessContentType(errorResponse, CONTENT_TEXT);
+			ContentType contentType = guessContentType(errorResponse, ContentType.TEXT);
 			switch (contentType)
 			{
-				case CONTENT_JSON :
+				case JSON :
 					response.setContentType("application/json");
 					break;
 
-				case CONTENT_XML :
+				case XML :
 					response.setContentType("application/xml");
 					break;
 
