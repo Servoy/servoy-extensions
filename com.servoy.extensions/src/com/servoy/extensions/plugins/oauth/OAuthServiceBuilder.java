@@ -51,6 +51,7 @@ public class OAuthServiceBuilder implements IScriptable, IJavaScriptType
 	private String _deeplink;
 	private final OAuthProvider provider;
 	private long redirectToAuthUrlTime;
+	private String _domain;
 
 	private static final String GET_CODE_METHOD = "getSvyOAuthCode";
 	private static final String SVY_AUTH_CODE_VAR = "svy_authCode";
@@ -175,6 +176,18 @@ public class OAuthServiceBuilder implements IScriptable, IJavaScriptType
 		return this;
 	}
 
+	/**
+	 * Set the domain if the API supports it (e.g.Okta)
+	 * @param tenant
+	 * @return the service builder for method chaining
+	 */
+	@JSFunction
+	public OAuthServiceBuilder domain(String domain)
+	{
+		this._domain = domain;
+		return this;
+	}
+
 
 	/**
 	 * Creates an OAuth service that can be used to obtain an access token and access protected data.
@@ -194,7 +207,7 @@ public class OAuthServiceBuilder implements IScriptable, IJavaScriptType
 		builder.callback(provider.getRedirectURL(deeplink_name));
 		if (OAuthService.log.isDebugEnabled()) OAuthService.log.debug("Redirect url " + provider.getRedirectURL(deeplink_name));
 
-		OAuthService service = new OAuthService(builder.build(OAuthProvider.getApiInstance(api, _tenant)), _state);
+		OAuthService service = new OAuthService(builder.build(OAuthProvider.getApiInstance(api, _tenant, _domain)), _state);
 		return _callback != null ? buildWithCallback(generateGlobalMethods, deeplink_name, service) : service;
 	}
 
