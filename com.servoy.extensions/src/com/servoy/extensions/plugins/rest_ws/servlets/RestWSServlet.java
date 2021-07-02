@@ -291,7 +291,7 @@ public class RestWSServlet extends HttpServlet
 		catch (IllegalArgumentException e)
 		{
 			// solution not found
-			throw new NoClientsException();
+			throw new NoClientsException(e);
 		}
 		return new Pair<IHeadlessClient, String>(client, solutionName);
 	}

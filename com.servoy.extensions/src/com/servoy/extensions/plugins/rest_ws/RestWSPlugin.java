@@ -339,7 +339,7 @@ public class RestWSPlugin implements IServerPlugin
 		catch (NoSuchElementException e)
 		{
 			// no more licenses
-			throw new NoClientsException();
+			throw new NoClientsException(e);
 		}
 	}
 
@@ -399,6 +399,10 @@ public class RestWSPlugin implements IServerPlugin
 
 	public static class NoClientsException extends Exception
 	{
+		public NoClientsException(Exception cause)
+		{
+			super(cause);
+		}
 	}
 	public static class NotAuthorizedException extends Exception
 	{
