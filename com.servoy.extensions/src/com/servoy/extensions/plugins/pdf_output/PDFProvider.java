@@ -24,6 +24,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -1040,6 +1041,26 @@ public class PDFProvider implements IScriptable
 		return imgArray;
 	}
 
+	/**
+	 * Returns the number of pages for pdf document.
+	 *
+	 * @sample
+	 * //get the number of pages
+	 * var pages = plugins.pdf_output.getNumberOfPages(bytes);
+	 *
+	 * @param data the PDF
+	 *
+	 * @return the number of pages of the PDF document
+	 *
+	 */
+	@ServoyClientSupport(ng = true, wc = true, sc = true)
+	public int js_getNumberOfPages(byte[] data) throws IOException
+	{
+		PDDocument pdfDoc = PDDocument.load(data);
+		int pages = pdfDoc.getNumberOfPages();
+		pdfDoc.close();
+		return pages;
+	}
 
 	/**
 	 * Add text over every page at a 45 degree angle
