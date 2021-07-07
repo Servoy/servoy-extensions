@@ -117,7 +117,7 @@ public class SQLProcessor implements ISQLService, IServerPlugin
 					}
 					finally
 					{
-						application.endPerformanceTiming(server, perfUuid);
+						application.endPerformanceTiming(server, perfUuid, clientId);
 					}
 				}
 				else
@@ -140,7 +140,7 @@ public class SQLProcessor implements ISQLService, IServerPlugin
 					}
 					finally
 					{
-						application.endPerformanceTiming(server, perfUuid);
+						application.endPerformanceTiming(server, perfUuid, clientId);
 					}
 				}
 				return true;
