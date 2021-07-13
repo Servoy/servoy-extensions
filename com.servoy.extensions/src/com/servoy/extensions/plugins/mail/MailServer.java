@@ -604,4 +604,10 @@ public class MailServer implements IMailService, IServerPlugin
 		}
 		return access;
 	}
+
+	@Override
+	public String getPluginProperty(String propertyName)
+	{
+		return settings.getProperty(propertyName);
+	}
 }

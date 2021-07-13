@@ -24,8 +24,10 @@ import java.util.StringTokenizer;
 import com.servoy.extensions.plugins.mail.IMailService;
 import com.servoy.j2db.documentation.ServoyDocumented;
 import com.servoy.j2db.plugins.IClientPluginAccess;
+import com.servoy.j2db.scripting.IJavaScriptType;
 import com.servoy.j2db.scripting.IReturnedTypesProvider;
 import com.servoy.j2db.scripting.IScriptable;
+import com.servoy.j2db.scripting.annotations.JSReadonlyProperty;
 import com.servoy.j2db.util.Debug;
 import com.servoy.j2db.util.Utils;
 
@@ -33,7 +35,7 @@ import com.servoy.j2db.util.Utils;
  * @author jblok
  */
 @ServoyDocumented(publicName = MailPlugin.PLUGIN_NAME, scriptingName = "plugins." + MailPlugin.PLUGIN_NAME)
-public class MailProvider implements IReturnedTypesProvider, IScriptable
+public class MailProvider implements IReturnedTypesProvider, IScriptable, IJavaScriptType
 {
 	private final MailPlugin plugin;
 	private IMailService mailService = null;
@@ -1153,6 +1155,22 @@ public class MailProvider implements IReturnedTypesProvider, IScriptable
 	public String js_getLastSendMailExceptionMsg()
 	{
 		return sendMailException;
+	}
+
+	/**
+	 * Returns the value of the mail.from property which is set on the admin page.
+	 * @sample
+	 * var from = plugins.mail.from
+	 */
+	@JSReadonlyProperty
+	public String getFrom()
+	{
+		createMailService();
+		if (mailService != null)
+		{
+			return mailService.getPluginProperty("mail.from");
+		}
+		return null;
 	}
 
 	public Class< ? >[] getAllReturnedTypes()
