@@ -35,7 +35,6 @@ import com.servoy.j2db.preference.PreferencePanel;
 import com.servoy.j2db.server.shared.ApplicationServerRegistry;
 import com.servoy.j2db.util.Debug;
 import com.servoy.j2db.util.ServoyException;
-import com.servoy.j2db.util.UUID;
 import com.servoy.j2db.util.Utils;
 
 /**
@@ -110,7 +109,7 @@ public class SQLProcessor implements ISQLService, IServerPlugin
 				{
 					ps = connection.createStatement();
 					long t1 = System.currentTimeMillis();
-					UUID perfUuid = application.addPerformanceTiming(server, sql, 0 - t1, clientId);
+					Integer perfUuid = application.addPerformanceTiming(server, sql, 0 - t1, clientId);
 					try
 					{
 						ps.execute(sql);
@@ -133,7 +132,7 @@ public class SQLProcessor implements ISQLService, IServerPlugin
 						((PreparedStatement)ps).setObject(i + 1, data);
 					}
 					long t1 = System.currentTimeMillis();
-					UUID perfUuid = application.addPerformanceTiming(server, sql, 0 - t1, clientId);
+					Integer perfUuid = application.addPerformanceTiming(server, sql, 0 - t1, clientId);
 					try
 					{
 						((PreparedStatement)ps).execute();
