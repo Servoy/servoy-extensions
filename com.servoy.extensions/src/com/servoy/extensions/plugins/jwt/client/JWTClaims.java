@@ -1,5 +1,5 @@
 /*
- This file belongs to the Servoy development and deployment environment, Copyright (C) 1997-2020 Servoy BV
+ This file belongs to the Servoy development and deployment environment, Copyright (C) 1997-2021 Servoy BV
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU Affero General Public License as published by the Free
@@ -15,28 +15,20 @@
  Software Foundation,Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
 */
 
-package com.servoy.extensions.plugins.jwt;
+package com.servoy.extensions.plugins.jwt.client;
 
-import java.rmi.Remote;
-import java.rmi.RemoteException;
-import java.util.Date;
-
-import org.json.JSONObject;
+import com.servoy.base.scripting.annotations.ServoyClientSupport;
+import com.servoy.j2db.documentation.ServoyDocumented;
+import com.servoy.j2db.scripting.IConstantsObject;
 
 /**
  * @author emera
  */
-public interface IJWTService extends Remote
+@ServoyDocumented(scriptingName = "JWTClaims")
+@ServoyClientSupport(ng = true, wc = true, sc = true)
+public class JWTClaims implements IConstantsObject
 {
-
-	String create(JSONObject claims, Date expireDate) throws RemoteException, Exception;
-
-	String create(JSONObject headers, JSONObject claims, Date expireDate) throws RemoteException, Exception;
-
-	JSONObject verify(String token) throws RemoteException;
-
-	boolean configureAlgorithm(String alg, String publicKey, String privateKey, String kid);
-
-	boolean configureAlgorithm(String alg, byte[] publicKey, byte[] privateKey, String kid);
-
+	public static final String SUB = "sub";
+	public static final String ISS = "iss";
+	public static final String AUD = "aud";
 }
