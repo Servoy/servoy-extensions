@@ -52,6 +52,7 @@ public class OAuthServiceBuilder implements IScriptable, IJavaScriptType
 	private final OAuthProvider provider;
 	private long redirectToAuthUrlTime;
 	private String _domain;
+	private Object additionalParameters;
 
 	private static final String GET_CODE_METHOD = "getSvyOAuthCode";
 	private static final String SVY_AUTH_CODE_VAR = "svy_authCode";
@@ -178,7 +179,7 @@ public class OAuthServiceBuilder implements IScriptable, IJavaScriptType
 
 	/**
 	 * Set the domain if the API supports it (e.g.Okta)
-	 * @param tenant
+	 * @param domain
 	 * @return the service builder for method chaining
 	 */
 	@JSFunction
@@ -188,6 +189,30 @@ public class OAuthServiceBuilder implements IScriptable, IJavaScriptType
 		return this;
 	}
 
+	/**
+	 * Set the response_type. Defaults to "code" if not set.
+	 * @param response_type
+	 * @return the service builder for method chaining
+	 */
+	@JSFunction
+	public OAuthServiceBuilder responseType(String response_type)
+	{
+		builder.responseType(response_type);
+		return this;
+	}
+
+	/**
+	 * Add some more parameters to the authorization url.
+	 * @param params  a json containing the parameters and their values
+	 * 		e.g. {'param1': 'value1', 'param2': 'value2'}
+	 * @return the service builder for method chaining
+	 */
+	@JSFunction
+	public OAuthServiceBuilder additionalParameters(Object params)
+	{
+		additionalParameters = params;
+		return this;
+	}
 
 	/**
 	 * Creates an OAuth service that can be used to obtain an access token and access protected data.
@@ -223,7 +248,7 @@ public class OAuthServiceBuilder implements IScriptable, IJavaScriptType
 
 		try
 		{
-			String authURL = service.getAuthorizationURL();
+			String authURL = service.getAuthorizationURL(additionalParameters);
 			if (OAuthService.log.isDebugEnabled()) OAuthService.log.debug("authorization url " + authURL);
 			ExecutorService executor = Executors.newFixedThreadPool(1);
 			executor.submit(() -> {

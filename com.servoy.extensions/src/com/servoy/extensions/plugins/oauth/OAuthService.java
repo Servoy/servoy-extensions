@@ -18,8 +18,10 @@
 package com.servoy.extensions.plugins.oauth;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.concurrent.ExecutionException;
 
+import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.annotations.JSFunction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,7 +60,35 @@ public class OAuthService implements IScriptable, IJavaScriptType
 	@JSFunction
 	public String getAuthorizationURL()
 	{
+
 		return state != null ? service.getAuthorizationUrl(state) : service.getAuthorizationUrl();
+	}
+
+	/**
+	 * Get the authorization url with some additional parameters.
+	 * @param params  a json containing the parameters and their values
+	 * 		e.g. {'param1': 'value1', 'param2': 'value2'}
+	 * @return the authorization url with the provided parameters appended to the query string.
+	 */
+	@JSFunction
+	public String getAuthorizationURL(Object params)
+	{
+		if (params == null) return getAuthorizationURL();
+
+		HashMap<String, String> additionalParameters = new HashMap<String, String>();
+		if (params instanceof Scriptable)
+		{
+			Scriptable scriptable = (Scriptable)params;
+			for (Object id : scriptable.getIds())
+			{
+				if (id instanceof String && scriptable.get((String)id, null) instanceof String)
+				{
+					additionalParameters.put((String)id, (String)scriptable.get((String)id, null));
+				}
+			}
+		}
+		if (state != null) additionalParameters.put("state", state);
+		return service.getAuthorizationUrl(additionalParameters);
 	}
 
 	/**
