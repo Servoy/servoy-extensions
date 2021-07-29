@@ -21,6 +21,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import org.json.JSONObject;
 import org.mozilla.javascript.Function;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.annotations.JSFunction;
@@ -267,14 +268,15 @@ public class OAuthServiceBuilder implements IScriptable, IJavaScriptType
 						if (code instanceof Scriptable)
 						{
 							Scriptable result = ((Scriptable)code);
-							if (result.has("code", result))
+							if (result.has("code", result) || result.has("id_token", result) || result.has("token_type", result))
 							{
 								try
 								{
 									if (OAuthService.log.isDebugEnabled())
 										OAuthService.log.debug("Received code in " + (System.currentTimeMillis() - redirectToAuthUrlTime) / 1000 +
 											"s since the beginning of the request.");
-									service.setAccessToken((String)result.get("code", result));
+									String _code = result.has("code", result) ? (String)(result.get("code", result)) : toJsonString(result);
+									service.setAccessToken(_code);
 									if (OAuthService.log.isDebugEnabled())
 										OAuthService.log.debug("Received access token in  " + (System.currentTimeMillis() - redirectToAuthUrlTime) / 1000 +
 											"s since the beginning of the request.");
@@ -347,5 +349,19 @@ public class OAuthServiceBuilder implements IScriptable, IJavaScriptType
 			return null;
 		}
 		return service;
+	}
+
+	private String toJsonString(Scriptable result)
+	{
+		JSONObject obj = new JSONObject();
+		Scriptable scriptable = result;
+		for (Object id : scriptable.getIds())
+		{
+			if (id instanceof String)
+			{
+				obj.put((String)id, scriptable.get((String)id, null));
+			}
+		}
+		return obj.toString();
 	}
 }

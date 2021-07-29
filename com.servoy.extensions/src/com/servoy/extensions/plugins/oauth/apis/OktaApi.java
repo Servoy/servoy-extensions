@@ -17,6 +17,7 @@
 
 package com.servoy.extensions.plugins.oauth.apis;
 
+import com.github.scribejava.apis.openid.OpenIdJsonTokenExtractor;
 import com.github.scribejava.core.builder.api.DefaultApi20;
 import com.github.scribejava.core.model.Verb;
 
@@ -57,5 +58,11 @@ public class OktaApi extends DefaultApi20
 	protected String getAuthorizationBaseUrl()
 	{
 		return authorizationBaseUrl;
+	}
+
+	@Override
+	public OpenIdJsonTokenExtractor getAccessTokenExtractor()
+	{
+		return OpenIdJsonTokenExtractor.instance();
 	}
 }
