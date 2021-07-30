@@ -26,6 +26,7 @@ import org.mozilla.javascript.annotations.JSFunction;
 import com.servoy.extensions.plugins.jwt.IJWTService;
 import com.servoy.j2db.documentation.ServoyDocumented;
 import com.servoy.j2db.plugins.IClientPluginAccess;
+import com.servoy.j2db.scripting.IReturnedTypesProvider;
 import com.servoy.j2db.scripting.IScriptable;
 import com.servoy.j2db.util.Debug;
 
@@ -33,7 +34,7 @@ import com.servoy.j2db.util.Debug;
  * @author emera
  */
 @ServoyDocumented(publicName = JWTPlugin.PLUGIN_NAME, scriptingName = "plugins." + JWTPlugin.PLUGIN_NAME)
-public class JWTProvider implements IScriptable
+public class JWTProvider implements IScriptable, IReturnedTypesProvider
 {
 	private final JWTPlugin plugin;
 	private IJWTService jwtService;
@@ -95,18 +96,7 @@ public class JWTProvider implements IScriptable
 		{
 			try
 			{
-				JSONObject obj = new JSONObject();
-				if (payload instanceof Scriptable)
-				{
-					Scriptable scriptable = (Scriptable)payload;
-					for (Object id : scriptable.getIds())
-					{
-						if (id instanceof String)
-						{
-							obj.put((String)id, scriptable.get((String)id, null));
-						}
-					}
-				}
+				JSONObject obj = toJSON(payload);
 				return jwtService.create(obj, expiresAt);
 			}
 			catch (Exception e)
@@ -115,6 +105,42 @@ public class JWTProvider implements IScriptable
 			}
 		}
 		return null;
+	}
+
+	@JSFunction
+	public String create(Object headers, Object payload, Date expiresAt)
+	{
+		createJWTService();
+
+		if (jwtService != null)
+		{
+			try
+			{
+				return jwtService.create(toJSON(headers), toJSON(payload), expiresAt);
+			}
+			catch (Exception e)
+			{
+				Debug.error(e);
+			}
+		}
+		return null;
+	}
+
+	private JSONObject toJSON(Object payload)
+	{
+		JSONObject obj = new JSONObject();
+		if (payload instanceof Scriptable)
+		{
+			Scriptable scriptable = (Scriptable)payload;
+			for (Object id : scriptable.getIds())
+			{
+				if (id instanceof String)
+				{
+					obj.put((String)id, scriptable.get((String)id, null));
+				}
+			}
+		}
+		return obj;
 	}
 
 	/**
@@ -141,5 +167,83 @@ public class JWTProvider implements IScriptable
 			}
 		}
 		return null;
+	}
+
+	@JSFunction
+	public boolean configureAlgorithm(String alg, String publicKey, String privateKey)
+	{
+		createJWTService();
+		if (jwtService != null)
+		{
+			try
+			{
+				return jwtService.configureAlgorithm(alg, publicKey, privateKey, null);
+			}
+			catch (Exception e)
+			{
+				Debug.error(e);
+			}
+		}
+		return false;
+	}
+
+	@JSFunction
+	public boolean configureAlgorithm(String alg, byte[] publicKey, byte[] privateKey)
+	{
+		createJWTService();
+		if (jwtService != null)
+		{
+			try
+			{
+				return jwtService.configureAlgorithm(alg, publicKey, privateKey, null);
+			}
+			catch (Exception e)
+			{
+				Debug.error(e);
+			}
+		}
+		return false;
+	}
+
+	@JSFunction
+	public boolean configureAlgorithm(String alg, String publicKey, String privateKey, String kid)
+	{
+		createJWTService();
+		if (jwtService != null)
+		{
+			try
+			{
+				return jwtService.configureAlgorithm(alg, publicKey, privateKey, kid);
+			}
+			catch (Exception e)
+			{
+				Debug.error(e);
+			}
+		}
+		return false;
+	}
+
+	@JSFunction
+	public boolean configureAlgorithm(String alg, byte[] publicKey, byte[] privateKey, String kid)
+	{
+		createJWTService();
+		if (jwtService != null)
+		{
+			try
+			{
+				return jwtService.configureAlgorithm(alg, publicKey, privateKey, kid);
+			}
+			catch (Exception e)
+			{
+				Debug.error(e);
+			}
+		}
+		return false;
+	}
+
+	@Override
+	public Class< ? >[] getAllReturnedTypes()
+	{
+		return new Class[] { JWTAlgorithms.class, JWTClaims.class, JWTHeaders.class };
 	}
 }

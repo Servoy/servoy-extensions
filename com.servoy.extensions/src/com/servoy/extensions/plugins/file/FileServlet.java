@@ -39,7 +39,7 @@ import com.servoy.j2db.util.Utils;
  */
 public class FileServlet extends HttpServlet
 {
-	private final static ConcurrentMap<UUID, File> registeredFiles = new ConcurrentHashMap<>();
+	private final static ConcurrentMap<String, File> registeredFiles = new ConcurrentHashMap<>();
 
 	private final FileServerPlugin fileServerPlugin;
 	private final IServerAccess app;
@@ -63,12 +63,7 @@ public class FileServlet extends HttpServlet
 		{
 			String filePath = pathInfo.substring(5);
 			String uuidString = filePath.substring(1);
-			File file = null;
-			if (uuidString != null && uuidString.split("-").length == 5)
-			{
-				file = registeredFiles.get(UUID.fromString(uuidString));
-
-			}
+			File file = registeredFiles.get(uuidString);
 			if (file == null)
 			{
 				RemoteFileData remoteFileData = fileServerPlugin.getRemoteFileData(app.getServerLocalClientID(), filePath);
@@ -111,12 +106,12 @@ public class FileServlet extends HttpServlet
 	static UUID registerFile(File file)
 	{
 		UUID uuid = UUID.randomUUID();
-		registeredFiles.put(uuid, file);
+		registeredFiles.put(uuid.toString(), file);
 		return uuid;
 	}
 
 	static void unregisterFile(UUID uuid)
 	{
-		registeredFiles.remove(uuid);
+		registeredFiles.remove(uuid.toString());
 	}
 }

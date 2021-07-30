@@ -62,6 +62,6 @@ public class OAuthProviders implements IConstantsObject
 
 	//added by us
 	public static final String INTUIT = "com.servoy.extensions.plugins.oauth.apis.IntuitApi";
-
+	public static final String OKTA = "com.servoy.extensions.plugins.oauth.apis.OktaApi";
 
 }

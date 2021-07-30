@@ -25,6 +25,7 @@ import com.github.scribejava.apis.MicrosoftAzureActiveDirectory20Api;
 import com.github.scribejava.core.builder.ServiceBuilder;
 import com.github.scribejava.core.builder.api.DefaultApi20;
 import com.servoy.base.scripting.annotations.ServoyClientSupport;
+import com.servoy.extensions.plugins.oauth.apis.OktaApi;
 import com.servoy.j2db.documentation.ServoyDocumented;
 import com.servoy.j2db.plugins.IClientPluginAccess;
 import com.servoy.j2db.scripting.IReturnedTypesProvider;
@@ -129,7 +130,7 @@ public class OAuthProvider implements IScriptable, IReturnedTypesProvider
 		builder.apiSecret(clientSecret);
 		if (scope != null) builder.defaultScope(scope);
 		if (deeplinkmethod != null) builder.callback(getRedirectURL(deeplinkmethod));
-		return new OAuthService(builder.build(getApiInstance(provider, null)), state);
+		return new OAuthService(builder.build(getApiInstance(provider, null, null)), state);
 	}
 
 	String getRedirectURL(String callbackmethod)
@@ -143,12 +144,14 @@ public class OAuthProvider implements IScriptable, IReturnedTypesProvider
 		return redirectURL;
 	}
 
-	static DefaultApi20 getApiInstance(String provider, String tenant) throws Exception
+	static DefaultApi20 getApiInstance(String provider, String tenant, String domain) throws Exception
 	{
 		switch (provider)
 		{
 			case OAuthProviders.MICROSOFT_AD :
 				return tenant != null ? MicrosoftAzureActiveDirectory20Api.custom(tenant) : MicrosoftAzureActiveDirectory20Api.instance();
+			case OAuthProviders.OKTA :
+				return OktaApi.custom(domain);
 			default :
 				try
 				{

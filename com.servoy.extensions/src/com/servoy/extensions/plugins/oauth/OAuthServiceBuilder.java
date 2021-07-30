@@ -21,6 +21,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import org.json.JSONObject;
 import org.mozilla.javascript.Function;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.annotations.JSFunction;
@@ -51,6 +52,8 @@ public class OAuthServiceBuilder implements IScriptable, IJavaScriptType
 	private String _deeplink;
 	private final OAuthProvider provider;
 	private long redirectToAuthUrlTime;
+	private String _domain;
+	private Object additionalParameters;
 
 	private static final String GET_CODE_METHOD = "getSvyOAuthCode";
 	private static final String SVY_AUTH_CODE_VAR = "svy_authCode";
@@ -175,6 +178,42 @@ public class OAuthServiceBuilder implements IScriptable, IJavaScriptType
 		return this;
 	}
 
+	/**
+	 * Set the domain if the API supports it (e.g.Okta)
+	 * @param domain
+	 * @return the service builder for method chaining
+	 */
+	@JSFunction
+	public OAuthServiceBuilder domain(String domain)
+	{
+		this._domain = domain;
+		return this;
+	}
+
+	/**
+	 * Set the response_type. Defaults to "code" if not set.
+	 * @param response_type
+	 * @return the service builder for method chaining
+	 */
+	@JSFunction
+	public OAuthServiceBuilder responseType(String response_type)
+	{
+		builder.responseType(response_type);
+		return this;
+	}
+
+	/**
+	 * Add some more parameters to the authorization url.
+	 * @param params  a json containing the parameters and their values
+	 * 		e.g. {'param1': 'value1', 'param2': 'value2'}
+	 * @return the service builder for method chaining
+	 */
+	@JSFunction
+	public OAuthServiceBuilder additionalParameters(Object params)
+	{
+		additionalParameters = params;
+		return this;
+	}
 
 	/**
 	 * Creates an OAuth service that can be used to obtain an access token and access protected data.
@@ -194,7 +233,7 @@ public class OAuthServiceBuilder implements IScriptable, IJavaScriptType
 		builder.callback(provider.getRedirectURL(deeplink_name));
 		if (OAuthService.log.isDebugEnabled()) OAuthService.log.debug("Redirect url " + provider.getRedirectURL(deeplink_name));
 
-		OAuthService service = new OAuthService(builder.build(OAuthProvider.getApiInstance(api, _tenant)), _state);
+		OAuthService service = new OAuthService(builder.build(OAuthProvider.getApiInstance(api, _tenant, _domain)), _state);
 		return _callback != null ? buildWithCallback(generateGlobalMethods, deeplink_name, service) : service;
 	}
 
@@ -210,7 +249,7 @@ public class OAuthServiceBuilder implements IScriptable, IJavaScriptType
 
 		try
 		{
-			String authURL = service.getAuthorizationURL();
+			String authURL = service.getAuthorizationURL(additionalParameters);
 			if (OAuthService.log.isDebugEnabled()) OAuthService.log.debug("authorization url " + authURL);
 			ExecutorService executor = Executors.newFixedThreadPool(1);
 			executor.submit(() -> {
@@ -229,14 +268,15 @@ public class OAuthServiceBuilder implements IScriptable, IJavaScriptType
 						if (code instanceof Scriptable)
 						{
 							Scriptable result = ((Scriptable)code);
-							if (result.has("code", result))
+							if (result.has("code", result) || result.has("id_token", result) || result.has("token_type", result))
 							{
 								try
 								{
 									if (OAuthService.log.isDebugEnabled())
 										OAuthService.log.debug("Received code in " + (System.currentTimeMillis() - redirectToAuthUrlTime) / 1000 +
 											"s since the beginning of the request.");
-									service.setAccessToken((String)result.get("code", result));
+									String _code = result.has("code", result) ? (String)(result.get("code", result)) : toJsonString(result);
+									service.setAccessToken(_code);
 									if (OAuthService.log.isDebugEnabled())
 										OAuthService.log.debug("Received access token in  " + (System.currentTimeMillis() - redirectToAuthUrlTime) / 1000 +
 											"s since the beginning of the request.");
@@ -309,5 +349,19 @@ public class OAuthServiceBuilder implements IScriptable, IJavaScriptType
 			return null;
 		}
 		return service;
+	}
+
+	private String toJsonString(Scriptable result)
+	{
+		JSONObject obj = new JSONObject();
+		Scriptable scriptable = result;
+		for (Object id : scriptable.getIds())
+		{
+			if (id instanceof String)
+			{
+				obj.put((String)id, scriptable.get((String)id, null));
+			}
+		}
+		return obj.toString();
 	}
 }

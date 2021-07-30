@@ -18,12 +18,15 @@ package com.servoy.extensions.plugins.rest_ws;
 
 import java.beans.PropertyChangeEvent;
 import java.net.URL;
+import java.util.List;
 import java.util.Properties;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
+
+import org.apache.commons.fileupload.FileItem;
 
 import com.servoy.j2db.plugins.IClientPlugin;
 import com.servoy.j2db.plugins.IClientPluginAccess;
@@ -45,7 +48,9 @@ public class RestWSClientPlugin implements IClientPlugin, IIconProvider
 
 	private HttpServletRequest request;
 	private HttpServletResponse response;
+	private List<FileItem> contents;
 	private boolean sendUserPropertiesHeaders = true;
+
 
 	public void load() throws PluginException
 	{
@@ -102,12 +107,13 @@ public class RestWSClientPlugin implements IClientPlugin, IIconProvider
 	}
 
 	/*
-	 * Set/clear request and response, called from server-plugin
+	 * Set/clear request, response and contents, called from server-plugin
 	 */
-	public void setRequestResponse(HttpServletRequest request, HttpServletResponse response)
+	public void setRequestResponseContents(HttpServletRequest request, HttpServletResponse response, List<FileItem> contents)
 	{
 		this.request = request;
 		this.response = response;
+		this.contents = contents;
 	}
 
 	HttpServletRequest getRequest()
@@ -118,6 +124,11 @@ public class RestWSClientPlugin implements IClientPlugin, IIconProvider
 	HttpServletResponse getResponse()
 	{
 		return response;
+	}
+
+	public List<FileItem> getContents()
+	{
+		return contents;
 	}
 
 	@Override

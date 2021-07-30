@@ -49,4 +49,6 @@ public interface IMailService extends Remote
 		Date onlyRecieveMsgWithSentDate, String[] overrideProperties) throws RemoteException;
 
 	public MailMessage createMailMessageFromBinary(String clientId, byte[] data) throws RemoteException;
+
+	public String getPluginProperty(String propertyName);
 }
