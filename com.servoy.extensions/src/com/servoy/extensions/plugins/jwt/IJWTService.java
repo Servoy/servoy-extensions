@@ -28,15 +28,7 @@ import org.json.JSONObject;
  */
 public interface IJWTService extends Remote
 {
-
 	String create(JSONObject claims, Date expireDate) throws RemoteException, Exception;
 
-	String create(JSONObject headers, JSONObject claims, Date expireDate) throws RemoteException, Exception;
-
 	JSONObject verify(String token) throws RemoteException;
-
-	boolean configureAlgorithm(String alg, String publicKey, String privateKey, String kid);
-
-	boolean configureAlgorithm(String alg, byte[] publicKey, byte[] privateKey, String kid);
-
 }

@@ -18,17 +18,6 @@
 package com.servoy.extensions.plugins.jwt;
 
 import java.rmi.RemoteException;
-import java.security.KeyFactory;
-import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.security.interfaces.ECPrivateKey;
-import java.security.interfaces.ECPublicKey;
-import java.security.interfaces.RSAPrivateKey;
-import java.security.interfaces.RSAPublicKey;
-import java.security.spec.InvalidKeySpecException;
-import java.security.spec.PKCS8EncodedKeySpec;
-import java.security.spec.X509EncodedKeySpec;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -36,7 +25,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.commons.codec.binary.Base64;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.mozilla.javascript.NativeArray;
@@ -48,10 +36,6 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.auth0.jwt.interfaces.DecodedJWT;
-import com.auth0.jwt.interfaces.ECDSAKeyProvider;
-import com.auth0.jwt.interfaces.RSAKeyProvider;
-import com.servoy.extensions.plugins.jwt.client.JWTAlgorithms;
-import com.servoy.extensions.plugins.jwt.client.JWTHeaders;
 import com.servoy.j2db.plugins.IServerAccess;
 import com.servoy.j2db.plugins.IServerPlugin;
 import com.servoy.j2db.plugins.PluginException;
@@ -212,116 +196,6 @@ public class JWTServer implements IServerPlugin, IJWTService
 		}
 	}
 
-
-	@Override
-	public String create(JSONObject headers, JSONObject claims, Date expire) throws RemoteException, Exception
-	{
-		try
-		{
-			Algorithm alg;
-			if (headers != null && headers.has(JWTHeaders.ALG))
-			{
-				alg = algorithms.get(headers.getString(JWTHeaders.ALG) + headers.optString(JWTHeaders.KID, ""));
-			}
-			else
-			{
-				if (!checkInit()) return null;
-				alg = algorithm;
-			}
-			Builder builder = JWT.create();
-			if (headers != null)
-			{
-				Map<String, Object> headerClaims = new HashMap<String, Object>();
-				for (String k : headers.keySet())
-				{
-					headerClaims.put(k, headers.get(k));
-				}
-				builder.withHeader(headerClaims);
-			}
-			addClaims(claims, builder);
-			if (expire != null)
-			{
-				builder.withExpiresAt(expire);
-			}
-
-			return builder.sign(alg);
-		}
-		catch (Exception e)
-		{
-			Debug.error("Could not create the JWT token", e);
-		}
-		return null;
-	}
-
-	private ECDSAKeyProvider getECPublicPrivateKeyPair(byte[] publicKey, byte[] privateKey, String kid)
-		throws NoSuchAlgorithmException, InvalidKeySpecException
-	{
-		KeyFactory keyFactory = KeyFactory.getInstance("EC");
-		PKCS8EncodedKeySpec keySpecPKCS8 = new PKCS8EncodedKeySpec(Base64.decodeBase64(privateKey));
-		final PrivateKey privKey = keyFactory.generatePrivate(keySpecPKCS8);
-
-		X509EncodedKeySpec keySpecX509 = new X509EncodedKeySpec(Base64.decodeBase64(publicKey));
-		final PublicKey pubKey = keyFactory.generatePublic(keySpecX509);
-
-		ECDSAKeyProvider keyProvider = new ECDSAKeyProvider()
-		{
-			@Override
-			public ECPublicKey getPublicKeyById(String keyId)
-			{
-				return (ECPublicKey)pubKey;
-			}
-
-			@Override
-			public ECPrivateKey getPrivateKey()
-			{
-				return (ECPrivateKey)privKey;
-			}
-
-			@Override
-			public String getPrivateKeyId()
-			{
-				return kid;
-			}
-		};
-
-		return keyProvider;
-	}
-
-	private RSAKeyProvider getRSAPublicPrivateKeyPair(byte[] publicKey, byte[] privateKey, String kid)
-		throws NoSuchAlgorithmException, InvalidKeySpecException
-	{
-		KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-		PKCS8EncodedKeySpec keySpecPKCS8 = new PKCS8EncodedKeySpec(Base64.decodeBase64(privateKey));
-		final PrivateKey privKey = keyFactory.generatePrivate(keySpecPKCS8);
-
-		X509EncodedKeySpec keySpecX509 = new X509EncodedKeySpec(Base64.decodeBase64(publicKey));
-		final PublicKey pubKey = keyFactory.generatePublic(keySpecX509);
-
-		RSAKeyProvider keyProvider = new RSAKeyProvider()
-		{
-
-			@Override
-			public RSAPublicKey getPublicKeyById(String keyId)
-			{
-				return (RSAPublicKey)pubKey;
-			}
-
-			@Override
-			public String getPrivateKeyId()
-			{
-				return kid;
-			}
-
-			@Override
-			public RSAPrivateKey getPrivateKey()
-			{
-				return (RSAPrivateKey)privKey;
-			}
-		};
-		return keyProvider;
-	}
-
-
 	private Long[] convertToLongArray(Object value)
 	{
 		NativeArray array = (NativeArray)value;
@@ -362,13 +236,18 @@ public class JWTServer implements IServerPlugin, IJWTService
 		{
 			if (token == null) return null;
 			JSONObject headers = new JSONObject(new String(Utils.decodeBASE64(token)));
-			String algKey = headers.getString(JWTHeaders.ALG) + headers.optString(JWTHeaders.KID);
+			String algKey = headers.getString("alg") + headers.optString("kid");
 
 			JWTVerifier jwtVerifier = verifiers.get(algKey);
 			if (jwtVerifier == null)
 			{
-				if (!checkInit()) return null; //TODO check init alg
-				jwtVerifier = JWT.require(algorithms.get(algKey))
+				Algorithm alg = algorithms.get(algKey);
+				if (alg == null)
+				{
+					if (!checkInit()) return null;
+					alg = algorithm;
+				}
+				jwtVerifier = JWT.require(alg)
 					.build();
 				verifiers.put(algKey, jwtVerifier);
 			}
@@ -385,65 +264,5 @@ public class JWTServer implements IServerPlugin, IJWTService
 			Debug.error(e);
 		}
 		return null;
-	}
-
-	@Override
-	public boolean configureAlgorithm(String alg, String publicKey, String privateKey, String kid)
-	{
-		byte[] pub = publicKey != null ? publicKey.getBytes() : null;
-		byte[] priv = privateKey != null ? privateKey.getBytes() : null;
-		return configureAlgorithm(alg, pub, priv, kid);
-	}
-
-
-	@Override
-	public boolean configureAlgorithm(String alg, byte[] publicKey, byte[] privateKey, String kid)
-	{
-		String key = alg + (kid != null ? kid : "");
-		try
-		{
-			switch (alg)
-			{
-				case JWTAlgorithms.HS256 :
-					//(this is the default actually)...
-					algorithms.put(key, Algorithm.HMAC256(settings.getProperty(JWT_SECRET_KEY)));
-					break;
-				case JWTAlgorithms.HS384 :
-					algorithms.put(key, Algorithm.HMAC384(settings.getProperty(JWT_SECRET_KEY)));
-					break;
-				case JWTAlgorithms.HS512 :
-					algorithms.put(key, Algorithm.HMAC512(settings.getProperty(JWT_SECRET_KEY)));
-					break;
-
-				case JWTAlgorithms.ES256 :
-					algorithms.put(key, Algorithm.ECDSA256(getECPublicPrivateKeyPair(publicKey, privateKey, kid)));
-					break;
-				case JWTAlgorithms.ES384 :
-					algorithms.put(key, Algorithm.ECDSA384(getECPublicPrivateKeyPair(publicKey, privateKey, kid)));
-					break;
-				case JWTAlgorithms.ES512 :
-					algorithms.put(key, Algorithm.ECDSA512(getECPublicPrivateKeyPair(publicKey, privateKey, kid)));
-					break;
-
-				case JWTAlgorithms.RS256 :
-					algorithms.put(key, Algorithm.RSA256(getRSAPublicPrivateKeyPair(publicKey, privateKey, kid)));
-					break;
-				case JWTAlgorithms.RS384 :
-					algorithms.put(key, Algorithm.RSA384(getRSAPublicPrivateKeyPair(publicKey, privateKey, kid)));
-					break;
-				case JWTAlgorithms.RS512 :
-					algorithms.put(key, Algorithm.RSA512(getRSAPublicPrivateKeyPair(publicKey, privateKey, kid)));
-					break;
-				default :
-					Debug.error("Algorithm " + alg + " is not supported by the JWT plugin.");
-					return false;
-			}
-			return true;
-		}
-		catch (IllegalArgumentException | NoSuchAlgorithmException | InvalidKeySpecException e)
-		{
-			Debug.error(e);
-		}
-		return false;
 	}
 }

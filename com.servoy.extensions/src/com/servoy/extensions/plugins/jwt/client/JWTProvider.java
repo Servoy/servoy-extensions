@@ -19,16 +19,24 @@ package com.servoy.extensions.plugins.jwt.client;
 
 import java.util.Date;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.annotations.JSFunction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.JWTVerifier;
+import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.auth0.jwt.exceptions.TokenExpiredException;
+import com.auth0.jwt.interfaces.DecodedJWT;
 import com.servoy.extensions.plugins.jwt.IJWTService;
 import com.servoy.j2db.documentation.ServoyDocumented;
 import com.servoy.j2db.plugins.IClientPluginAccess;
 import com.servoy.j2db.scripting.IReturnedTypesProvider;
 import com.servoy.j2db.scripting.IScriptable;
-import com.servoy.j2db.util.Debug;
+import com.servoy.j2db.util.Utils;
 
 /**
  * @author emera
@@ -38,6 +46,7 @@ public class JWTProvider implements IScriptable, IReturnedTypesProvider
 {
 	private final JWTPlugin plugin;
 	private IJWTService jwtService;
+	public static final Logger log = LoggerFactory.getLogger("plugin.jwt");
 
 	public JWTProvider(JWTPlugin jwtPlugin)
 	{
@@ -55,7 +64,7 @@ public class JWTProvider implements IScriptable, IReturnedTypesProvider
 			}
 			catch (Exception ex)
 			{
-				Debug.error(ex);
+				log.error(ex.getMessage());
 			}
 		}
 	}
@@ -101,26 +110,7 @@ public class JWTProvider implements IScriptable, IReturnedTypesProvider
 			}
 			catch (Exception e)
 			{
-				Debug.error(e);
-			}
-		}
-		return null;
-	}
-
-	@JSFunction
-	public String create(Object headers, Object payload, Date expiresAt)
-	{
-		createJWTService();
-
-		if (jwtService != null)
-		{
-			try
-			{
-				return jwtService.create(toJSON(headers), toJSON(payload), expiresAt);
-			}
-			catch (Exception e)
-			{
-				Debug.error(e);
+				log.error(e.getMessage());
 			}
 		}
 		return null;
@@ -163,87 +153,52 @@ public class JWTProvider implements IScriptable, IReturnedTypesProvider
 			}
 			catch (Exception e)
 			{
-				Debug.error(e);
+				log.error(e.getMessage());
 			}
 		}
 		return null;
 	}
 
 	@JSFunction
-	public boolean configureAlgorithm(String alg, String publicKey, String privateKey)
+	public Object verify(String token, com.auth0.jwt.algorithms.Algorithm alg)
 	{
-		createJWTService();
-		if (jwtService != null)
+		if (alg != null)
 		{
 			try
 			{
-				return jwtService.configureAlgorithm(alg, publicKey, privateKey, null);
+				JWTVerifier jwtVerifier = JWT.require(alg)
+					.build();
+				DecodedJWT jwt = jwtVerifier.verify(token);
+				String payload = new String(Utils.decodeBASE64(jwt.getPayload()));
+				return new JSONObject(payload);
 			}
-			catch (Exception e)
+			catch (TokenExpiredException e)
 			{
-				Debug.error(e);
+				if (log.isTraceEnabled()) log.trace(e.getMessage());
+			}
+			catch (JWTVerificationException | JSONException e)
+			{
+				log.error(e.getMessage());
 			}
 		}
-		return false;
+		return null;
 	}
 
 	@JSFunction
-	public boolean configureAlgorithm(String alg, byte[] publicKey, byte[] privateKey)
+	public Algorithm algorithm()
 	{
-		createJWTService();
-		if (jwtService != null)
-		{
-			try
-			{
-				return jwtService.configureAlgorithm(alg, publicKey, privateKey, null);
-			}
-			catch (Exception e)
-			{
-				Debug.error(e);
-			}
-		}
-		return false;
+		return new Algorithm();
 	}
 
 	@JSFunction
-	public boolean configureAlgorithm(String alg, String publicKey, String privateKey, String kid)
+	public Builder builder()
 	{
-		createJWTService();
-		if (jwtService != null)
-		{
-			try
-			{
-				return jwtService.configureAlgorithm(alg, publicKey, privateKey, kid);
-			}
-			catch (Exception e)
-			{
-				Debug.error(e);
-			}
-		}
-		return false;
-	}
-
-	@JSFunction
-	public boolean configureAlgorithm(String alg, byte[] publicKey, byte[] privateKey, String kid)
-	{
-		createJWTService();
-		if (jwtService != null)
-		{
-			try
-			{
-				return jwtService.configureAlgorithm(alg, publicKey, privateKey, kid);
-			}
-			catch (Exception e)
-			{
-				Debug.error(e);
-			}
-		}
-		return false;
+		return new Builder();
 	}
 
 	@Override
 	public Class< ? >[] getAllReturnedTypes()
 	{
-		return new Class[] { JWTAlgorithms.class, JWTClaims.class, JWTHeaders.class };
+		return new Class[] { JWTAlgorithms.class, JWTClaims.class };
 	}
 }
