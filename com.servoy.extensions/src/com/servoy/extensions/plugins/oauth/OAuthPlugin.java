@@ -19,6 +19,7 @@ package com.servoy.extensions.plugins.oauth;
 
 import java.beans.PropertyChangeEvent;
 import java.net.URL;
+import java.util.Map;
 import java.util.Properties;
 
 import javax.swing.Icon;
@@ -28,6 +29,8 @@ import com.servoy.base.scripting.annotations.ServoyClientSupport;
 import com.servoy.j2db.plugins.IClientPlugin;
 import com.servoy.j2db.plugins.IClientPluginAccess;
 import com.servoy.j2db.plugins.IIconProvider;
+import com.servoy.j2db.plugins.IServerAccess;
+import com.servoy.j2db.plugins.IServerPlugin;
 import com.servoy.j2db.plugins.PluginException;
 import com.servoy.j2db.scripting.IScriptable;
 
@@ -35,12 +38,14 @@ import com.servoy.j2db.scripting.IScriptable;
  * @author emera
  */
 @ServoyClientSupport(ng = true, wc = false, sc = false)
-public class OAuthPlugin implements IClientPlugin, IIconProvider
+public class OAuthPlugin implements IClientPlugin, IIconProvider, IServerPlugin
 {
 	public static final String PLUGIN_NAME = "oauth"; //$NON-NLS-1$
 
 	private OAuthProvider impl;
 	private IClientPluginAccess access;
+
+	private IServerAccess application;
 
 	@Override
 	public void load() throws PluginException
@@ -112,5 +117,18 @@ public class OAuthPlugin implements IClientPlugin, IIconProvider
 	public URL getIconUrl()
 	{
 		return this.getClass().getResource("images/oauth.png"); //$NON-NLS-1$
+	}
+
+	@Override
+	public void initialize(IServerAccess app) throws PluginException
+	{
+		this.application = app;
+		app.registerWebService("oauth", new OAuthLandingServlet(this));
+	}
+
+	@Override
+	public Map<String, String> getRequiredPropertyNames()
+	{
+		return null;
 	}
 }

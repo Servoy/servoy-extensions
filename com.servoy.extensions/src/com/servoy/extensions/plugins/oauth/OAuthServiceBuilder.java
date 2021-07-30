@@ -54,6 +54,7 @@ public class OAuthServiceBuilder implements IScriptable, IJavaScriptType
 	private long redirectToAuthUrlTime;
 	private String _domain;
 	private Object additionalParameters;
+	private boolean implicitGrantType = false;
 
 	private static final String GET_CODE_METHOD = "getSvyOAuthCode";
 	private static final String SVY_AUTH_CODE_VAR = "svy_authCode";
@@ -202,6 +203,20 @@ public class OAuthServiceBuilder implements IScriptable, IJavaScriptType
 		return this;
 	}
 
+
+	/**
+	 * Use the implicit grant type flow.
+	 * In this case the redirect url configured for the oauth app needs to be of the following form
+	 * https://example.com/servoy-service/oauth/solutions/<solution_name>/m/<deeplinkmethod> - where <deeplinkmethod> is the name configured with the service builder
+	 * @return the service builder for method chaining
+	 */
+	@JSFunction
+	public OAuthServiceBuilder implicitGrantType()
+	{
+		this.implicitGrantType = true;
+		return this;
+	}
+
 	/**
 	 * Add some more parameters to the authorization url.
 	 * @param params  a json containing the parameters and their values
@@ -230,8 +245,9 @@ public class OAuthServiceBuilder implements IScriptable, IJavaScriptType
 			throw new Exception("Cannot build OAuth service. Please specify a callback function, see serviceBuilder.callback() docs for more details.");
 		}
 		String deeplink_name = _deeplink == null ? DEEPLINK_METHOD_NAME : _deeplink;
-		builder.callback(provider.getRedirectURL(deeplink_name));
-		if (OAuthService.log.isDebugEnabled()) OAuthService.log.debug("Redirect url " + provider.getRedirectURL(deeplink_name));
+		String redirectURL = provider.getRedirectURL(deeplink_name, implicitGrantType);
+		builder.callback(redirectURL);
+		if (OAuthService.log.isDebugEnabled()) OAuthService.log.debug("Redirect url " + redirectURL);
 
 		OAuthService service = new OAuthService(builder.build(OAuthProvider.getApiInstance(api, _tenant, _domain)), _state);
 		return _callback != null ? buildWithCallback(generateGlobalMethods, deeplink_name, service) : service;
