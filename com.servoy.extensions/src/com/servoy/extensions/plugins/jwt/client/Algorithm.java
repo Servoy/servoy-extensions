@@ -37,9 +37,9 @@ import com.auth0.jwt.interfaces.RSAKeyProvider;
 import com.servoy.j2db.documentation.ServoyDocumented;
 import com.servoy.j2db.scripting.IJavaScriptType;
 import com.servoy.j2db.scripting.IScriptable;
-import com.servoy.j2db.util.Debug;
 
 /**
+ * Builder for an algorithm object which is used to sign or verify a JWT token.
  * @author emera
  */
 @ServoyDocumented(scriptingName = "Algorithm")
@@ -49,11 +49,20 @@ public class Algorithm implements IScriptable, IJavaScriptType
 	private byte[] pubKey;
 	private byte[] privKey;
 	private String keyId;
+	private final JWTProvider provider;
+	private final String alg;
 
-	public Algorithm()
+	public Algorithm(JWTProvider jwtProvider, String alg)
 	{
+		this.provider = jwtProvider;
+		this.alg = alg;
 	}
 
+	/**
+	 * The secret password for HMAC algorithms.
+	 * @param password
+	 * @return the algorithm builder for method chaining
+	 */
 	@JSFunction
 	public Algorithm password(String password)
 	{
@@ -61,28 +70,43 @@ public class Algorithm implements IScriptable, IJavaScriptType
 		return this;
 	}
 
+	/**
+	 * The public key (used to verify the token).
+	 * @param publicKey as a string
+	 * @return the algorithm builder for method chaining
+	 */
 	@JSFunction
 	public Algorithm publicKey(String publicKey)
 	{
 		if (publicKey != null)
 		{
-			//TODO strip begin and end..
-			this.pubKey = publicKey.getBytes();
+			String publicKeyContent = publicKey.replaceAll("\\n", "").replace("-----BEGIN PUBLIC KEY-----", "").replace("-----END PUBLIC KEY-----", "");
+			this.pubKey = publicKeyContent.getBytes();
 		}
 		return this;
 	}
 
+	/**
+	 * The private key (used to create the token).
+	 * @param privateKey as a string
+	 * @return the algorithm builder for method chaining
+	 */
 	@JSFunction
 	public Algorithm privateKey(String privateKey)
 	{
 		if (privateKey != null)
 		{
-			//TODO strip begin and end..
-			this.privKey = privateKey.getBytes();
+			String privateKeyContent = privateKey.replaceAll("\\n", "").replace("-----BEGIN PRIVATE KEY-----", "").replace("-----END PRIVATE KEY-----", "");
+			this.privKey = privateKeyContent.getBytes();
 		}
 		return this;
 	}
 
+	/**
+	 * The public key used to verify the token.
+	 * @param publicKey as a byte array
+	 * @return the algorithm builder for method chaining
+	 */
 	@JSFunction
 	public Algorithm publicKey(byte[] publicKey)
 	{
@@ -90,6 +114,23 @@ public class Algorithm implements IScriptable, IJavaScriptType
 		return this;
 	}
 
+	/**
+	 * The private key used to create the token.
+	 * @param privateKey as a byte array
+	 * @return the algorithm builder for method chaining
+	 */
+	@JSFunction
+	public Algorithm privateKey(byte[] privateKey)
+	{
+		this.privKey = privateKey;
+		return this;
+	}
+
+	/**
+	 * The key identifier, will be added to the token header.
+	 * @param kid the private key identifier
+	 * @return  the algorithm builder for method chaining
+	 */
 	@JSFunction
 	public Algorithm kid(String kid)
 	{
@@ -97,10 +138,13 @@ public class Algorithm implements IScriptable, IJavaScriptType
 		return this;
 	}
 
+	/**
+	 * Build the algorithm which is used to create and verify jwt tokens.
+	 * @return the algorithm object
+	 */
 	@JSFunction
-	public com.auth0.jwt.algorithms.Algorithm build(String alg)
+	public com.auth0.jwt.algorithms.Algorithm build()
 	{
-		if (alg == null) return null; //TODO return com.auth0.jwt.algorithms.Algorithm.none() ?
 		try
 		{
 			if (alg.startsWith("HS"))
@@ -110,11 +154,11 @@ public class Algorithm implements IScriptable, IJavaScriptType
 			if (alg.startsWith("RS"))
 				return buildRSAAlgorithm(alg);
 
-			Debug.error("Algorithm " + alg + " is not supported by the JWT plugin.");
+			JWTProvider.log.error("Algorithm " + alg + " is not supported by the JWT plugin.");
 		}
 		catch (NoSuchAlgorithmException | InvalidKeySpecException e)
 		{
-			Debug.error(e);//TODO log
+			JWTProvider.log.error(e.getMessage());
 		}
 		return null;
 	}
@@ -123,7 +167,7 @@ public class Algorithm implements IScriptable, IJavaScriptType
 	{
 		if (privKey == null && pubKey == null)
 		{
-			Debug.error("Cannot create RSA algorithm. Both public and private keys cannot be null.");
+			JWTProvider.log.error("Cannot create RSA algorithm. Both public and private keys cannot be null.");
 			return null;
 		}
 		RSAKeyProvider keyProvider = getRSAPublicPrivateKeyPair();
@@ -136,7 +180,7 @@ public class Algorithm implements IScriptable, IJavaScriptType
 			case JWTAlgorithms.RS512 :
 				return com.auth0.jwt.algorithms.Algorithm.RSA512(keyProvider);
 			default :
-				Debug.error("Algorithm " + alg + " is not supported by the JWT plugin.");
+				JWTProvider.log.error("Algorithm " + alg + " is not supported by the JWT plugin.");
 		}
 		return null;
 	}
@@ -145,7 +189,7 @@ public class Algorithm implements IScriptable, IJavaScriptType
 	{
 		if (privKey == null && pubKey == null)
 		{
-			Debug.error("Cannot create ECDSA algorithm. Both public and private keys cannot be null.");
+			JWTProvider.log.error("Cannot create ECDSA algorithm. Both public and private keys cannot be null.");
 			return null;
 		}
 		ECDSAKeyProvider keyProvider = getECPublicPrivateKeyPair();
@@ -158,19 +202,16 @@ public class Algorithm implements IScriptable, IJavaScriptType
 			case JWTAlgorithms.ES512 :
 				return com.auth0.jwt.algorithms.Algorithm.ECDSA512(keyProvider);
 			default :
-				Debug.error("Algorithm " + alg + " is not supported by the JWT plugin.");
+				JWTProvider.log.error("Algorithm " + alg + " is not supported by the JWT plugin.");
 		}
 		return null;
 	}
 
-	/**
-	 * @return
-	 */
 	private com.auth0.jwt.algorithms.Algorithm buildHSAlgorithm(String alg)
 	{
 		if (pwd == null)
 		{
-			// TODO get pwd from the server
+			pwd = provider.getSecret();
 		}
 		switch (alg)
 		{
@@ -181,7 +222,7 @@ public class Algorithm implements IScriptable, IJavaScriptType
 			case JWTAlgorithms.HS512 :
 				return com.auth0.jwt.algorithms.Algorithm.HMAC512(pwd);
 			default :
-				Debug.error("Algorithm " + alg + " is not supported by the JWT plugin.");
+				JWTProvider.log.error("Algorithm " + alg + " is not supported by the JWT plugin.");
 		}
 		return null;
 	}

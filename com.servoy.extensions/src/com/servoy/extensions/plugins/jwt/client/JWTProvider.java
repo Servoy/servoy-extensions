@@ -21,7 +21,6 @@ import java.util.Date;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.annotations.JSFunction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,6 +30,7 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.servoy.base.scripting.annotations.ServoyClientSupport;
 import com.servoy.extensions.plugins.jwt.IJWTService;
 import com.servoy.j2db.documentation.ServoyDocumented;
 import com.servoy.j2db.plugins.IClientPluginAccess;
@@ -78,10 +78,12 @@ public class JWTProvider implements IScriptable, IReturnedTypesProvider
 	 * @return a string representing the encrypted data
 	 * 		or null if the token cannot be generated
 	 */
+	@ServoyClientSupport(ng = true, wc = true, sc = false)
 	@JSFunction
 	public String create(Object payload)
 	{
-		return create(payload, null);
+		com.auth0.jwt.algorithms.Algorithm alg = new Algorithm(this, JWTAlgorithms.HS256).build();
+		return builder().payload(payload).sign(alg);
 	}
 
 	/**
@@ -96,69 +98,39 @@ public class JWTProvider implements IScriptable, IReturnedTypesProvider
 	 * @return a string representing the encrypted data
 	 * 		or null if the token cannot be generated
 	 */
+	@ServoyClientSupport(ng = true, wc = true, sc = false)
 	@JSFunction
 	public String create(Object payload, Date expiresAt)
 	{
-		createJWTService();
-
-		if (jwtService != null)
-		{
-			try
-			{
-				JSONObject obj = toJSON(payload);
-				return jwtService.create(obj, expiresAt);
-			}
-			catch (Exception e)
-			{
-				log.error(e.getMessage());
-			}
-		}
-		return null;
-	}
-
-	private JSONObject toJSON(Object payload)
-	{
-		JSONObject obj = new JSONObject();
-		if (payload instanceof Scriptable)
-		{
-			Scriptable scriptable = (Scriptable)payload;
-			for (Object id : scriptable.getIds())
-			{
-				if (id instanceof String)
-				{
-					obj.put((String)id, scriptable.get((String)id, null));
-				}
-			}
-		}
-		return obj;
+		com.auth0.jwt.algorithms.Algorithm alg = new Algorithm(this, JWTAlgorithms.HS256).build();
+		return builder().payload(payload).withExpires(expiresAt).sign(alg);
 	}
 
 	/**
 	 * Verifiy a token that is created with the {@link #create(Object)} method.
-	 * This will only verify and return the payload that was given if the token could be verified with the (shared) secrect key 'jwt.secret.password' that is configured on the admin page.
+	 * This will only verify and return the payload that was given if the token could be verified with the (shared) secret key 'jwt.secret.password' that is configured on the admin page.
 	 * Will also return null if the token passed its expire date.
 	 *
 	 * @param token a JSON Web Token
 	 * @return the payload or null if the token can't be verified
 	 */
+	@ServoyClientSupport(ng = true, wc = true, sc = false)
 	@JSFunction
 	public Object verify(String token)
 	{
-		createJWTService();
-		if (jwtService != null)
-		{
-			try
-			{
-				return jwtService.verify(token);
-			}
-			catch (Exception e)
-			{
-				log.error(e.getMessage());
-			}
-		}
-		return null;
+		com.auth0.jwt.algorithms.Algorithm alg = new Algorithm(this, JWTAlgorithms.HS256).build();
+		return verify(token, alg);
 	}
 
+	/**
+	 * Verify a token that is created with the {@link #create(Object)} method.
+	 * This will only verify and return the payload that was given if the token could be verified with the (shared) secret key 'jwt.secret.password' that is configured on the admin page.
+	 * Will also return null if the token passed its expire date.
+	 *
+	 * @param token a JSON Web Token
+	 * @param alg an algorithm used to verify the signature
+	 * @return the payload or null if the token can't be verified
+	 */
 	@JSFunction
 	public Object verify(String token, com.auth0.jwt.algorithms.Algorithm alg)
 	{
@@ -184,16 +156,165 @@ public class JWTProvider implements IScriptable, IReturnedTypesProvider
 		return null;
 	}
 
+	/**
+	 * Builder to create a new Algorithm instance using HmacSHA256. Tokens specify this as "HS256".
+	 * @sample plugins.jwt.HS256.secret('your secret password.....').build()
+	 * @return an algorithm builder used to sign or verify JSON Web Tokens.
+	 */
 	@JSFunction
-	public Algorithm algorithm()
+	public Algorithm HS256()
 	{
-		return new Algorithm();
+		return new Algorithm(this, JWTAlgorithms.HS256);
 	}
 
+	/**
+	 * Builder to create a new Algorithm instance using HmacSHA384. Tokens specify this as "HS384".
+	 * @sample plugins.jwt.HS384.secret('your secret password.....').build()
+	 * @return an algorithm builder used to sign or verify JSON Web Tokens.
+	 */
+	@JSFunction
+	public Algorithm HS384()
+	{
+		return new Algorithm(this, JWTAlgorithms.HS384);
+	}
+
+	/**
+	 * Builder to create a new Algorithm instance using HmacSHA512. Tokens specify this as "HS512".
+	 * @sample plugins.jwt.HS512.secret('your secret password.....').build()
+	 * @return an algorithm builder used to sign or verify JSON Web Tokens.
+	 */
+	@JSFunction
+	public Algorithm HS512()
+	{
+		return new Algorithm(this, JWTAlgorithms.HS512);
+	}
+
+	/**
+	 * Builder to create a new Algorithm instance using SHA256withRSA. Tokens specify this as "RS256".
+	 * @sample plugins.jwt.RSA256.publicKey('MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAnzyis...')
+	 *      .privateKey('MIIEogIBAAKCAQEAnzyis1ZjfNB0bBgKFMSvvkTtwlvB...')
+	 *      .kid('2X9R4H....').build()
+	 * @return an algorithm builder used to sign or verify Json Web Tokens.
+	 */
+	@JSFunction
+	public Algorithm RSA256()
+	{
+		return new Algorithm(this, JWTAlgorithms.RS256);
+	}
+
+	/**
+	 * Builder to create a new Algorithm instance using SHA384withRSA. Tokens specify this as "RS384".
+	 * @sample plugins.jwt.RSA384.publicKey('MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAnzyis...')
+	 *      .privateKey('MIIEogIBAAKCAQEAnzyis1ZjfNB0bBgKFMSvvkTtwlvB...')
+	 *      .kid('2X9R4H....').build()
+	 * @return an algorithm builder used to sign or verify JSON Web Tokens.
+	 */
+	@JSFunction
+	public Algorithm RSA384()
+	{
+		return new Algorithm(this, JWTAlgorithms.RS384);
+	}
+
+	/**
+	 * Builder to create a new Algorithm instance using SHA512withRSA. Tokens specify this as "RS512".
+	 * @sample plugins.jwt.RSA512.publicKey('MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAnzyis...')
+	 *      .privateKey('MIIEogIBAAKCAQEAnzyis1ZjfNB0bBgKFMSvvkTtwlvB...')
+	 *      .kid('2X9R4H....').build()
+	 * @return an algorithm builder used to sign or verify JSON Web Tokens.
+	 */
+	@JSFunction
+	public Algorithm RSA512()
+	{
+		return new Algorithm(this, JWTAlgorithms.RS512);
+	}
+
+	/**
+	 * Builder to create a new Algorithm instance using SHA256withECDSA. Tokens specify this as "ES256".
+	 * @sample plugins.jwt.ES256.publicKey('MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEEV....')
+	 *      .privateKey('MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wa...')
+	 *      .kid('2X9R4H....').build()
+	 * @return an algorithm builder used to sign or verify JSON Web Tokens.
+	 */
+	@JSFunction
+	public Algorithm ES256()
+	{
+		return new Algorithm(this, JWTAlgorithms.ES256);
+	}
+
+	/**
+	 * Builder to create a new Algorithm instance using SHA384withECDSA. Tokens specify this as "ES384".
+	 * @sample plugins.jwt.ES384.publicKey('MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEEV....')
+	 *      .privateKey('MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wa...')
+	 *      .kid('2X9R4H....').build()
+	 * @return an algorithm builder used to sign or verify JSON Web Tokens.
+	 */
+	@JSFunction
+	public Algorithm ES384()
+	{
+		return new Algorithm(this, JWTAlgorithms.ES384);
+	}
+
+	/**
+	 * Builder to create a new Algorithm instance using SHA512withECDSA. Tokens specify this as "ES512".
+	 * @sample plugins.jwt.ES512.publicKey('MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEEV....')
+	 *      .privateKey('MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wa...')
+	 *      .kid('2X9R4H....').build()
+	 * @return an algorithm builder used to sign or verify JSON Web Tokens.
+	 */
+	@JSFunction
+	public Algorithm ES512()
+	{
+		return new Algorithm(this, JWTAlgorithms.ES512);
+	}
+
+	/**
+	 * Returns a JSON Web Token token builder.
+	 * @sample var algorithm = plugins.jwt.ES256().publicKey(...).privateKey(...).build();
+	 *
+	 *		   var token = plugins.jwt.builder()
+	 *                     .payload({'some': 'data', 'somemore': 'data2'})
+	 *                     .sign(algorithm);
+	 *		   if (token != null) {
+	 *		       //success
+	 *		       application.output(token);
+	 *		   }
+	 *         else {
+	 *             application.output('Could not create a token.');
+	 *         }
+	 *
+	 *         var verified = plugins.jwt.verify(token, algorithm);
+	 *         if (verified != null) {
+	 *              //success
+	 *		       application.output(verified);
+	 *         }
+	 *         else {
+	 *             application.output('The token is not valid.');
+	 *         }
+	 *
+	 *
+	 * @return an object which creates a jwt token.
+	 */
 	@JSFunction
 	public Builder builder()
 	{
 		return new Builder();
+	}
+
+	String getSecret()
+	{
+		createJWTService();
+		if (jwtService != null)
+		{
+			try
+			{
+				return jwtService.getSecret(plugin.getClientPluginAccess().getClientID());
+			}
+			catch (Exception e)
+			{
+				log.error(e.getMessage());
+			}
+		}
+		return null;
 	}
 
 	@Override

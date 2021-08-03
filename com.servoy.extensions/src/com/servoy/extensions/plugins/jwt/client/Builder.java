@@ -31,7 +31,6 @@ import com.auth0.jwt.exceptions.JWTCreationException;
 import com.servoy.j2db.documentation.ServoyDocumented;
 import com.servoy.j2db.scripting.IJavaScriptType;
 import com.servoy.j2db.scripting.IScriptable;
-import com.servoy.j2db.util.Debug;
 
 /**
  * @author emera
@@ -48,6 +47,12 @@ public class Builder implements IScriptable, IJavaScriptType
 	}
 
 
+	/**
+	 * Adds the payload (claims) to the web token.
+	 * @param payload a json containing the data,
+	 * 		e.g. {'some': 'data', 'somemore': 'data2'}
+	 * @return the jwt builder for method chaining
+	 */
 	@JSFunction
 	public Builder payload(Object payload)
 	{
@@ -67,6 +72,13 @@ public class Builder implements IScriptable, IJavaScriptType
 		return this;
 	}
 
+	/**
+	 * Adds data to the payload, which contains the claims.
+	 * Claims are statements about an entity (typically, the user) and additional data.
+	 * @param key a string representing the claim name (e.g. 'iss' which stands for issuer; 'email', 'name', etc.)
+	 * @param value can be a string, a boolean, a date, a number or an array
+	 * @return the jwt builder for method chaining
+	 */
 	@JSFunction
 	public Builder withClaim(String key, Object value)
 	{
@@ -123,6 +135,12 @@ public class Builder implements IScriptable, IJavaScriptType
 		return true;
 	}
 
+	/**
+	 * Adds a header to the JWT token.
+	 * @param key a string representing the header name
+	 * @param value can be a string
+	 * @return the jwt builder for method chaining
+	 */
 	@JSFunction
 	public Builder header(String key, String value)
 	{
@@ -134,6 +152,11 @@ public class Builder implements IScriptable, IJavaScriptType
 		return this;
 	}
 
+	/**
+	 * Add a specific Expires At ("exp") claim to the Payload.
+	 * @param expire a date representing the expiration time of the token
+	 * @return the jwt builder for method chaining
+	 */
 	@JSFunction
 	public Builder withExpires(Date expire)
 	{
@@ -141,6 +164,12 @@ public class Builder implements IScriptable, IJavaScriptType
 		return this;
 	}
 
+	/**
+	 * Sign the token with the given algorithm.
+	 * The 'alg' claim is automatically added to the token header.
+	 * @param alg the algorithm used to sign the token.
+	 * @return a string representing the constructed JSON Web Token.
+	 */
 	@JSFunction
 	public String sign(Algorithm alg)
 	{
@@ -154,7 +183,7 @@ public class Builder implements IScriptable, IJavaScriptType
 		}
 		catch (JWTCreationException | IllegalArgumentException e)
 		{
-			Debug.error(e); //TODO log
+			JWTProvider.log.error(e.getMessage());
 		}
 		return null;
 	}
