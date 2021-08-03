@@ -628,7 +628,7 @@
 										alias="ServoyClient" storepass="${jarsigner.storepass}"
 										tsaurl="http://sha256timestamp.ws.symantec.com/sha256/timestamp"
 										sigalg="SHA256withRSA" digestalg="SHA-256" />
-									<signjar keystore="${jarsigner.keystore}"
+									<!-- signjar keystore="${jarsigner.keystore}"
 										jar="${project.build.directory}/plugins_beans/plugins/jwt/java-jwt.jar"
 										alias="ServoyClient" storepass="${jarsigner.storepass}"
 										tsaurl="http://sha256timestamp.ws.symantec.com/sha256/timestamp"
@@ -647,7 +647,7 @@
 										jar="${project.build.directory}/plugins_beans/plugins/jwt/jackson-databind.jar"
 										alias="ServoyClient" storepass="${jarsigner.storepass}"
 										tsaurl="http://sha256timestamp.ws.symantec.com/sha256/timestamp"
-										sigalg="SHA256withRSA" digestalg="SHA-256" />
+										sigalg="SHA256withRSA" digestalg="SHA-256" /-->
 								</parallel>
 							</target>
 						</configuration>
