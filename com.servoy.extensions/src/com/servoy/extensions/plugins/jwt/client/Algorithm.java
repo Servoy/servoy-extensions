@@ -148,11 +148,11 @@ public class Algorithm implements IScriptable, IJavaScriptType
 		try
 		{
 			if (alg.startsWith("HS"))
-				return buildHSAlgorithm(alg);
+				return buildHSAlgorithm();
 			if (alg.startsWith("ES"))
-				return buildECDSAAlgorithm(alg);
+				return buildECDSAAlgorithm();
 			if (alg.startsWith("RS"))
-				return buildRSAAlgorithm(alg);
+				return buildRSAAlgorithm();
 
 			JWTProvider.log.error("Algorithm " + alg + " is not supported by the JWT plugin.");
 		}
@@ -163,7 +163,7 @@ public class Algorithm implements IScriptable, IJavaScriptType
 		return null;
 	}
 
-	private com.auth0.jwt.algorithms.Algorithm buildRSAAlgorithm(String alg) throws NoSuchAlgorithmException, InvalidKeySpecException
+	private com.auth0.jwt.algorithms.Algorithm buildRSAAlgorithm() throws NoSuchAlgorithmException, InvalidKeySpecException
 	{
 		if (privKey == null && pubKey == null)
 		{
@@ -185,7 +185,7 @@ public class Algorithm implements IScriptable, IJavaScriptType
 		return null;
 	}
 
-	private com.auth0.jwt.algorithms.Algorithm buildECDSAAlgorithm(String alg) throws NoSuchAlgorithmException, InvalidKeySpecException
+	private com.auth0.jwt.algorithms.Algorithm buildECDSAAlgorithm() throws NoSuchAlgorithmException, InvalidKeySpecException
 	{
 		if (privKey == null && pubKey == null)
 		{
@@ -207,7 +207,7 @@ public class Algorithm implements IScriptable, IJavaScriptType
 		return null;
 	}
 
-	private com.auth0.jwt.algorithms.Algorithm buildHSAlgorithm(String alg)
+	private com.auth0.jwt.algorithms.Algorithm buildHSAlgorithm()
 	{
 		if (pwd == null)
 		{
@@ -232,11 +232,11 @@ public class Algorithm implements IScriptable, IJavaScriptType
 		throws NoSuchAlgorithmException, InvalidKeySpecException
 	{
 		KeyFactory keyFactory = KeyFactory.getInstance("EC");
-		PKCS8EncodedKeySpec keySpecPKCS8 = new PKCS8EncodedKeySpec(Base64.decodeBase64(privKey));
-		final PrivateKey private_Key = keyFactory.generatePrivate(keySpecPKCS8);
+		PKCS8EncodedKeySpec keySpecPKCS8 = privKey != null ? new PKCS8EncodedKeySpec(Base64.decodeBase64(privKey)) : null;
+		final PrivateKey private_Key = privKey != null ? keyFactory.generatePrivate(keySpecPKCS8) : null;
 
-		X509EncodedKeySpec keySpecX509 = new X509EncodedKeySpec(Base64.decodeBase64(pubKey));
-		final PublicKey public_Key = keyFactory.generatePublic(keySpecX509);
+		X509EncodedKeySpec keySpecX509 = pubKey != null ? new X509EncodedKeySpec(Base64.decodeBase64(pubKey)) : null;
+		final PublicKey public_Key = pubKey != null ? keyFactory.generatePublic(keySpecX509) : null;
 
 		ECDSAKeyProvider keyProvider = new ECDSAKeyProvider()
 		{
@@ -265,11 +265,12 @@ public class Algorithm implements IScriptable, IJavaScriptType
 		throws NoSuchAlgorithmException, InvalidKeySpecException
 	{
 		KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-		PKCS8EncodedKeySpec keySpecPKCS8 = new PKCS8EncodedKeySpec(Base64.decodeBase64(privKey));
-		final PrivateKey private_Key = keyFactory.generatePrivate(keySpecPKCS8);
+		PKCS8EncodedKeySpec keySpecPKCS8 = privKey != null ? new PKCS8EncodedKeySpec(Base64.decodeBase64(privKey)) : null;
+		final PrivateKey private_Key = privKey != null ? keyFactory.generatePrivate(keySpecPKCS8) : null;
 
-		X509EncodedKeySpec keySpecX509 = new X509EncodedKeySpec(Base64.decodeBase64(pubKey));
-		final PublicKey public_Key = keyFactory.generatePublic(keySpecX509);
+		X509EncodedKeySpec keySpecX509 = pubKey != null ? new X509EncodedKeySpec(Base64.decodeBase64(pubKey)) : null;
+		final PublicKey public_Key = pubKey != null ? keyFactory.generatePublic(keySpecX509) : null;
+
 
 		RSAKeyProvider keyProvider = new RSAKeyProvider()
 		{
