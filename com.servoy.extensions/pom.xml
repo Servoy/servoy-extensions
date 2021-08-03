@@ -345,6 +345,13 @@
 										<fileset
 											file="${project.basedir}/resources/jwt/jwt.jar.jnlp" />
 									</copy>
+									<copy overwrite="true"
+										todir="${project.build.directory}/plugins_beans/plugins/jwt">
+										<fileset file="${project.basedir}/lib/java-jwt.jar" />
+										<fileset file="${project.basedir}/lib/jackson-annotations.jar" />
+										<fileset file="${project.basedir}/lib/jackson-core.jar" />
+										<fileset file="${project.basedir}/lib/jackson-databind.jar" />
+									</copy>
 									<makejar srcdir="mail"
 										includes=",META-INF/services/com.servoy.j2db.plugins.IPlugin" />
 									<makejar srcdir="openid" />
