@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<jnlp spec="1.0+"
+      codebase="%%serverURL%%"
+      href="/servoy-client/plugins/jwt.jar.jnlp">
+   <information> 
+      <title>Servoy Client Plugins</title> 
+      <vendor>Servoy and Others</vendor>
+      <offline-allowed/>
+   </information>
+   <resources>
+      <jar href="/plugins/jwt.jar" download="eager" part="jwt" version="%%version%%"/>
+      <jar href="/plugins/jwt/java-jwt.jar" download="%%loadmethod%%" part="javajwt" version="3.9.0"/>
+      <jar href="/plugins/jwt/jackson-annotations.jar" download="%%loadmethod%%" part="jackson" version="2.12.1"/>
+      <jar href="/plugins/jwt/jackson-core.jar" download="%%loadmethod%%" part="jackson" version="2.12.1"/>
+      <jar href="/plugins/jwt/jackson-databind.jar" download="%%loadmethod%%" part="jackson" version="2.12.1"/>
+   </resources>
+   <component-desc/>
+	<security>
+		<all-permissions/>
+	</security>
+</jnlp>
