@@ -26,7 +26,6 @@ import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.annotations.JSFunction;
 
 import com.auth0.jwt.JWT;
-import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
 import com.servoy.j2db.documentation.ServoyDocumented;
 import com.servoy.j2db.scripting.IJavaScriptType;
@@ -90,47 +89,48 @@ public class Builder implements IScriptable, IJavaScriptType
 		if (value instanceof String) builder.withClaim(key, (String)value);
 		if (value instanceof NativeArray)
 		{
-			if (isNumbersArray((NativeArray)value))
+			value = ((NativeArray)value).unwrap();
+		}
+
+		if (value instanceof Object[])
+		{
+			if (isNumbersArray((Object[])value))
 			{
-				builder.withArrayClaim(key, convertToLongArray(value));
+				builder.withArrayClaim(key, convertToLongArray((Object[])value));
 			}
 			else
 			{
-				builder.withArrayClaim(key, convertToStringArray(value));
+				builder.withArrayClaim(key, convertToStringArray((Object[])value));
 			}
 		}
 		return this;
 	}
 
-	private Long[] convertToLongArray(Object value)
+	private Long[] convertToLongArray(Object[] array)
 	{
-		NativeArray array = (NativeArray)value;
-		int size = Long.valueOf(array.getLength()).intValue();
-		Long[] result = new Long[size];
-		for (int i = 0; i < size; i++)
+		Long[] result = new Long[array.length];
+		for (int i = 0; i < array.length; i++)
 		{
-			result[i] = array.get(i) == null ? null : ((Number)array.get(i)).longValue();
+			result[i] = array[i] == null ? null : ((Number)array[i]).longValue();
 		}
 		return result;
 	}
 
-	private String[] convertToStringArray(Object value)
+	private String[] convertToStringArray(Object[] array)
 	{
-		NativeArray array = (NativeArray)value;
-		int size = Long.valueOf(array.getLength()).intValue();
-		String[] result = new String[size];
-		for (int i = 0; i < size; i++)
+		String[] result = new String[array.length];
+		for (int i = 0; i < array.length; i++)
 		{
-			result[i] = array.get(i) == null ? null : array.get(i).toString();
+			result[i] = array[i] == null ? null : array[i].toString();
 		}
 		return result;
 	}
 
-	private boolean isNumbersArray(NativeArray value)
+	private boolean isNumbersArray(Object[] value)
 	{
-		for (int i = 0; i < value.getLength(); i++)
+		for (Object element : value)
 		{
-			if (value.get(i) != null && !(value.get(i) instanceof Number)) return false;
+			if (element != null && !(element instanceof Number)) return false;
 		}
 		return true;
 	}
@@ -175,11 +175,15 @@ public class Builder implements IScriptable, IJavaScriptType
 	{
 		try
 		{
-			if (headers != null)
+			com.auth0.jwt.algorithms.Algorithm algo = alg.build();
+			if (algo != null)
 			{
-				builder.withHeader(headers);
+				if (headers != null)
+				{
+					builder.withHeader(headers);
+				}
 			}
-			return builder.sign(alg);
+			return builder.sign(algo);
 		}
 		catch (JWTCreationException | IllegalArgumentException e)
 		{

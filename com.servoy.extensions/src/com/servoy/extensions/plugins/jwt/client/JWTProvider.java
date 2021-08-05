@@ -82,7 +82,7 @@ public class JWTProvider implements IScriptable, IReturnedTypesProvider
 	@JSFunction
 	public String create(Object payload)
 	{
-		com.auth0.jwt.algorithms.Algorithm alg = new Algorithm(this, JWTAlgorithms.HS256).build();
+		Algorithm alg = new Algorithm(this, JWTAlgorithms.HS256);
 		return builder().payload(payload).sign(alg);
 	}
 
@@ -102,7 +102,7 @@ public class JWTProvider implements IScriptable, IReturnedTypesProvider
 	@JSFunction
 	public String create(Object payload, Date expiresAt)
 	{
-		com.auth0.jwt.algorithms.Algorithm alg = new Algorithm(this, JWTAlgorithms.HS256).build();
+		Algorithm alg = new Algorithm(this, JWTAlgorithms.HS256);
 		return builder().payload(payload).withExpires(expiresAt).sign(alg);
 	}
 
@@ -118,7 +118,7 @@ public class JWTProvider implements IScriptable, IReturnedTypesProvider
 	@JSFunction
 	public Object verify(String token)
 	{
-		com.auth0.jwt.algorithms.Algorithm alg = new Algorithm(this, JWTAlgorithms.HS256).build();
+		Algorithm alg = new Algorithm(this, JWTAlgorithms.HS256);
 		return verify(token, alg);
 	}
 
@@ -132,17 +132,21 @@ public class JWTProvider implements IScriptable, IReturnedTypesProvider
 	 * @return the payload or null if the token can't be verified
 	 */
 	@JSFunction
-	public Object verify(String token, com.auth0.jwt.algorithms.Algorithm alg)
+	public Object verify(String token, Algorithm alg)
 	{
 		if (alg != null)
 		{
 			try
 			{
-				JWTVerifier jwtVerifier = JWT.require(alg)
-					.build();
-				DecodedJWT jwt = jwtVerifier.verify(token);
-				String payload = new String(Utils.decodeBASE64(jwt.getPayload()));
-				return new JSONObject(payload);
+				com.auth0.jwt.algorithms.Algorithm algo = alg.build();
+				if (algo != null)
+				{
+					JWTVerifier jwtVerifier = JWT.require(algo)
+						.build();
+					DecodedJWT jwt = jwtVerifier.verify(token);
+					String payload = new String(Utils.decodeBASE64(jwt.getPayload()));
+					return new JSONObject(payload);
+				}
 			}
 			catch (TokenExpiredException e)
 			{
@@ -157,10 +161,12 @@ public class JWTProvider implements IScriptable, IReturnedTypesProvider
 	}
 
 	/**
-	 * Builder to create a new Algorithm instance using HmacSHA256. Tokens specify this as "HS256".
-	 * @sample plugins.jwt.HS256.secret('your secret password.....').build()
-	 * @return an algorithm builder used to sign or verify JSON Web Tokens.
+	 * Create a new Algorithm instance using HmacSHA256. Tokens specify this as "HS256".
+	 * The password used to configure the algorithm is the (shared) secret key 'jwt.secret.password' that has to be configured on the admin page for this plugin.
+	 * @sample plugins.jwt.HS256()
+	 * @return an algorithm used to sign or verify JSON Web Tokens.
 	 */
+	@ServoyClientSupport(ng = true, wc = true, sc = false)
 	@JSFunction
 	public Algorithm HS256()
 	{
@@ -168,10 +174,24 @@ public class JWTProvider implements IScriptable, IReturnedTypesProvider
 	}
 
 	/**
-	 * Builder to create a new Algorithm instance using HmacSHA384. Tokens specify this as "HS384".
-	 * @sample plugins.jwt.HS384.secret('your secret password.....').build()
-	 * @return an algorithm builder used to sign or verify JSON Web Tokens.
+	 * Create a new HmacSHA256 Algorithm using the specified password. Tokens specify this as "HS256".
+	 * @param password the secret used to encrypt and decrypt the tokens
+	 * @return an algorithm used to sign or verify JSON Web Tokens.
 	 */
+	@JSFunction
+	public Algorithm HS256(String password)
+	{
+		Algorithm algorithm = new Algorithm(this, JWTAlgorithms.HS256);
+		return algorithm.password(password);
+	}
+
+	/**
+	 * Create a new Algorithm instance using HmacSHA384. Tokens specify this as "HS384".
+	 * The password used to configure the algorithm is the (shared) secret key 'jwt.secret.password' that has to be configured on the admin page for this plugin.
+	 * @sample plugins.jwt.HS384()
+	 * @return an algorithm used to sign or verify JSON Web Tokens.
+	 */
+	@ServoyClientSupport(ng = true, wc = true, sc = false)
 	@JSFunction
 	public Algorithm HS384()
 	{
@@ -179,10 +199,26 @@ public class JWTProvider implements IScriptable, IReturnedTypesProvider
 	}
 
 	/**
-	 * Builder to create a new Algorithm instance using HmacSHA512. Tokens specify this as "HS512".
-	 * @sample plugins.jwt.HS512.secret('your secret password.....').build()
-	 * @return an algorithm builder used to sign or verify JSON Web Tokens.
+	 * Create a new HmacSHA384 Algorithm using the specified password. Tokens specify this as "HS384".
+	 * @sample plugins.jwt.HS384('your secret password.....')
+	 * @param password the secret used to encrypt and decrypt the tokens
+	 * @return an algorithm used to sign or verify JSON Web Tokens.
 	 */
+	@JSFunction
+	public Algorithm HS384(String password)
+	{
+		Algorithm algorithm = new Algorithm(this, JWTAlgorithms.HS384);
+		return algorithm.password(password);
+	}
+
+
+	/**
+	 * Create a new Algorithm instance using HmacSHA512. Tokens specify this as "HS512".
+	 * The password used to configure the algorithm is the (shared) secret key 'jwt.secret.password' that has to be configured on the admin page for this plugin.
+	 * @sample plugins.jwt.HS512.secret()
+	 * @return an algorithm used to sign or verify JSON Web Tokens.
+	 */
+	@ServoyClientSupport(ng = true, wc = true, sc = false)
 	@JSFunction
 	public Algorithm HS512()
 	{
@@ -190,86 +226,350 @@ public class JWTProvider implements IScriptable, IReturnedTypesProvider
 	}
 
 	/**
-	 * Builder to create a new Algorithm instance using SHA256withRSA. Tokens specify this as "RS256".
-	 * @sample plugins.jwt.RSA256.publicKey('MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAnzyis...')
-	 *      .privateKey('MIIEogIBAAKCAQEAnzyis1ZjfNB0bBgKFMSvvkTtwlvB...')
-	 *      .kid('2X9R4H....').build()
-	 * @return an algorithm builder used to sign or verify Json Web Tokens.
+	 * Create a new Algorithm instance using HmacSHA512. Tokens specify this as "HS512".
+	 * @sample plugins.jwt.HS512.secret('your secret password.....')
+	 * @param password the secret used to encrypt and decrypt the tokens
+	 * @return an algorithm used to sign or verify JSON Web Tokens.
 	 */
 	@JSFunction
-	public Algorithm RSA256()
+	public Algorithm HS512(String password)
 	{
-		return new Algorithm(this, JWTAlgorithms.RS256);
+		Algorithm algorithm = new Algorithm(this, JWTAlgorithms.HS512);
+		return algorithm.password(password);
+	}
+
+	/**
+	 * Builder to create a new Algorithm instance using SHA256withRSA. Tokens specify this as "RS256".
+	 * @sample plugins.jwt.RSA256('MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAnzyis...')
+	 *      .kid('2X9R4H....')
+	 * @param publicKey a String representing the publicKey (mostly used to verify tokens)
+	 * @return an algorithm used to sign or verify Json Web Tokens.
+	 */
+	@JSFunction
+	public Algorithm RSA256(String publicKey)
+	{
+		Algorithm algorithm = new Algorithm(this, JWTAlgorithms.RS256);
+		return algorithm.publicKey(publicKey);
+	}
+
+	/**
+	 * Builder to create a new Algorithm instance using SHA256withRSA. Tokens specify this as "RS256".
+	 * @sample plugins.jwt.RSA256('MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAnzyis...', 'MIIEogIBAAKCAQEAnzyis1ZjfNB0bBgKFMSvvkTtwlvB...')
+	 *      .kid('2X9R4H....')
+	 * @param publicKey a String representing the publicKey (mostly used to verify tokens)
+	 * @param privateKey a String representing the privateKey (mostly used to create tokens)
+	 * @return an algorithm used to sign or verify Json Web Tokens.
+	 */
+	@JSFunction
+	public Algorithm RSA256(String publicKey, String privateKey)
+	{
+		Algorithm algorithm = new Algorithm(this, JWTAlgorithms.RS256);
+		return algorithm.publicKey(publicKey).privateKey(privateKey);
+	}
+
+	/**
+	 * Builder to create a new Algorithm instance using SHA256withRSA. Tokens specify this as "RS256".
+	 * @param publicKey a byte array representing the publicKey (mostly used to verify tokens)
+	 * @return an algorithm used to sign or verify Json Web Tokens.
+	 */
+	@JSFunction
+	public Algorithm RSA256(byte[] publicKey)
+	{
+		Algorithm algorithm = new Algorithm(this, JWTAlgorithms.RS256);
+		return algorithm.publicKey(publicKey);
+	}
+
+	/**
+	 * Builder to create a new Algorithm instance using SHA256withRSA. Tokens specify this as "RS256".
+	 * @param publicKey a byte array representing the publicKey (mostly used to verify tokens)
+	 * @param privateKey a byte array representing the privateKey (mostly used to create tokens)
+	 * @return an algorithm used to sign or verify Json Web Tokens.
+	 */
+	@JSFunction
+	public Algorithm RSA256(byte[] publicKey, byte[] privateKey)
+	{
+		Algorithm algorithm = new Algorithm(this, JWTAlgorithms.RS256);
+		return algorithm.publicKey(publicKey).privateKey(privateKey);
+	}
+
+
+	/**
+	 * Builder to create a new Algorithm instance using SHA384withRSA. Tokens specify this as "RS384".
+	 * @sample plugins.jwt.RSA384('MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAnzyis...')
+	 *      .kid('2X9R4H....')
+	 * @param publicKey a String representing the publicKey (mostly used to verify tokens)
+	 * @return an algorithm used to sign or verify JSON Web Tokens.
+	 */
+	@JSFunction
+	public Algorithm RSA384(String publicKey)
+	{
+		Algorithm algorithm = new Algorithm(this, JWTAlgorithms.RS384);
+		return algorithm.publicKey(publicKey);
 	}
 
 	/**
 	 * Builder to create a new Algorithm instance using SHA384withRSA. Tokens specify this as "RS384".
-	 * @sample plugins.jwt.RSA384.publicKey('MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAnzyis...')
-	 *      .privateKey('MIIEogIBAAKCAQEAnzyis1ZjfNB0bBgKFMSvvkTtwlvB...')
-	 *      .kid('2X9R4H....').build()
-	 * @return an algorithm builder used to sign or verify JSON Web Tokens.
+	 * @sample plugins.jwt.RSA384.publicKey('MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAnzyis...', 'MIIEogIBAAKCAQEAnzyis1ZjfNB0bBgKFMSvvkTtwlvB...')
+	 *      .kid('2X9R4H....')
+	 * @param publicKey a String representing the publicKey (mostly used to verify tokens)
+	 * @param privateKey a String representing the privateKey (mostly used to create tokens)
+	 * @return an algorithm used to sign or verify JSON Web Tokens.
 	 */
 	@JSFunction
-	public Algorithm RSA384()
+	public Algorithm RSA384(String publicKey, String privateKey)
 	{
-		return new Algorithm(this, JWTAlgorithms.RS384);
+		Algorithm algorithm = new Algorithm(this, JWTAlgorithms.RS384);
+		return algorithm.publicKey(publicKey).privateKey(privateKey);
+	}
+
+	/**
+	 * Builder to create a new Algorithm instance using SHA384withRSA. Tokens specify this as "RS384".
+	 * @param publicKey a byte array representing the publicKey (mostly used to verify tokens)
+	 * @return an algorithm used to sign or verify JSON Web Tokens.
+	 */
+	@JSFunction
+	public Algorithm RSA384(byte[] publicKey)
+	{
+		Algorithm algorithm = new Algorithm(this, JWTAlgorithms.RS384);
+		return algorithm.publicKey(publicKey);
+	}
+
+	/**
+	 * Builder to create a new Algorithm instance using SHA384withRSA. Tokens specify this as "RS384".
+	 * @param publicKey a byte array representing the publicKey (mostly used to verify tokens)
+	 * @param privateKey a byte array representing the privateKey (mostly used to create tokens)
+	 * @return an algorithm used to sign or verify JSON Web Tokens.
+	 */
+	@JSFunction
+	public Algorithm RSA384(byte[] publicKey, byte[] privateKey)
+	{
+		Algorithm algorithm = new Algorithm(this, JWTAlgorithms.RS384);
+		return algorithm.publicKey(publicKey).privateKey(privateKey);
+	}
+
+
+	/**
+	 * Builder to create a new Algorithm instance using SHA512withRSA. Tokens specify this as "RS512".
+	 * @sample plugins.jwt.RSA512('MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAnzyis...')
+	 *      .kid('2X9R4H....')
+	 * @param publicKey a String representing the publicKey (mostly used to verify tokens)
+	 * @return an algorithm used to sign or verify JSON Web Tokens.
+	 */
+	@JSFunction
+	public Algorithm RSA512(String publicKey)
+	{
+		Algorithm algorithm = new Algorithm(this, JWTAlgorithms.RS512);
+		return algorithm.publicKey(publicKey);
 	}
 
 	/**
 	 * Builder to create a new Algorithm instance using SHA512withRSA. Tokens specify this as "RS512".
-	 * @sample plugins.jwt.RSA512.publicKey('MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAnzyis...')
-	 *      .privateKey('MIIEogIBAAKCAQEAnzyis1ZjfNB0bBgKFMSvvkTtwlvB...')
-	 *      .kid('2X9R4H....').build()
-	 * @return an algorithm builder used to sign or verify JSON Web Tokens.
+	 * @sample plugins.jwt.RSA512('MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAnzyis...','MIIEogIBAAKCAQEAnzyis1ZjfNB0bBgKFMSvvkTtwlvB...')
+	 *      .kid('2X9R4H....')
+	 * @param publicKey a String representing the publicKey (mostly used to verify tokens)
+	 * @param privateKey a String representing the privateKey (mostly used to create tokens)
+	 * @return an algorithm used to sign or verify JSON Web Tokens.
 	 */
 	@JSFunction
-	public Algorithm RSA512()
+	public Algorithm RSA512(String publicKey, String privateKey)
 	{
-		return new Algorithm(this, JWTAlgorithms.RS512);
+		Algorithm algorithm = new Algorithm(this, JWTAlgorithms.RS512);
+		return algorithm.publicKey(publicKey).privateKey(privateKey);
+	}
+
+	/**
+	 * Builder to create a new Algorithm instance using SHA512withRSA. Tokens specify this as "RS512".
+	 * @param publicKey a byte array representing the publicKey (mostly used to verify tokens)
+	 * @return an algorithm used to sign or verify JSON Web Tokens.
+	 */
+	@JSFunction
+	public Algorithm RSA512(byte[] publicKey)
+	{
+		Algorithm algorithm = new Algorithm(this, JWTAlgorithms.RS512);
+		return algorithm.publicKey(publicKey);
+	}
+
+	/**
+	 * Builder to create a new Algorithm instance using SHA512withRSA. Tokens specify this as "RS512".
+	 * @param publicKey a byte array representing the publicKey (mostly used to verify tokens)
+	 * @param privateKey a byte array representing the privateKey (mostly used to create tokens)
+	 * @return an algorithm used to sign or verify JSON Web Tokens.
+	 */
+	@JSFunction
+	public Algorithm RSA512(byte[] publicKey, byte[] privateKey)
+	{
+		Algorithm algorithm = new Algorithm(this, JWTAlgorithms.RS512);
+		return algorithm.publicKey(publicKey).privateKey(privateKey);
 	}
 
 	/**
 	 * Builder to create a new Algorithm instance using SHA256withECDSA. Tokens specify this as "ES256".
-	 * @sample plugins.jwt.ES256.publicKey('MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEEV....')
-	 *      .privateKey('MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wa...')
-	 *      .kid('2X9R4H....').build()
+	 * @sample plugins.jwt.ES256('MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEEV....')
+	 *      .kid('2X9R4H....')
+	 * @param publicKey a String representing the publicKey (mostly used to verify tokens)
 	 * @return an algorithm builder used to sign or verify JSON Web Tokens.
 	 */
 	@JSFunction
-	public Algorithm ES256()
+	public Algorithm ES256(String publicKey)
 	{
-		return new Algorithm(this, JWTAlgorithms.ES256);
+		Algorithm algorithm = new Algorithm(this, JWTAlgorithms.ES256);
+		return algorithm.publicKey(publicKey);
+	}
+
+	/**
+	 * Builder to create a new Algorithm instance using SHA256withECDSA. Tokens specify this as "ES256".
+	 * @sample plugins.jwt.ES256.publicKey('MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEEV....', 'MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wa...')
+	 *      .kid('2X9R4H....')
+	 * @param publicKey a String representing the publicKey (mostly used to verify tokens)
+	 * @param privateKey a String representing the privateKey (mostly used to create tokens)
+	 * @return an algorithm used to sign or verify JSON Web Tokens.
+	 */
+	@JSFunction
+	public Algorithm ES256(String publicKey, String privateKey)
+	{
+		Algorithm algorithm = new Algorithm(this, JWTAlgorithms.ES256);
+		return algorithm.publicKey(publicKey).privateKey(privateKey);
+	}
+
+	/**
+	 * Builder to create a new Algorithm instance using SHA256withECDSA. Tokens specify this as "ES256".
+	 * @param publicKey a byte array representing the publicKey (mostly used to verify tokens)
+	 * @return an algorithm builder used to sign or verify JSON Web Tokens.
+	 */
+	@JSFunction
+	public Algorithm ES256(byte[] publicKey)
+	{
+		Algorithm algorithm = new Algorithm(this, JWTAlgorithms.ES256);
+		return algorithm.publicKey(publicKey);
+	}
+
+	/**
+	 * Builder to create a new Algorithm instance using SHA256withECDSA. Tokens specify this as "ES256".
+	 * @param publicKey a byte array representing the publicKey (mostly used to verify tokens)
+	 * @param privateKey a byte array representing the privateKey (mostly used to create tokens)
+	 * @return an algorithm used to sign or verify JSON Web Tokens.
+	 */
+	@JSFunction
+	public Algorithm ES256(byte[] publicKey, byte[] privateKey)
+	{
+		Algorithm algorithm = new Algorithm(this, JWTAlgorithms.ES256);
+		return algorithm.publicKey(publicKey).privateKey(privateKey);
 	}
 
 	/**
 	 * Builder to create a new Algorithm instance using SHA384withECDSA. Tokens specify this as "ES384".
-	 * @sample plugins.jwt.ES384.publicKey('MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEEV....')
-	 *      .privateKey('MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wa...')
-	 *      .kid('2X9R4H....').build()
+	 * @sample plugins.jwt.ES384('MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEEV....')
+	 *      .kid('2X9R4H....')
+	 * @param publicKey a String representing the publicKey (mostly used to verify tokens)
 	 * @return an algorithm builder used to sign or verify JSON Web Tokens.
 	 */
 	@JSFunction
-	public Algorithm ES384()
+	public Algorithm ES384(String publicKey)
 	{
-		return new Algorithm(this, JWTAlgorithms.ES384);
+		Algorithm algorithm = new Algorithm(this, JWTAlgorithms.ES384);
+		return algorithm.publicKey(publicKey);
+	}
+
+	/**
+	 * Builder to create a new Algorithm instance using SHA384withECDSA. Tokens specify this as "ES384".
+	 * @sample plugins.jwt.ES384.publicKey('MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEEV....', 'MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wa...')
+	 *      .kid('2X9R4H....')
+	 * @param publicKey a String representing the publicKey (mostly used to verify tokens)
+	 * @param privateKey a String representing the privateKey (mostly used to create tokens)
+	 * @return an algorithm used to sign or verify JSON Web Tokens.
+	 */
+	@JSFunction
+	public Algorithm ES384(String publicKey, String privateKey)
+	{
+		Algorithm algorithm = new Algorithm(this, JWTAlgorithms.ES384);
+		return algorithm.publicKey(publicKey).privateKey(privateKey);
+	}
+
+
+	/**
+	 * Builder to create a new Algorithm instance using SHA384withECDSA. Tokens specify this as "ES384".
+	 * @param publicKey a byte array representing the publicKey (mostly used to verify tokens)
+	 * @return an algorithm builder used to sign or verify JSON Web Tokens.
+	 */
+	@JSFunction
+	public Algorithm ES384(byte[] publicKey)
+	{
+		Algorithm algorithm = new Algorithm(this, JWTAlgorithms.ES384);
+		return algorithm.publicKey(publicKey);
+	}
+
+	/**
+	 * Builder to create a new Algorithm instance using SHA384withECDSA. Tokens specify this as "ES384".
+	 * @param publicKey a byte array representing the publicKey (mostly used to verify tokens)
+	 * @param privateKey a byte array representing the privateKey (mostly used to create tokens)
+	 * @return an algorithm used to sign or verify JSON Web Tokens.
+	 */
+	@JSFunction
+	public Algorithm ES384(byte[] publicKey, byte[] privateKey)
+	{
+		Algorithm algorithm = new Algorithm(this, JWTAlgorithms.ES384);
+		return algorithm.publicKey(publicKey).privateKey(privateKey);
 	}
 
 	/**
 	 * Builder to create a new Algorithm instance using SHA512withECDSA. Tokens specify this as "ES512".
-	 * @sample plugins.jwt.ES512.publicKey('MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEEV....')
-	 *      .privateKey('MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wa...')
-	 *      .kid('2X9R4H....').build()
+	 * @sample plugins.jwt.ES512('MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEEV....')
+	 *      .kid('2X9R4H....')
+	 * @param publicKey a String representing the publicKey
 	 * @return an algorithm builder used to sign or verify JSON Web Tokens.
 	 */
 	@JSFunction
-	public Algorithm ES512()
+	public Algorithm ES512(String publicKey)
 	{
-		return new Algorithm(this, JWTAlgorithms.ES512);
+		Algorithm algorithm = new Algorithm(this, JWTAlgorithms.ES512);
+		return algorithm.publicKey(publicKey);
 	}
 
 	/**
+	 * Builder to create a new Algorithm instance using SHA512withECDSA. Tokens specify this as "ES512".
+	 * @sample plugins.jwt.ES512.publicKey('MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEEV....', 'MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wa...')
+	 *      .kid('2X9R4H....')
+	 * @param publicKey a String representing the publicKey (mostly used to verify tokens)
+	 * @param privateKey a String representing the privateKey (mostly used to create tokens)
+	 * @return an algorithm used to sign or verify JSON Web Tokens.
+	 */
+	@JSFunction
+	public Algorithm ES512(String publicKey, String privateKey)
+	{
+		Algorithm algorithm = new Algorithm(this, JWTAlgorithms.ES512);
+		return algorithm.publicKey(publicKey).privateKey(privateKey);
+	}
+
+
+	/**
+	 * Builder to create a new Algorithm instance using SHA512withECDSA. Tokens specify this as "ES512".
+	 * @param publicKey a byte array representing the publicKey (mostly used to verify tokens)
+	 * @return an algorithm builder used to sign or verify JSON Web Tokens.
+	 */
+	@JSFunction
+	public Algorithm ES512(byte[] publicKey)
+	{
+		Algorithm algorithm = new Algorithm(this, JWTAlgorithms.ES512);
+		return algorithm.publicKey(publicKey);
+	}
+
+	/**
+	 * Builder to create a new Algorithm instance using SHA512withECDSA. Tokens specify this as "ES512".
+	 * @param publicKey a byte array representing the publicKey (mostly used to verify tokens)
+	 * @param privateKey a byte array representing the privateKey (mostly used to create tokens)
+	 * @return an algorithm used to sign or verify JSON Web Tokens.
+	 */
+	@JSFunction
+	public Algorithm ES512(byte[] publicKey, byte[] privateKey)
+	{
+		Algorithm algorithm = new Algorithm(this, JWTAlgorithms.ES512);
+		return algorithm.publicKey(publicKey).privateKey(privateKey);
+	}
+
+
+	/**
 	 * Returns a JSON Web Token token builder.
-	 * @sample var algorithm = plugins.jwt.ES256().publicKey(...).privateKey(...).build();
+	 * @sample var algorithm = plugins.jwt.ES256(publicKey, privateKey);
 	 *
 	 *		   var token = plugins.jwt.builder()
 	 *                     .payload({'some': 'data', 'somemore': 'data2'})
@@ -320,6 +620,6 @@ public class JWTProvider implements IScriptable, IReturnedTypesProvider
 	@Override
 	public Class< ? >[] getAllReturnedTypes()
 	{
-		return new Class[] { JWTAlgorithms.class, JWTClaims.class };
+		return new Class[] { JWTClaims.class };
 	}
 }

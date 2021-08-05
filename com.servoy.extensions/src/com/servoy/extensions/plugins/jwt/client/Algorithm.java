@@ -42,6 +42,7 @@ import com.servoy.j2db.scripting.IScriptable;
  * Builder for an algorithm object which is used to sign or verify a JWT token.
  * @author emera
  */
+@SuppressWarnings("nls")
 @ServoyDocumented(scriptingName = "Algorithm")
 public class Algorithm implements IScriptable, IJavaScriptType
 {
@@ -63,7 +64,6 @@ public class Algorithm implements IScriptable, IJavaScriptType
 	 * @param password
 	 * @return the algorithm builder for method chaining
 	 */
-	@JSFunction
 	public Algorithm password(String password)
 	{
 		this.pwd = password;
@@ -75,7 +75,6 @@ public class Algorithm implements IScriptable, IJavaScriptType
 	 * @param publicKey as a string
 	 * @return the algorithm builder for method chaining
 	 */
-	@JSFunction
 	public Algorithm publicKey(String publicKey)
 	{
 		if (publicKey != null)
@@ -91,7 +90,6 @@ public class Algorithm implements IScriptable, IJavaScriptType
 	 * @param privateKey as a string
 	 * @return the algorithm builder for method chaining
 	 */
-	@JSFunction
 	public Algorithm privateKey(String privateKey)
 	{
 		if (privateKey != null)
@@ -107,7 +105,6 @@ public class Algorithm implements IScriptable, IJavaScriptType
 	 * @param publicKey as a byte array
 	 * @return the algorithm builder for method chaining
 	 */
-	@JSFunction
 	public Algorithm publicKey(byte[] publicKey)
 	{
 		this.pubKey = publicKey;
@@ -119,7 +116,6 @@ public class Algorithm implements IScriptable, IJavaScriptType
 	 * @param privateKey as a byte array
 	 * @return the algorithm builder for method chaining
 	 */
-	@JSFunction
 	public Algorithm privateKey(byte[] privateKey)
 	{
 		this.privKey = privateKey;
@@ -142,7 +138,6 @@ public class Algorithm implements IScriptable, IJavaScriptType
 	 * Build the algorithm which is used to create and verify jwt tokens.
 	 * @return the algorithm object
 	 */
-	@JSFunction
 	public com.auth0.jwt.algorithms.Algorithm build()
 	{
 		try
