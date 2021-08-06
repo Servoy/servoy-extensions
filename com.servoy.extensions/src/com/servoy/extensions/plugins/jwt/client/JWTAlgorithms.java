@@ -17,17 +17,11 @@
 
 package com.servoy.extensions.plugins.jwt.client;
 
-import com.servoy.base.scripting.annotations.ServoyClientSupport;
-import com.servoy.j2db.documentation.ServoyDocumented;
-import com.servoy.j2db.scripting.IConstantsObject;
-
 /**
  * @author emera
  */
-@ServoyDocumented(scriptingName = "JWTAlgorithms")
-@ServoyClientSupport(ng = true, wc = true, sc = true)
 @SuppressWarnings("nls")
-public class JWTAlgorithms implements IConstantsObject
+public class JWTAlgorithms
 {
 	public static final String HS256 = "HS256";
 	public static final String HS384 = "HS384";

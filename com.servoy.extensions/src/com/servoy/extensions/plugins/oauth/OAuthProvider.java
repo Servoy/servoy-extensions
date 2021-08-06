@@ -129,19 +129,27 @@ public class OAuthProvider implements IScriptable, IReturnedTypesProvider
 		ServiceBuilder builder = new ServiceBuilder(clientId);
 		builder.apiSecret(clientSecret);
 		if (scope != null) builder.defaultScope(scope);
-		if (deeplinkmethod != null) builder.callback(getRedirectURL(deeplinkmethod));
+		if (deeplinkmethod != null) builder.callback(getRedirectURL(deeplinkmethod, false));
 		return new OAuthService(builder.build(getApiInstance(provider, null, null)), state);
 	}
 
-	String getRedirectURL(String callbackmethod)
+	String getRedirectURL(String callbackmethod, boolean implicitGrantType)
 	{
-		String redirectURL = getPluginAccess().getServerURL().toString();
+		StringBuilder redirectURL = new StringBuilder(getPluginAccess().getServerURL().toString());
+		if (implicitGrantType)
+		{
+			if (!redirectURL.toString().endsWith("/"))
+			{
+				redirectURL.append("/");
+			}
+			redirectURL.append("servoy-service/oauth/");
+		}
 		String path = getPluginAccess().getRuntimeProperties().containsKey("NG2") && (Boolean)getPluginAccess().getRuntimeProperties().get("NG2")
 			? SOLUTION_PATH
 			: SOLUTIONS_PATH;
-		redirectURL += (!redirectURL.endsWith("/") ? "/" + path : path);
-		redirectURL += getPluginAccess().getMainSolutionName() + "/m/" + callbackmethod;
-		return redirectURL;
+		redirectURL.append(!redirectURL.toString().endsWith("/") ? "/" + path : path);
+		redirectURL.append(getPluginAccess().getMainSolutionName() + "/m/" + callbackmethod);
+		return redirectURL.toString();
 	}
 
 	static DefaultApi20 getApiInstance(String provider, String tenant, String domain) throws Exception

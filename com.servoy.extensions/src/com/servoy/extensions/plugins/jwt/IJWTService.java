@@ -19,24 +19,11 @@ package com.servoy.extensions.plugins.jwt;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
-import java.util.Date;
-
-import org.json.JSONObject;
 
 /**
  * @author emera
  */
 public interface IJWTService extends Remote
 {
-
-	String create(JSONObject claims, Date expireDate) throws RemoteException, Exception;
-
-	String create(JSONObject headers, JSONObject claims, Date expireDate) throws RemoteException, Exception;
-
-	JSONObject verify(String token) throws RemoteException;
-
-	boolean configureAlgorithm(String alg, String publicKey, String privateKey, String kid);
-
-	boolean configureAlgorithm(String alg, byte[] publicKey, byte[] privateKey, String kid);
-
+	String getSecret(String clientID) throws RemoteException;
 }
