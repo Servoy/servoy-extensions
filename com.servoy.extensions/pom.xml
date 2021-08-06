@@ -17,7 +17,7 @@
 		</repository>
 	</repositories>
 	<properties>
-		<tycho.version>2.3.0</tycho.version>
+		<tycho.version>2.4.0</tycho.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
@@ -273,11 +273,13 @@
 											<arg
 												value="${project.build.directory}/plugins_beans/@{type}/@{jarname}.jar" />
 										</exec>
-										<signjar keystore="${jarsigner.keystore}"
-											jar="${project.build.directory}/plugins_beans/@{type}/@{jarname}.jar"
-											alias="ServoyClient" storepass="${jarsigner.storepass}"
-											tsaurl="http://sha256timestamp.ws.symantec.com/sha256/timestamp"
-											sigalg="SHA256withRSA" digestalg="SHA-256" />
+										<retry retrycount="3" retrydelay="1000">
+											<signjar keystore="${jarsigner.keystore}"
+												jar="${project.build.directory}/plugins_beans/@{type}/@{jarname}.jar"
+												alias="ServoyClient" storepass="${jarsigner.storepass}"
+												tsaurl="http://sha256timestamp.ws.symantec.com/sha256/timestamp"
+												sigalg="SHA256withRSA" digestalg="SHA-256" />
+											</retry>
 									</sequential>
 								</macrodef>
 
