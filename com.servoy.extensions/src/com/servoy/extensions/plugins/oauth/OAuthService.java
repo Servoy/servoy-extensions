@@ -225,6 +225,17 @@ public class OAuthService implements IScriptable, IJavaScriptType
 	}
 
 	/**
+	 * Revoke the provided access token.
+	 * @param token to revoke
+	 * @throws Exception
+	 */
+	@JSFunction
+	public void revokeToken(String token) throws Exception
+	{
+		service.revokeToken(token);
+	}
+
+	/**
 	 * Creates a JSOAuthRequest for with the enum of RequestType (GET, PUT, DELETE, etc) for a resource url.
 	 *
 	 * @sample

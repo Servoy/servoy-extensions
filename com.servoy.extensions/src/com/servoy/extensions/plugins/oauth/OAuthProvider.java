@@ -181,6 +181,52 @@ public class OAuthProvider implements IScriptable, IReturnedTypesProvider
 		}
 	}
 
+	/**
+	 * Create a custom OAuth api builder.
+	 * @sample
+	 * var customApi = plugins.oauth.customApi("https://example.com/oauth2/default/v1/authorize",  //authorization base url
+	 *                                         "https://example.com/oauth2/default/v1/token");     //access token endpoint
+	 * customApi = customApi.
+	 * plugins.oauth.serviceBuilder("0lqd1s0aw...")		//client/application ID
+	 * 				.clientSecret("bIk6163KHi...")		//client secret
+	 * 				.state("secret123337")				//anti forgery session state, required by the Facebook api
+	 * 				.deeplink("deeplink_method")		//OPTIONAL deeplink method name or last part of your redirect URL, see docs
+	 * 													//if missing, a global method with the name 'deeplink_svy_oauth' will be generated
+	 * 				.callback(myFunction, 30) 			//see function below, timeout is 30 seconds
+	 * 				.build(customApi);                  //the custom api created above
+	 *
+	 * function myFunction(result, auth_outcome) {
+	 * if (result)
+	 * {
+	 * 		//SUCCESS
+	 * 		var service = auth_outcome;
+	 * 		if (service.getAccessToken() == null) return;
+	 * 		var response = service.executeGetRequest("https://graph.facebook.com/v2.11/me");
+	 * 		if (response.getCode() == 200) {
+	 * 			application.output(response.getBody());
+	 * 			var json = response.getAsJSON();
+	 * 			application.output("Name is "+json.name);
+	 *		}
+	 *		else {
+	 *			application.output('ERROR http status '+response.getCode());
+	 *		}
+	 *	else {
+	 *		//ERROR
+	 *		application.output("ERROR "+auth_outcome);//could not get access token, request timed out, etc..
+	 *	}
+	 *  }
+	 * }
+	 *
+	 * @param authorizationBaseUrl the base URL where you should redirect your users to authenticate your application
+	 * @param accessTokenEndpoint the URL that receives the access token requests
+	 * @return
+	 */
+	@JSFunction
+	public CustomApiBuilder customApi(String authorizationBaseUrl, String accessTokenEndpoint)
+	{
+		return new CustomApiBuilder(authorizationBaseUrl, accessTokenEndpoint);
+	}
+
 	public IClientPluginAccess getPluginAccess()
 	{
 		return plugin.getAccess();

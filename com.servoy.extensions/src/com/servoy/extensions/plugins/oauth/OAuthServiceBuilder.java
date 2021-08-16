@@ -27,6 +27,7 @@ import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.annotations.JSFunction;
 
 import com.github.scribejava.core.builder.ServiceBuilder;
+import com.github.scribejava.core.builder.api.DefaultApi20;
 import com.github.scribejava.core.utils.Preconditions;
 import com.servoy.base.scripting.annotations.ServoyClientSupport;
 import com.servoy.base.solutionmodel.IBaseSMVariable;
@@ -232,12 +233,29 @@ public class OAuthServiceBuilder implements IScriptable, IJavaScriptType
 
 	/**
 	 * Creates an OAuth service that can be used to obtain an access token and access protected data.
+	 * @param api a custom api, see plugins.oauth.customApi
+	 * @return an OAuthService object that can be used to make signed requests to the api
+	 * @throws Exception if the service cannot be created
+	 */
+	@JSFunction
+	public OAuthService build(CustomApiBuilder api) throws Exception
+	{
+		return build(api.build());
+	}
+
+	/**
+	 * Creates an OAuth service that can be used to obtain an access token and access protected data.
 	 * @param api an OAuth provider id, see plugins.oauth.OAuthProviders
 	 * @return an OAuthService object that can be used to make signed requests to the api
 	 * @throws Exception if the service cannot be created
 	 */
 	@JSFunction
 	public OAuthService build(String api) throws Exception
+	{
+		return build(OAuthProvider.getApiInstance(api, _tenant, _domain));
+	}
+
+	private OAuthService build(DefaultApi20 api) throws Exception
 	{
 		boolean generateGlobalMethods = _deeplink == null || provider.getPluginAccess().getSolutionModel().getGlobalMethod(GLOBALS_SCOPE, _deeplink) == null;
 		if (generateGlobalMethods && _callback == null)
@@ -249,7 +267,7 @@ public class OAuthServiceBuilder implements IScriptable, IJavaScriptType
 		builder.callback(redirectURL);
 		if (OAuthService.log.isDebugEnabled()) OAuthService.log.debug("Redirect url " + redirectURL);
 
-		OAuthService service = new OAuthService(builder.build(OAuthProvider.getApiInstance(api, _tenant, _domain)), _state);
+		OAuthService service = new OAuthService(builder.build(api), _state);
 		return _callback != null ? buildWithCallback(generateGlobalMethods, deeplink_name, service) : service;
 	}
 
