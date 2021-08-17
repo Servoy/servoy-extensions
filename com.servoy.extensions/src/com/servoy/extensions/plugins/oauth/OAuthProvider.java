@@ -235,6 +235,6 @@ public class OAuthProvider implements IScriptable, IReturnedTypesProvider
 	@Override
 	public Class< ? >[] getAllReturnedTypes()
 	{
-		return new Class[] { OAuthServiceBuilder.class, OAuthService.class, OAuthProviders.class, OAuthResponseText.class, OAuthResponseJSON.class, OAuthResponseBinary.class, OAuthRequestType.class, JSOAuthRequest.class };
+		return new Class[] { OAuthServiceBuilder.class, OAuthService.class, OAuthProviders.class, OAuthResponseText.class, OAuthResponseJSON.class, OAuthResponseBinary.class, OAuthRequestType.class, JSOAuthRequest.class, OAuthTokenExtractors.class };
 	}
 }
