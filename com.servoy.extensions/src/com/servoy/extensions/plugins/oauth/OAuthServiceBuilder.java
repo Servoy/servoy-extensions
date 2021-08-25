@@ -17,6 +17,8 @@
 
 package com.servoy.extensions.plugins.oauth;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -28,6 +30,7 @@ import org.mozilla.javascript.annotations.JSFunction;
 
 import com.github.scribejava.core.builder.ServiceBuilder;
 import com.github.scribejava.core.builder.api.DefaultApi20;
+import com.github.scribejava.core.oauth.AuthorizationUrlBuilder;
 import com.github.scribejava.core.utils.Preconditions;
 import com.servoy.base.scripting.annotations.ServoyClientSupport;
 import com.servoy.base.solutionmodel.IBaseSMVariable;
@@ -54,8 +57,9 @@ public class OAuthServiceBuilder implements IScriptable, IJavaScriptType
 	private final OAuthProvider provider;
 	private long redirectToAuthUrlTime;
 	private String _domain;
-	private Object additionalParameters;
-	private boolean implicitGrantType = false;
+	private final Map<String, String> additionalParameters = new HashMap<>();
+	private String responseType;
+	private String responseMode;
 
 	private static final String GET_CODE_METHOD = "getSvyOAuthCode";
 	private static final String SVY_AUTH_CODE_VAR = "svy_authCode";
@@ -193,28 +197,41 @@ public class OAuthServiceBuilder implements IScriptable, IJavaScriptType
 	}
 
 	/**
-	 * Set the response_type. Defaults to "code" if not set.
-	 * @param response_type
+	 * Configures the OAuth flow. Defaults to "code" (authorization code flow) if not set.
+	 * Use response type "token" for the implicit grant flow.
+	 * Use response type "id_token" for OpenID Connect sign-in. In this case the response is a JWT token which can be used to verify the identity of a user.
+	 * OAuth providers may allow combinations of "code" "id_token" "token".
+	 * @param response_type one or a combination of "code" "id_token" "token"
 	 * @return the service builder for method chaining
 	 */
 	@JSFunction
 	public OAuthServiceBuilder responseType(String response_type)
 	{
+		this.responseType = response_type;
 		builder.responseType(response_type);
 		return this;
 	}
 
-
 	/**
-	 * Use the implicit grant type flow.
-	 * In this case the redirect url configured for the oauth app needs to be of the following form
+	 * Configure if the code/tokens are going to be received as a query or as a url fragment.
+	 * Will be ignored if the response type is token/id_token or if the oauth provider does not support it.
+	 *
+	 * For the "fragment" response mode the redirect url configured for the oauth app needs to be of the following form
 	 * https://example.com/servoy-service/oauth/solutions/<solution_name>/m/<deeplinkmethod> - where <deeplinkmethod> is the name configured with the service builder
+	 * @param mode can be "query" or "fragment"
 	 * @return the service builder for method chaining
 	 */
 	@JSFunction
-	public OAuthServiceBuilder implicitGrantType()
+	public OAuthServiceBuilder responseMode(String mode) throws Exception
 	{
-		this.implicitGrantType = true;
+		if ("fragment".equalsIgnoreCase(mode) || "query".equalsIgnoreCase(mode))
+		{
+			additionalParameters.put("response_mode", mode);
+		}
+		else
+		{
+			throw new Exception("'" + mode + "' is not a valid response mode. Only ''fragment' and 'query' are allowed by the plugin.");
+		}
 		return this;
 	}
 
@@ -227,7 +244,17 @@ public class OAuthServiceBuilder implements IScriptable, IJavaScriptType
 	@JSFunction
 	public OAuthServiceBuilder additionalParameters(Object params)
 	{
-		additionalParameters = params;
+		if (params instanceof Scriptable)
+		{
+			Scriptable scriptable = (Scriptable)params;
+			for (Object id : scriptable.getIds())
+			{
+				if (id instanceof String && scriptable.get((String)id, null) instanceof String)
+				{
+					additionalParameters.put((String)id, (String)scriptable.get((String)id, null));
+				}
+			}
+		}
 		return this;
 	}
 
@@ -262,13 +289,23 @@ public class OAuthServiceBuilder implements IScriptable, IJavaScriptType
 		{
 			throw new Exception("Cannot build OAuth service. Please specify a callback function, see serviceBuilder.callback() docs for more details.");
 		}
-		String deeplink_name = _deeplink == null ? DEEPLINK_METHOD_NAME : _deeplink;
-		String redirectURL = provider.getRedirectURL(deeplink_name, implicitGrantType);
+		String deeplink_name = getDeeplinkName();
+		String redirectURL = provider.getRedirectURL(deeplink_name, isFragmentResponse());
 		builder.callback(redirectURL);
 		if (OAuthService.log.isDebugEnabled()) OAuthService.log.debug("Redirect url " + redirectURL);
 
 		OAuthService service = new OAuthService(builder.build(api), _state);
 		return _callback != null ? buildWithCallback(generateGlobalMethods, deeplink_name, service) : service;
+	}
+
+	boolean isFragmentResponse()
+	{
+		return responseType != null && responseType.contains("token") || "fragment".equalsIgnoreCase(responseMode);
+	}
+
+	String getDeeplinkName()
+	{
+		return _deeplink == null ? DEEPLINK_METHOD_NAME : _deeplink;
 	}
 
 	private OAuthService buildWithCallback(boolean generateGlobalMethods, String deeplink_name, OAuthService service)
@@ -283,8 +320,7 @@ public class OAuthServiceBuilder implements IScriptable, IJavaScriptType
 
 		try
 		{
-			String authURL = service.getAuthorizationURL(additionalParameters);
-			if (OAuthService.log.isDebugEnabled()) OAuthService.log.debug("authorization url " + authURL);
+			String authURL = buildAuthUrl(service);
 			ExecutorService executor = Executors.newFixedThreadPool(1);
 			executor.submit(() -> {
 				try
@@ -302,15 +338,31 @@ public class OAuthServiceBuilder implements IScriptable, IJavaScriptType
 						if (code instanceof Scriptable)
 						{
 							Scriptable result = ((Scriptable)code);
-							if (result.has("code", result) || result.has("id_token", result) || result.has("token_type", result))
+							if (result.has("code", result) || result.has("access_token", result) || result.has("id_token", result))
 							{
 								try
 								{
 									if (OAuthService.log.isDebugEnabled())
 										OAuthService.log.debug("Received code in " + (System.currentTimeMillis() - redirectToAuthUrlTime) / 1000 +
 											"s since the beginning of the request.");
-									String _code = result.has("code", result) ? (String)(result.get("code", result)) : toJsonString(result);
-									service.setAccessToken(_code);
+
+									if (result.has("code", result))
+									{
+										//authorization code flow
+										service.setAccessToken((String)(result.get("code", result)));
+									}
+									else if (result.has("access_token", result))
+									{
+										//implicit grant flow
+										service.setToken(toJsonString(result));
+									}
+
+									if (result.has("id_token", result)) //openid connect
+									{
+										//openid connect
+										service.setIdToken((String)(result.get("id_token", result)));
+									}
+
 									if (OAuthService.log.isDebugEnabled())
 										OAuthService.log.debug("Received access token in  " + (System.currentTimeMillis() - redirectToAuthUrlTime) / 1000 +
 											"s since the beginning of the request.");
@@ -383,6 +435,16 @@ public class OAuthServiceBuilder implements IScriptable, IJavaScriptType
 			return null;
 		}
 		return service;
+	}
+
+	private String buildAuthUrl(OAuthService service)
+	{
+		AuthorizationUrlBuilder authUrlBuilder = service.getAuthorizatinUrlBuilder();
+		if (_state != null) authUrlBuilder.state(_state);
+		if (!additionalParameters.isEmpty()) authUrlBuilder = authUrlBuilder.additionalParams(additionalParameters);
+		String authURL = authUrlBuilder.build();
+		if (OAuthService.log.isDebugEnabled()) OAuthService.log.debug("authorization url " + authURL);
+		return authURL;
 	}
 
 	private String toJsonString(Scriptable result)

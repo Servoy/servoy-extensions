@@ -133,10 +133,10 @@ public class OAuthProvider implements IScriptable, IReturnedTypesProvider
 		return new OAuthService(builder.build(getApiInstance(provider, null, null)), state);
 	}
 
-	String getRedirectURL(String callbackmethod, boolean implicitGrantType)
+	String getRedirectURL(String callbackmethod, boolean responseModeFragment)
 	{
 		StringBuilder redirectURL = new StringBuilder(getPluginAccess().getServerURL().toString());
-		if (implicitGrantType)
+		if (responseModeFragment)
 		{
 			if (!redirectURL.toString().endsWith("/"))
 			{
@@ -150,6 +150,18 @@ public class OAuthProvider implements IScriptable, IReturnedTypesProvider
 		redirectURL.append(!redirectURL.toString().endsWith("/") ? "/" + path : path);
 		redirectURL.append(getPluginAccess().getMainSolutionName() + "/m/" + callbackmethod);
 		return redirectURL.toString();
+	}
+
+	/**
+	 * Help method to get the redirect URL which needs to be configured on the OAuth provider application page.
+	 * The url is computed based on what is set on the service builder: deeplink method name, response mode and response type.
+	 * @param builder an OAuth service builder
+	 * @return the redirect url
+	 */
+	@JSFunction
+	public String getUsedRedirectUrl(OAuthServiceBuilder builder)
+	{
+		return getRedirectURL(builder.getDeeplinkName(), builder.isFragmentResponse());
 	}
 
 	static DefaultApi20 getApiInstance(String provider, String tenant, String domain) throws Exception
