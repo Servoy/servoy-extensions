@@ -50,5 +50,5 @@ public interface IMailService extends Remote
 
 	public MailMessage createMailMessageFromBinary(String clientId, byte[] data) throws RemoteException;
 
-	public String getPluginProperty(String propertyName);
+	public String getPluginProperty(String propertyName) throws RemoteException;
 }

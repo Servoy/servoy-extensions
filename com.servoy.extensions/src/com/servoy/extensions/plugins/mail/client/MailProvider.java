@@ -16,6 +16,7 @@
  */
 package com.servoy.extensions.plugins.mail.client;
 
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -1168,7 +1169,14 @@ public class MailProvider implements IReturnedTypesProvider, IScriptable, IJavaS
 		createMailService();
 		if (mailService != null)
 		{
-			return mailService.getPluginProperty("mail.from");
+			try
+			{
+				return mailService.getPluginProperty("mail.from");
+			}
+			catch (RemoteException e)
+			{
+				Debug.error(e);
+			}
 		}
 		return null;
 	}
