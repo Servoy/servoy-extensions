@@ -70,8 +70,10 @@ public class JWTProvider implements IScriptable, IReturnedTypesProvider
 	}
 
 	/**
-	 * Create a JSON Web Token for the given payload that is signed with the (shared) secret key 'jwt.secret.password' that has to be configured on the admin page for this plugin.
+	 * Create a JSON Web Token for the given payload that is signed with the (shared) secret key 'jwt.secret.password'.
+	 * The 'jwt.secret.password' plugin property has to be configured on the admin page.
 	 * The payload can be for example a user:username of the current user, so that with this token if it verifies with the same secret key you can assume it is the same user that wants to login.
+	 * This is a shorthand method of the {@link #builder()} method with a HS256 algorithm.
 	 *
 	 * @param payload a json containing the data,
 	 * 		e.g. {'some': 'data', 'somemore': 'data2'}
@@ -87,9 +89,11 @@ public class JWTProvider implements IScriptable, IReturnedTypesProvider
 	}
 
 	/**
-	 * Create a JSON Web Token for the given payload that is signed with the (shared) secret key 'jwt.secret.password' that has to be configured on the admin page for this plugin.
+	 * Create a JSON Web Token for the given payload that is signed with the HS256 algorithm and the (shared) secret key 'jwt.secret.password'.
+	 * The 'jwt.secret.password' plugin property has to be configured on the admin page.
 	 * The payload can be for example a user:username of the current user, so that with this token if it verifies with the same secret key you can assume it is the same user that wants to login.
 	 * The expiresAt makes sure this token is only valid until that date.
+	 * This is a shorthand method of the {@link #builder()} method with a HS256 algorithm.
 	 *
 	 * @param payload a json containing the data,
 	 * 		e.g. {'some': 'data', 'somemore': 'data2'}
@@ -107,8 +111,9 @@ public class JWTProvider implements IScriptable, IReturnedTypesProvider
 	}
 
 	/**
-	 * Verify a token that is created with the {@link #create(Object)} method.
-	 * This will only verify and return the payload that was given if the token could be verified with the (shared) secret key 'jwt.secret.password' that is configured on the admin page.
+	 * Verify a JSON Web Token with the HS256 algorithm and the (shared) secret key 'jwt.secret.password'.
+	 * The 'jwt.secret.password' plugin property has to be configured on the admin page.
+	 * This will only verify and return the payload that was given if the token was created with the HS256 algorithm and the 'jwt.secret.password'.
 	 * Will also return null if the token passed its expire date.
 	 *
 	 * @param token a JSON Web Token
@@ -123,7 +128,9 @@ public class JWTProvider implements IScriptable, IReturnedTypesProvider
 	}
 
 	/**
-	 * Verify a token that is created with the {@link #create(Object)} method.
+	 * Verify a JSON Web Token with a specific algorithm.
+	 * The token could be external or created with the {@link #builder()} method.
+	 *
 	 * This will only verify and return the payload that was given if the token could be verified with the provided algorithm.
 	 * Will also return null if the token passed its expire date.
 	 *
