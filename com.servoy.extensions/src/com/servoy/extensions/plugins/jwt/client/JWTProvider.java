@@ -107,7 +107,7 @@ public class JWTProvider implements IScriptable, IReturnedTypesProvider
 	}
 
 	/**
-	 * Verifiy a token that is created with the {@link #create(Object)} method.
+	 * Verify a token that is created with the {@link #create(Object)} method.
 	 * This will only verify and return the payload that was given if the token could be verified with the (shared) secret key 'jwt.secret.password' that is configured on the admin page.
 	 * Will also return null if the token passed its expire date.
 	 *
@@ -124,7 +124,7 @@ public class JWTProvider implements IScriptable, IReturnedTypesProvider
 
 	/**
 	 * Verify a token that is created with the {@link #create(Object)} method.
-	 * This will only verify and return the payload that was given if the token could be verified with the (shared) secret key 'jwt.secret.password' that is configured on the admin page.
+	 * This will only verify and return the payload that was given if the token could be verified with the provided algorithm.
 	 * Will also return null if the token passed its expire date.
 	 *
 	 * @param token a JSON Web Token
