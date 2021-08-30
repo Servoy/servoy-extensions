@@ -20,7 +20,6 @@ package com.servoy.extensions.plugins.oauth;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import org.json.JSONObject;
@@ -321,8 +320,8 @@ public class OAuthServiceBuilder implements IScriptable, IJavaScriptType
 		try
 		{
 			String authURL = buildAuthUrl(service);
-			ExecutorService executor = Executors.newFixedThreadPool(1);
-			executor.submit(() -> {
+			ExecutorService executor = provider.getPluginAccess().getExecutor();
+			executor.execute(() -> {
 				try
 				{
 					Object code = null;
@@ -400,8 +399,6 @@ public class OAuthServiceBuilder implements IScriptable, IJavaScriptType
 							errorMessage = "Request timed out. Did not obtain the authorization code within " + _timeout + "seconds.";
 						}
 					}
-
-					executor.shutdown();
 
 					FunctionDefinition fd = new FunctionDefinition(_callback);
 					if (OAuthService.log.isDebugEnabled())
