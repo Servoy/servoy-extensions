@@ -26,11 +26,14 @@ import org.mozilla.javascript.annotations.JSFunction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.github.scribejava.apis.openid.OpenIdOAuth2AccessToken;
+import com.github.scribejava.core.exceptions.OAuthException;
 import com.github.scribejava.core.model.OAuth2AccessToken;
 import com.github.scribejava.core.model.OAuthRequest;
 import com.github.scribejava.core.model.Response;
 import com.github.scribejava.core.model.Verb;
 import com.github.scribejava.core.oauth.AccessTokenRequestParams;
+import com.github.scribejava.core.oauth.AuthorizationUrlBuilder;
 import com.github.scribejava.core.oauth.OAuth20Service;
 import com.servoy.base.scripting.annotations.ServoyClientSupport;
 import com.servoy.j2db.documentation.ServoyDocumented;
@@ -50,6 +53,7 @@ public class OAuthService implements IScriptable, IJavaScriptType
 	private OAuth2AccessToken accessToken;
 	private final String state;
 	private long accessTokenExpire;
+	private String idToken;
 
 	public OAuthService(OAuth20Service service, String state)
 	{
@@ -60,7 +64,6 @@ public class OAuthService implements IScriptable, IJavaScriptType
 	@JSFunction
 	public String getAuthorizationURL()
 	{
-
 		return state != null ? service.getAuthorizationUrl(state) : service.getAuthorizationUrl();
 	}
 
@@ -89,6 +92,11 @@ public class OAuthService implements IScriptable, IJavaScriptType
 		}
 		if (state != null) additionalParameters.put("state", state);
 		return service.getAuthorizationUrl(additionalParameters);
+	}
+
+	public AuthorizationUrlBuilder getAuthorizatinUrlBuilder()
+	{
+		return service.createAuthorizationUrlBuilder();
 	}
 
 	/**
@@ -222,6 +230,17 @@ public class OAuthService implements IScriptable, IJavaScriptType
 	public int getAccessTokenLifetime()
 	{
 		return accessToken.getExpiresIn().intValue();
+	}
+
+	/**
+	 * Revoke the provided access token.
+	 * @param token to revoke
+	 * @throws Exception
+	 */
+	@JSFunction
+	public void revokeToken(String token) throws Exception
+	{
+		service.revokeToken(token);
 	}
 
 	/**
@@ -422,5 +441,39 @@ public class OAuthService implements IScriptable, IJavaScriptType
 			log.error("Could not execute request " + req.getUrl(), e);
 		}
 		return null;
+	}
+
+	/**
+	 * This is for the implicit grant flow, when we don't need to make a second request because the response already contains the access token.
+	 */
+	public void setToken(String result)
+	{
+		try
+		{
+			this.accessToken = service.getApi().getAccessTokenExtractor().extract(new Response(200, null, null, result));
+		}
+		catch (OAuthException | IOException e)
+		{
+			log.error("Could not set the access token.", e);
+		}
+	}
+
+	public void setIdToken(String string)
+	{
+		this.idToken = string;
+	}
+
+	/**
+	 * Obtain the Openid token if it is available.
+	 * @return the id token, or null if was not set on the service.
+	 */
+	@JSFunction
+	public String getIdToken()
+	{
+		if (idToken == null && accessToken instanceof OpenIdOAuth2AccessToken)
+		{
+			((OpenIdOAuth2AccessToken)accessToken).getOpenIdToken();
+		}
+		return idToken;
 	}
 }

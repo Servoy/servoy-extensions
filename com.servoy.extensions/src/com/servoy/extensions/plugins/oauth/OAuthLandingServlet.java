@@ -65,6 +65,7 @@ public class OAuthLandingServlet extends HttpServlet
 		if (queryString != null)
 		{
 			url.append(queryString);
+			url.append('&');
 		}
 
 		resp.setContentType("text/html");

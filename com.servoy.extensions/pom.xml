@@ -7,7 +7,7 @@
 	</prerequisites>
 	<groupId>com.servoy</groupId>
 	<artifactId>com.servoy.extensions</artifactId>
-	<version>2021.9.0.3700_rc</version>
+	<version>2021.12.0.3720_rc</version>
 
 	<repositories>
 		<repository>
@@ -31,7 +31,7 @@
 		<pdfbox.version>2.0.24</pdfbox.version>
 		<fontbox.version>2.0.16</fontbox.version>
 		<jwt.version>3.9.0</jwt.version>
-		<fasterxml.version>2.12.1</fasterxml.version>
+		<fasterxml.version>2.12.2</fasterxml.version>
 	</properties>
 
 	<profiles>
