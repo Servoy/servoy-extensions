@@ -29,7 +29,7 @@
 		<amqp.version>5.7.0</amqp.version>
 		<doc.version>1.5.0</doc.version>
 		<pdfbox.version>2.0.24</pdfbox.version>
-		<fontbox.version>2.0.16</fontbox.version>
+		<fontbox.version>2.0.24</fontbox.version>
 		<jwt.version>3.9.0</jwt.version>
 		<fasterxml.version>2.12.2</fasterxml.version>
 	</properties>
