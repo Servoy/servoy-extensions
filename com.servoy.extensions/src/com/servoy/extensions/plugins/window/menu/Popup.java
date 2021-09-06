@@ -58,7 +58,8 @@ public class Popup extends AbstractMenu
 	}
 
 	/**
-	 * Show the popup above the specified element. In NGClient, using a component from tableview/listview form doesn't work, you have to specify coordinates (from JSEvent).
+	 * Show the popup below the specified element. If there is no available room, the popup is displayed above.
+	 * In NGClient, using a component from tableview/listview form doesn't work, you have to specify coordinates (from JSEvent).
 	 *
 	 * @sample
 	 * // NOTE: usually this code is placed in a handler of an event (e.g. right click on some component)
@@ -93,7 +94,8 @@ public class Popup extends AbstractMenu
 	}
 
 	/**
-	 * Show the popup above the specified element, adding x an y values relative to the element.
+	 * Show the popup below to the specified element, adding x an y values relative to the element.
+	 * If there is no available room, the popup is displayed above.
 	 *
 	 * @sampleas js_show(IComponent)
 	 *
@@ -104,6 +106,45 @@ public class Popup extends AbstractMenu
 	public void js_show(IComponent component, int x, int y) throws PluginException
 	{
 		getMenuHandler().showPopup(getMenu(), component, x, y);
+	}
+
+	/**
+	 * Show the popup according to the checkAboveFirst parameter.
+	 * If there is no available room, the popup is displayed on the other side.
+	 *
+	 * @sample
+	 * // create a popup menu
+	 * var menu = plugins.window.createPopupMenu();
+	 * // add a menu item
+	 * menu.addMenuItem("item", feedback_item);
+	 * // display the popup above the components (if there is room available)
+	 * menu.show(event.getSource(), true);
+	 * // display the popup above the components (if there is room available) adding the specified coordinated relative to the component
+	 * menu.show(event.getSource(), 3, 5, true);
+	 *
+	 * @param component
+	 * @param checkAboveFirst
+	 */
+	@ServoyClientSupport(ng = true, wc = false, sc = false)
+	public void js_show(IComponent component, boolean checkAboveFirst) throws PluginException
+	{
+		//code completion in NgClient
+	}
+
+	/**
+	 * Show the popup according to the checkAboveFirst parameter, adding x an y values relative to the element.
+	 * If there is no available room, the popup is displayed on the other side.
+	 *
+	 * @sampleas js_show(IComponent, boolean)
+	 *
+	 * @param component
+	 * @param x
+	 * @param y
+	 */
+	@ServoyClientSupport(ng = true, wc = false, sc = false)
+	public void js_show(IComponent component, int x, int y, boolean checkAbove) throws PluginException
+	{
+		//code completion in NgClient
 	}
 
 	/**
