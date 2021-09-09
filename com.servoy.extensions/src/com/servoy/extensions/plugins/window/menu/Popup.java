@@ -140,9 +140,10 @@ public class Popup extends AbstractMenu
 	 * @param component
 	 * @param x
 	 * @param y
+	 * @param checkAboveFirst
 	 */
 	@ServoyClientSupport(ng = true, wc = false, sc = false)
-	public void js_show(IComponent component, int x, int y, boolean checkAbove) throws PluginException
+	public void js_show(IComponent component, int x, int y, boolean checkAboveFirst) throws PluginException
 	{
 		//code completion in NgClient
 	}
