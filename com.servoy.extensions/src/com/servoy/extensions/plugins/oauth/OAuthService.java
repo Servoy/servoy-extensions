@@ -52,7 +52,7 @@ public class OAuthService implements IScriptable, IJavaScriptType
 	private final OAuth20Service service;
 	private OAuth2AccessToken accessToken;
 	private final String state;
-	private long accessTokenExpire;
+	private Long accessTokenExpire = null;
 	private String idToken;
 
 	public OAuthService(OAuth20Service service, String state)
@@ -110,7 +110,10 @@ public class OAuthService implements IScriptable, IJavaScriptType
 		try
 		{
 			this.accessToken = service.getAccessToken(code);
-			this.accessTokenExpire = System.currentTimeMillis() + accessToken.getExpiresIn().intValue() * 1000;
+			if (accessToken != null && accessToken.getExpiresIn() != null)
+			{
+				this.accessTokenExpire = System.currentTimeMillis() + accessToken.getExpiresIn().longValue() * 1000;
+			}
 		}
 		catch (IOException | InterruptedException | ExecutionException e)
 		{
@@ -131,7 +134,10 @@ public class OAuthService implements IScriptable, IJavaScriptType
 		try
 		{
 			this.accessToken = service.getAccessToken(AccessTokenRequestParams.create(code).scope(scope));
-			this.accessTokenExpire = System.currentTimeMillis() + accessToken.getExpiresIn().intValue() * 1000;
+			if (accessToken != null && accessToken.getExpiresIn() != null)
+			{
+				this.accessTokenExpire = System.currentTimeMillis() + accessToken.getExpiresIn().longValue() * 1000;
+			}
 		}
 		catch (IOException | InterruptedException | ExecutionException e)
 		{
@@ -179,7 +185,10 @@ public class OAuthService implements IScriptable, IJavaScriptType
 		try
 		{
 			accessToken = service.refreshAccessToken(accessToken.getRefreshToken(), accessToken.getScope());
-			this.accessTokenExpire = System.currentTimeMillis() + accessToken.getExpiresIn().intValue() * 1000;
+			if (accessToken != null && accessToken.getExpiresIn() != null)
+			{
+				this.accessTokenExpire = System.currentTimeMillis() + accessToken.getExpiresIn().longValue() * 1000;
+			}
 			return accessToken.getAccessToken();
 		}
 		catch (Exception e)
@@ -208,27 +217,32 @@ public class OAuthService implements IScriptable, IJavaScriptType
 	@JSFunction
 	public long getAccessExpiresIn() throws Exception
 	{
-		if (accessToken == null) throw new Exception("Could getAccessExpiresIn, the access token was not set on the service.");
-		return (accessTokenExpire - System.currentTimeMillis()) / 1000;
+		if (accessToken == null) throw new Exception("Could not get access token expire information, the access token was not set on the service.");
+		if (accessTokenExpire == null) throw new Exception("The access token expire information is not available.");
+		return (accessTokenExpire.longValue() - System.currentTimeMillis()) / 1000;
 	}
 
 	/**
-	 * Checks if the access token is expired.
+	 * Checks if the access token is expired. Returns false if the access token expire information is not set.
 	 * @return true if the access token is expired, false otherwise
 	 */
 	@JSFunction
 	public boolean isAccessTokenExpired()
 	{
-		return System.currentTimeMillis() >= accessTokenExpire;
+		if (accessTokenExpire == null) return false;
+		return System.currentTimeMillis() >= accessTokenExpire.longValue();
 	}
 
 	/**
 	 * Return the token lifetime in seconds.
 	 * @return the token lifetime as it was retrieved by the OAuth provider with the access token
+	 * @throws Exception  if the access token was not set
 	 */
 	@JSFunction
-	public int getAccessTokenLifetime()
+	public int getAccessTokenLifetime() throws Exception
 	{
+		if (accessToken == null) throw new Exception("Could not get access token lifetime, the access token was not set on the service.");
+		if (accessTokenExpire == null) throw new Exception("Could not get access token lifetime, the access token expire information is not available.");
 		return accessToken.getExpiresIn().intValue();
 	}
 
@@ -241,6 +255,7 @@ public class OAuthService implements IScriptable, IJavaScriptType
 	public void revokeToken(String token) throws Exception
 	{
 		service.revokeToken(token);
+		accessTokenExpire = null;
 	}
 
 	/**
