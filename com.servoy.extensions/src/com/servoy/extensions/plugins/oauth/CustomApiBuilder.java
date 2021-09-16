@@ -25,6 +25,7 @@ import com.github.scribejava.core.builder.api.DefaultApi20;
 import com.github.scribejava.core.extractors.TokenExtractor;
 import com.github.scribejava.core.model.OAuth2AccessToken;
 import com.github.scribejava.core.model.Verb;
+import com.github.scribejava.core.oauth2.clientauthentication.ClientAuthentication;
 
 /**
  * Enables the use of the OAuth plugin with uncommon providers such as in-house solutions.
@@ -38,7 +39,7 @@ public class CustomApiBuilder
 	private String _refreshTokenEndpoint;
 	private String _revokeTokenEndpoint;
 	private TokenExtractor<OAuth2AccessToken> tokenExtractor;
-
+	private ClientAuthentication _clientAuthentication;
 
 	public CustomApiBuilder(String authorizationBaseUrl, String accessTokenEndpoint)
 	{
@@ -108,6 +109,29 @@ public class CustomApiBuilder
 		return this;
 	}
 
+	/**
+	 * Configures the api with a client authentication method which specifies how the client credentials are sent.
+	 * They can be sent as basic Auth header or in the request body.
+	 * @param clientAuthentication see plugins.oauth.ClientAuthentication
+	 * @return the api builder for method chaining
+	 * @throws Exception if the client authentication cannot be created
+	 */
+	@JSFunction
+	public CustomApiBuilder withClientAuthentication(String clientAuthentication) throws Exception
+	{
+		Class< ? > clazz = Class.forName(clientAuthentication);
+		Method instance = clazz.getDeclaredMethod("instance");
+		if (instance != null && ClientAuthentication.class.isAssignableFrom(clazz))
+		{
+			_clientAuthentication = (ClientAuthentication)instance.invoke(null, (Object[])null);
+		}
+		else
+		{
+			throw new Exception("'" + clientAuthentication + "' was not found or is not a client authentication type");
+		}
+		return this;
+	}
+
 	public DefaultApi20 build()
 	{
 		return new DefaultApi20()
@@ -146,6 +170,12 @@ public class CustomApiBuilder
 			public String getRevokeTokenEndpoint()
 			{
 				return _revokeTokenEndpoint != null ? _revokeTokenEndpoint : super.getRevokeTokenEndpoint();
+			}
+
+			@Override
+			public ClientAuthentication getClientAuthentication()
+			{
+				return _clientAuthentication != null ? _clientAuthentication : super.getClientAuthentication();
 			}
 		};
 	}
