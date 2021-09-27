@@ -126,7 +126,7 @@ public class Popup extends AbstractMenu
 	 * menu.show(event.getSource(), 3, 5, true);
 	 *
 	 * @param component
-	 * @param topPosition
+	 * @param positionTop
 	 */
 	@ServoyClientSupport(ng = true, wc = false, sc = false)
 	public void js_show(IComponent component, boolean positionTop) throws PluginException
@@ -147,7 +147,7 @@ public class Popup extends AbstractMenu
 	 * @param component
 	 * @param x
 	 * @param y
-	 * @param checkAboveFirst
+	 * @param positionTop
 	 */
 	@ServoyClientSupport(ng = true, wc = false, sc = false)
 	public void js_show(IComponent component, int x, int y, boolean positionTop) throws PluginException
