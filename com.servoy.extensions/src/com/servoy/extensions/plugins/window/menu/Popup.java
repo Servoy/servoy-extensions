@@ -109,8 +109,11 @@ public class Popup extends AbstractMenu
 	}
 
 	/**
-	 * Show the popup according to the checkAboveFirst parameter.
-	 * If there is no available room, the popup is displayed on the other side.
+	 * Show the popup menu according to the positionTop parameter.
+	 * By default the popup menu is displayed below the component, and if there is no room available it is displayed above.
+	 * If positionTop is true, and there is enough room available, then popup menu is displayed above;
+	 * By default, positionTop is false.
+	 * If there is not enough space above or under the component, the behavior is undefined (the browser will decide how menu is displayed)
 	 *
 	 * @sample
 	 * // create a popup menu
@@ -123,26 +126,31 @@ public class Popup extends AbstractMenu
 	 * menu.show(event.getSource(), 3, 5, true);
 	 *
 	 * @param component
-	 * @param checkAboveFirst
+	 * @param positionTop
 	 */
 	@ServoyClientSupport(ng = true, wc = false, sc = false)
-	public void js_show(IComponent component, boolean checkAboveFirst) throws PluginException
+	public void js_show(IComponent component, boolean positionTop) throws PluginException
 	{
 		//code completion in NgClient
 	}
 
 	/**
-	 * Show the popup according to the checkAboveFirst parameter, adding x an y values relative to the element.
-	 * If there is no available room, the popup is displayed on the other side.
+	 * Show the popup menu according to the positionTop, x, y parameters.
+	 * By default the popup menu is show at the x, y coordinates.
+	 * If positionTop is true, and there is enough room available, then popup menu's bottom - left corner is ending at the specified coordinates;
+	 * x, y values are relative to top-left corner of the component.
+	 * By default, positionTop is false.
+	 * If there is not enough space above or under the component, the behavior is undefined (the browser will decide how menu is displayed)
 	 *
 	 * @sampleas js_show(IComponent, boolean)
 	 *
 	 * @param component
 	 * @param x
 	 * @param y
+	 * @param positionTop
 	 */
 	@ServoyClientSupport(ng = true, wc = false, sc = false)
-	public void js_show(IComponent component, int x, int y, boolean checkAbove) throws PluginException
+	public void js_show(IComponent component, int x, int y, boolean positionTop) throws PluginException
 	{
 		//code completion in NgClient
 	}
