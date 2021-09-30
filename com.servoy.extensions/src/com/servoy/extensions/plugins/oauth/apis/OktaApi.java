@@ -29,6 +29,7 @@ public class OktaApi extends DefaultApi20
 
 	private final String tokenEndpoint;
 	private final String authorizationBaseUrl;
+	private final String revokeTokenEndpoint;
 
 	public static OktaApi custom(String domain)
 	{
@@ -39,6 +40,7 @@ public class OktaApi extends DefaultApi20
 	{
 		tokenEndpoint = "https://" + domain + "/oauth2/default/v1/token";
 		authorizationBaseUrl = "https://" + domain + "/oauth2/default/v1/authorize";
+		revokeTokenEndpoint = "https://" + domain + "/oauth2/v1/revoke";
 	}
 
 	@Override
@@ -58,6 +60,12 @@ public class OktaApi extends DefaultApi20
 	protected String getAuthorizationBaseUrl()
 	{
 		return authorizationBaseUrl;
+	}
+
+	@Override
+	public String getRevokeTokenEndpoint()
+	{
+		return revokeTokenEndpoint;
 	}
 
 	@Override
