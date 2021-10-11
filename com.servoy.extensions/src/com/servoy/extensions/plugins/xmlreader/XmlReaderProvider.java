@@ -89,7 +89,7 @@ public class XmlReaderProvider implements IScriptable, IReturnedTypesProvider
 		try
 		{
 			DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
-			Document doc = docBuilder.parse(new InputSource(new StringReader(argument)));
+			Document doc = docBuilder.parse(new InputSource(new StringReader(argument.trim())));
 			return readDoc(doc);
 		}
 		catch (Exception e)

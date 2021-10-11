@@ -50,6 +50,8 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileSystemView;
 
+import org.apache.commons.io.ByteOrderMark;
+import org.apache.commons.io.input.BOMInputStream;
 import org.mozilla.javascript.Function;
 import org.mozilla.javascript.NativeArray;
 import org.mozilla.javascript.annotations.JSFunction;
@@ -1826,6 +1828,13 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 
 			if (fileObj != null) // !cancelled
 			{
+				if (charsetname.contains("UTF")) //$NON-NLS-1$
+				{
+					BOMInputStream bomIn = new BOMInputStream(new FileInputStream(fileObj), false,
+						ByteOrderMark.UTF_16LE, ByteOrderMark.UTF_16BE,
+						ByteOrderMark.UTF_32LE, ByteOrderMark.UTF_32BE);
+					return readTXTFile(charsetname, bomIn);
+				}
 				return readTXTFile(charsetname, new FileInputStream(fileObj));
 			}
 			return null;
