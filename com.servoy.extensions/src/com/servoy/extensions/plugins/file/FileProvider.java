@@ -1831,6 +1831,7 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 				if (charsetname.contains("UTF")) //$NON-NLS-1$
 				{
 					BOMInputStream bomIn = new BOMInputStream(new FileInputStream(fileObj), false,
+						ByteOrderMark.UTF_8,
 						ByteOrderMark.UTF_16LE, ByteOrderMark.UTF_16BE,
 						ByteOrderMark.UTF_32LE, ByteOrderMark.UTF_32BE);
 					return readTXTFile(charsetname, bomIn);
