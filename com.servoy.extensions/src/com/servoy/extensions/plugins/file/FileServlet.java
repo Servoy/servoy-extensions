@@ -21,6 +21,7 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.URLDecoder;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -63,6 +64,7 @@ public class FileServlet extends HttpServlet
 		{
 			String filePath = pathInfo.substring(5);
 			String uuidString = filePath.substring(1);
+			filePath = URLDecoder.decode(filePath, "UTF-8");
 			File file = registeredFiles.get(uuidString);
 			if (file == null)
 			{

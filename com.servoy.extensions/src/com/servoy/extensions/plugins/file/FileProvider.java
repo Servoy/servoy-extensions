@@ -32,6 +32,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
 import java.rmi.RemoteException;
@@ -2933,7 +2934,8 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 			if (!file.js_exists()) throw new RuntimeException("File " + file.js_getName() + " does not exist on the server");
 			String serverURL = plugin.getClientPluginAccess().getServerURL().toURI().toString();
 			serverURL = serverURL.endsWith("/") ? serverURL : serverURL + '/';
-			return new URL(serverURL + "servoy-service/file" + file.js_getAbsolutePath()).toURI().toString(); //$NON-NLS-1$
+			String filePathWithoutSpace = URLEncoder.encode(file.js_getAbsolutePath().substring(1), "UTF-8");
+			return new URL(serverURL + "servoy-service/file/" + filePathWithoutSpace).toURI().toString(); //$NON-NLS-1$
 		}
 		throw new RuntimeException("File " + file.js_getName() + " is not a remote file");
 	}
