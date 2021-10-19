@@ -2927,6 +2927,7 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 * @param file the remote file where the url should be generated from. Must be a remote file
 	 * @return the url as a string
 	 */
+	@SuppressWarnings("nls")
 	public String js_getUrlForRemoteFile(JSFile file) throws Exception
 	{
 		if (file.getAbstractFile() instanceof RemoteFile)
@@ -2934,8 +2935,8 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 			if (!file.js_exists()) throw new RuntimeException("File " + file.js_getName() + " does not exist on the server");
 			String serverURL = plugin.getClientPluginAccess().getServerURL().toURI().toString();
 			serverURL = serverURL.endsWith("/") ? serverURL : serverURL + '/';
-			String filePathWithoutSpace = URLEncoder.encode(file.js_getAbsolutePath().substring(1), "UTF-8");
-			return new URL(serverURL + "servoy-service/file/" + filePathWithoutSpace).toURI().toString(); //$NON-NLS-1$
+			String encodedPath = URLEncoder.encode(file.js_getAbsolutePath().substring(1), "UTF-8");
+			return new URL(serverURL + "servoy-service/file/" + encodedPath).toURI().toString();
 		}
 		throw new RuntimeException("File " + file.js_getName() + " is not a remote file");
 	}
