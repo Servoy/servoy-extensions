@@ -17,7 +17,6 @@
 package com.servoy.extensions.plugins.file;
 
 import java.io.BufferedOutputStream;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -125,18 +124,18 @@ public class WebFileProvider extends FileProvider
 	{
 		if (file instanceof JSFile)
 		{
-			byte[] bytes = ((JSFile)file).jsFunction_getBytes();
-			if (bytes != null)
+			try
 			{
-				try
+				InputStream is = ((JSFile)file).getInputStream();
+				if (is != null)
 				{
-					return readTXTFile(charsetname, new ByteArrayInputStream(bytes));
+					return readTXTFile(charsetname, is);
 				}
-				catch (Exception e)
-				{
-					Debug.error(e);
-					return null;
-				}
+			}
+			catch (Exception e)
+			{
+				Debug.error(e);
+				return null;
 			}
 			return "";
 		}
