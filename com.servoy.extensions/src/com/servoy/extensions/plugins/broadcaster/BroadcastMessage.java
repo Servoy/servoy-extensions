@@ -17,11 +17,13 @@
 
 package com.servoy.extensions.plugins.broadcaster;
 
+import java.io.Serializable;
+
 /**
  * @author lvostinar
  *
  */
-public class BroadcastMessage
+public class BroadcastMessage implements Serializable
 {
 	final String originServerUUID;
 	private final String channelName;
