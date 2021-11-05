@@ -8,16 +8,17 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.servoy.j2db.dataprocessing.JSDataSet;
+import com.servoy.j2db.plugins.IPostInitializeListener;
 import com.servoy.j2db.plugins.IServerAccess;
 import com.servoy.j2db.plugins.IServerPlugin;
 import com.servoy.j2db.plugins.PluginException;
 import com.servoy.j2db.server.shared.IClientInformation;
 
-public class ClientManagerServer implements IServerPlugin, IClientManagerService
+public class ClientManagerServer implements IServerPlugin, IClientManagerService, IPostInitializeListener
 {
 	private IServerAccess application;
 	private final ConcurrentHashMap<String, List<BroadcastInfo>> registeredClients = new ConcurrentHashMap<>();
-
+	private ClientManagerServerToBroadcasterBridge broadcasterBridge;
 
 	public ClientManagerServer()
 	{
@@ -40,6 +41,16 @@ public class ClientManagerServer implements IServerPlugin, IClientManagerService
 		catch (RemoteException ex)
 		{
 			throw new PluginException(ex);
+		}
+	}
+
+	@Override
+	public void afterInit()
+	{
+		if (isBroadcasterPluginAvailable())
+		{
+			this.broadcasterBridge = new ClientManagerServerToBroadcasterBridge(application, this);
+			this.broadcasterBridge.afterInit();
 		}
 	}
 
@@ -139,7 +150,15 @@ public class ClientManagerServer implements IServerPlugin, IClientManagerService
 	@Override
 	public void broadcastMessage(BroadcastInfo info, String message)
 	{
-		// TODO for smart client this is really slow, because getName() call goes to the smart client first all the time.
+		this.broadcastMessageInternal(info, message);
+		if (this.broadcasterBridge != null)
+		{
+			this.broadcasterBridge.broadcastMessageToAllServers(info, message);
+		}
+	}
+
+	void broadcastMessageInternal(BroadcastInfo info, String message)
+	{
 		List<BroadcastInfo> list = registeredClients.get(info.getChannelName());
 		if (list != null)
 		{
@@ -162,6 +181,20 @@ public class ClientManagerServer implements IServerPlugin, IClientManagerService
 	public JSDataSet getLocks() throws RemoteException
 	{
 		return application.getLocks();
+	}
+
+	private boolean isBroadcasterPluginAvailable()
+	{
+		try
+		{
+			Class.forName("com.servoy.extensions.plugins.broadcaster.DataNotifyBroadCaster", false, getClass().getClassLoader()); //$NON-NLS-1$
+			return true;
+		}
+		catch (Exception e)
+		{
+			// ignore
+		}
+		return false;
 	}
 
 }

@@ -32,6 +32,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
 import java.rmi.RemoteException;
@@ -50,6 +51,8 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileSystemView;
 
+import org.apache.commons.io.ByteOrderMark;
+import org.apache.commons.io.input.BOMInputStream;
 import org.mozilla.javascript.Function;
 import org.mozilla.javascript.NativeArray;
 import org.mozilla.javascript.annotations.JSFunction;
@@ -1826,6 +1829,14 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 
 			if (fileObj != null) // !cancelled
 			{
+				if (charsetname.contains("UTF")) //$NON-NLS-1$
+				{
+					BOMInputStream bomIn = new BOMInputStream(new FileInputStream(fileObj), false,
+						ByteOrderMark.UTF_8,
+						ByteOrderMark.UTF_16LE, ByteOrderMark.UTF_16BE,
+						ByteOrderMark.UTF_32LE, ByteOrderMark.UTF_32BE);
+					return readTXTFile(charsetname, bomIn);
+				}
 				return readTXTFile(charsetname, new FileInputStream(fileObj));
 			}
 			return null;
@@ -2916,6 +2927,7 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 * @param file the remote file where the url should be generated from. Must be a remote file
 	 * @return the url as a string
 	 */
+	@SuppressWarnings("nls")
 	public String js_getUrlForRemoteFile(JSFile file) throws Exception
 	{
 		if (file.getAbstractFile() instanceof RemoteFile)
@@ -2923,7 +2935,8 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 			if (!file.js_exists()) throw new RuntimeException("File " + file.js_getName() + " does not exist on the server");
 			String serverURL = plugin.getClientPluginAccess().getServerURL().toURI().toString();
 			serverURL = serverURL.endsWith("/") ? serverURL : serverURL + '/';
-			return new URL(serverURL + "servoy-service/file" + file.js_getAbsolutePath()).toURI().toString(); //$NON-NLS-1$
+			String encodedPath = URLEncoder.encode(file.js_getAbsolutePath().substring(1), "UTF-8");
+			return new URL(serverURL + "servoy-service/file/" + encodedPath).toURI().toString();
 		}
 		throw new RuntimeException("File " + file.js_getName() + " is not a remote file");
 	}

@@ -17,7 +17,7 @@
 		</repository>
 	</repositories>
 	<properties>
-		<tycho.version>2.4.0</tycho.version>
+		<tycho.version>2.5.0</tycho.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
@@ -25,7 +25,7 @@
 		<servoy-shiplibs.url>http://developer.servoy.com/p2_repository/ship_plugins/2019.12/</servoy-shiplibs.url>
 		<workspace_dir>${project.basedir}/../</workspace_dir>
 		<servoy-local.url>${project.baseUri}/target/repository/</servoy-local.url>
-		<scribejava.version>6.5.1</scribejava.version>
+		<scribejava.version>8.3.1</scribejava.version>
 		<amqp.version>5.7.0</amqp.version>
 		<doc.version>1.5.0</doc.version>
 		<pdfbox.version>2.0.24</pdfbox.version>
@@ -487,6 +487,14 @@
 									<destFileName>scribejava-core.jar</destFileName>
 								</artifactItem>
 								<artifactItem>
+									<groupId>com.github.scribejava</groupId>
+									<artifactId>scribejava-java8</artifactId>
+									<version>${scribejava.version}</version>
+									<overWrite>true</overWrite>
+									<outputDirectory>${project.build.directory}/plugins_beans/plugins/oauth</outputDirectory>
+									<destFileName>scribejava-java8.jar</destFileName>
+								</artifactItem>
+								<artifactItem>
 									<groupId>org.apache.pdfbox</groupId>
 									<artifactId>pdfbox</artifactId>
 									<version>${pdfbox.version}</version>
@@ -803,6 +811,11 @@
 		<dependency>
 			<groupId>com.github.scribejava</groupId>
 			<artifactId>scribejava-core</artifactId>
+			<version>${scribejava.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.github.scribejava</groupId>
+			<artifactId>scribejava-java8</artifactId>
 			<version>${scribejava.version}</version>
 		</dependency>
 		<dependency>

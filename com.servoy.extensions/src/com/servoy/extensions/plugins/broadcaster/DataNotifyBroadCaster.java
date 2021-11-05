@@ -18,10 +18,12 @@
 package com.servoy.extensions.plugins.broadcaster;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -60,10 +62,13 @@ public class DataNotifyBroadCaster implements IServerPlugin
 {
 	private static final String EXCHANGE_NAME = "databroadcast";
 	private static final String ROUTING_KEY = "";
-	private static final String ORIGIN_SERVER_UUID = UUID.randomUUID().toString();
+	public static final String ORIGIN_SERVER_UUID = UUID.randomUUID().toString();
 
 	private Connection connection;
 	private Channel channel;
+
+	private IBroadcastMessageConsumer messageConsumer;
+	private IServerAccess application;
 
 	@Override
 	public void load() throws PluginException
@@ -96,6 +101,7 @@ public class DataNotifyBroadCaster implements IServerPlugin
 	@Override
 	public void initialize(IServerAccess app) throws PluginException
 	{
+		this.application = app;
 		String hostname = app.getSettings().getProperty("amqpbroadcaster.hostname");
 		if (hostname != null && !hostname.trim().equals(""))
 		{
@@ -245,6 +251,20 @@ public class DataNotifyBroadCaster implements IServerPlugin
 									}
 								}
 							}
+							else if (readObject instanceof BroadcastMessage)
+							{
+								if (DataNotifyBroadCaster.this.messageConsumer != null)
+								{
+									if (!ORIGIN_SERVER_UUID.equals(((BroadcastMessage)readObject).originServerUUID))
+									{
+										DataNotifyBroadCaster.this.messageConsumer.handleDelivery((BroadcastMessage)readObject);
+									}
+								}
+								else
+								{
+									Debug.error("a message came without messageConsumer being set: " + readObject);
+								}
+							}
 							else
 							{
 								Debug.error("an object get from the queue that was not an NotifyData: " + readObject);
@@ -263,6 +283,49 @@ public class DataNotifyBroadCaster implements IServerPlugin
 				Debug.error("Error in databroadcaster plugin, can't initialize a connection, please check hostname/username/password", e);
 			}
 		}
+	}
+
+	public IBroadcastMessageSender registerMessageBroadcastConsumer(IBroadcastMessageConsumer messageConsumer)
+	{
+		if (this.channel != null)
+		{
+			this.messageConsumer = messageConsumer;
+			return new IBroadcastMessageSender()
+			{
+
+				@Override
+				public void sendMessage(BroadcastMessage message)
+				{
+					ByteArrayOutputStream baos;
+					try
+					{
+						baos = new ByteArrayOutputStream();
+						ObjectOutputStream oos = new ObjectOutputStream(baos);
+						oos.writeObject(message);
+						oos.close();
+					}
+					catch (Exception e)
+					{
+						Debug.error("failed to serialize " + message, e);
+						return;
+					}
+					try
+					{
+						if (baos != null)
+						{
+							channel.basicPublish(application.getSettings().getProperty("amqpbroadcaster.exchange", EXCHANGE_NAME),
+								application.getSettings().getProperty("amqpbroadcaster.routingkey", ROUTING_KEY), null, baos.toByteArray());
+						}
+					}
+					catch (Exception e)
+					{
+						Debug.error(e);
+					}
+
+				}
+			};
+		}
+		return null;
 	}
 
 	@SuppressWarnings("nls")

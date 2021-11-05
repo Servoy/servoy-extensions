@@ -56,4 +56,11 @@ public class IntuitApi extends DefaultApi20
 	{
 		return "https://appcenter.intuit.com/connect/oauth2";
 	}
+
+
+	@Override
+	public String getRevokeTokenEndpoint()
+	{
+		return "https://developer.api.intuit.com/v2/oauth2/tokens/revoke";
+	}
 }
