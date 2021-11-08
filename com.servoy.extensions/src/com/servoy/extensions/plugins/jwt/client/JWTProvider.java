@@ -135,16 +135,26 @@ public class JWTProvider implements IScriptable, IReturnedTypesProvider
 	 * Will also return null if the token passed its expire date.
 	 *
 	 * @param token a JSON Web Token
-	 * @param alg an algorithm used to verify the signature
+	 * @param algorithm an algorithm used to verify the signature
 	 * @return the payload or null if the token can't be verified
 	 */
 	@JSFunction
-	public Object verify(String token, Algorithm alg)
+	public Object verify(String token, Algorithm algorithm)
 	{
+		Algorithm alg = algorithm;
 		if (alg != null)
 		{
 			try
 			{
+				if (alg.jwks_url != null)
+				{
+					DecodedJWT decoded = JWT.decode(token);
+					if (decoded.getKeyId() == null)
+					{
+						log.error("Cannot verify the token with jwks '" + alg.jwks_url + "' because the key id is not present in the token header.");
+					}
+					alg = alg.kid(decoded.getKeyId());
+				}
 				com.auth0.jwt.algorithms.Algorithm algo = alg.build();
 				if (algo != null)
 				{
@@ -272,6 +282,21 @@ public class JWTProvider implements IScriptable, IReturnedTypesProvider
 	{
 		Algorithm algorithm = new Algorithm(this, JWTAlgorithms.RS256);
 		return algorithm.publicKey(publicKey).privateKey(privateKey);
+	}
+
+	/**
+	 * Builder to create an algorithm instance based on a Json Web Key Set (JWKS) url.
+	 * Please note that the returned algorithm can only be used to verify tokens.
+	 * @sample var alg = plugins.jwt.JWK('https://....')
+	 *         var verified = plugins.jwt.verify(token, alg)
+	 * @param url the jwks url
+	 * @return an algorithm which can only be used to VERIFY Json Web Tokens.
+	 */
+	@JSFunction
+	public Algorithm JWK(String url)
+	{
+		Algorithm algorithm = new Algorithm(this);
+		return algorithm.jwksUrl(url);
 	}
 
 	/**

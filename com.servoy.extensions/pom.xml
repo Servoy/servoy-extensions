@@ -32,6 +32,7 @@
 		<fontbox.version>2.0.24</fontbox.version>
 		<jwt.version>3.9.0</jwt.version>
 		<fasterxml.version>2.12.2</fasterxml.version>
+		<jwks.version>0.20.0</jwks.version>
 	</properties>
 
 	<profiles>
@@ -353,6 +354,7 @@
 										<fileset file="${project.basedir}/lib/jackson-annotations.jar" />
 										<fileset file="${project.basedir}/lib/jackson-core.jar" />
 										<fileset file="${project.basedir}/lib/jackson-databind.jar" />
+										<fileset file="${project.basedir}/lib/jwks-rsa.jar" />
 									</copy>
 									<makejar srcdir="mail"
 										includes=",META-INF/services/com.servoy.j2db.plugins.IPlugin" />
@@ -517,6 +519,14 @@
 									<overWrite>true</overWrite>
 									<outputDirectory>${project.build.directory}/plugins_beans/plugins/jwt</outputDirectory>
 									<destFileName>java-jwt.jar</destFileName>
+								</artifactItem>
+								<artifactItem>
+    								<groupId>com.auth0</groupId>
+    								<artifactId>jwks-rsa</artifactId>
+    								<version>${jwks.version}</version>
+    								<overWrite>true</overWrite>
+									<outputDirectory>${project.build.directory}/plugins_beans/plugins/jwt</outputDirectory>
+									<destFileName>jwks-rsa.jar</destFileName>
 								</artifactItem>
 								<artifactItem>
 									<groupId>com.fasterxml.jackson.core</groupId>
@@ -827,6 +837,11 @@
 			<groupId>com.auth0</groupId>
 			<artifactId>java-jwt</artifactId>
 			<version>${jwt.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.auth0</groupId>
+			<artifactId>jwks-rsa</artifactId>
+			<version>${jwks.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
