@@ -17,6 +17,8 @@
 
 package com.servoy.extensions.plugins.jwt.client;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
@@ -32,6 +34,11 @@ import java.security.spec.X509EncodedKeySpec;
 import org.apache.commons.codec.binary.Base64;
 import org.mozilla.javascript.annotations.JSFunction;
 
+import com.auth0.jwk.InvalidPublicKeyException;
+import com.auth0.jwk.Jwk;
+import com.auth0.jwk.JwkException;
+import com.auth0.jwk.JwkProvider;
+import com.auth0.jwk.UrlJwkProvider;
 import com.auth0.jwt.interfaces.ECDSAKeyProvider;
 import com.auth0.jwt.interfaces.RSAKeyProvider;
 import com.servoy.j2db.documentation.ServoyDocumented;
@@ -51,12 +58,19 @@ public class Algorithm implements IScriptable, IJavaScriptType
 	private byte[] privKey;
 	private String keyId;
 	private final JWTProvider provider;
-	private final String alg;
+	private String alg;
+	String jwks_url;
+	private Jwk jwk;
 
 	public Algorithm(JWTProvider jwtProvider, String alg)
 	{
 		this.provider = jwtProvider;
 		this.alg = alg;
+	}
+
+	public Algorithm(JWTProvider jwtProvider)
+	{
+		this.provider = jwtProvider;
 	}
 
 	/**
@@ -134,6 +148,12 @@ public class Algorithm implements IScriptable, IJavaScriptType
 		return this;
 	}
 
+	public Algorithm jwksUrl(String url)
+	{
+		this.jwks_url = url;
+		return this;
+	}
+
 	/**
 	 * Build the algorithm which is used to create and verify jwt tokens.
 	 * @return the algorithm object
@@ -142,6 +162,25 @@ public class Algorithm implements IScriptable, IJavaScriptType
 	{
 		try
 		{
+			if (alg == null && jwks_url != null)
+			{
+				final JwkProvider jwkStore = new UrlJwkProvider(new URL(jwks_url));
+				if (keyId != null)
+				{
+					jwk = jwkStore.get(keyId);
+					alg = jwk.getAlgorithm();
+				}
+				else
+				{
+					JWTProvider.log.error("JWK error: public key id was not specified");
+				}
+			}
+			else if (privKey == null && pubKey == null)
+			{
+				JWTProvider.log.error("Cannot create algorithm. Both public and private keys cannot be null.");
+				return null;
+			}
+
 			if (alg.startsWith("HS"))
 				return buildHSAlgorithm();
 			if (alg.startsWith("ES"))
@@ -151,7 +190,7 @@ public class Algorithm implements IScriptable, IJavaScriptType
 
 			JWTProvider.log.error("Algorithm " + alg + " is not supported by the JWT plugin.");
 		}
-		catch (NoSuchAlgorithmException | InvalidKeySpecException e)
+		catch (NoSuchAlgorithmException | InvalidKeySpecException | JwkException | MalformedURLException e)
 		{
 			JWTProvider.log.error(e.getMessage());
 		}
@@ -160,12 +199,7 @@ public class Algorithm implements IScriptable, IJavaScriptType
 
 	private com.auth0.jwt.algorithms.Algorithm buildRSAAlgorithm() throws NoSuchAlgorithmException, InvalidKeySpecException
 	{
-		if (privKey == null && pubKey == null)
-		{
-			JWTProvider.log.error("Cannot create RSA algorithm. Both public and private keys cannot be null.");
-			return null;
-		}
-		RSAKeyProvider keyProvider = getRSAPublicPrivateKeyPair();
+		RSAKeyProvider keyProvider = jwk == null ? getRSAPublicPrivateKeyPair() : getJWKRSAProvider();
 		switch (alg)
 		{
 			case JWTAlgorithms.RS256 :
@@ -180,14 +214,10 @@ public class Algorithm implements IScriptable, IJavaScriptType
 		return null;
 	}
 
-	private com.auth0.jwt.algorithms.Algorithm buildECDSAAlgorithm() throws NoSuchAlgorithmException, InvalidKeySpecException
+	private com.auth0.jwt.algorithms.Algorithm buildECDSAAlgorithm()
+		throws NoSuchAlgorithmException, InvalidKeySpecException
 	{
-		if (privKey == null && pubKey == null)
-		{
-			JWTProvider.log.error("Cannot create ECDSA algorithm. Both public and private keys cannot be null.");
-			return null;
-		}
-		ECDSAKeyProvider keyProvider = getECPublicPrivateKeyPair();
+		ECDSAKeyProvider keyProvider = jwk == null ? getECPublicPrivateKeyPair() : getJWKECDSAProvider();
 		switch (alg)
 		{
 			case JWTAlgorithms.ES256 :
@@ -286,6 +316,72 @@ public class Algorithm implements IScriptable, IJavaScriptType
 			public RSAPrivateKey getPrivateKey()
 			{
 				return (RSAPrivateKey)private_Key;
+			}
+		};
+		return keyProvider;
+	}
+
+	private RSAKeyProvider getJWKRSAProvider()
+	{
+		RSAKeyProvider keyProvider = new RSAKeyProvider()
+		{
+			@Override
+			public RSAPublicKey getPublicKeyById(String kid)
+			{
+				try
+				{
+					return (RSAPublicKey)jwk.getPublicKey();
+				}
+				catch (InvalidPublicKeyException e)
+				{
+					JWTProvider.log.error("JWK error: Cannot get the RSA public key.");
+					return null;
+				}
+			}
+
+			@Override
+			public RSAPrivateKey getPrivateKey()
+			{
+				return null;
+			}
+
+			@Override
+			public String getPrivateKeyId()
+			{
+				return null;
+			}
+		};
+		return keyProvider;
+	}
+
+	private ECDSAKeyProvider getJWKECDSAProvider()
+	{
+		ECDSAKeyProvider keyProvider = new ECDSAKeyProvider()
+		{
+			@Override
+			public ECPublicKey getPublicKeyById(String kid)
+			{
+				try
+				{
+					return (ECPublicKey)jwk.getPublicKey();
+				}
+				catch (InvalidPublicKeyException e)
+				{
+					JWTProvider.log.error("JWK error: Cannot get the EC public key.");
+					return null;
+				}
+			}
+
+			@Override
+			public ECPrivateKey getPrivateKey()
+			{
+				return null;
+			}
+
+			@Override
+			public String getPrivateKeyId()
+			{
+				return null;
 			}
 		};
 		return keyProvider;
