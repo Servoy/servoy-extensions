@@ -63,7 +63,7 @@ public class OAuthServiceBuilder implements IScriptable, IJavaScriptType
 	private static final String GET_CODE_METHOD = "getSvyOAuthCode";
 	private static final String SVY_AUTH_CODE_VAR = "svy_authCode";
 	private static final String GLOBALS_SCOPE = "globals";
-	private static final String DEFAULT_GET_FUNCTION = "function getSvyOAuthCode(){ return svy_authCode; }";
+	private static final String DEFAULT_GET_FUNCTION = "function getSvyOAuthCode(){ var res = svy_authCode; svy_authCode = null; return res; }";
 	private static final String DEFAULT_DEEPLINK_FUNCTION_BODY = "(a,b){ svy_authCode = b; }";
 	private static final String DEEPLINK_METHOD_NAME = "deeplink_svy_oauth";
 
@@ -384,9 +384,6 @@ public class OAuthServiceBuilder implements IScriptable, IJavaScriptType
 						{
 							errorMessage = "Request timed out. Did not obtain the authorization code within " + _timeout + "seconds";
 						}
-						sm.removeGlobalMethod(GLOBALS_SCOPE, deeplink_name);
-						sm.removeGlobalMethod(GLOBALS_SCOPE, GET_CODE_METHOD);
-						sm.removeGlobalVariable(GLOBALS_SCOPE, SVY_AUTH_CODE_VAR);
 					}
 					else
 					{
@@ -417,6 +414,12 @@ public class OAuthServiceBuilder implements IScriptable, IJavaScriptType
 				catch (Exception e)
 				{
 					OAuthService.log.error(e.getMessage());
+				}
+				finally
+				{
+					sm.removeGlobalMethod(GLOBALS_SCOPE, deeplink_name);
+					sm.removeGlobalMethod(GLOBALS_SCOPE, GET_CODE_METHOD);
+					sm.removeGlobalVariable(GLOBALS_SCOPE, SVY_AUTH_CODE_VAR);
 				}
 			});
 
