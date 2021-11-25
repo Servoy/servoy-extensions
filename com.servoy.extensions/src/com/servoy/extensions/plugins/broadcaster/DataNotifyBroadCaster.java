@@ -58,6 +58,7 @@ import com.servoy.j2db.util.Utils;
 /**
  * @author jcompagner
  */
+@SuppressWarnings("nls")
 public class DataNotifyBroadCaster implements IServerPlugin
 {
 	private static final String EXCHANGE_NAME = "databroadcast";
@@ -97,7 +98,6 @@ public class DataNotifyBroadCaster implements IServerPlugin
 		return props;
 	}
 
-	@SuppressWarnings("nls")
 	@Override
 	public void initialize(IServerAccess app) throws PluginException
 	{
@@ -285,50 +285,43 @@ public class DataNotifyBroadCaster implements IServerPlugin
 		}
 	}
 
-	public IBroadcastMessageSender registerMessageBroadcastConsumer(IBroadcastMessageConsumer messageConsumer)
+	public IBroadcastMessageSender registerMessageBroadcastConsumer(IBroadcastMessageConsumer mc)
 	{
 		if (this.channel != null)
 		{
-			this.messageConsumer = messageConsumer;
-			return new IBroadcastMessageSender()
-			{
-
-				@Override
-				public void sendMessage(BroadcastMessage message)
+			final String exchange = application.getSettings().getProperty("amqpbroadcaster.exchange", EXCHANGE_NAME);
+			final String routing = application.getSettings().getProperty("amqpbroadcaster.routingkey", ROUTING_KEY);
+			this.messageConsumer = mc;
+			return (message) -> {
+				ByteArrayOutputStream baos;
+				try
 				{
-					ByteArrayOutputStream baos;
-					try
+					baos = new ByteArrayOutputStream();
+					ObjectOutputStream oos = new ObjectOutputStream(baos);
+					oos.writeObject(message);
+					oos.close();
+				}
+				catch (Exception e)
+				{
+					Debug.error("failed to serialize " + message, e);
+					return;
+				}
+				try
+				{
+					if (baos != null)
 					{
-						baos = new ByteArrayOutputStream();
-						ObjectOutputStream oos = new ObjectOutputStream(baos);
-						oos.writeObject(message);
-						oos.close();
+						channel.basicPublish(exchange, routing, null, baos.toByteArray());
 					}
-					catch (Exception e)
-					{
-						Debug.error("failed to serialize " + message, e);
-						return;
-					}
-					try
-					{
-						if (baos != null)
-						{
-							channel.basicPublish(application.getSettings().getProperty("amqpbroadcaster.exchange", EXCHANGE_NAME),
-								application.getSettings().getProperty("amqpbroadcaster.routingkey", ROUTING_KEY), null, baos.toByteArray());
-						}
-					}
-					catch (Exception e)
-					{
-						Debug.error(e);
-					}
-
+				}
+				catch (Exception e)
+				{
+					Debug.error(e);
 				}
 			};
 		}
 		return null;
 	}
 
-	@SuppressWarnings("nls")
 	@Override
 	public Map<String, String> getRequiredPropertyNames()
 	{

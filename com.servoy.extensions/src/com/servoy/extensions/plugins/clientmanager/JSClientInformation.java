@@ -197,6 +197,7 @@ public class JSClientInformation implements IScriptable
 		return clientInformation.getStatusLine();
 	}
 
+	@SuppressWarnings("nls")
 	@Override
 	public String toString()
 	{

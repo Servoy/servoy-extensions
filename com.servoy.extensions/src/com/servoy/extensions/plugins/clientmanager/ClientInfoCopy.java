@@ -139,6 +139,7 @@ public class ClientInfoCopy implements IClientInformation, Serializable
 		return clientInfos;
 	}
 
+	@SuppressWarnings("nls")
 	@Override
 	public String toString()
 	{

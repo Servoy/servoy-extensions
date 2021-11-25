@@ -19,7 +19,6 @@ package com.servoy.extensions.plugins.clientmanager;
 
 import com.servoy.extensions.plugins.broadcaster.BroadcastMessage;
 import com.servoy.extensions.plugins.broadcaster.DataNotifyBroadCaster;
-import com.servoy.extensions.plugins.broadcaster.IBroadcastMessageConsumer;
 import com.servoy.extensions.plugins.broadcaster.IBroadcastMessageSender;
 import com.servoy.j2db.plugins.IServerAccess;
 
@@ -45,16 +44,8 @@ public class ClientManagerServerToBroadcasterBridge
 		DataNotifyBroadCaster broadcaster = application.getPluginInstance(DataNotifyBroadCaster.class);
 		if (broadcaster != null)
 		{
-			this.broadcastNetworkSender = broadcaster.registerMessageBroadcastConsumer(new IBroadcastMessageConsumer()
-			{
-
-				@Override
-				public void handleDelivery(BroadcastMessage message)
-				{
-					clientManagerServer.broadcastMessageInternal(new BroadcastInfo(null, message.getName(), message.getChannelName()), message.getName());
-
-				}
-			});
+			this.broadcastNetworkSender = broadcaster.registerMessageBroadcastConsumer((message) -> clientManagerServer
+				.broadcastMessageInternal(new BroadcastInfo(null, message.getName(), message.getChannelName()), message.getName()));
 		}
 
 	}

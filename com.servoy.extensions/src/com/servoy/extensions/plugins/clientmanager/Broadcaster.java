@@ -60,7 +60,7 @@ public class Broadcaster implements IBroadcaster, IJavaScriptType
 			}
 			catch (Exception e)
 			{
-				Debug.error("Couldn't export object for the broadcaster", e);
+				Debug.error("Couldn't export object for the broadcaster", e); //$NON-NLS-1$
 			}
 		}
 		try

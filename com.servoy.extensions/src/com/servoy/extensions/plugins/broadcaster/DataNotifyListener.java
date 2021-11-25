@@ -36,6 +36,7 @@ import com.servoy.j2db.util.Debug;
  * @author jcompagner
  *
  */
+@SuppressWarnings("nls")
 public class DataNotifyListener implements IDataNotifyListener
 {
 	private final Channel channel;

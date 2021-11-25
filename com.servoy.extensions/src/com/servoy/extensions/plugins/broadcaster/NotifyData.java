@@ -61,6 +61,7 @@ public final class NotifyData implements Serializable
 		this.insertColumnData = null;
 	}
 
+	@SuppressWarnings("nls")
 	@Override
 	public String toString()
 	{

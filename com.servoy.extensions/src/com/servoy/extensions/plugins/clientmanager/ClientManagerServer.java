@@ -13,6 +13,7 @@ import com.servoy.j2db.plugins.IServerAccess;
 import com.servoy.j2db.plugins.IServerPlugin;
 import com.servoy.j2db.plugins.PluginException;
 import com.servoy.j2db.server.shared.IClientInformation;
+import com.servoy.j2db.util.Debug;
 
 public class ClientManagerServer implements IServerPlugin, IClientManagerService, IPostInitializeListener
 {
@@ -170,8 +171,7 @@ public class ClientManagerServer implements IServerPlugin, IClientManagerService
 				}
 				catch (RemoteException e)
 				{
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					Debug.error(e);
 				}
 			}
 		}

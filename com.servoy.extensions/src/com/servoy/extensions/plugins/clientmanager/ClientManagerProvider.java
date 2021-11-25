@@ -23,7 +23,6 @@ import com.servoy.j2db.util.Utils;
  */
 @ServoyDocumented(publicName = ClientManagerPlugin.PLUGIN_NAME, scriptingName = "plugins." + ClientManagerPlugin.PLUGIN_NAME)
 @ServoyClientSupport(ng = true, mc = false, wc = true, sc = true)
-@SuppressWarnings("boxing")
 public class ClientManagerProvider implements IScriptable, IReturnedTypesProvider
 {
 	private final ClientManagerPlugin plugin;
