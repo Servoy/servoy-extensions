@@ -56,6 +56,7 @@ import org.apache.commons.io.FileCleaningTracker;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
+import org.jabsorb.serializer.UnmarshallException;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -1211,6 +1212,19 @@ public class RestWSServlet extends HttpServlet
 		FileItem body = contents.get(0);
 		String charset = getHeaderKey(request.getHeader("Content-Type"), "charset", CHARSET_DEFAULT);
 
+		return decode(contentType, body, charset);
+	}
+
+	/**
+	 * @param contentType
+	 * @param body
+	 * @param charset
+	 * @return
+	 * @throws UnmarshallException
+	 * @throws UnsupportedEncodingException
+	 */
+	private Object decode(ContentType contentType, FileItem body, String charset) throws UnmarshallException, UnsupportedEncodingException
+	{
 		switch (contentType)
 		{
 			case JSON :
@@ -1269,58 +1283,72 @@ public class RestWSServlet extends HttpServlet
 		return upload.parseRequest(request);
 	}
 
-	private Object[] getMultipartContent(List<FileItem> contents, String requestCharset)
+	private Object[] getMultipartContent(List<FileItem> contents, String requestCharset) throws UnsupportedEncodingException, UnmarshallException
 	{
-		List<JSMap<String, Object>> parts = new ArrayList<>();
 		Map<String, String> formFields = new JSMap<>();
-		for (FileItem item : contents)
+
+		boolean useJSUploadWithFormFields = false;
+		if (plugin.useJSUploadForBinaryData())
 		{
-			if (item.isFormField())
+			// if all fields are form fields there is no fileUpload to move it to
+			useJSUploadWithFormFields = !contents.stream().allMatch(FileItem::isFormField);
+			if (useJSUploadWithFormFields)
 			{
-				String charset = getHeaderKey(item.getContentType(), "charset", null);
-				if (charset == null) charset = requestCharset;
-				if (charset != null)
+				for (FileItem item : contents)
 				{
-					try
+					if (item.isFormField())
 					{
-						formFields.put(item.getFieldName(), item.getString(charset));
+						String charset = getHeaderKey(item.getContentType(), "charset", requestCharset);
+						if (charset != null)
+						{
+							try
+							{
+								formFields.put(item.getFieldName(), item.getString(charset));
+							}
+							catch (UnsupportedEncodingException e)
+							{
+								formFields.put(item.getFieldName(), item.getString());
+							}
+						}
+						else
+						{
+							formFields.put(item.getFieldName(), item.getString());
+						}
 					}
-					catch (UnsupportedEncodingException e)
-					{
-						formFields.put(item.getFieldName(), item.getString());
-					}
-				}
-				else
-				{
-					formFields.put(item.getFieldName(), item.getString());
 				}
 			}
-			else
+		}
+
+		List<JSMap<String, Object>> parts = new ArrayList<>();
+		for (FileItem item : contents)
+		{
+			if (!item.isFormField() || !useJSUploadWithFormFields)
 			{
 				JSMap<String, Object> partObj = new JSMap<String, Object>();
 				parts.add(partObj);
-				//filename
+				// filename
 				if (item.getName() != null) partObj.put("fileName", item.getName());
-				String partContentType = "";
-				//charset
+				String partContentType = item.isFormField() ? "text/plain" : "";
+				// charset
 				if (item.getContentType() != null) partContentType = item.getContentType();
-				String _charset = getHeaderKey(partContentType, "charset", "");
+				String charset = getHeaderKey(partContentType, "charset", "");
 				partContentType = partContentType.replaceAll("(.*?);\\s*\\w+=.*", "$1");
-				//contentType
+				// contentType
 				if (partContentType.length() > 0)
 				{
 					partObj.put("contentType", partContentType);
 				}
-				if (_charset.length() > 0)
+				if (charset.length() > 0)
 				{
-					partObj.put("charset", _charset);
+					partObj.put("charset", charset);
 				}
 				else
 				{
-					_charset = "UTF-8"; // still use a valid default encoding in case it's not specified for reading it - it is ok that it will not be reported to JS I guess (this happens almost all the time)
+					charset = "UTF-8"; // still use a valid default encoding in case it's not specified for reading it - it is ok that it will not be reported to JS I guess (this happens almost all the time)
 				}
 
-				partObj.put("value", plugin.useJSUploadForBinaryData() ? new JSUpload(item, formFields) : item.get());
+				partObj.put("value",
+					useJSUploadWithFormFields ? new JSUpload(item, formFields) : decode(getContentType(partContentType), item, charset));
 				formFields = new JSMap<>();
 
 				// Get name header
