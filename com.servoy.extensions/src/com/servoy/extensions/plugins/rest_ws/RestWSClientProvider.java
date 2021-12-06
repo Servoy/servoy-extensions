@@ -76,6 +76,9 @@ public class RestWSClientProvider implements IScriptable
 	 * var cookie = plugins.rest_ws.createCookie('chocolate', 'chip');
 	 * var response = plugins.rest_ws.getResponse();
 	 * response.addCookie(cookie);
+	 *
+	 * @param name The name of the cookie
+	 * @param value The value of the cookie
 	 */
 	@JSFunction
 	public WsCookie createCookie(String name, String value)
