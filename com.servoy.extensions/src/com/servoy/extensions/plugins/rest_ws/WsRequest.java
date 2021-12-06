@@ -67,6 +67,8 @@ public class WsRequest implements IScriptable, IJavaScriptType
 	 * @sample
 	 * var request = plugins.rest_ws.getRequest();
 	 * var header = request.getHeader('');
+	 *
+	 * @param name The name of the header to get
 	 */
 	@JSFunction
 	public String getHeader(String name)
@@ -339,7 +341,7 @@ public class WsRequest implements IScriptable, IJavaScriptType
 	 *
 	 * Returns well-formed IETF BCP 47 language tags representing
 	 * the locales.
-	
+
 	 * @return an array of preferred
 	 * <code>Locale</code> objects for the client
 	 */
