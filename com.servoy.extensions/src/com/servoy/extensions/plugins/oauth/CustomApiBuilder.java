@@ -26,11 +26,15 @@ import com.github.scribejava.core.extractors.TokenExtractor;
 import com.github.scribejava.core.model.OAuth2AccessToken;
 import com.github.scribejava.core.model.Verb;
 import com.github.scribejava.core.oauth2.clientauthentication.ClientAuthentication;
+import com.servoy.base.scripting.annotations.ServoyClientSupport;
+import com.servoy.j2db.documentation.ServoyDocumented;
 
 /**
  * Enables the use of the OAuth plugin with uncommon providers such as in-house solutions.
  * @author emera
  */
+@ServoyDocumented(publicName = "CustomApiBuilder", scriptingName = "CustomApiBuilder")
+@ServoyClientSupport(ng = true, wc = false, sc = false)
 public class CustomApiBuilder
 {
 	private final String authorizationBaseUrl;
