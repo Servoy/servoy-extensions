@@ -9,7 +9,7 @@
    </information>
    <resources>
       <jar href="/plugins/images.jar" download="eager" part="images" version="%%version%%"/>
-      <jar href="/plugins/images/metadataextractor.jar" download="%%loadmethod%%" part="metadata" version="2.3.1"/>
+      <jar href="/plugins/images/metadataextractor.jar" download="%%loadmethod%%" part="metadata" version="2.6.0"/>
       <package name="com.drew.*" part="metadata" recursive="true"/>
    </resources>
    <component-desc/>
