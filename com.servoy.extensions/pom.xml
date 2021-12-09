@@ -793,11 +793,6 @@
 		</dependency>
 		<dependency>
 			<groupId>com.servoy</groupId>
-			<artifactId>metadataextractor</artifactId>
-			<version>1.0</version>
-		</dependency>
-		<dependency>
-			<groupId>com.servoy</groupId>
 			<artifactId>itext</artifactId>
 			<version>1.0</version>
 		</dependency>

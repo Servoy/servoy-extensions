@@ -25,6 +25,7 @@ import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.TreeMap;
 
@@ -35,11 +36,11 @@ import com.drew.imaging.ImageProcessingException;
 import com.drew.lang.Rational;
 import com.drew.metadata.Directory;
 import com.drew.metadata.Metadata;
-import com.drew.metadata.MetadataException;
 import com.drew.metadata.Tag;
 import com.drew.metadata.jpeg.JpegComponent;
 import com.servoy.j2db.documentation.ServoyDocumented;
 import com.servoy.j2db.scripting.IScriptable;
+import com.servoy.j2db.util.Debug;
 import com.servoy.j2db.util.ImageLoader;
 import com.servoy.j2db.util.MimeTypes;
 import com.servoy.j2db.util.Utils;
@@ -144,8 +145,8 @@ public class JSImage implements IScriptable, Wrapper
 	 *
 	 * @sampleas js_getData()
 	 *
-	 * @param width 
-	 * @param height 
+	 * @param width
+	 * @param height
 	 */
 	public JSImage js_resize(int width, int height)
 	{
@@ -167,7 +168,7 @@ public class JSImage implements IScriptable, Wrapper
 	 * var bytes = image.getData();//gets the image bytes
 	 * plugins.file.writeFile('filename',bytes);//saves the image bytes
 	 *
-	 * @param degrees 
+	 * @param degrees
 	 */
 	public JSImage js_rotate(final double degrees)
 	{
@@ -232,7 +233,7 @@ public class JSImage implements IScriptable, Wrapper
 	 * var bytes = image.getData();//gets the image bytes
 	 * plugins.file.writeFile('filename',bytes);//saves the image bytes
 	 *
-	 * @param type 
+	 * @param type
 	 */
 	public JSImage js_flip(int type)
 	{
@@ -297,7 +298,7 @@ public class JSImage implements IScriptable, Wrapper
 
 	/**
 	 * Gets the available metadata properties from the image. Currently only jpg is supported.
-	 * 
+	 *
 	 * @sample
 	 * var image = plugins.images.getImage(byteArray_or_file_or_filename);//loads the image
 	 * // get the available metadata properties from the image, currently only jpg is supported
@@ -322,7 +323,7 @@ public class JSImage implements IScriptable, Wrapper
 	 * Gets the description of a metadata property from the image. Currently only jpg is supported.
 	 *
 	 * @sampleas js_getMetaDataProperties()
-	 * 
+	 *
 	 * @param property
 	 */
 	public String js_getMetaDataDescription(String property)
@@ -338,9 +339,9 @@ public class JSImage implements IScriptable, Wrapper
 
 	/**
 	 * Gets the real object of a metadata property from the image. Currently only jpg is supported.
-	 * 
+	 *
 	 * @sampleas js_getMetaDataProperties()
-	 * 
+	 *
 	 * @param property
 	 */
 	public Object js_getMetaDataObject(String property)
@@ -372,48 +373,58 @@ public class JSImage implements IScriptable, Wrapper
 		{
 
 			Metadata metadata = null;
-			if (imageData != null)
+			try
 			{
-				metadata = ImageMetadataReader.readMetadata(new BufferedInputStream(new ByteArrayInputStream(imageData), 512));
-			}
-			else
-			{
-				metadata = ImageMetadataReader.readMetadata(file);
-			}
-			Iterator directories = metadata.getDirectoryIterator();
-			while (directories.hasNext())
-			{
-				Directory directory = (Directory)directories.next();
-				// iterate through tags and print to System.out  
-				Iterator tags = directory.getTagIterator();
-				while (tags.hasNext())
+				if (imageData != null)
 				{
-					Tag tag = (Tag)tags.next();
-					// use Tag.toString()  
-					if (tag.getDirectoryName().equals("Sony Makernote")) continue;
-					String description = "";
-					try
+					metadata = ImageMetadataReader.readMetadata(new BufferedInputStream(new ByteArrayInputStream(imageData), 512));
+				}
+				else
+				{
+					metadata = ImageMetadataReader.readMetadata(file);
+				}
+			}
+			catch (IOException iOException)
+			{
+				Debug.error(iOException);
+			}
+			if (metadata != null)
+			{
+				Iterator<Directory> directories = metadata.getDirectories().iterator();
+				while (directories.hasNext())
+				{
+					Directory directory = directories.next();
+					// iterate through tags and print to System.out
+					Iterator<Tag> tags = directory.getTags().iterator();
+					while (tags.hasNext())
 					{
-						description = tag.getDescription();
-						if (tag.getDescription() == null || "".equals(description)) continue;
-					}
-					catch (MetadataException ex)
-					{
-						continue;
-					}
-					String name = tag.getTagName();
-					if (name.indexOf("Unknown tag") != -1) continue;
+						Tag tag = tags.next();
+						// use Tag.toString()
+						if (tag.getDirectoryName().equals("Sony Makernote")) continue;
+						String description = "";
+						try
+						{
+							description = tag.getDescription();
+							if (tag.getDescription() == null || "".equals(description)) continue;
+						}
+						catch (Exception ex)
+						{
+							continue;
+						}
+						String name = tag.getTagName();
+						if (name.indexOf("Unknown tag") != -1) continue;
 
-					Object object = directory.getObject(tag.getTagType());
-					if (object instanceof JpegComponent || object instanceof int[] || (object instanceof byte[] && ((byte[])object).length <= 4))
-					{
-						object = description;
+						Object object = directory.getObject(tag.getTagType());
+						if (object instanceof JpegComponent || object instanceof int[] || (object instanceof byte[] && ((byte[])object).length <= 4))
+						{
+							object = description;
+						}
+						else if (object instanceof Rational)
+						{
+							object = ((Rational)object).toString();
+						}
+						metadataMap.put(tag.getDirectoryName() + " - " + name, new Object[] { description, object });
 					}
-					else if (object instanceof Rational)
-					{
-						object = ((Rational)object).toString();
-					}
-					metadataMap.put(tag.getDirectoryName() + " - " + name, new Object[] { description, object });
 				}
 			}
 		}
