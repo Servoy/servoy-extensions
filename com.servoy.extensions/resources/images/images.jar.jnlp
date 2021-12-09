@@ -10,6 +10,7 @@
    <resources>
       <jar href="/plugins/images.jar" download="eager" part="images" version="%%version%%"/>
       <jar href="/plugins/images/metadataextractor.jar" download="%%loadmethod%%" part="metadata" version="2.6.0"/>
+      <jar href="/plugins/images/xmpcore.jar" download="%%loadmethod%%" part="metadata" version="6.1.11"/>
       <package name="com.drew.*" part="metadata" recursive="true"/>
    </resources>
    <component-desc/>
