@@ -116,6 +116,12 @@ public class ClientManagerServer implements IServerPlugin, IClientManagerService
 	}
 
 	@Override
+	public void releaseLocks(String clientId)
+	{
+		application.releaseLocks(clientId);
+	}
+
+	@Override
 	public void registerChannelListener(BroadcastInfo info) throws RemoteException
 	{
 		String channel = info.getChannelName();

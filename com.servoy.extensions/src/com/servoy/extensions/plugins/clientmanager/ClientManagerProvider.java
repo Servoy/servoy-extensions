@@ -336,4 +336,22 @@ public class ClientManagerProvider implements IScriptable, IReturnedTypesProvide
 		}
 		return null;
 	}
+
+	/**
+	 * Release all locks acquired by a client
+	 *
+	 * @param clientId
+	 */
+	public void js_releaseLocks(String clientId)
+
+	{
+		try
+		{
+			plugin.getClientService().releaseLocks(clientId);
+		}
+		catch (Exception e)
+		{
+			Debug.error("Exception while shutting down client '" + clientId + "'.", e); //$NON-NLS-1$ //$NON-NLS-2$
+		}
+	}
 }

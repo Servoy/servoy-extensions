@@ -28,4 +28,6 @@ public interface IClientManagerService extends Remote
 
 	JSDataSet getLocks() throws RemoteException;
 
+	void releaseLocks(String client_id) throws RemoteException;
+
 }
