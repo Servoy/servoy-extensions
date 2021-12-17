@@ -35,6 +35,7 @@ import org.slf4j.LoggerFactory;
 
 import com.servoy.extensions.plugins.rest_ws.servlets.RestWSServlet;
 import com.servoy.j2db.documentation.ServoyDocumented;
+import com.servoy.j2db.plugins.IPreShutdownListener;
 import com.servoy.j2db.plugins.IServerAccess;
 import com.servoy.j2db.plugins.IServerPlugin;
 import com.servoy.j2db.plugins.PluginException;
@@ -60,7 +61,7 @@ import com.servoy.j2db.util.serialize.JSONSerializerWrapper;
  */
 @SuppressWarnings("nls")
 @ServoyDocumented
-public class RestWSPlugin implements IServerPlugin
+public class RestWSPlugin implements IServerPlugin, IPreShutdownListener
 {
 	private static final String CLIENT_POOL_SIZE_PROPERTY = "rest_ws_plugin_client_pool_size";
 	private static final String DEPRECATED_CLIENT_POOL_SIZE_PER_SOLUTION_PROPERTY = "rest_ws_plugin_client_pool_size_per_solution";
@@ -84,7 +85,7 @@ public class RestWSPlugin implements IServerPlugin
 	private Boolean shouldReloadSolutionAfterRequest;
 	private Boolean useJSUploadForBinaryData;
 	private IServerAccess application;
-
+	private boolean acceptingRequests = true;
 
 	public void initialize(IServerAccess app) throws PluginException
 	{
@@ -444,5 +445,20 @@ public class RestWSPlugin implements IServerPlugin
 		{
 			return getCause() instanceof JavaScriptException;
 		}
+	}
+
+	@Override
+	public void beforeShutdown()
+	{
+		acceptingRequests = false;
+		if (clientPool == null && !clientPool.isClosed())
+		{
+			clientPool.close();
+		}
+	}
+
+	public boolean isAcceptingRequests()
+	{
+		return acceptingRequests;
 	}
 }

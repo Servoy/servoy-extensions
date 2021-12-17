@@ -35,6 +35,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -86,6 +87,7 @@ import com.servoy.j2db.util.Debug;
 import com.servoy.j2db.util.HTTPUtils;
 import com.servoy.j2db.util.MimeTypes;
 import com.servoy.j2db.util.Pair;
+import com.servoy.j2db.util.ServoyException;
 import com.servoy.j2db.util.Utils;
 
 /**
@@ -196,14 +198,15 @@ public class RestWSServlet extends HttpServlet
 	@Override
 	protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
 	{
+		if (!plugin.isAcceptingRequests())
+		{
+			sendError(response, HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+			return;
+		}
+
 		RestWSServletResponse restWSServletResponse = new RestWSServletResponse(response);
 
-		String value = request.getHeader("Origin");
-		if (value == null)
-		{
-			value = "*";
-		}
-		restWSServletResponse.setHeader("Access-Control-Allow-Origin", value);
+		restWSServletResponse.setHeader("Access-Control-Allow-Origin", Optional.ofNullable(request.getHeader("Origin")).orElse("*"));
 		restWSServletResponse.setHeader("Access-Control-Max-Age", "1728000");
 		restWSServletResponse.setHeader("Access-Control-Allow-Credentials", "true");
 
@@ -220,7 +223,7 @@ public class RestWSServlet extends HttpServlet
 		{
 			restWSServletResponse.setHeader("Access-Control-Expose-Headers", WS_USER_PROPERTIES_HEADER);
 		}
-		value = request.getHeader("Access-Control-Request-Headers");
+		String value = request.getHeader("Access-Control-Request-Headers");
 		if (value != null)
 		{
 			restWSServletResponse.setHeader("Access-Control-Allow-Headers", value);
@@ -318,6 +321,11 @@ public class RestWSServlet extends HttpServlet
 				"Client could not be found. Possible reasons: 1.Client could not be created due to maximum number of licenses reached. 2.Client could not be created due to property mustAuthenticate=true in ws solution. 3.The client pool reached maximum number of clients. 4.An internal error occured. " +
 					request.getRequestURI(),
 				e);
+			errorCode = HttpServletResponse.SC_SERVICE_UNAVAILABLE;
+		}
+		else if (e instanceof ServoyException && ((ServoyException)e).getErrorCode() == ServoyException.MAINTENANCE_MODE)
+		{
+			plugin.log.info("Could not create client while server is in maintenance mode");
 			errorCode = HttpServletResponse.SC_SERVICE_UNAVAILABLE;
 		}
 		else if (e instanceof IllegalArgumentException)
