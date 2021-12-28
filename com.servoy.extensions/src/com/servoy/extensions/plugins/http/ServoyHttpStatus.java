@@ -21,7 +21,7 @@ package com.servoy.extensions.plugins.http;
 /**
  * Dummy class for listing http codes.
  * Full copy of HttpStatus from apache.
- * 
+ *
  * @author acostache
  *
  */
@@ -29,7 +29,7 @@ public interface ServoyHttpStatus
 {
 	// --- 1xx Informational ---
 
-	/** 100 Continue (HTTP/1.1 - RFC 2616) 
+	/** 100 Continue (HTTP/1.1 - RFC 2616)
 	 * @sampleas SC_OK
 	 * */
 	public static final int SC_CONTINUE = 100;
@@ -44,7 +44,7 @@ public interface ServoyHttpStatus
 
 	// --- 2xx Success ---
 
-	/** 200 OK (HTTP/1.0 - RFC 1945) 
+	/** 200 OK (HTTP/1.0 - RFC 1945)
 	 * @sample
 	 * var client = plugins.http.createNewHttpClient();
 	 * var request = client.createGetRequest('http://www.servoy.com');
@@ -60,11 +60,11 @@ public interface ServoyHttpStatus
 	 * }
 	 */
 	public static final int SC_OK = 200;
-	/** 201 Created (HTTP/1.0 - RFC 1945) 
+	/** 201 Created (HTTP/1.0 - RFC 1945)
 	 * @sampleas SC_OK
 	 * */
 	public static final int SC_CREATED = 201;
-	/** 202 Accepted (HTTP/1.0 - RFC 1945) 
+	/** 202 Accepted (HTTP/1.0 - RFC 1945)
 	 * @sampleas SC_OK
 	 */
 	public static final int SC_ACCEPTED = 202;
@@ -72,7 +72,7 @@ public interface ServoyHttpStatus
 	 * @sampleas SC_OK
 	 */
 	public static final int SC_NON_AUTHORITATIVE_INFORMATION = 203;
-	/** 204 No Content (HTTP/1.0 - RFC 1945) 
+	/** 204 No Content (HTTP/1.0 - RFC 1945)
 	 * @sampleas SC_OK
 	 */
 	public static final int SC_NO_CONTENT = 204;
@@ -87,26 +87,34 @@ public interface ServoyHttpStatus
 	/**
 	 * 207 Multi-Status (WebDAV - RFC 2518) or 207 Partial Update
 	 * OK (HTTP/1.1 - draft-ietf-http-v11-spec-rev-01?)
-	 * 
+	 *
 	 * @sampleas SC_OK
 	 */
 	public static final int SC_MULTI_STATUS = 207;
 
+	/**
+	 * response status code indicates the user has sent too many requests in a given amount of time ("rate limiting")
+	 * (RFC 6585)
+	 * 
+	 * @sampleas SC_OK
+	 */
+	public static final int SC_TOO_MANY_REQUESTS = 429;
+
 	// --- 3xx Redirection ---
 
-	/** 300 Mutliple Choices (HTTP/1.1 - RFC 2616) 
+	/** 300 Mutliple Choices (HTTP/1.1 - RFC 2616)
 	 * @sampleas SC_OK
 	 */
 	public static final int SC_MULTIPLE_CHOICES = 300;
-	/** 301 Moved Permanently (HTTP/1.0 - RFC 1945) 
+	/** 301 Moved Permanently (HTTP/1.0 - RFC 1945)
 	 * @sampleas SC_OK
 	 */
 	public static final int SC_MOVED_PERMANENTLY = 301;
-	/** 302 Moved Temporarily (Sometimes Found) (HTTP/1.0 - RFC 1945) 
+	/** 302 Moved Temporarily (Sometimes Found) (HTTP/1.0 - RFC 1945)
 	 * @sampleas SC_OK
 	 */
 	public static final int SC_MOVED_TEMPORARILY = 302;
-	/** 303 See Other (HTTP/1.1 - RFC 2616) 
+	/** 303 See Other (HTTP/1.1 - RFC 2616)
 	 * @sampleas SC_OK
 	 */
 	public static final int SC_SEE_OTHER = 303;
@@ -114,18 +122,18 @@ public interface ServoyHttpStatus
 	 * @sampleas SC_OK
 	 */
 	public static final int SC_NOT_MODIFIED = 304;
-	/** 305 Use Proxy (HTTP/1.1 - RFC 2616) 
+	/** 305 Use Proxy (HTTP/1.1 - RFC 2616)
 	 * @sampleas SC_OK
 	 */
 	public static final int SC_USE_PROXY = 305;
-	/** 307 Temporary Redirect (HTTP/1.1 - RFC 2616) 
+	/** 307 Temporary Redirect (HTTP/1.1 - RFC 2616)
 	 * @sampleas SC_OK
 	 */
 	public static final int SC_TEMPORARY_REDIRECT = 307;
 
 	// --- 4xx Client Error ---
 
-	/** 400 Bad Request (HTTP/1.1 - RFC 2616) 
+	/** 400 Bad Request (HTTP/1.1 - RFC 2616)
 	 * @sampleas SC_OK
 	 */
 	public static final int SC_BAD_REQUEST = 400;
@@ -133,19 +141,19 @@ public interface ServoyHttpStatus
 	 * @sampleas SC_OK
 	 */
 	public static final int SC_UNAUTHORIZED = 401;
-	/** 402 Payment Required (HTTP/1.1 - RFC 2616) 
+	/** 402 Payment Required (HTTP/1.1 - RFC 2616)
 	 * @sampleas SC_OK
 	 */
 	public static final int SC_PAYMENT_REQUIRED = 402;
-	/** 403 Forbidden (HTTP/1.0 - RFC 1945) 
+	/** 403 Forbidden (HTTP/1.0 - RFC 1945)
 	 * @sampleas SC_OK
 	 */
 	public static final int SC_FORBIDDEN = 403;
-	/** 404 Not Found (HTTP/1.0 - RFC 1945) 
+	/** 404 Not Found (HTTP/1.0 - RFC 1945)
 	 * @sampleas SC_OK
 	 */
 	public static final int SC_NOT_FOUND = 404;
-	/** 405 Method Not Allowed (HTTP/1.1 - RFC 2616) 
+	/** 405 Method Not Allowed (HTTP/1.1 - RFC 2616)
 	 * @sampleas SC_OK
 	 */
 	public static final int SC_METHOD_NOT_ALLOWED = 405;
@@ -157,15 +165,15 @@ public interface ServoyHttpStatus
 	 * @sampleas SC_OK
 	 */
 	public static final int SC_PROXY_AUTHENTICATION_REQUIRED = 407;
-	/** 408 Request Timeout (HTTP/1.1 - RFC 2616) 
+	/** 408 Request Timeout (HTTP/1.1 - RFC 2616)
 	 * @sampleas SC_OK
 	 */
 	public static final int SC_REQUEST_TIMEOUT = 408;
-	/** 409 Conflict (HTTP/1.1 - RFC 2616) 
+	/** 409 Conflict (HTTP/1.1 - RFC 2616)
 	 * @sampleas SC_OK
 	 */
 	public static final int SC_CONFLICT = 409;
-	/** 410 Gone (HTTP/1.1 - RFC 2616) 
+	/** 410 Gone (HTTP/1.1 - RFC 2616)
 	 * @sampleas SC_OK
 	 */
 	public static final int SC_GONE = 410;
@@ -185,15 +193,15 @@ public interface ServoyHttpStatus
 	 * @sampleas SC_OK
 	 */
 	public static final int SC_REQUEST_URI_TOO_LONG = 414;
-	/** 415 Unsupported Media Type (HTTP/1.1 - RFC 2616) 
+	/** 415 Unsupported Media Type (HTTP/1.1 - RFC 2616)
 	 * @sampleas SC_OK
 	 */
 	public static final int SC_UNSUPPORTED_MEDIA_TYPE = 415;
-	/** 416 Requested Range Not Satisfiable (HTTP/1.1 - RFC 2616) 
+	/** 416 Requested Range Not Satisfiable (HTTP/1.1 - RFC 2616)
 	 * @sampleas SC_OK
 	 */
 	public static final int SC_REQUESTED_RANGE_NOT_SATISFIABLE = 416;
-	/** 417 Expectation Failed (HTTP/1.1 - RFC 2616) 
+	/** 417 Expectation Failed (HTTP/1.1 - RFC 2616)
 	 * @sampleas SC_OK
 	 */
 	public static final int SC_EXPECTATION_FAILED = 417;
@@ -212,7 +220,7 @@ public interface ServoyHttpStatus
 	 * (WebDAV - draft-ietf-webdav-protocol-05?)
 	 * or 419 Proxy Reauthentication Required
 	 * (HTTP/1.1 drafts?)
-	 * 
+	 *
 	 * @sampleas SC_OK
 	 */
 	public static final int SC_INSUFFICIENT_SPACE_ON_RESOURCE = 419;
@@ -220,7 +228,7 @@ public interface ServoyHttpStatus
 	 * Static constant for a 420 error.
 	 * 420 Method Failure
 	 * (WebDAV - draft-ietf-webdav-protocol-05?)
-	 * 
+	 *
 	 * @sampleas SC_OK
 	 */
 	public static final int SC_METHOD_FAILURE = 420;
@@ -232,14 +240,14 @@ public interface ServoyHttpStatus
 	 * @sampleas SC_OK
 	 */
 	public static final int SC_LOCKED = 423;
-	/** 424 Failed Dependency (WebDAV - RFC 2518) 
+	/** 424 Failed Dependency (WebDAV - RFC 2518)
 	 * @sampleas SC_OK
 	 */
 	public static final int SC_FAILED_DEPENDENCY = 424;
 
 	// --- 5xx Server Error ---
 
-	/** 500 Server Error (HTTP/1.0 - RFC 1945) 
+	/** 500 Server Error (HTTP/1.0 - RFC 1945)
 	 * @sampleas SC_OK
 	 */
 	public static final int SC_INTERNAL_SERVER_ERROR = 500;
@@ -247,7 +255,7 @@ public interface ServoyHttpStatus
 	 * @sampleas SC_OK
 	 */
 	public static final int SC_NOT_IMPLEMENTED = 501;
-	/** 502 Bad Gateway (HTTP/1.0 - RFC 1945) 
+	/** 502 Bad Gateway (HTTP/1.0 - RFC 1945)
 	 * @sampleas SC_OK
 	 */
 	public static final int SC_BAD_GATEWAY = 502;
@@ -255,11 +263,11 @@ public interface ServoyHttpStatus
 	 * @sampleas SC_OK
 	 */
 	public static final int SC_SERVICE_UNAVAILABLE = 503;
-	/** 504 Gateway Timeout (HTTP/1.1 - RFC 2616) 
+	/** 504 Gateway Timeout (HTTP/1.1 - RFC 2616)
 	 * @sampleas SC_OK
 	 */
 	public static final int SC_GATEWAY_TIMEOUT = 504;
-	/** 505 HTTP Version Not Supported (HTTP/1.1 - RFC 2616) 
+	/** 505 HTTP Version Not Supported (HTTP/1.1 - RFC 2616)
 	 * @sampleas SC_OK
 	 */
 	public static final int SC_HTTP_VERSION_NOT_SUPPORTED = 505;
