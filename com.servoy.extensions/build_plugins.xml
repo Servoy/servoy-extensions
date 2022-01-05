@@ -150,7 +150,7 @@
 	</target>
 
 	<target	name="all_plugins"
-			    depends="_all_common_plugins,compile,all_extensions"
+			    depends="_all_common_plugins,compile"
 	/>
 	
 	<target	name="_all_common_plugins"
@@ -161,11 +161,6 @@
 		<!--<ant target="clean"/>-->
 	</target>
 	
-	<target	name="all_extensions"
-				    depends="agent.exp,dialog.exp,http.exp,mail.exp,tabxport.exp,excelxport.exp,pdf_output.exp,file.exp,scheduler.exp,
-	 	   pdf_forms.exp,dbtreeview.exp,jfxpanel.exp,amortization.exp,spellcheck.exp,images.exp,window.exp,udp.exp,rawSQL.exp,openid.exp,
-	 	   xmlreader.exp,serialize.exp,default_validators.exp,converters.exp,rest_ws.exp,headlessclient.exp"/>
-
 	<!--================================================
 		From here on only targets for specific jar files
 		================================================-->
@@ -192,26 +187,6 @@
 		<delete dir="${tempForJar.dir}"/>
 	</target>
 
-	<target name="agent.exp" depends="agent.jar">
-		<delete dir="${tempForJar.dir}"/>
-		<mkdir dir="${tempForJar.dir}"/>
-		<delete file="${extensions.dir}/agent.exp" quiet="true"/>
-		<copy overwrite="true" todir="${tempForJar.dir}">
-			<fileset file="${src_plugins.dir}/agent/package.xml"/>
-		</copy>
-		<copy overwrite="true" todir="${tempForJar.dir}/application_server/plugins">
-			<fileset file="${plugins.dir}/agent.jar"/>
-		</copy>
-		<copy overwrite="true" todir="${tempForJar.dir}/screenshots">
-			<fileset file="${src_plugins.dir}/agent/images/agent.png"/>
-		</copy>
-		<zip	destfile="${extensions.dir}/agent.exp"
-				basedir="${tempForJar.dir}"
-				duplicate="fail"
-		/>
-		<delete dir="${tempForJar.dir}"/>
-	</target>
-	
 	<target name="dialog.jar" depends="compile">
 		<delete dir="${tempForJar.dir}"/>
 		<mkdir dir="${tempForJar.dir}"/>
@@ -234,26 +209,6 @@
 		<delete dir="${tempForJar.dir}"/>
 	</target>
 
-	<target name="dialog.exp" depends="dialog.jar">
-		<delete dir="${tempForJar.dir}"/>
-		<mkdir dir="${tempForJar.dir}"/>
-		<delete file="${extensions.dir}/dialog.exp" quiet="true"/>
-		<copy overwrite="true" todir="${tempForJar.dir}">
-			<fileset file="${src_plugins.dir}/dialog/package.xml"/>
-		</copy>
-		<copy overwrite="true" todir="${tempForJar.dir}/application_server/plugins">
-			<fileset file="${plugins.dir}/dialog.jar"/>
-		</copy>
-		<copy overwrite="true" todir="${tempForJar.dir}/screenshots">
-			<fileset file="${src_plugins.dir}/dialog/images/dialogs.png"/>
-		</copy>
-		<zip	destfile="${extensions.dir}/dialog.exp"
-				basedir="${tempForJar.dir}"
-				duplicate="fail"
-		/>
-		<delete dir="${tempForJar.dir}"/>
-	</target>
-			
 	<target name="http.jar" depends="compile">
 		<delete dir="${tempForJar.dir}"/>
 		<mkdir dir="${tempForJar.dir}"/>
@@ -279,28 +234,6 @@
 		<delete dir="${tempForJar.dir}"/>
 	</target>
 
-
-	<target name="http.exp" depends="http.jar">
-		<delete dir="${tempForJar.dir}"/>
-		<mkdir dir="${tempForJar.dir}"/>
-		<delete file="${extensions.dir}/http.exp" quiet="true"/>
-		<copy overwrite="true" todir="${tempForJar.dir}">
-			<fileset file="${src_plugins.dir}/http/package.xml"/>
-		</copy>
-		<copy overwrite="true" todir="${tempForJar.dir}/application_server/plugins">
-			<fileset file="${plugins.dir}/http.jar"/>
-			<fileset file="resources/http/http.jar.jnlp"/>
-		</copy>
-		<copy overwrite="true" todir="${tempForJar.dir}/screenshots">
-			<fileset file="${src_plugins.dir}/http/images/http.png"/>
-		</copy>
-		<zip	destfile="${extensions.dir}/http.exp"
-				basedir="${tempForJar.dir}"
-				duplicate="fail"
-		/>
-		<delete dir="${tempForJar.dir}"/>
-	</target>
-					
 	<target name="openid.jar" depends="compile">
 		<delete dir="${tempForJar.dir}"/>
 		<mkdir dir="${tempForJar.dir}"/>
@@ -327,30 +260,6 @@
 		<delete dir="${tempForJar.dir}"/>
 	</target>
 
-	<target name="openid.exp" depends="openid.jar">
-		<delete dir="${tempForJar.dir}"/>
-		<mkdir dir="${tempForJar.dir}"/>
-		<delete file="${extensions.dir}/openid.exp" quiet="true"/>
-		<copy overwrite="true" todir="${tempForJar.dir}">
-			<fileset file="${src_plugins.dir}/openid/package.xml"/>
-		</copy>
-		<copy overwrite="true" todir="${tempForJar.dir}/application_server/plugins">
-			<fileset file="${plugins.dir}/openid.jar"/>
-		</copy>
-		<copy overwrite="true" todir="${tempForJar.dir}/application_server/plugins/openid">
-			<fileset file="lib/openid4java.jar"/>
-			<fileset file="lib/guice-2.0.jar"/>
-		</copy>
-		<copy overwrite="true" todir="${tempForJar.dir}/screenshots">
-			<fileset file="${src_plugins.dir}/openid/images/openid.png"/>
-		</copy>
-		<zip	destfile="${extensions.dir}/openid.exp"
-				basedir="${tempForJar.dir}"
-				duplicate="fail"
-		/>
-		<delete dir="${tempForJar.dir}"/>
-	</target>
-	
 	<target name="serialize.jar" depends="compile">
 		<delete dir="${tempForJar.dir}"/>
 		<mkdir dir="${tempForJar.dir}"/>
@@ -376,27 +285,6 @@
 		<delete dir="${tempForJar.dir}"/>
 	</target>
 
-	<target name="serialize.exp" depends="serialize.jar">
-		<delete dir="${tempForJar.dir}"/>
-		<mkdir dir="${tempForJar.dir}"/>
-		<delete file="${extensions.dir}/serialize.exp" quiet="true"/>
-		<copy overwrite="true" todir="${tempForJar.dir}">
-			<fileset file="${src_plugins.dir}/serialize/package.xml"/>
-		</copy>
-		<copy overwrite="true" todir="${tempForJar.dir}/application_server/plugins">
-			<fileset file="${plugins.dir}/serialize.jar"/>
-			<fileset file="resources/http/serialize.jar.jnlp"/>
-		</copy>
-		<copy overwrite="true" todir="${tempForJar.dir}/screenshots">
-			<fileset file="${src_plugins.dir}/serialize/images/serialize.png"/>
-		</copy>
-		<zip	destfile="${extensions.dir}/serialize.exp"
-				basedir="${tempForJar.dir}"
-				duplicate="fail"
-		/>
-		<delete dir="${tempForJar.dir}"/>
-	</target>
-	
 	<target name="converters.jar" depends="compile">
 		<delete dir="${tempForJar.dir}"/>
 		<mkdir dir="${tempForJar.dir}"/>
@@ -413,26 +301,6 @@
 			</fileset>
 		</copy>
 		<jar	destfile="${plugins.dir}/converters.jar"
-				basedir="${tempForJar.dir}"
-				duplicate="fail"
-		/>
-		<delete dir="${tempForJar.dir}"/>
-	</target>
-	
-	<target name="converters.exp" depends="converters.jar">
-		<delete dir="${tempForJar.dir}"/>
-		<mkdir dir="${tempForJar.dir}"/>
-		<delete file="${extensions.dir}/converters.exp" quiet="true"/>
-		<copy overwrite="true" todir="${tempForJar.dir}">
-			<fileset file="${src_plugins.dir}/converters/package.xml"/>
-		</copy>
-		<copy overwrite="true" todir="${tempForJar.dir}/application_server/plugins">
-			<fileset file="${plugins.dir}/converters.jar"/>
-		</copy>
-		<copy overwrite="true" todir="${tempForJar.dir}/screenshots">
-			<fileset file="${src_plugins.dir}/converters/images/converter.gif"/>
-		</copy>
-		<zip	destfile="${extensions.dir}/converters.exp"
 				basedir="${tempForJar.dir}"
 				duplicate="fail"
 		/>
@@ -458,26 +326,6 @@
 		<delete dir="${tempForJar.dir}"/>
 	</target>
 
-	<target name="rest_ws.exp" depends="rest_ws.jar">
-		<delete dir="${tempForJar.dir}"/>
-		<mkdir dir="${tempForJar.dir}"/>
-		<delete file="${extensions.dir}/rest_ws.exp" quiet="true"/>
-		<copy overwrite="true" todir="${tempForJar.dir}">
-			<fileset file="${src_plugins.dir}/rest_ws/package.xml"/>
-		</copy>
-		<copy overwrite="true" todir="${tempForJar.dir}/application_server/plugins">
-			<fileset file="${plugins.dir}/rest_ws.jar"/>
-		</copy>
-		<copy overwrite="true" todir="${tempForJar.dir}/screenshots">
-			<fileset file="${src_plugins.dir}/rest_ws/images/web_services.gif"/>
-		</copy>
-		<zip	destfile="${extensions.dir}/rest_ws.exp"
-				basedir="${tempForJar.dir}"
-				duplicate="fail"
-		/>
-		<delete dir="${tempForJar.dir}"/>
-	</target>
-	
 	<target name="headlessclient.jar" depends="compile">
 		<delete dir="${tempForJar.dir}"/>
 		<mkdir dir="${tempForJar.dir}"/>
@@ -492,26 +340,6 @@
 			</fileset>
 		</copy>
 		<jar	destfile="${plugins.dir}/headlessclient.jar"
-				basedir="${tempForJar.dir}"
-				duplicate="fail"
-		/>
-		<delete dir="${tempForJar.dir}"/>
-	</target>
-	
-	<target name="headlessclient.exp" depends="headlessclient.jar">
-		<delete dir="${tempForJar.dir}"/>
-		<mkdir dir="${tempForJar.dir}"/>
-		<delete file="${extensions.dir}/headlessclient.exp" quiet="true"/>
-		<copy overwrite="true" todir="${tempForJar.dir}">
-			<fileset file="${src_plugins.dir}/headlessclient/package.xml"/>
-		</copy>
-		<copy overwrite="true" todir="${tempForJar.dir}/application_server/plugins">
-			<fileset file="${plugins.dir}/headlessclient.jar"/>
-		</copy>
-		<copy overwrite="true" todir="${tempForJar.dir}/screenshots">
-			<fileset file="${src_plugins.dir}/headlessclient/images/headlessclient.png"/>
-		</copy>
-		<zip	destfile="${extensions.dir}/headlessclient.exp"
 				basedir="${tempForJar.dir}"
 				duplicate="fail"
 		/>
@@ -550,26 +378,6 @@
 		<delete dir="${tempForJar.dir}"/>
 	</target>
 
-	<target name="mail.exp" depends="mail.jar">
-		<delete dir="${tempForJar.dir}"/>
-		<mkdir dir="${tempForJar.dir}"/>
-		<delete file="${extensions.dir}/mail.exp" quiet="true"/>
-		<copy overwrite="true" todir="${tempForJar.dir}">
-			<fileset file="${src_plugins.dir}/mail/package.xml"/>
-		</copy>
-		<copy overwrite="true" todir="${tempForJar.dir}/application_server/plugins">
-			<fileset file="${plugins.dir}/mail.jar"/>
-		</copy>
-		<copy overwrite="true" todir="${tempForJar.dir}/screenshots">
-			<fileset file="${src_plugins.dir}/mail/client/images/mail.png"/>
-		</copy>
-		<zip	destfile="${extensions.dir}/mail.exp"
-				basedir="${tempForJar.dir}"
-				duplicate="fail"
-		/>
-		<delete dir="${tempForJar.dir}"/>
-	</target>
-	
 	<target name="tabxport.jar" depends="compile">
 		<delete dir="${tempForJar.dir}"/>
 		<mkdir dir="${tempForJar.dir}"/>
@@ -592,26 +400,6 @@
 		<delete dir="${tempForJar.dir}"/>
 	</target>
 
-	<target name="tabxport.exp" depends="tabxport.jar">
-		<delete dir="${tempForJar.dir}"/>
-		<mkdir dir="${tempForJar.dir}"/>
-		<delete file="${extensions.dir}/tabxport.exp" quiet="true"/>
-		<copy overwrite="true" todir="${tempForJar.dir}">
-			<fileset file="${src_plugins.dir}/tabxport/package.xml"/>
-		</copy>
-		<copy overwrite="true" todir="${tempForJar.dir}/application_server/plugins">
-			<fileset file="${plugins.dir}/tabxport.jar"/>
-		</copy>
-		<copy overwrite="true" todir="${tempForJar.dir}/screenshots">
-			<fileset file="${src_plugins.dir}/tabxport/images/textexport.png"/>
-		</copy>
-		<zip	destfile="${extensions.dir}/tabxport.exp"
-				basedir="${tempForJar.dir}"
-				duplicate="fail"
-		/>
-		<delete dir="${tempForJar.dir}"/>
-	</target>
-	
 	<target name="excelxport.jar" depends="compile">
 		<delete dir="${tempForJar.dir}"/>
 		<mkdir dir="${tempForJar.dir}"/>
@@ -637,30 +425,6 @@
 		<copy overwrite="true" todir="${plugins.dir}/jakarta-poi">
 			<fileset file="lib/jakarta-poi.jar"/>
 		</copy>
-		<delete dir="${tempForJar.dir}"/>
-	</target>
-
-	<target name="excelxport.exp" depends="excelxport.jar">
-		<delete dir="${tempForJar.dir}"/>
-		<mkdir dir="${tempForJar.dir}"/>
-		<delete file="${extensions.dir}/excelxport.exp" quiet="true"/>
-		<copy overwrite="true" todir="${tempForJar.dir}">
-			<fileset file="${src_plugins.dir}/excelxport/package.xml"/>
-		</copy>
-		<copy overwrite="true" todir="${tempForJar.dir}/application_server/plugins">
-			<fileset file="${plugins.dir}/excelxport.jar"/>
-			<fileset file="resources/excelxport/excelxport.jar.jnlp"/>
-		</copy>
-		<copy overwrite="true" todir="${tempForJar.dir}/application_server/plugins/jakarta-poi">
-			<fileset file="lib/jakarta-poi.jar"/>
-		</copy>
-		<copy overwrite="true" todir="${tempForJar.dir}/screenshots">
-			<fileset file="${src_plugins.dir}/excelxport/images/excelexport.png"/>
-		</copy>
-		<zip	destfile="${extensions.dir}/excelxport.exp"
-				basedir="${tempForJar.dir}"
-				duplicate="fail"
-		/>
 		<delete dir="${tempForJar.dir}"/>
 	</target>
 	
@@ -696,32 +460,6 @@
 		</copy>
 		<delete dir="${tempForJar.dir}"/>
 	</target>
-
-	<target name="pdf_output.exp" depends="pdf_output.jar">
-		<delete dir="${tempForJar.dir}"/>
-		<mkdir dir="${tempForJar.dir}"/>
-		<delete file="${extensions.dir}/pdf_output.exp" quiet="true"/>
-		<copy overwrite="true" todir="${tempForJar.dir}">
-			<fileset file="${src_plugins.dir}/pdf_output/package.xml"/>
-		</copy>
-		<copy overwrite="true" todir="${tempForJar.dir}/application_server/plugins">
-			<fileset file="resources/pdf_output/pdf_output.jar.jnlp"/>
-			<fileset file="${plugins.dir}/pdf_output.jar"/>
-		</copy>
-		<copy overwrite="true" todir="${tempForJar.dir}/application_server/plugins/pdf_output">
-			<fileset file="lib/itext.jar"/>
-			<fileset file="lib/bcmail.jar"/>
-			<fileset file="lib/bcprov.jar"/>
-		</copy>
-		<copy overwrite="true" todir="${tempForJar.dir}/screenshots">
-			<fileset file="${src_plugins.dir}/pdf_output/images/pdf_output.png"/>
-		</copy>
-		<zip	destfile="${extensions.dir}/pdf_output.exp"
-				basedir="${tempForJar.dir}"
-				duplicate="fail"
-		/>
-		<delete dir="${tempForJar.dir}"/>
-	</target>
 	
 	<target name="scheduler.jar" depends="compile">
 		<delete dir="${tempForJar.dir}"/>
@@ -752,30 +490,6 @@
 		<delete dir="${tempForJar.dir}"/>
 	</target>
 
-	<target name="scheduler.exp" depends="scheduler.jar">
-		<delete dir="${tempForJar.dir}"/>
-		<mkdir dir="${tempForJar.dir}"/>
-		<delete file="${extensions.dir}/scheduler.exp" quiet="true"/>
-		<copy overwrite="true" todir="${tempForJar.dir}">
-			<fileset file="${src_plugins.dir}/scheduler/package.xml"/>
-		</copy>
-		<copy overwrite="true" todir="${tempForJar.dir}/application_server/plugins">
-			<fileset file="resources/scheduler/scheduler.jar.jnlp"/>
-			<fileset file="${plugins.dir}/scheduler.jar"/>
-		</copy>
-		<copy overwrite="true" todir="${tempForJar.dir}/application_server/plugins/scheduler">
-			<fileset file="lib/quartz.jar"/>
-		</copy>
-		<copy overwrite="true" todir="${tempForJar.dir}/screenshots">
-			<fileset file="${src_plugins.dir}/scheduler/images/scheduler.png"/>
-		</copy>
-		<zip	destfile="${extensions.dir}/scheduler.exp"
-				basedir="${tempForJar.dir}"
-				duplicate="fail"
-		/>
-		<delete dir="${tempForJar.dir}"/>
-	</target>
-	
 	<target name="pdf_forms.jar" depends="compile">
 		<delete dir="${tempForJar.dir}"/>
 		<mkdir dir="${tempForJar.dir}"/>
@@ -792,32 +506,6 @@
 		<copy overwrite="true" todir="${plugins.dir}/adobe_pdf_forms">
 			<fileset file="lib/jFdfTk.jar"/>
 		</copy>
-	</target>
-
-	<target name="pdf_forms.exp" depends="pdf_forms.jar">
-		<delete dir="${tempForJar.dir}"/>
-		<mkdir dir="${tempForJar.dir}"/>
-		<delete file="${extensions.dir}/pdf_forms.exp" quiet="true"/>
-		<copy overwrite="true" todir="${tempForJar.dir}">
-			<fileset file="${src_plugins.dir}/pdf_forms/package.xml"/>
-		</copy>
-		<copy overwrite="true" todir="${tempForJar.dir}/application_server/plugins">
-			<fileset file="${plugins.dir}/pdf_forms.jar"/>
-		</copy>
-		<copy overwrite="true" todir="${tempForJar.dir}/application_server/plugins/pdf_output">
-			<fileset file="lib/itext.jar"/>
-		</copy>
-		<copy overwrite="true" todir="${tempForJar.dir}/application_server/plugins/adobe_pdf_forms">
-			<fileset file="lib/jFdfTk.jar"/>
-		</copy>
-		<copy overwrite="true" todir="${tempForJar.dir}/screenshots">
-			<fileset file="${src_plugins.dir}/pdf_forms/images/pdf_output.png"/>
-		</copy>
-		<zip	destfile="${extensions.dir}/pdf_forms.exp"
-				basedir="${tempForJar.dir}"
-				duplicate="fail"
-		/>
-		<delete dir="${tempForJar.dir}"/>
 	</target>
 	
 	<target name="file.jar" depends="compile">
@@ -842,26 +530,6 @@
 		<delete dir="${tempForJar.dir}"/>
 	</target>
 
-	<target name="file.exp" depends="file.jar">
-		<delete dir="${tempForJar.dir}"/>
-		<mkdir dir="${tempForJar.dir}"/>
-		<delete file="${extensions.dir}/file.exp" quiet="true"/>
-		<copy overwrite="true" todir="${tempForJar.dir}">
-			<fileset file="${src_plugins.dir}/file/package.xml"/>
-		</copy>
-		<copy overwrite="true" todir="${tempForJar.dir}/application_server/plugins">
-			<fileset file="${plugins.dir}/file.jar"/>
-		</copy>
-		<copy overwrite="true" todir="${tempForJar.dir}/screenshots">
-			<fileset file="${src_plugins.dir}/file/images/file.png"/>
-		</copy>
-		<zip	destfile="${extensions.dir}/file.exp"
-				basedir="${tempForJar.dir}"
-				duplicate="fail"
-		/>
-		<delete dir="${tempForJar.dir}"/>
-	</target>
-	
 	<target name="default_validators.jar" depends="compile">
 		<delete dir="${tempForJar.dir}"/>
 		<mkdir dir="${tempForJar.dir}"/>
@@ -884,26 +552,6 @@
 		<delete dir="${tempForJar.dir}"/>
 	</target>
 
-	<target name="default_validators.exp" depends="default_validators.jar">
-		<delete dir="${tempForJar.dir}"/>
-		<mkdir dir="${tempForJar.dir}"/>
-		<delete file="${extensions.dir}/default_validators.exp" quiet="true"/>
-		<copy overwrite="true" todir="${tempForJar.dir}">
-			<fileset file="${src_plugins.dir}/validators/package.xml"/>
-		</copy>
-		<copy overwrite="true" todir="${tempForJar.dir}/application_server/plugins">
-			<fileset file="${plugins.dir}/default_validators.jar"/>
-		</copy>
-		<copy overwrite="true" todir="${tempForJar.dir}/screenshots">
-			<fileset file="${src_plugins.dir}/validators/images/validators.gif"/>
-		</copy>
-		<zip	destfile="${extensions.dir}/default_validators.exp"
-				basedir="${tempForJar.dir}"
-				duplicate="fail"
-		/>
-		<delete dir="${tempForJar.dir}"/>
-	</target>
-	
 	<target name="dbtreeview.jar" depends="compile">
 		<delete dir="${tempForJar.dir}"/>
 		<mkdir dir="${tempForJar.dir}"/>
@@ -952,29 +600,6 @@
 		<delete dir="${tempForJar.dir}"/>
 	</target>
 	
-	<target name="dbtreeview.exp" depends="dbtreeview.jar">
-		<delete dir="${tempForJar.dir}"/>
-		<mkdir dir="${tempForJar.dir}"/>
-		<delete file="${extensions.dir}/dbtreeview.exp" quiet="true"/>
-		<copy overwrite="true" todir="${tempForJar.dir}">
-			<fileset file="${src_beans.dir}/dbtreeview/package.xml"/>
-		</copy>
-		<copy overwrite="true" todir="${tempForJar.dir}/application_server/beans">
-			<fileset file="${beans.dir}/dbtreeview.jar"/>
-		</copy>
-		<copy overwrite="true" todir="${tempForJar.dir}/application_server/beans">
-			<fileset file="lib/inmethod-grid.jar"/>
-		</copy>
-		<copy overwrite="true" todir="${tempForJar.dir}/screenshots">
-			<fileset file="${src_beans.dir}/dbtreeview/res/icon/DBTreeView32.gif"/>
-		</copy>
-		<zip	destfile="${extensions.dir}/dbtreeview.exp"
-				basedir="${tempForJar.dir}"
-				duplicate="fail"
-		/>
-		<delete dir="${tempForJar.dir}"/>
-	</target>
-	
 	<target name="jfxpanel.jar" depends="compile">
 		<delete dir="${tempForJar.dir}"/>
 		<mkdir dir="${tempForJar.dir}"/>
@@ -1005,24 +630,7 @@
 		/>
 		<delete dir="${tempForJar.dir}"/>
 	</target>
-	
-	<target name="jfxpanel.exp" depends="jfxpanel.jar">
-		<delete dir="${tempForJar.dir}"/>
-		<mkdir dir="${tempForJar.dir}"/>
-		<delete file="${extensions.dir}/jfxpanel.exp" quiet="true"/>
-		<copy overwrite="true" todir="${tempForJar.dir}">
-			<fileset file="${src_beans.dir}/jfxpanel/package.xml"/>
-		</copy>
-		<copy overwrite="true" todir="${tempForJar.dir}/application_server/beans">
-			<fileset file="${beans.dir}/jfxpanel.jar"/>
-		</copy>
-		<zip	destfile="${extensions.dir}/jfxpanel.exp"
-				basedir="${tempForJar.dir}"
-				duplicate="fail"
-		/>
-		<delete dir="${tempForJar.dir}"/>
-	</target>
-	
+		
 	<target name="amortization.jar" depends="compile">
 		<delete dir="${tempForJar.dir}"/>
 		<mkdir dir="${tempForJar.dir}"/>
@@ -1045,26 +653,6 @@
 		<delete dir="${tempForJar.dir}"/>
 	</target>
 
-	<target name="amortization.exp" depends="amortization.jar">
-		<delete dir="${tempForJar.dir}"/>
-		<mkdir dir="${tempForJar.dir}"/>
-		<delete file="${extensions.dir}/amortization.exp" quiet="true"/>
-		<copy overwrite="true" todir="${tempForJar.dir}">
-			<fileset file="${src_plugins.dir}/amortization/package.xml"/>
-		</copy>
-		<copy overwrite="true" todir="${tempForJar.dir}/application_server/plugins">
-			<fileset file="${plugins.dir}/amortization.jar"/>
-		</copy>
-		<copy overwrite="true" todir="${tempForJar.dir}/screenshots">
-			<fileset file="${src_plugins.dir}/amortization/images/amortization.png"/>
-		</copy>
-		<zip	destfile="${extensions.dir}/amortization.exp"
-				basedir="${tempForJar.dir}"
-				duplicate="fail"
-		/>
-		<delete dir="${tempForJar.dir}"/>
-	</target>
-	
 	<target name="spellcheck.jar" depends="compile">
 		<delete dir="${tempForJar.dir}"/>
 		<mkdir dir="${tempForJar.dir}"/>
@@ -1098,31 +686,6 @@
 		<delete dir="${tempForJar.dir}"/>
 	</target>
 
-	<target name="spellcheck.exp" depends="spellcheck.jar">
-		<delete dir="${tempForJar.dir}"/>
-		<mkdir dir="${tempForJar.dir}"/>
-		<delete file="${extensions.dir}/spellcheck.exp" quiet="true"/>
-		<copy overwrite="true" todir="${tempForJar.dir}">
-			<fileset file="${src_plugins.dir}/spellcheck/package.xml"/>
-		</copy>
-		<copy overwrite="true" todir="${tempForJar.dir}/application_server/plugins">
-			<fileset file="${plugins.dir}/spellcheck.jar"/>
-		</copy>
-		<copy overwrite="true" todir="${tempForJar.dir}/application_server/plugins/spellcheck">
-			<fileset file="lib/RapidSpell.jar"/>
-			<fileset file="lib/RapidSpell_US_UK_Dict.jar"/>
-			<fileset file="resources/spellcheck/*.dict"/>
-		</copy>
-		<copy overwrite="true" todir="${tempForJar.dir}/screenshots">
-			<fileset file="${src_plugins.dir}/spellcheck/images/spellcheck.png"/>
-		</copy>
-		<zip	destfile="${extensions.dir}/spellcheck.exp"
-				basedir="${tempForJar.dir}"
-				duplicate="fail"
-		/>
-		<delete dir="${tempForJar.dir}"/>
-	</target>
-	
 	<target name="images.jar" depends="compile">
 		<delete dir="${tempForJar.dir}"/>
 		<mkdir dir="${tempForJar.dir}"/>
@@ -1146,30 +709,6 @@
 		<copy overwrite="true" todir="${plugins.dir}/images">
 			<fileset file="lib/metadataextractor.jar"/>
 		</copy>
-		<delete dir="${tempForJar.dir}"/>
-	</target>
-	
-	<target name="images.exp" depends="images.jar">
-		<delete dir="${tempForJar.dir}"/>
-		<mkdir dir="${tempForJar.dir}"/>
-		<delete file="${extensions.dir}/images.exp" quiet="true"/>
-		<copy overwrite="true" todir="${tempForJar.dir}">
-			<fileset file="${src_plugins.dir}/images/package.xml"/>
-		</copy>
-		<copy overwrite="true" todir="${tempForJar.dir}/application_server/plugins">
-			<fileset file="${plugins.dir}/images.jar"/>
-			<fileset file="resources/images/images.jar.jnlp"/>
-		</copy>
-		<copy overwrite="true" todir="${tempForJar.dir}/application_server/plugins/images">
-			<fileset file="lib/metadataextractor.jar"/>
-		</copy>
-		<copy overwrite="true" todir="${tempForJar.dir}/screenshots">
-			<fileset file="${src_plugins.dir}/images/images.png"/>
-		</copy>
-		<zip	destfile="${extensions.dir}/images.exp"
-				basedir="${tempForJar.dir}"
-				duplicate="fail"
-		/>
 		<delete dir="${tempForJar.dir}"/>
 	</target>
 	
@@ -1201,26 +740,6 @@
 		</copy>
 
 		<jar	destfile="${plugins.dir}/window.jar"
-				basedir="${tempForJar.dir}"
-				duplicate="fail"
-		/>
-		<delete dir="${tempForJar.dir}"/>
-	</target>
-	
-	<target name="window.exp" depends="window.jar">
-		<delete dir="${tempForJar.dir}"/>
-		<mkdir dir="${tempForJar.dir}"/>
-		<delete file="${extensions.dir}/window.exp" quiet="true"/>
-		<copy overwrite="true" todir="${tempForJar.dir}">
-			<fileset file="${src_plugins.dir}/window/package.xml"/>
-		</copy>
-		<copy overwrite="true" todir="${tempForJar.dir}/application_server/plugins">
-			<fileset file="${plugins.dir}/window.jar"/>
-		</copy>
-		<copy overwrite="true" todir="${tempForJar.dir}/screenshots">
-			<fileset file="${src_plugins.dir}/window/images/window.png"/>
-		</copy>
-		<zip	destfile="${extensions.dir}/window.exp"
 				basedir="${tempForJar.dir}"
 				duplicate="fail"
 		/>
@@ -1296,26 +815,6 @@
 		<delete dir="${tempForJar.dir}"/>
 	</target>
 	
-	<target name="udp.exp" depends="udp.jar">
-		<delete dir="${tempForJar.dir}"/>
-		<mkdir dir="${tempForJar.dir}"/>
-		<delete file="${extensions.dir}/udp.exp" quiet="true"/>
-		<copy overwrite="true" todir="${tempForJar.dir}">
-			<fileset file="${src_plugins.dir}/udp/package.xml"/>
-		</copy>
-		<copy overwrite="true" todir="${tempForJar.dir}/application_server/plugins">
-			<fileset file="${plugins.dir}/udp.jar"/>
-		</copy>
-		<copy overwrite="true" todir="${tempForJar.dir}/screenshots">
-			<fileset file="${src_plugins.dir}/udp/images/udp.png"/>
-		</copy>
-		<zip	destfile="${extensions.dir}/udp.exp"
-				basedir="${tempForJar.dir}"
-				duplicate="fail"
-		/>
-		<delete dir="${tempForJar.dir}"/>
-	</target>
-	
 	<target name="rawSQL.jar" depends="compile">
 		<delete dir="${tempForJar.dir}"/>
 		<mkdir dir="${tempForJar.dir}"/>
@@ -1334,26 +833,6 @@
 		<jar	destfile="${plugins.dir}/rawSQL.jar"
 				basedir="${tempForJar.dir}"
 				duplicate="fail"
-		/>
-		<delete dir="${tempForJar.dir}"/>
-	</target>
-
-	<target name="rawSQL.exp" depends="rawSQL.jar">
-		<delete dir="${tempForJar.dir}"/>
-		<mkdir dir="${tempForJar.dir}"/>
-		<delete file="${extensions.dir}/rawSQL.exp" quiet="true"/>
-		<copy overwrite="true" todir="${tempForJar.dir}">
-			<fileset file="${src_plugins.dir}/rawSQL/package.xml"/>
-		</copy>
-		<copy overwrite="true" todir="${tempForJar.dir}/application_server/plugins">
-			<fileset file="${plugins.dir}/rawSQL.jar"/>
-		</copy>
-		<copy overwrite="true" todir="${tempForJar.dir}/screenshots">
-			<fileset file="${src_plugins.dir}/rawSQL/images/raw_sql.png"/>
-		</copy>
-		<zip	destfile="${extensions.dir}/rawSQL.exp"
-			basedir="${tempForJar.dir}"
-			duplicate="fail"
 		/>
 		<delete dir="${tempForJar.dir}"/>
 	</target>
@@ -1380,23 +859,4 @@
 		<delete dir="${tempForJar.dir}"/>
 	</target>
 	
-	<target name="xmlreader.exp" depends="xmlreader.jar">
-		<delete dir="${tempForJar.dir}"/>
-		<mkdir dir="${tempForJar.dir}"/>
-		<delete file="${extensions.dir}/xmlreader.exp" quiet="true"/>
-		<copy overwrite="true" todir="${tempForJar.dir}">
-			<fileset file="${src_plugins.dir}/xmlreader/package.xml"/>
-		</copy>
-		<copy overwrite="true" todir="${tempForJar.dir}/application_server/plugins">
-			<fileset file="${plugins.dir}/xmlreader.jar"/>
-		</copy>
-		<copy overwrite="true" todir="${tempForJar.dir}/screenshots">
-			<fileset file="${src_plugins.dir}/xmlreader/images/xml_reader.png"/>
-		</copy>
-		<zip	destfile="${extensions.dir}/xmlreader.exp"
-			basedir="${tempForJar.dir}"
-			duplicate="fail"
-		/>
-		<delete dir="${tempForJar.dir}"/>
-	</target>
 </project>
