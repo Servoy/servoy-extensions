@@ -1829,7 +1829,7 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 
 			if (fileObj != null) // !cancelled
 			{
-				if (charsetname.contains("UTF")) //$NON-NLS-1$
+				if (charsetname != null && charsetname.contains("UTF")) //$NON-NLS-1$
 				{
 					BOMInputStream bomIn = new BOMInputStream(new FileInputStream(fileObj), false,
 						ByteOrderMark.UTF_8,
