@@ -162,24 +162,7 @@ public class Algorithm implements IScriptable, IJavaScriptType
 	{
 		try
 		{
-			if (alg == null && jwks_url != null)
-			{
-				final JwkProvider jwkStore = new UrlJwkProvider(new URL(jwks_url));
-				if (keyId != null)
-				{
-					jwk = jwkStore.get(keyId);
-					alg = jwk.getAlgorithm();
-				}
-				else
-				{
-					JWTProvider.log.error("JWK error: public key id was not specified");
-				}
-			}
-			else if (privKey == null && pubKey == null)
-			{
-				JWTProvider.log.error("Cannot create algorithm. Both public and private keys cannot be null.");
-				return null;
-			}
+			if (!validateAlgorithm()) return null;
 
 			if (alg.startsWith("HS"))
 				return buildHSAlgorithm();
@@ -195,6 +178,49 @@ public class Algorithm implements IScriptable, IJavaScriptType
 			JWTProvider.log.error(e.getMessage());
 		}
 		return null;
+	}
+
+	/**
+	 * @throws MalformedURLException
+	 * @throws JwkException
+	 */
+	private boolean validateAlgorithm() throws MalformedURLException, JwkException
+	{
+		if (alg != null)
+		{
+			if (alg.startsWith("HS"))
+			{
+				if (pwd == null)
+				{
+					pwd = provider.getSecret();
+				}
+				if (pwd == null)
+				{
+					JWTProvider.log.error("Cannot create a HMAC algorithm, the password was not specified.");
+					return false;
+				}
+			}
+			else if (privKey == null && pubKey == null)
+			{
+				JWTProvider.log.error("Cannot create algorithm. Both public and private keys cannot be null.");
+				return false;
+			}
+		}
+		else if (jwks_url != null)
+		{
+			final JwkProvider jwkStore = new UrlJwkProvider(new URL(jwks_url));
+			if (keyId != null)
+			{
+				jwk = jwkStore.get(keyId);
+				alg = jwk.getAlgorithm();
+			}
+			else
+			{
+				JWTProvider.log.error("JWK error: public key id was not specified");
+				return false;
+			}
+		}
+		return true;
 	}
 
 	private com.auth0.jwt.algorithms.Algorithm buildRSAAlgorithm() throws NoSuchAlgorithmException, InvalidKeySpecException
@@ -234,10 +260,6 @@ public class Algorithm implements IScriptable, IJavaScriptType
 
 	private com.auth0.jwt.algorithms.Algorithm buildHSAlgorithm()
 	{
-		if (pwd == null)
-		{
-			pwd = provider.getSecret();
-		}
 		switch (alg)
 		{
 			case JWTAlgorithms.HS256 :
