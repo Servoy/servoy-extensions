@@ -110,7 +110,7 @@ public class JWTServer implements IServerPlugin, IJWTService
 	{
 		if (clientID == null) return null;
 		Optional<IClientInformation> clientInfo = Arrays.stream(serverAccess.getConnectedClients()).filter(ci -> clientID.equals(ci.getClientID())).findAny();
-		if (clientInfo.isPresent() && clientInfo.get().getApplicationType() != IApplication.CLIENT)
+		if (clientInfo.isPresent() && (clientInfo.get().getApplicationType() != IApplication.CLIENT || serverAccess.isServerProcess(clientID)))
 		{
 			return settings.getProperty(JWT_SECRET_KEY);
 		}
