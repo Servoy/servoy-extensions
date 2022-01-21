@@ -31,8 +31,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.net.URI;
 import java.net.URL;
-import java.net.URLEncoder;
 import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
 import java.rmi.RemoteException;
@@ -2933,10 +2933,10 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 		if (file.getAbstractFile() instanceof RemoteFile)
 		{
 			if (!file.js_exists()) throw new RuntimeException("File " + file.js_getName() + " does not exist on the server");
-			String serverURL = plugin.getClientPluginAccess().getServerURL().toURI().toString();
-			serverURL = serverURL.endsWith("/") ? serverURL : serverURL + '/';
-			String encodedPath = URLEncoder.encode(file.js_getAbsolutePath().substring(1), "UTF-8");
-			return new URL(serverURL + "servoy-service/file/" + encodedPath).toURI().toString();
+			URL serverUrl = plugin.getClientPluginAccess().getServerURL();
+			String serverPath = serverUrl.getPath().endsWith("/") ? serverUrl.getPath() : serverUrl.getPath() + '/';
+			return new URI(serverUrl.getProtocol(), serverUrl.getAuthority(), serverPath + "servoy-service/file" + file.js_getAbsolutePath(), null, null)
+				.toURL().toString();
 		}
 		throw new RuntimeException("File " + file.js_getName() + " is not a remote file");
 	}
@@ -3034,7 +3034,7 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 		}
 		else
 		{
-			throw new RuntimeException("Can stream " + file + " because the file does not exists");
+			throw new RuntimeException("Can't stream " + file + " because the file does not exists");
 		}
 	}
 
