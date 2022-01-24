@@ -28,8 +28,8 @@
 		<scribejava.version>8.3.1</scribejava.version>
 		<amqp.version>5.7.0</amqp.version>
 		<doc.version>1.5.0</doc.version>
-		<pdfbox.version>2.0.24</pdfbox.version>
-		<fontbox.version>2.0.24</fontbox.version>
+		<pdfbox.version>2.0.25</pdfbox.version>
+		<fontbox.version>2.0.25</fontbox.version>
 		<jwt.version>3.9.0</jwt.version>
 		<fasterxml.version>2.12.2</fasterxml.version>
 		<jwks.version>0.20.0</jwks.version>
@@ -379,10 +379,6 @@
 									<copy overwrite="true"
 										todir="${project.build.directory}/plugins_beans/plugins/pdf_output">
 										<fileset file="${project.basedir}/lib/itext.jar" />
-										<fileset file="${project.basedir}/lib/bcmail.jar" />
-										<fileset file="${project.basedir}/lib/bcprov.jar" />
-										<fileset file="${project.basedir}/lib/pdfbox.jar" />
-										<fileset file="${project.basedir}/lib/fontbox.jar" />
 									</copy>
 									<makejar srcdir="rawSQL" />
 									<makejar srcdir="rest_ws" />
@@ -511,6 +507,22 @@
 									<destFileName>fontbox.jar</destFileName>
 								</artifactItem>
 								<artifactItem>
+                                    <groupId>org.bouncycastle</groupId>
+                                    <artifactId>bcprov-jdk15on</artifactId>
+                                    <version>1.70</version>
+									<overWrite>true</overWrite>
+									<outputDirectory>${project.build.directory}/plugins_beans/plugins/pdf_output</outputDirectory>
+									<destFileName>bcprov.jar</destFileName>
+								</artifactItem>
+                                <artifactItem>
+                                    <groupId>org.bouncycastle</groupId>
+                                    <artifactId>bcmail-jdk15on</artifactId>
+                                    <version>1.70</version>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>${project.build.directory}/plugins_beans/plugins/pdf_output</outputDirectory>
+                                    <destFileName>bcmail.jar</destFileName>
+                                </artifactItem>
+								<artifactItem>
 									<groupId>com.auth0</groupId>
 									<artifactId>java-jwt</artifactId>
 									<version>${jwt.version}</version>
@@ -606,7 +618,29 @@
 										<arg
 											value="${project.build.directory}/plugins_beans/plugins/pdf_output/pdfbox.jar" />
 									</exec>
-									<exec
+                                    <exec
+                                        dir="${project.build.directory}/plugins_beans/plugins/pdf_output/"
+                                        executable="pack200"
+                                        output="${project.build.directory}/bcprov_repack200b.txt"
+                                        failonerror="true">
+                                        <arg value="-J-Xmx512m" />
+                                        <arg value="-r" />
+                                        <!-- This may break some features <arg value="-O" /> -->
+                                        <arg
+                                            value="${project.build.directory}/plugins_beans/plugins/pdf_output/bcprov.jar" />
+                                    </exec>
+                                    <exec
+                                        dir="${project.build.directory}/plugins_beans/plugins/pdf_output/"
+                                        executable="pack200"
+                                        output="${project.build.directory}/bcmail_repack200b.txt"
+                                        failonerror="true">
+                                        <arg value="-J-Xmx512m" />
+                                        <arg value="-r" />
+                                        <!-- This may break some features <arg value="-O" /> -->
+                                        <arg
+                                            value="${project.build.directory}/plugins_beans/plugins/pdf_output/bcmail.jar" />
+                                    </exec>
+                                    <exec
 										dir="${project.build.directory}/plugins_beans/plugins/jwt/"
 										executable="pack200"
 										output="${project.build.directory}/java-jwt_repack200b.txt"
@@ -684,6 +718,16 @@
 										alias="ServoyClient" storepass="${jarsigner.storepass}"
 										tsaurl="http://sha256timestamp.ws.symantec.com/sha256/timestamp"
 										sigalg="SHA256withRSA" digestalg="SHA-256" />
+                                    <signjar keystore="${jarsigner.keystore}"
+                                        jar="${project.build.directory}/plugins_beans/plugins/pdf_output/bcprov.jar"
+                                        alias="ServoyClient" storepass="${jarsigner.storepass}"
+                                        tsaurl="http://sha256timestamp.ws.symantec.com/sha256/timestamp"
+                                        sigalg="SHA256withRSA" digestalg="SHA-256" />
+                                    <signjar keystore="${jarsigner.keystore}"
+                                        jar="${project.build.directory}/plugins_beans/plugins/pdf_output/bcmail.jar"
+                                        alias="ServoyClient" storepass="${jarsigner.storepass}"
+                                        tsaurl="http://sha256timestamp.ws.symantec.com/sha256/timestamp"
+                                        sigalg="SHA256withRSA" digestalg="SHA-256" />
 									<signjar keystore="${jarsigner.keystore}"
 										jar="${project.build.directory}/plugins_beans/plugins/jwt/java-jwt.jar"
 										alias="ServoyClient" storepass="${jarsigner.storepass}"
