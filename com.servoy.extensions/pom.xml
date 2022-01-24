@@ -509,7 +509,7 @@
 								<artifactItem>
                                     <groupId>org.bouncycastle</groupId>
                                     <artifactId>bcprov-jdk15on</artifactId>
-                                    <version>1.70</version>
+                                    <version>1.64</version>
 									<overWrite>true</overWrite>
 									<outputDirectory>${project.build.directory}/plugins_beans/plugins/pdf_output</outputDirectory>
 									<destFileName>bcprov.jar</destFileName>
@@ -517,7 +517,7 @@
                                 <artifactItem>
                                     <groupId>org.bouncycastle</groupId>
                                     <artifactId>bcmail-jdk15on</artifactId>
-                                    <version>1.70</version>
+                                    <version>1.64</version>
                                     <overWrite>true</overWrite>
                                     <outputDirectory>${project.build.directory}/plugins_beans/plugins/pdf_output</outputDirectory>
                                     <destFileName>bcmail.jar</destFileName>
