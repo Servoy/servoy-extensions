@@ -35,6 +35,7 @@ import com.servoy.base.scripting.annotations.ServoyClientSupport;
 import com.servoy.base.solutionmodel.IBaseSMVariable;
 import com.servoy.j2db.documentation.ServoyDocumented;
 import com.servoy.j2db.plugins.IAllWebClientPluginAccess;
+import com.servoy.j2db.plugins.INGClientPluginAccess;
 import com.servoy.j2db.scripting.FunctionDefinition;
 import com.servoy.j2db.scripting.IJavaScriptType;
 import com.servoy.j2db.scripting.IScriptable;
@@ -406,6 +407,7 @@ public class OAuthServiceBuilder implements IScriptable, IJavaScriptType
 					}
 					fd.executeAsync(provider.getPluginAccess(),
 						new Object[] { errorMessage != null ? Boolean.FALSE : Boolean.TRUE, errorMessage != null ? errorMessage : service });
+					((INGClientPluginAccess)provider.getPluginAccess()).replaceUrlState();
 				}
 				catch (InterruptedException e)
 				{
