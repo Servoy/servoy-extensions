@@ -30,6 +30,7 @@ import org.mozilla.javascript.annotations.JSFunction;
 import com.github.scribejava.core.builder.ServiceBuilder;
 import com.github.scribejava.core.builder.api.DefaultApi20;
 import com.github.scribejava.core.oauth.AuthorizationUrlBuilder;
+import com.github.scribejava.core.oauth.OAuth20Service;
 import com.github.scribejava.core.utils.Preconditions;
 import com.servoy.base.scripting.annotations.ServoyClientSupport;
 import com.servoy.base.solutionmodel.IBaseSMVariable;
@@ -251,11 +252,46 @@ public class OAuthServiceBuilder implements IScriptable, IJavaScriptType
 			{
 				if (id instanceof String && scriptable.get((String)id, null) instanceof String)
 				{
+					if ("redirect_uri".equals(id))
+					{
+						throw new IllegalArgumentException(
+							"The redirect url cannot be used as an additional parameter because it is automatically generated when using the builder.");
+					}
+					if ("response_mode".equals(id) || "response_type".equals(id))
+					{
+						throw new IllegalArgumentException(
+							id + " cannot be used as an additional parameter. Please use the corresponding method on the builder.");
+					}
 					additionalParameters.put((String)id, (String)scriptable.get((String)id, null));
 				}
 			}
 		}
 		return this;
+	}
+
+	/**
+	 * Get the authorization url. This is for DEBUGGING PURPOSES ONLY.
+	 * @param api an OAuth provider id, see plugins.oauth.OAuthProviders
+	 * @return the used authorization url
+	 * @throws Exception if the service could not be built.
+	 */
+	@JSFunction
+	public String getUsedAuthorizationURL(String api) throws Exception
+	{
+		OAuthService service = build(OAuthProvider.getApiInstance(api, _tenant, _domain));
+		return buildAuthUrl(service);
+	}
+
+	/**
+	 * Get the authorization url. This is for DEBUGGING PURPOSES ONLY.
+	 * @param api a custom api builder
+	 * @return the used authorization url
+	 */
+	@JSFunction
+	public String getUsedAuthorizationURL(CustomApiBuilder api)
+	{
+		OAuth20Service service = builder.build(api.build());
+		return buildAuthUrl(new OAuthService(service, _state));
 	}
 
 	/**
