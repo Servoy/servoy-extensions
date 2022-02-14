@@ -48,8 +48,22 @@ public class CustomApiBuilder
 	public CustomApiBuilder(String authorizationBaseUrl, String accessTokenEndpoint)
 	{
 		super();
-		this.authorizationBaseUrl = authorizationBaseUrl;
-		this.accessTokenEndpoint = accessTokenEndpoint;
+		if (authorizationBaseUrl == null) throw new NullPointerException("The authorization base url cannot be null");
+		if (accessTokenEndpoint == null) throw new NullPointerException("The accessToken endpoint cannot be null");
+		this.authorizationBaseUrl = cleanURL(authorizationBaseUrl);
+		this.accessTokenEndpoint = cleanURL(accessTokenEndpoint);
+	}
+
+	/**
+	 * @param authorizationBaseUrl
+	 * @return
+	 */
+	private String cleanURL(String toClean)
+	{
+		if (toClean == null) return null;
+		String url = toClean.trim();
+		return url.endsWith("/") ? url.substring(0, url.length() - 1)
+			: url;
 	}
 
 	/**
@@ -75,7 +89,7 @@ public class CustomApiBuilder
 	@JSFunction
 	public CustomApiBuilder withRefreshTokenEndpoint(String refreshTokenEndpoint)
 	{
-		this._refreshTokenEndpoint = refreshTokenEndpoint;
+		this._refreshTokenEndpoint = cleanURL(refreshTokenEndpoint);
 		return this;
 	}
 
@@ -87,7 +101,7 @@ public class CustomApiBuilder
 	@JSFunction
 	public CustomApiBuilder withRevokeTokenEndpoint(String revokeTokenEndpoint)
 	{
-		this._revokeTokenEndpoint = revokeTokenEndpoint;
+		this._revokeTokenEndpoint = cleanURL(revokeTokenEndpoint);
 		return this;
 	}
 
