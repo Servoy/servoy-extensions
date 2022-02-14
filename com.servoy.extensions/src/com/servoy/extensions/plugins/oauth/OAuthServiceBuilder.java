@@ -278,6 +278,9 @@ public class OAuthServiceBuilder implements IScriptable, IJavaScriptType
 	public String getUsedAuthorizationURL(String api) throws Exception
 	{
 		OAuthService service = build(OAuthProvider.getApiInstance(api, _tenant, _domain));
+		String deeplink_name = getDeeplinkName();
+		String redirectURL = provider.getRedirectURL(deeplink_name, isFragmentResponse());
+		builder.callback(redirectURL);
 		return buildAuthUrl(service);
 	}
 
@@ -290,6 +293,9 @@ public class OAuthServiceBuilder implements IScriptable, IJavaScriptType
 	public String getUsedAuthorizationURL(CustomApiBuilder api)
 	{
 		OAuth20Service service = builder.build(api.build());
+		String deeplink_name = getDeeplinkName();
+		String redirectURL = provider.getRedirectURL(deeplink_name, isFragmentResponse());
+		builder.callback(redirectURL);
 		return buildAuthUrl(new OAuthService(service, _state));
 	}
 
