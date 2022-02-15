@@ -491,4 +491,26 @@ public class OAuthService implements IScriptable, IJavaScriptType
 		}
 		return idToken;
 	}
+
+	/**
+	 * @param params
+	 * @throws Exception
+	 */
+	public void setAccessToken(AccessTokenRequestParams params) throws Exception
+	{
+		try
+		{
+			this.accessToken = service.getAccessToken(params);
+			if (accessToken != null && accessToken.getExpiresIn() != null)
+			{
+				this.accessTokenExpire = System.currentTimeMillis() + accessToken.getExpiresIn().longValue() * 1000;
+			}
+		}
+		catch (IOException | InterruptedException | ExecutionException e)
+		{
+			log.error("Could not set the access token.", e);
+			throw new Exception("Could not set the access token. See the log for more details");
+		}
+
+	}
 }

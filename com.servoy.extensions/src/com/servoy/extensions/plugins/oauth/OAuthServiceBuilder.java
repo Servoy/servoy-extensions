@@ -29,6 +29,7 @@ import org.mozilla.javascript.annotations.JSFunction;
 
 import com.github.scribejava.core.builder.ServiceBuilder;
 import com.github.scribejava.core.builder.api.DefaultApi20;
+import com.github.scribejava.core.oauth.AccessTokenRequestParams;
 import com.github.scribejava.core.oauth.AuthorizationUrlBuilder;
 import com.github.scribejava.core.oauth.OAuth20Service;
 import com.github.scribejava.core.utils.Preconditions;
@@ -61,6 +62,8 @@ public class OAuthServiceBuilder implements IScriptable, IJavaScriptType
 	private final Map<String, String> additionalParameters = new HashMap<>();
 	private String responseType;
 	private String responseMode;
+	private boolean withPKCE = false;
+	private AuthorizationUrlBuilder authUrlBuilder;
 
 	private static final String GET_CODE_METHOD = "getSvyOAuthCode";
 	private static final String SVY_AUTH_CODE_VAR = "svy_authCode";
@@ -270,6 +273,19 @@ public class OAuthServiceBuilder implements IScriptable, IJavaScriptType
 	}
 
 	/**
+	 * Configures the service with Proof Key for Code Exchange, which prevents authorization code interception attacks.
+	 * See more at https://datatracker.ietf.org/doc/html/rfc7636.
+	 * @return the service builder for method chaining
+	 */
+	@JSFunction
+	public OAuthServiceBuilder withPKCE()
+	{
+		this.withPKCE = true;
+		return this;
+	}
+
+
+	/**
 	 * Get the authorization url. This is for DEBUGGING PURPOSES ONLY.
 	 * @param api an OAuth provider id, see plugins.oauth.OAuthProviders
 	 * @return the used authorization url
@@ -391,7 +407,16 @@ public class OAuthServiceBuilder implements IScriptable, IJavaScriptType
 									if (result.has("code", result))
 									{
 										//authorization code flow
-										service.setAccessToken((String)(result.get("code", result)));
+										String code2 = (String)(result.get("code", result));
+										if (withPKCE)
+										{
+											service.setAccessToken(AccessTokenRequestParams.create(code2)
+												.pkceCodeVerifier(authUrlBuilder.getPkce().getCodeVerifier()).setExtraParameters(additionalParameters));
+										}
+										else
+										{
+											service.setAccessToken(code2);
+										}
 									}
 									else if (result.has("access_token", result))
 									{
@@ -483,9 +508,10 @@ public class OAuthServiceBuilder implements IScriptable, IJavaScriptType
 
 	private String buildAuthUrl(OAuthService service)
 	{
-		AuthorizationUrlBuilder authUrlBuilder = service.getAuthorizatinUrlBuilder();
+		this.authUrlBuilder = service.getAuthorizatinUrlBuilder();
 		if (_state != null) authUrlBuilder.state(_state);
 		if (!additionalParameters.isEmpty()) authUrlBuilder = authUrlBuilder.additionalParams(additionalParameters);
+		if (withPKCE) authUrlBuilder = authUrlBuilder.initPKCE();
 		String authURL = authUrlBuilder.build();
 		if (OAuthService.log.isDebugEnabled()) OAuthService.log.debug("authorization url " + authURL);
 		return authURL;
