@@ -349,10 +349,13 @@
 									<copy overwrite="true"
 										todir="${project.build.directory}/plugins_beans/plugins/jwt">
 										<fileset file="${project.basedir}/lib/java-jwt.jar" />
+										<fileset file="${project.basedir}/lib/jwks-rsa.jar" />
+									</copy>
+									<copy overwrite="true"
+										todir="${project.build.directory}/plugins_beans/plugins/jackson">
 										<fileset file="${project.basedir}/lib/jackson-annotations.jar" />
 										<fileset file="${project.basedir}/lib/jackson-core.jar" />
 										<fileset file="${project.basedir}/lib/jackson-databind.jar" />
-										<fileset file="${project.basedir}/lib/jwks-rsa.jar" />
 									</copy>
 									<makejar srcdir="mail"
 										includes=",META-INF/services/com.servoy.j2db.plugins.IPlugin" />
@@ -362,7 +365,7 @@
 										<fileset file="${project.basedir}/lib/openid4java.jar" />
 										<fileset file="${project.basedir}/lib/guice-2.0.jar" />
 									</copy>
-									<makejar srcdir="oauth" />
+									<makejar srcdir="oauth" manifest="${project.basedir}/resources/oauth/MANIFEST.MF"/>
 									<makejar srcdir="pdf_forms" />
 									<copy overwrite="true"
 										todir="${project.build.directory}/plugins_beans/plugins/adobe_pdf_forms">
@@ -543,7 +546,7 @@
 									<artifactId>jackson-databind</artifactId>
 									<version>${fasterxml.version}</version>
 									<overWrite>true</overWrite>
-									<outputDirectory>${project.build.directory}/plugins_beans/plugins/jwt</outputDirectory>
+									<outputDirectory>${project.build.directory}/plugins_beans/plugins/jackson</outputDirectory>
 									<destFileName>jackson-databind.jar</destFileName>
 								</artifactItem>
 								<artifactItem>
@@ -551,7 +554,7 @@
 									<artifactId>jackson-annotations</artifactId>
 									<version>${fasterxml.version}</version>
 									<overWrite>true</overWrite>
-									<outputDirectory>${project.build.directory}/plugins_beans/plugins/jwt</outputDirectory>
+									<outputDirectory>${project.build.directory}/plugins_beans/plugins/jackson</outputDirectory>
 									<destFileName>jackson-annotations.jar</destFileName>
 								</artifactItem>
 								<artifactItem>
@@ -559,7 +562,7 @@
 									<artifactId>jackson-core</artifactId>
 									<version>${fasterxml.version}</version>
 									<overWrite>true</overWrite>
-									<outputDirectory>${project.build.directory}/plugins_beans/plugins/jwt</outputDirectory>
+									<outputDirectory>${project.build.directory}/plugins_beans/plugins/jackson</outputDirectory>
 									<destFileName>jackson-core.jar</destFileName>
 								</artifactItem>
 								<artifactItem>
@@ -652,7 +655,7 @@
 											value="${project.build.directory}/plugins_beans/plugins/jwt/java-jwt.jar" />
 									</exec>
 									<exec
-										dir="${project.build.directory}/plugins_beans/plugins/jwt/"
+										dir="${project.build.directory}/plugins_beans/plugins/jackson/"
 										executable="pack200"
 										output="${project.build.directory}/jackson-annotations_repack200b.txt"
 										failonerror="true">
@@ -660,10 +663,10 @@
 										<arg value="-r" />
 										<!-- This may break some features <arg value="-O" /> -->
 										<arg
-											value="${project.build.directory}/plugins_beans/plugins/jwt/jackson-annotations.jar" />
+											value="${project.build.directory}/plugins_beans/plugins/jackson/jackson-annotations.jar" />
 									</exec>
 									<exec
-										dir="${project.build.directory}/plugins_beans/plugins/jwt/"
+										dir="${project.build.directory}/plugins_beans/plugins/jackson/"
 										executable="pack200"
 										output="${project.build.directory}/jackson-core_repack200b.txt"
 										failonerror="true">
@@ -671,10 +674,10 @@
 										<arg value="-r" />
 										<!-- This may break some features <arg value="-O" /> -->
 										<arg
-											value="${project.build.directory}/plugins_beans/plugins/jwt/jackson-core.jar" />
+											value="${project.build.directory}/plugins_beans/plugins/jackson/jackson-core.jar" />
 									</exec>
 									<exec
-										dir="${project.build.directory}/plugins_beans/plugins/jwt/"
+										dir="${project.build.directory}/plugins_beans/plugins/jackson/"
 										executable="pack200"
 										output="${project.build.directory}/jackson-databind_repack200b.txt"
 										failonerror="true">
@@ -682,7 +685,7 @@
 										<arg value="-r" />
 										<!-- This may break some features <arg value="-O" /> -->
 										<arg
-											value="${project.build.directory}/plugins_beans/plugins/jwt/jackson-databind.jar" />
+											value="${project.build.directory}/plugins_beans/plugins/jackson/jackson-databind.jar" />
 									</exec>
 									<exec
                                         dir="${project.build.directory}/plugins_beans/plugins/images/"
@@ -734,17 +737,22 @@
 										tsaurl="http://sha256timestamp.ws.symantec.com/sha256/timestamp"
 										sigalg="SHA256withRSA" digestalg="SHA-256" />
 									<signjar keystore="${jarsigner.keystore}"
-										jar="${project.build.directory}/plugins_beans/plugins/jwt/jackson-annotations.jar"
+										jar="${project.build.directory}/plugins_beans/plugins/jwt/jwks-rsa.jar"
 										alias="ServoyClient" storepass="${jarsigner.storepass}"
 										tsaurl="http://sha256timestamp.ws.symantec.com/sha256/timestamp"
 										sigalg="SHA256withRSA" digestalg="SHA-256" />
 									<signjar keystore="${jarsigner.keystore}"
-										jar="${project.build.directory}/plugins_beans/plugins/jwt/jackson-core.jar"
+										jar="${project.build.directory}/plugins_beans/plugins/jackson/jackson-annotations.jar"
 										alias="ServoyClient" storepass="${jarsigner.storepass}"
 										tsaurl="http://sha256timestamp.ws.symantec.com/sha256/timestamp"
 										sigalg="SHA256withRSA" digestalg="SHA-256" />
 									<signjar keystore="${jarsigner.keystore}"
-										jar="${project.build.directory}/plugins_beans/plugins/jwt/jackson-databind.jar"
+										jar="${project.build.directory}/plugins_beans/plugins/jackson/jackson-core.jar"
+										alias="ServoyClient" storepass="${jarsigner.storepass}"
+										tsaurl="http://sha256timestamp.ws.symantec.com/sha256/timestamp"
+										sigalg="SHA256withRSA" digestalg="SHA-256" />
+									<signjar keystore="${jarsigner.keystore}"
+										jar="${project.build.directory}/plugins_beans/plugins/jackson/jackson-databind.jar"
 										alias="ServoyClient" storepass="${jarsigner.storepass}"
 										tsaurl="http://sha256timestamp.ws.symantec.com/sha256/timestamp"
 										sigalg="SHA256withRSA" digestalg="SHA-256" />
