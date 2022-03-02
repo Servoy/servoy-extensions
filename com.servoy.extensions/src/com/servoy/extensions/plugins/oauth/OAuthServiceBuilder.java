@@ -474,7 +474,7 @@ public class OAuthServiceBuilder implements IScriptable, IJavaScriptType
 					}
 					fd.executeAsync(provider.getPluginAccess(),
 						new Object[] { errorMessage != null ? Boolean.FALSE : Boolean.TRUE, errorMessage != null ? errorMessage : service });
-					((INGClientPluginAccess)provider.getPluginAccess()).replaceUrlState();
+					((INGClientPluginAccess)provider.getPluginAccess()).clearUrlState();
 				}
 				catch (InterruptedException e)
 				{
