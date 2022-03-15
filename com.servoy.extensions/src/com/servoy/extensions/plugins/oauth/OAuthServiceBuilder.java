@@ -63,7 +63,6 @@ public class OAuthServiceBuilder implements IScriptable, IJavaScriptType
 	private String responseType;
 	private String responseMode;
 	private boolean withPKCE = false;
-	private AuthorizationUrlBuilder authUrlBuilder;
 
 	private static final String GET_CODE_METHOD = "getSvyOAuthCode";
 	private static final String SVY_AUTH_CODE_VAR = "svy_authCode";
@@ -298,7 +297,7 @@ public class OAuthServiceBuilder implements IScriptable, IJavaScriptType
 		String redirectURL = provider.getRedirectURL(deeplink_name, isFragmentResponse());
 		builder.callback(redirectURL);
 		OAuthService service = build(OAuthProvider.getApiInstance(api, _tenant, _domain));
-		return buildAuthUrl(service);
+		return getAuthUrlBuilder(service).build();
 	}
 
 	/**
@@ -313,7 +312,7 @@ public class OAuthServiceBuilder implements IScriptable, IJavaScriptType
 		String redirectURL = provider.getRedirectURL(deeplink_name, isFragmentResponse());
 		builder.callback(redirectURL);
 		OAuth20Service service = builder.build(api.build());
-		return buildAuthUrl(new OAuthService(service, _state));
+		return getAuthUrlBuilder(new OAuthService(service, _state)).build();
 	}
 
 	/**
@@ -378,7 +377,8 @@ public class OAuthServiceBuilder implements IScriptable, IJavaScriptType
 
 		try
 		{
-			String authURL = buildAuthUrl(service);
+			AuthorizationUrlBuilder authUrlBuilder = getAuthUrlBuilder(service);
+			String authURL = authUrlBuilder.build();
 			ExecutorService executor = provider.getPluginAccess().getExecutor();
 			executor.execute(() -> {
 				try
@@ -506,15 +506,17 @@ public class OAuthServiceBuilder implements IScriptable, IJavaScriptType
 		return service;
 	}
 
-	private String buildAuthUrl(OAuthService service)
+	private AuthorizationUrlBuilder getAuthUrlBuilder(OAuthService service)
 	{
-		this.authUrlBuilder = service.getAuthorizatinUrlBuilder();
+		AuthorizationUrlBuilder authUrlBuilder = service.getAuthorizatinUrlBuilder();
 		if (_state != null) authUrlBuilder.state(_state);
 		if (!additionalParameters.isEmpty()) authUrlBuilder = authUrlBuilder.additionalParams(additionalParameters);
 		if (withPKCE) authUrlBuilder = authUrlBuilder.initPKCE();
-		String authURL = authUrlBuilder.build();
-		if (OAuthService.log.isDebugEnabled()) OAuthService.log.debug("authorization url " + authURL);
-		return authURL;
+		if (OAuthService.log.isDebugEnabled()) {
+			String authURL = authUrlBuilder.build();
+			OAuthService.log.debug("authorization url " + authURL);
+		}
+		return authUrlBuilder;
 	}
 
 	private String toJsonString(Scriptable result)
