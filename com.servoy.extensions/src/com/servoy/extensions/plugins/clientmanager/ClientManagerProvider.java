@@ -340,6 +340,8 @@ public class ClientManagerProvider implements IScriptable, IReturnedTypesProvide
 	/**
 	 * Release all locks acquired by a client
 	 *
+	 * WARNING: use with care
+	 *
 	 * @param clientId
 	 */
 	public void js_releaseLocks(String clientId)
