@@ -20,6 +20,7 @@ import java.util.Map;
 
 import com.servoy.j2db.dataprocessing.ITypedColumnConverter;
 import com.servoy.j2db.persistence.IColumnTypes;
+import com.servoy.j2db.util.Debug;
 import com.servoy.j2db.util.serialize.JSONSerializerWrapper;
 
 public class StringSerializer implements ITypedColumnConverter
@@ -31,16 +32,32 @@ public class StringSerializer implements ITypedColumnConverter
 		plugin = p;
 	}
 
-	public Object convertFromObject(Map props, int column_type, Object obj) throws Exception
+	public Object convertFromObject(Map<String, String> props, int column_type, Object obj) throws Exception
 	{
 		if (obj == null) return null;
-		return plugin.getJSONSerializer().toJSON(obj).toString();
+		try
+		{
+			return plugin.getJSONSerializer().toJSON(obj).toString();
+		}
+		catch (Exception e)
+		{
+			Debug.error("Error converting object '" + obj + "' to a json value"); //$NON-NLS-1$ //$NON-NLS-2$
+			throw e;
+		}
 	}
 
-	public Object convertToObject(Map props, int column_type, Object dbvalue) throws Exception
+	public Object convertToObject(Map<String, String> props, int column_type, Object dbvalue) throws Exception
 	{
 		if (dbvalue == null) return null;
-		return plugin.getJSONSerializer().fromJSON(plugin.getClientPluginAccess().getDatabaseManager(), dbvalue.toString());
+		try
+		{
+			return plugin.getJSONSerializer().fromJSON(plugin.getClientPluginAccess().getDatabaseManager(), dbvalue.toString());
+		}
+		catch (Exception e)
+		{
+			Debug.error("Error converting json value '" + dbvalue + "'"); //$NON-NLS-1$ //$NON-NLS-2$
+			throw e;
+		}
 	}
 
 	public Map getDefaultProperties()
