@@ -943,7 +943,9 @@
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
-			<version>${fasterxml.version}</version>
+            <!-- <version>${fasterxml.version}</version> -->
+            <!-- TODO: remove hardcoded version when all jackons libs will have the same top version in maven -->
+            <version>2.13.2.1</version>
 		</dependency>
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
