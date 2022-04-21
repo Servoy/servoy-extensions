@@ -11,9 +11,9 @@
       <jar href="/plugins/jwt.jar" download="eager" part="jwt" version="%%version%%"/>
       <jar href="/plugins/jwt/java-jwt.jar" download="%%loadmethod%%" part="javajwt" version="3.9.0"/>
       <jar href="/plugins/jwt/jwks-rsa.jar" download="%%loadmethod%%" part="javajwt" version="0.20.0"/>
-      <jar href="/plugins/jackson/jackson-annotations.jar" download="%%loadmethod%%" part="jackson" version="2.12.2"/>
-      <jar href="/plugins/jackson/jackson-core.jar" download="%%loadmethod%%" part="jackson" version="2.12.2"/>
-      <jar href="/plugins/jackson/jackson-databind.jar" download="%%loadmethod%%" part="jackson" version="2.12.2"/>
+      <jar href="/plugins/jackson/jackson-annotations.jar" download="%%loadmethod%%" part="jackson" version="2.13.1"/>
+      <jar href="/plugins/jackson/jackson-core.jar" download="%%loadmethod%%" part="jackson" version="2.13.1"/>
+      <jar href="/plugins/jackson/jackson-databind.jar" download="%%loadmethod%%" part="jackson" version="2.13.1"/>
    </resources>
    <component-desc/>
 	<security>

@@ -323,6 +323,8 @@
 										<fileset file="${project.basedir}/lib/jakarta-poi.jar" />
 										<fileset
 											file="${project.basedir}/lib/commons-math3.jar" />
+                                        <fileset
+                                            file="${project.basedir}/lib/SparseBitSet.jar" />											
 									</copy>
 									<makejar srcdir="file" />
 									<makejar srcdir="headlessclient" />
@@ -512,7 +514,7 @@
 								<artifactItem>
                                     <groupId>org.bouncycastle</groupId>
                                     <artifactId>bcprov-jdk15on</artifactId>
-                                    <version>1.64</version>
+                                    <version>1.68</version>
 									<overWrite>true</overWrite>
 									<outputDirectory>${project.build.directory}/plugins_beans/plugins/pdf_output</outputDirectory>
 									<destFileName>bcprov.jar</destFileName>
@@ -520,7 +522,7 @@
                                 <artifactItem>
                                     <groupId>org.bouncycastle</groupId>
                                     <artifactId>bcmail-jdk15on</artifactId>
-                                    <version>1.64</version>
+                                    <version>1.68</version>
                                     <overWrite>true</overWrite>
                                     <outputDirectory>${project.build.directory}/plugins_beans/plugins/pdf_output</outputDirectory>
                                     <destFileName>bcmail.jar</destFileName>
