@@ -31,7 +31,7 @@
 		<pdfbox.version>2.0.25</pdfbox.version>
 		<fontbox.version>2.0.25</fontbox.version>
 		<jwt.version>3.9.0</jwt.version>
-		<fasterxml.version>2.12.2</fasterxml.version>
+		<fasterxml.version>2.13.1</fasterxml.version>
 		<jwks.version>0.20.0</jwks.version>
 		<metadataextractor.version>2.16.0</metadataextractor.version>
 		<xmpcore.version>6.1.11</xmpcore.version>
@@ -323,6 +323,8 @@
 										<fileset file="${project.basedir}/lib/jakarta-poi.jar" />
 										<fileset
 											file="${project.basedir}/lib/commons-math3.jar" />
+                                        <fileset
+                                            file="${project.basedir}/lib/SparseBitSet.jar" />											
 									</copy>
 									<makejar srcdir="file" />
 									<makejar srcdir="headlessclient" />
@@ -512,7 +514,7 @@
 								<artifactItem>
                                     <groupId>org.bouncycastle</groupId>
                                     <artifactId>bcprov-jdk15on</artifactId>
-                                    <version>1.64</version>
+                                    <version>1.68</version>
 									<overWrite>true</overWrite>
 									<outputDirectory>${project.build.directory}/plugins_beans/plugins/pdf_output</outputDirectory>
 									<destFileName>bcprov.jar</destFileName>
@@ -520,7 +522,7 @@
                                 <artifactItem>
                                     <groupId>org.bouncycastle</groupId>
                                     <artifactId>bcmail-jdk15on</artifactId>
-                                    <version>1.64</version>
+                                    <version>1.68</version>
                                     <overWrite>true</overWrite>
                                     <outputDirectory>${project.build.directory}/plugins_beans/plugins/pdf_output</outputDirectory>
                                     <destFileName>bcmail.jar</destFileName>
