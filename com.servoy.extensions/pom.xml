@@ -249,12 +249,19 @@
 										default="${project.basedir}/resources/MANIFEST.MF" />
 									<attribute name="type" default="plugins" />
 									<sequential>
-										<jar
+    									<copy todir="${project.build.directory}/tmp_@{type}_@{jarname}">
+                                          <fileset dir="${project.build.directory}/classes" 
+                                            includes="com/servoy/extensions//@{type}/@{srcdir}/** @{includes}"
+                                            excludes="**/servoy-extension.html,**/servoy-extension.warnings.txt,"/>
+                                        </copy>
+                                        <copy overwrite="true" failonerror="false" file="${project.basedir}/resources/@{jarname}/com.servoy.j2db.plugins.IPlugin"
+                                                todir="${project.build.directory}/tmp_@{type}_@{jarname}/META-INF/services/">
+                                        </copy>
+                                        <jar
 											destfile="${project.build.directory}/plugins_beans/@{type}/@{jarname}.jar"
-											basedir="${project.build.directory}/classes"
-											includes="com/servoy/extensions//@{type}/@{srcdir}/** @{includes}"
+											basedir="${project.build.directory}/tmp_@{type}_@{jarname}"
 											manifest="@{manifest}" filesetmanifest="merge"
-											excludes="**/servoy-extension.html,**/servoy-extension.warnings.txt,">
+											>
 											<manifest>
 												<attribute name="Codebase" value="*" />
 												<attribute name="Application-Name"
@@ -283,6 +290,7 @@
 												tsaurl="http://sha256timestamp.ws.symantec.com/sha256/timestamp"
 												sigalg="SHA256withRSA" digestalg="SHA-256" />
 											</retry>
+										  <delete quiet="true" dir="${project.build.directory}/tmp_@{type}_@{jarname}"/>
 									</sequential>
 								</macrodef>
 
@@ -304,7 +312,7 @@
 								</copy>
 
 								<parallel>
-									<makejar srcdir="agent" />
+<!--									<makejar srcdir="agent" /> -->
 									<makejar srcdir="amortization" />
 									<makejar srcdir="broadcaster" />
 									<makejar srcdir="clientmanager" />

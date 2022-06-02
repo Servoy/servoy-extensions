@@ -1,0 +1,3 @@
+com.servoy.extensions.plugins.jwt.JWTServer
+com.servoy.extensions.plugins.jwt.client.JWTPlugin
+
