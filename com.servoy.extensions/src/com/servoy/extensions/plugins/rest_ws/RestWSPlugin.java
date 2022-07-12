@@ -120,7 +120,7 @@ public class RestWSPlugin implements IServerPlugin, IPreShutdownListener
 		req.put(USE_JSUPLOAD_OBJECTS_FOR_BINARY_DATA_PROPERTY,
 			"Convert binary uploads (multipart or pure byte uploads) to a JSUpload that is cached on disk if they are bigger then a threshold (servoy.ng_web_client.tempfile.threshold property), default 'true'");
 		req.put(SEND_USER_PROPERTIES_HEADERS,
-			"This setting specifies if the user properties are generated as header values on the REST responses. Default is true.");
+			"This is a global setting to specify if the user properties are generated as header values on the REST responses. It can also be set in the rest ws plugin ws_* methods. Default is true.");
 
 		// RELOAD_SOLUTION_AFTER_REQUEST_PROPERTY is discouraged so we do not show it in the admin page plugin properties
 
