@@ -27,20 +27,27 @@ import java.util.List;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLPeerUnverifiedException;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.CookieStore;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.config.RequestConfig.Builder;
-import org.apache.http.config.SocketConfig;
-import org.apache.http.conn.ConnectionKeepAliveStrategy;
-import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.impl.client.BasicCookieStore;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.DefaultConnectionKeepAliveStrategy;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.impl.cookie.BasicClientCookie;
-import org.apache.http.protocol.HttpContext;
-import org.apache.http.ssl.SSLContexts;
+import org.apache.hc.client5.http.ConnectionKeepAliveStrategy;
+import org.apache.hc.client5.http.config.RequestConfig;
+import org.apache.hc.client5.http.config.RequestConfig.Builder;
+import org.apache.hc.client5.http.cookie.BasicCookieStore;
+import org.apache.hc.client5.http.cookie.CookieStore;
+import org.apache.hc.client5.http.impl.DefaultConnectionKeepAliveStrategy;
+import org.apache.hc.client5.http.impl.async.CloseableHttpAsyncClient;
+import org.apache.hc.client5.http.impl.async.HttpAsyncClientBuilder;
+import org.apache.hc.client5.http.impl.async.HttpAsyncClients;
+import org.apache.hc.client5.http.impl.cookie.BasicClientCookie;
+import org.apache.hc.client5.http.impl.nio.PoolingAsyncClientConnectionManager;
+import org.apache.hc.client5.http.impl.nio.PoolingAsyncClientConnectionManagerBuilder;
+import org.apache.hc.client5.http.ssl.ClientTlsStrategyBuilder;
+import org.apache.hc.client5.http.ssl.SSLConnectionSocketFactory;
+import org.apache.hc.core5.http.HttpHost;
+import org.apache.hc.core5.http.HttpResponse;
+import org.apache.hc.core5.http.protocol.HttpContext;
+import org.apache.hc.core5.http.ssl.TLS;
+import org.apache.hc.core5.ssl.SSLContexts;
+import org.apache.hc.core5.util.TimeValue;
+import org.apache.hc.core5.util.Timeout;
 
 import com.servoy.j2db.documentation.ServoyDocumented;
 import com.servoy.j2db.plugins.IClientPluginAccess;
@@ -53,7 +60,7 @@ import com.servoy.j2db.util.Utils;
 @ServoyDocumented
 public class HttpClient implements IScriptable, IJavaScriptType
 {
-	CloseableHttpClient client;
+	CloseableHttpAsyncClient client;
 	CookieStore cookieStore;
 	Builder requestConfigBuilder;
 	private final HttpPlugin httpPlugin;
@@ -71,22 +78,28 @@ public class HttpClient implements IScriptable, IJavaScriptType
 	{
 		this.httpPlugin = httpPlugin;
 
-		HttpClientBuilder builder = HttpClientBuilder.create();
+		HttpAsyncClientBuilder builder = HttpAsyncClients.custom();
 		requestConfigBuilder = RequestConfig.custom();
 		requestConfigBuilder.setCircularRedirectsAllowed(true);
-		builder.setMaxConnPerRoute(5);
 
 		cookieStore = new BasicCookieStore();
 		builder.setDefaultCookieStore(cookieStore);
-		builder.setDefaultSocketConfig(SocketConfig.custom().setSoKeepAlive(true).build());
 		try
 		{
 			final AllowedCertTrustStrategy allowedCertTrustStrategy = new AllowedCertTrustStrategy();
-			SSLContext sslContext = SSLContexts.custom().loadTrustMaterial(allowedCertTrustStrategy).useProtocol(config != null ? config.protocol : null)
-				.build();
+			SSLContext sslContext = SSLContexts.custom().loadTrustMaterial(allowedCertTrustStrategy).build();
 
-			SSLConnectionSocketFactory socketFactory = new CertificateSSLSocketFactoryHandler(sslContext, allowedCertTrustStrategy, httpPlugin);
-			builder.setSSLSocketFactory(socketFactory);
+			// no longer supported SSLConnectionSocketFactory socketFactory = new CertificateSSLSocketFactoryHandler(sslContext, allowedCertTrustStrategy, httpPlugin);
+
+			final PoolingAsyncClientConnectionManager cm = PoolingAsyncClientConnectionManagerBuilder.create()
+				.setTlsStrategy(ClientTlsStrategyBuilder.create()
+					.setSslContext(sslContext)
+					.setTlsVersions(config != null && config.protocol != null ? config.protocol : TLS.V_1_2.id)
+					.build())
+				//no longer supported  .setDefaultSocketConfig(SocketConfig.custom().setSoKeepAlive(true).build())
+				.setMaxConnPerRoute(5)
+				.build();
+			builder.setConnectionManager(cm);
 		}
 		catch (Exception ex)
 		{
@@ -97,14 +110,14 @@ public class HttpClient implements IScriptable, IJavaScriptType
 			builder.setKeepAliveStrategy(new ConnectionKeepAliveStrategy()
 			{
 				@Override
-				public long getKeepAliveDuration(HttpResponse response, HttpContext context)
+				public TimeValue getKeepAliveDuration(HttpResponse response, HttpContext context)
 				{
-					long duration = DefaultConnectionKeepAliveStrategy.INSTANCE.getKeepAliveDuration(response, context);
-					if (duration >= 0)
+					TimeValue duration = DefaultConnectionKeepAliveStrategy.INSTANCE.getKeepAliveDuration(response, context);
+					if (duration != null)
 					{
 						return duration;
 					}
-					return config.keepAliveDuration * 1000;
+					return TimeValue.ofMilliseconds(config.keepAliveDuration * 1000);
 				}
 
 			});
@@ -114,6 +127,7 @@ public class HttpClient implements IScriptable, IJavaScriptType
 			builder.setUserAgent(config.userAgent);
 		}
 		client = builder.build();
+		client.start();
 	}
 
 	/**
@@ -142,8 +156,8 @@ public class HttpClient implements IScriptable, IJavaScriptType
 	 */
 	public void js_setTimeout(int timeout)
 	{
-		requestConfigBuilder.setSocketTimeout(timeout);
-		requestConfigBuilder.setConnectTimeout(timeout);
+		requestConfigBuilder.setResponseTimeout(Timeout.ofMilliseconds(timeout));
+		requestConfigBuilder.setConnectTimeout(Timeout.ofMilliseconds(timeout));
 	}
 
 	/**
@@ -259,8 +273,8 @@ public class HttpClient implements IScriptable, IJavaScriptType
 	 */
 	public Cookie js_getCookie(String cookieName)
 	{
-		List<org.apache.http.cookie.Cookie> cookies = cookieStore.getCookies();
-		for (org.apache.http.cookie.Cookie element : cookies)
+		List<org.apache.hc.client5.http.cookie.Cookie> cookies = cookieStore.getCookies();
+		for (org.apache.hc.client5.http.cookie.Cookie element : cookies)
 		{
 			if (element.getName().equals(cookieName)) return new com.servoy.extensions.plugins.http.Cookie(element);
 		}
@@ -275,7 +289,7 @@ public class HttpClient implements IScriptable, IJavaScriptType
 	 */
 	public Cookie[] js_getCookies()
 	{
-		List<org.apache.http.cookie.Cookie> cookies = cookieStore.getCookies();
+		List<org.apache.hc.client5.http.cookie.Cookie> cookies = cookieStore.getCookies();
 		Cookie[] cookieObjects = new Cookie[cookies.size()];
 		for (int i = 0; i < cookies.size(); i++)
 		{
@@ -492,8 +506,12 @@ public class HttpClient implements IScriptable, IJavaScriptType
 		}
 
 		@Override
-		public Socket connectSocket(int connectTimeout, Socket socket, org.apache.http.HttpHost host, InetSocketAddress remoteAddress,
-			InetSocketAddress localAddress, org.apache.http.protocol.HttpContext context) throws IOException
+		public Socket connectSocket(final TimeValue connectTimeout,
+			final Socket socket,
+			final HttpHost host,
+			final InetSocketAddress remoteAddress,
+			final InetSocketAddress localAddress,
+			final HttpContext context) throws IOException
 		{
 			try
 			{

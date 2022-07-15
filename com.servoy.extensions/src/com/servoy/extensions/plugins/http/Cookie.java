@@ -21,25 +21,25 @@ import com.servoy.j2db.scripting.IScriptable;
 
 /**
  * gives the Servoy developer access to some Cookie methods for basic cookie operations
- * 
+ *
  * @author paul
  */
 @ServoyDocumented
 public class Cookie implements IScriptable
 {
 
-	private org.apache.http.cookie.Cookie cookie;
+	private org.apache.hc.client5.http.cookie.Cookie cookie;
 
 	public Cookie()
 	{
 	}
 
-	public void setCookie(org.apache.http.cookie.Cookie cookie)
+	public void setCookie(org.apache.hc.client5.http.cookie.Cookie cookie)
 	{
 		this.cookie = cookie;
 	}
 
-	public Cookie(org.apache.http.cookie.Cookie cookie)
+	public Cookie(org.apache.hc.client5.http.cookie.Cookie cookie)
 	{
 		this.cookie = cookie;
 	}
@@ -51,7 +51,7 @@ public class Cookie implements IScriptable
 	 * var cookie = client.getCookie('cookieName')
 	 * var name = cookie.getName();
 	 *
-	 * @param  
+	 * @param
 	 */
 	public String js_getName()
 	{
@@ -66,7 +66,7 @@ public class Cookie implements IScriptable
 	 * var cookie = client.getCookie('cookieName')
 	 * var value = cookie.getValue();
 	 *
-	 * @param  
+	 * @param
 	 */
 	public String js_getValue()
 	{
@@ -81,7 +81,7 @@ public class Cookie implements IScriptable
 	 * var cookie = client.getCookie('cookieName')
 	 * var domain = cookie.getDomain();
 	 *
-	 * @param  
+	 * @param
 	 */
 	public String js_getDomain()
 	{
@@ -96,7 +96,7 @@ public class Cookie implements IScriptable
 	 * var cookie = client.getCookie('cookieName')
 	 * var path = cookie.getPath();
 	 *
-	 * @param  
+	 * @param
 	 */
 	public String js_getPath()
 	{
@@ -111,7 +111,7 @@ public class Cookie implements IScriptable
 	 * var cookie = client.getCookie('cookieName')
 	 * var path = cookie.getSecure();
 	 *
-	 * @param  
+	 * @param
 	 */
 	public boolean js_getSecure()
 	{
@@ -126,12 +126,16 @@ public class Cookie implements IScriptable
 	 * var cookie = client.getCookie('cookieName')
 	 * var path = cookie.getComment();
 	 *
-	 * @param  
+	 * @param
 	 */
+	@Deprecated
 	public String js_getComment()
 	{
-		if (cookie == null) return "";//$NON-NLS-1$
-		return cookie.getComment();
+		//obsolete method
+		/*
+		 * if (cookie == null) return "";//$NON-NLS-1$ return cookie.getComment();
+		 */
+		return "";
 	}
 
 }

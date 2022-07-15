@@ -23,24 +23,23 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.config.RequestConfig.Builder;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpRequestBase;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.FileEntity;
-import org.apache.http.entity.InputStreamEntity;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.entity.mime.HttpMultipartMode;
-import org.apache.http.entity.mime.MultipartEntityBuilder;
-import org.apache.http.entity.mime.content.ByteArrayBody;
-import org.apache.http.entity.mime.content.FileBody;
-import org.apache.http.entity.mime.content.StringBody;
-import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.protocol.HTTP;
+import org.apache.hc.client5.http.classic.methods.HttpUriRequestBase;
+import org.apache.hc.client5.http.config.RequestConfig.Builder;
+import org.apache.hc.client5.http.entity.UrlEncodedFormEntity;
+import org.apache.hc.client5.http.entity.mime.ByteArrayBody;
+import org.apache.hc.client5.http.entity.mime.FileBody;
+import org.apache.hc.client5.http.entity.mime.HttpMultipartMode;
+import org.apache.hc.client5.http.entity.mime.MultipartEntityBuilder;
+import org.apache.hc.client5.http.entity.mime.StringBody;
+import org.apache.hc.client5.http.impl.async.CloseableHttpAsyncClient;
+import org.apache.hc.client5.http.impl.auth.BasicCredentialsProvider;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.core5.http.NameValuePair;
+import org.apache.hc.core5.http.io.entity.FileEntity;
+import org.apache.hc.core5.http.io.entity.InputStreamEntity;
+import org.apache.hc.core5.http.io.entity.StringEntity;
+import org.apache.hc.core5.http.message.BasicNameValuePair;
 
 import com.servoy.extensions.plugins.file.JSFile;
 import com.servoy.j2db.util.Debug;
@@ -54,7 +53,7 @@ public class BaseEntityEnclosingRequest extends BaseRequest
 {
 	private String bodyContent;
 	private String bodyMimeType = ContentType.TEXT_PLAIN.getMimeType();
-	protected String charset = HTTP.UTF_8;
+	protected String charset = "UTF8";
 
 	private List<FileInfo> files;
 	private List<NameValuePair> params;
@@ -64,7 +63,7 @@ public class BaseEntityEnclosingRequest extends BaseRequest
 	{
 	}
 
-	public BaseEntityEnclosingRequest(String url, CloseableHttpClient hc, HttpRequestBase method, HttpPlugin httpPlugin, Builder requestConfigBuilder,
+	public BaseEntityEnclosingRequest(String url, CloseableHttpAsyncClient hc, HttpUriRequestBase method, HttpPlugin httpPlugin, Builder requestConfigBuilder,
 		BasicCredentialsProvider proxyCredentialsProvider)
 	{
 		super(url, hc, method, httpPlugin, requestConfigBuilder, proxyCredentialsProvider);
@@ -132,7 +131,7 @@ public class BaseEntityEnclosingRequest extends BaseRequest
 		{
 			if (params != null)
 			{
-				entity = new UrlEncodedFormEntity(params, charset);
+				entity = new UrlEncodedFormEntity(params, Charset.forName(charset));
 			}
 			else if (!Utils.stringIsEmpty(bodyContent))
 			{
@@ -164,7 +163,7 @@ public class BaseEntityEnclosingRequest extends BaseRequest
 		else
 		{
 			MultipartEntityBuilder builder = MultipartEntityBuilder.create();
-			builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
+			builder.setMode(HttpMultipartMode.LEGACY);
 
 			// For File parameters
 			for (FileInfo info : files)

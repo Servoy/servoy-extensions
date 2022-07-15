@@ -31,7 +31,7 @@ import java.util.concurrent.Executors;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
-import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.async.CloseableHttpAsyncClient;
 
 import com.servoy.j2db.plugins.IClientPlugin;
 import com.servoy.j2db.plugins.IClientPluginAccess;
@@ -52,7 +52,7 @@ public class HttpPlugin implements IClientPlugin, IIconProvider
 	private HttpProvider impl;
 	private JSONConverter jsonConverter;
 
-	private final HashMap<WeakReference<HttpClient>, CloseableHttpClient> openClients = new HashMap<>();
+	private final HashMap<WeakReference<HttpClient>, CloseableHttpAsyncClient> openClients = new HashMap<>();
 	private final ReferenceQueue<HttpClient> queue = new ReferenceQueue<>();
 
 
@@ -89,7 +89,7 @@ public class HttpPlugin implements IClientPlugin, IIconProvider
 	 */
 	private void closeClients()
 	{
-		for (CloseableHttpClient httpClient : openClients.values())
+		for (CloseableHttpAsyncClient httpClient : openClients.values())
 		{
 			try
 			{
@@ -198,7 +198,7 @@ public class HttpPlugin implements IClientPlugin, IIconProvider
 		Reference< ? extends HttpClient> ref = queue.poll();
 		while (ref != null)
 		{
-			CloseableHttpClient client = openClients.remove(ref);
+			CloseableHttpAsyncClient client = openClients.remove(ref);
 			if (client != null)
 			{
 				try
