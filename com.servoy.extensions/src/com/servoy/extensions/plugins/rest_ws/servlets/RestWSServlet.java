@@ -706,7 +706,7 @@ public class RestWSServlet extends HttpServlet
 			{
 				clientPlugin.setRequestResponseContents(request, response, contents);
 			}
-			return doWsService(wsMethod, fixedArgs, request, response, client, clientPlugin.isSendUserPropertiesHeaders());
+			return doWsService(wsMethod, fixedArgs, request, response, client, clientPlugin);
 		}
 		finally
 		{
@@ -718,7 +718,7 @@ public class RestWSServlet extends HttpServlet
 	}
 
 	private Object doWsService(String wsMethod, Object[] fixedArgs, HttpServletRequest request, HttpServletResponse response, IHeadlessClient client,
-		boolean sendUserProperties)
+		RestWSClientPlugin clientPlugin)
 		throws Exception
 	{
 		// update cookies in the application from request
@@ -795,7 +795,10 @@ public class RestWSServlet extends HttpServlet
 		}
 		if (plugin.log.isDebugEnabled()) plugin.log.debug("result = " + (result == null ? "<NULL>" : ("'" + result + '\'')));
 		// flush updated cookies from the application
-		if (sendUserProperties) setResponseUserProperties(request, response, client.getPluginAccess());
+
+		boolean shouldSendUserProperties = clientPlugin.isSendUserPropertiesHeaders() != null ? clientPlugin.isSendUserPropertiesHeaders().booleanValue()
+			: plugin.isSendUserPropertiesHeaders();
+		if (shouldSendUserProperties) setResponseUserProperties(request, response, client.getPluginAccess());
 		return result;
 	}
 

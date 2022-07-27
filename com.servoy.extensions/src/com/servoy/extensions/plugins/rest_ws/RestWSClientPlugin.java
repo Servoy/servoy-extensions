@@ -49,7 +49,7 @@ public class RestWSClientPlugin implements IClientPlugin, IIconProvider
 	private HttpServletRequest request;
 	private HttpServletResponse response;
 	private List<FileItem> contents;
-	private boolean sendUserPropertiesHeaders = true;
+	private Boolean sendUserPropertiesHeaders = null;
 
 
 	public void load() throws PluginException
@@ -139,10 +139,10 @@ public class RestWSClientPlugin implements IClientPlugin, IIconProvider
 
 	void setSendUserPropertiesHeaders(boolean send)
 	{
-		sendUserPropertiesHeaders = send;
+		sendUserPropertiesHeaders = Boolean.valueOf(send);
 	}
 
-	public boolean isSendUserPropertiesHeaders()
+	public Boolean isSendUserPropertiesHeaders()
 	{
 		return sendUserPropertiesHeaders;
 	}

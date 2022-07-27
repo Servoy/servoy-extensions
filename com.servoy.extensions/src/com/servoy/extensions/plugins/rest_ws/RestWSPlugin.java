@@ -73,6 +73,7 @@ public class RestWSPlugin implements IServerPlugin, IPreShutdownListener
 	private static final String AUTHORIZED_GROUPS_PROPERTY = "rest_ws_plugin_authorized_groups";
 	private static final String RELOAD_SOLUTION_AFTER_REQUEST_PROPERTY = "rest_ws_reload_solution_after_request";
 	private static final String USE_JSUPLOAD_OBJECTS_FOR_BINARY_DATA_PROPERTY = "rest_ws_use_jsupload_for_binary_data";
+	private static final String SEND_USER_PROPERTIES_HEADERS = "rest_ws_send_user_properties_headers";
 	private static final Boolean RELOAD_SOLUTION_AFTER_REQUEST_DEFAULT = Boolean.TRUE;
 
 	public static final String WEBSERVICE_NAME = "rest_ws";
@@ -86,6 +87,7 @@ public class RestWSPlugin implements IServerPlugin, IPreShutdownListener
 	private Boolean useJSUploadForBinaryData;
 	private IServerAccess application;
 	private boolean acceptingRequests = true;
+	private Boolean sendUserPropertiesHeaders = null;
 
 	public void initialize(IServerAccess app) throws PluginException
 	{
@@ -117,7 +119,8 @@ public class RestWSPlugin implements IServerPlugin, IPreShutdownListener
 			"Only authenticated users in the listed groups (comma-separated) have access, when left empty unauthorised access is allowed");
 		req.put(USE_JSUPLOAD_OBJECTS_FOR_BINARY_DATA_PROPERTY,
 			"Convert binary uploads (multipart or pure byte uploads) to a JSUpload that is cached on disk if they are bigger then a threshold (servoy.ng_web_client.tempfile.threshold property), default 'true'");
-
+		req.put(SEND_USER_PROPERTIES_HEADERS,
+			"This is a global setting to specify if the user properties are generated as header values on the REST responses. It can also be set in the rest ws plugin ws_* methods. Default is true.");
 
 		// RELOAD_SOLUTION_AFTER_REQUEST_PROPERTY is discouraged so we do not show it in the admin page plugin properties
 
@@ -133,6 +136,7 @@ public class RestWSPlugin implements IServerPlugin, IPreShutdownListener
 		useJSUploadForBinaryData = null;
 		shouldReloadSolutionAfterRequest = null;
 		serializerWrapper = null;
+		sendUserPropertiesHeaders = null;
 		// TODO: clear client pool
 	}
 
@@ -192,6 +196,15 @@ public class RestWSPlugin implements IServerPlugin, IPreShutdownListener
 			useJSUploadForBinaryData = Boolean.valueOf(application.getSettings().getProperty(USE_JSUPLOAD_OBJECTS_FOR_BINARY_DATA_PROPERTY, "true"));
 		}
 		return useJSUploadForBinaryData.booleanValue();
+	}
+
+	public boolean isSendUserPropertiesHeaders()
+	{
+		if (sendUserPropertiesHeaders == null)
+		{
+			sendUserPropertiesHeaders = Boolean.valueOf(application.getSettings().getProperty(SEND_USER_PROPERTIES_HEADERS, "true"));
+		}
+		return sendUserPropertiesHeaders.booleanValue();
 	}
 
 	synchronized KeyedObjectPool<String, IHeadlessClient> getClientPool()
