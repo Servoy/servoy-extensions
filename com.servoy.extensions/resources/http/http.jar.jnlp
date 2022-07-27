@@ -10,7 +10,7 @@
    <resources>
       <jar href="/plugins/http.jar" download="eager" part="http" version="%%version%%"/>
       <jar href="/plugins/http/httpclient5.jar" download="%%loadmethod%%" part="httpclient" version="%%version%%"/>
-      <jar href="/plugins/http/httpcore.jar" download="%%loadmethod%%" part="httpclient" version="%%version%%"/>
+      <jar href="/plugins/http/httpcore5.jar" download="%%loadmethod%%" part="httpclient" version="%%version%%"/>
       <jar href="/lib/commons-codec.jar" download="%%loadmethod%%" part="codec" version="%%version%%"/>
       <package name="org.apache.http.*" part="httpclient" recursive="true"/>      
       <package name="org.apache.commons.codec.*" part="codec" recursive="true"/>      

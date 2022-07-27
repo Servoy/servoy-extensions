@@ -28,6 +28,8 @@
 		<scribejava.version>8.3.1</scribejava.version>
 		<amqp.version>5.7.0</amqp.version>
 		<doc.version>1.5.0</doc.version>
+		<httpclient.version>5.1.3</httpclient.version>
+		<httpcore.version>5.1.4</httpcore.version>
 		<pdfbox.version>2.0.25</pdfbox.version>
 		<fontbox.version>2.0.25</fontbox.version>
 		<jwt.version>3.9.0</jwt.version>
@@ -342,11 +344,6 @@
 										<fileset
 											file="${project.basedir}/resources/http/http.jar.jnlp" />
 									</copy>
-									<copy overwrite="true"
-                                        todir="${project.build.directory}/plugins_beans/plugins/http">
-                                        <fileset file="${project.basedir}/lib/httpclient5.jar" />
-                                        <fileset file="${project.basedir}/lib/httpcore5.jar" />
-                                    </copy>
 									<makejar srcdir="images" />
 									<copy overwrite="true"
 										todir="${project.build.directory}/plugins_beans/plugins/">
@@ -359,17 +356,6 @@
 										todir="${project.build.directory}/plugins_beans/plugins/">
 										<fileset
 											file="${project.basedir}/resources/jwt/jwt.jar.jnlp" />
-									</copy>
-									<copy overwrite="true"
-										todir="${project.build.directory}/plugins_beans/plugins/jwt">
-										<fileset file="${project.basedir}/lib/java-jwt.jar" />
-										<fileset file="${project.basedir}/lib/jwks-rsa.jar" />
-									</copy>
-									<copy overwrite="true"
-										todir="${project.build.directory}/plugins_beans/plugins/jackson">
-										<fileset file="${project.basedir}/lib/jackson-annotations.jar" />
-										<fileset file="${project.basedir}/lib/jackson-core.jar" />
-										<fileset file="${project.basedir}/lib/jackson-databind.jar" />
 									</copy>
 									<makejar srcdir="mail"
 										includes=",META-INF/services/com.servoy.j2db.plugins.IPlugin" />
@@ -456,18 +442,6 @@
 											<exclude name="META-INF/**" />
 										</patternset>
 									</unzip>
-									<unzip src="${project.basedir}/lib/httpclient5.jar"
-                                        dest="${project.build.directory}/classes">
-                                        <patternset>
-                                            <exclude name="META-INF/**" />
-                                        </patternset>
-                                    </unzip>
-                                    <unzip src="${project.basedir}/lib/httpcore5.jar"
-                                        dest="${project.build.directory}/classes">
-                                        <patternset>
-                                            <exclude name="META-INF/**" />
-                                        </patternset>
-                                    </unzip>
 								</parallel>
 							</target>
 						</configuration>
@@ -593,6 +567,22 @@
 									<outputDirectory>${project.build.directory}/plugins_beans/plugins/jackson</outputDirectory>
 									<destFileName>jackson-core.jar</destFileName>
 								</artifactItem>
+                                <artifactItem>
+                                    <groupId>org.apache.httpcomponents.client5</groupId>
+                                    <artifactId>httpclient5</artifactId>
+                                    <version>${httpclient.version}</version>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>${project.build.directory}/plugins_beans/plugins/http</outputDirectory>
+                                    <destFileName>httpclient5.jar</destFileName>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.apache.httpcomponents.core5</groupId>
+                                    <artifactId>httpcore5</artifactId>
+                                    <version>${httpcore.version}</version>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>${project.build.directory}/plugins_beans/plugins/http</outputDirectory>
+                                    <destFileName>httpcore5.jar</destFileName>
+                                </artifactItem>
 								<artifactItem>
                                     <groupId>com.drewnoakes</groupId>
                                     <artifactId>metadata-extractor</artifactId>
@@ -715,6 +705,28 @@
 										<arg
 											value="${project.build.directory}/plugins_beans/plugins/jackson/jackson-databind.jar" />
 									</exec>
+                                    <exec
+                                        dir="${project.build.directory}/plugins_beans/plugins/http/"
+                                        executable="pack200"
+                                        output="${project.build.directory}/jackson-databind_repack200b.txt"
+                                        failonerror="true">
+                                        <arg value="-J-Xmx512m" />
+                                        <arg value="-r" />
+                                        <!-- This may break some features <arg value="-O" /> -->
+                                        <arg
+                                            value="${project.build.directory}/plugins_beans/plugins/http/httpclient5.jar" />
+                                    </exec>
+                                    <exec
+                                        dir="${project.build.directory}/plugins_beans/plugins/http/"
+                                        executable="pack200"
+                                        output="${project.build.directory}/jackson-databind_repack200b.txt"
+                                        failonerror="true">
+                                        <arg value="-J-Xmx512m" />
+                                        <arg value="-r" />
+                                        <!-- This may break some features <arg value="-O" /> -->
+                                        <arg
+                                            value="${project.build.directory}/plugins_beans/plugins/http/httpcore5.jar" />
+                                    </exec>
 									<exec
                                         dir="${project.build.directory}/plugins_beans/plugins/images/"
                                         executable="pack200"
@@ -784,6 +796,16 @@
 										alias="ServoyClient" storepass="${jarsigner.storepass}"
 										tsaurl="http://sha256timestamp.ws.symantec.com/sha256/timestamp"
 										sigalg="SHA256withRSA" digestalg="SHA-256" />
+                                    <signjar keystore="${jarsigner.keystore}"
+                                        jar="${project.build.directory}/plugins_beans/plugins/http/httpclient5.jar"
+                                        alias="ServoyClient" storepass="${jarsigner.storepass}"
+                                        tsaurl="http://sha256timestamp.ws.symantec.com/sha256/timestamp"
+                                        sigalg="SHA256withRSA" digestalg="SHA-256" />
+                                    <signjar keystore="${jarsigner.keystore}"
+                                        jar="${project.build.directory}/plugins_beans/plugins/http/httpcore5.jar"
+                                        alias="ServoyClient" storepass="${jarsigner.storepass}"
+                                        tsaurl="http://sha256timestamp.ws.symantec.com/sha256/timestamp"
+                                        sigalg="SHA256withRSA" digestalg="SHA-256" />
 									<signjar keystore="${jarsigner.keystore}"
                                         jar="${project.build.directory}/plugins_beans/plugins/images/metadataextractor.jar"
                                         alias="ServoyClient" storepass="${jarsigner.storepass}"
@@ -843,7 +865,12 @@
 		<dependency>
             <groupId>org.apache.httpcomponents.client5</groupId>
             <artifactId>httpclient5</artifactId>
-            <version>5.1.2</version>
+            <version>${httpclient.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents.core5</groupId>
+            <artifactId>httpcore5</artifactId>
+            <version>${httpcore.version}</version>
         </dependency>
 		<dependency>
 			<groupId>com.sun.activation</groupId>
