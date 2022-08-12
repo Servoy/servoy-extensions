@@ -45,7 +45,7 @@ public class ClientManagerServerToBroadcasterBridge
 		if (broadcaster != null)
 		{
 			this.broadcastNetworkSender = broadcaster.registerMessageBroadcastConsumer((message) -> clientManagerServer
-				.broadcastMessageInternal(new BroadcastInfo(null, message.getName(), message.getChannelName()), message.getName()));
+				.broadcastMessageInternal(new BroadcastInfo(null, message.getName(), message.getChannelName()), message.getMessage()));
 		}
 
 	}
