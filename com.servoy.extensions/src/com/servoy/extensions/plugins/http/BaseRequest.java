@@ -149,7 +149,7 @@ public abstract class BaseRequest implements IScriptable, IJavaScriptType
 	{
 		try
 		{
-			return executeRequest(userName, password, null, null, false, null, null, null);
+			return executeRequest(userName, password, null, null, false, null, null, null, true);
 		}
 		catch (Exception ex)
 		{
@@ -172,7 +172,7 @@ public abstract class BaseRequest implements IScriptable, IJavaScriptType
 	{
 		try
 		{
-			return executeRequest(userName, password, workstation, domain, true, null, null, null);
+			return executeRequest(userName, password, workstation, domain, true, null, null, null, true);
 		}
 		catch (Exception ex)
 		{
@@ -198,7 +198,7 @@ public abstract class BaseRequest implements IScriptable, IJavaScriptType
 	}
 
 	private Response executeRequest(String userName, String password, String workstation, String domain, boolean windowsAuthentication,
-		FunctionDefinition successFunctionDef, FunctionDefinition errorFunctionDef, Object[] callbackArgs) throws Exception
+		FunctionDefinition successFunctionDef, FunctionDefinition errorFunctionDef, Object[] callbackArgs, boolean waitForResult) throws Exception
 	{
 		HttpClientContext context = null;
 		HttpEntity entity = buildEntity();
@@ -302,7 +302,7 @@ public abstract class BaseRequest implements IScriptable, IJavaScriptType
 				}
 
 			});
-		if (successFunctionDef == null)
+		if (waitForResult)
 		{
 			future.get();
 			return new Response(finalResponse[0], method);
@@ -457,7 +457,7 @@ public abstract class BaseRequest implements IScriptable, IJavaScriptType
 		try
 		{
 			executeRequest(username, password, workstation, domain, windowsAuthentication, successFunctionDef, errorFunctionDef,
-				callbackArgs);
+				callbackArgs, false);
 		}
 		catch (final Exception ex)
 		{
