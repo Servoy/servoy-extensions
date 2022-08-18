@@ -708,7 +708,7 @@
                                     <exec
                                         dir="${project.build.directory}/plugins_beans/plugins/http/"
                                         executable="pack200"
-                                        output="${project.build.directory}/jackson-databind_repack200b.txt"
+                                        output="${project.build.directory}/http-httpclient5_repack200b.txt"
                                         failonerror="true">
                                         <arg value="-J-Xmx512m" />
                                         <arg value="-r" />
@@ -719,7 +719,7 @@
                                     <exec
                                         dir="${project.build.directory}/plugins_beans/plugins/http/"
                                         executable="pack200"
-                                        output="${project.build.directory}/jackson-databind_repack200b.txt"
+                                        output="${project.build.directory}/http-httpcore5_repack200b.txt"
                                         failonerror="true">
                                         <arg value="-J-Xmx512m" />
                                         <arg value="-r" />
