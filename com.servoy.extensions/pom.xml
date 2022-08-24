@@ -583,6 +583,14 @@
                                     <outputDirectory>${project.build.directory}/plugins_beans/plugins/http</outputDirectory>
                                     <destFileName>httpcore5.jar</destFileName>
                                 </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.apache.httpcomponents.core5</groupId>
+                                    <artifactId>httpcore5-h2</artifactId>
+                                    <version>${httpcore.version}</version>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>${project.build.directory}/plugins_beans/plugins/http</outputDirectory>
+                                    <destFileName>httpcore5-h2.jar</destFileName>
+                                </artifactItem>
 								<artifactItem>
                                     <groupId>com.drewnoakes</groupId>
                                     <artifactId>metadata-extractor</artifactId>
@@ -727,6 +735,17 @@
                                         <arg
                                             value="${project.build.directory}/plugins_beans/plugins/http/httpcore5.jar" />
                                     </exec>
+                                    <exec
+                                        dir="${project.build.directory}/plugins_beans/plugins/http/"
+                                        executable="pack200"
+                                        output="${project.build.directory}/http-httpcore5-h2_repack200b.txt"
+                                        failonerror="true">
+                                        <arg value="-J-Xmx512m" />
+                                        <arg value="-r" />
+                                        <!-- This may break some features <arg value="-O" /> -->
+                                        <arg
+                                            value="${project.build.directory}/plugins_beans/plugins/http/httpcore5-h2.jar" />
+                                    </exec>
 									<exec
                                         dir="${project.build.directory}/plugins_beans/plugins/images/"
                                         executable="pack200"
@@ -806,6 +825,11 @@
                                         alias="ServoyClient" storepass="${jarsigner.storepass}"
                                         tsaurl="http://sha256timestamp.ws.symantec.com/sha256/timestamp"
                                         sigalg="SHA256withRSA" digestalg="SHA-256" />
+                                    <signjar keystore="${jarsigner.keystore}"
+                                        jar="${project.build.directory}/plugins_beans/plugins/http/httpcore5-h2.jar"
+                                        alias="ServoyClient" storepass="${jarsigner.storepass}"
+                                        tsaurl="http://sha256timestamp.ws.symantec.com/sha256/timestamp"
+                                        sigalg="SHA256withRSA" digestalg="SHA-256" />
 									<signjar keystore="${jarsigner.keystore}"
                                         jar="${project.build.directory}/plugins_beans/plugins/images/metadataextractor.jar"
                                         alias="ServoyClient" storepass="${jarsigner.storepass}"
@@ -870,6 +894,11 @@
         <dependency>
             <groupId>org.apache.httpcomponents.core5</groupId>
             <artifactId>httpcore5</artifactId>
+            <version>${httpcore.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents.core5</groupId>
+            <artifactId>httpcore5-h2</artifactId>
             <version>${httpcore.version}</version>
         </dependency>
 		<dependency>
