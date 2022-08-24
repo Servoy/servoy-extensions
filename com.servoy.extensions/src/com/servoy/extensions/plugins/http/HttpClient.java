@@ -18,6 +18,8 @@
 package com.servoy.extensions.plugins.http;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.security.cert.X509Certificate;
@@ -25,6 +27,7 @@ import java.sql.Date;
 import java.util.List;
 
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLPeerUnverifiedException;
 
 import org.apache.hc.client5.http.ConnectionKeepAliveStrategy;
@@ -41,10 +44,12 @@ import org.apache.hc.client5.http.impl.nio.PoolingAsyncClientConnectionManager;
 import org.apache.hc.client5.http.impl.nio.PoolingAsyncClientConnectionManagerBuilder;
 import org.apache.hc.client5.http.ssl.ClientTlsStrategyBuilder;
 import org.apache.hc.client5.http.ssl.SSLConnectionSocketFactory;
+import org.apache.hc.core5.function.Factory;
 import org.apache.hc.core5.http.HttpHost;
 import org.apache.hc.core5.http.HttpResponse;
+import org.apache.hc.core5.http.nio.ssl.TlsStrategy;
 import org.apache.hc.core5.http.protocol.HttpContext;
-import org.apache.hc.core5.http.ssl.TLS;
+import org.apache.hc.core5.reactor.ssl.TlsDetails;
 import org.apache.hc.core5.ssl.SSLContexts;
 import org.apache.hc.core5.util.TimeValue;
 import org.apache.hc.core5.util.Timeout;
@@ -91,11 +96,16 @@ public class HttpClient implements IScriptable, IJavaScriptType
 
 			// no longer supported SSLConnectionSocketFactory socketFactory = new CertificateSSLSocketFactoryHandler(sslContext, allowedCertTrustStrategy, httpPlugin);
 
+			ClientTlsStrategyBuilder tlsFactory = ClientTlsStrategyBuilder.create().useSystemProperties()
+				.setSslContext(sslContext)
+				.setTlsDetailsFactory(createFactoryForJava11());
+			if (config != null && config.protocol != null)
+			{
+				tlsFactory.setTlsVersions(config.protocol);
+			}
+			TlsStrategy tlsStrat = tlsFactory.build();
 			final PoolingAsyncClientConnectionManager cm = PoolingAsyncClientConnectionManagerBuilder.create()
-				.setTlsStrategy(ClientTlsStrategyBuilder.create()
-					.setSslContext(sslContext)
-					.setTlsVersions(config != null && config.protocol != null ? config.protocol : TLS.V_1_2.id)
-					.build())
+				.setTlsStrategy(tlsStrat)
 				//no longer supported  .setDefaultSocketConfig(SocketConfig.custom().setSoKeepAlive(true).build())
 				.setMaxConnPerRoute(5)
 				.build();
@@ -128,6 +138,37 @@ public class HttpClient implements IScriptable, IJavaScriptType
 		}
 		client = builder.build();
 		client.start();
+	}
+
+	/**
+	 * @return
+	 */
+	protected Factory<SSLEngine, TlsDetails> createFactoryForJava11()
+	{
+		try
+		{
+			final Method method = SSLEngine.class.getMethod("getApplicationProtocol"); //$NON-NLS-1$
+			return new Factory<SSLEngine, TlsDetails>()
+			{
+				@Override
+				public TlsDetails create(final SSLEngine sslEngine)
+				{
+					try
+					{
+						return new TlsDetails(sslEngine.getSession(), (String)method.invoke(sslEngine, (Object[])null));
+					}
+					catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e)
+					{
+						Debug.error(e);
+					}
+					return null;
+				}
+			};
+		}
+		catch (NoSuchMethodException | SecurityException e)
+		{
+			return null;
+		}
 	}
 
 	/**
