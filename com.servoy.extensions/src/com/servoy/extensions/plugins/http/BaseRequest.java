@@ -37,8 +37,8 @@ import org.apache.hc.client5.http.impl.auth.BasicCredentialsProvider;
 import org.apache.hc.client5.http.impl.auth.BasicScheme;
 import org.apache.hc.client5.http.protocol.HttpClientContext;
 import org.apache.hc.core5.concurrent.FutureCallback;
-import org.apache.hc.core5.http.HttpEntity;
 import org.apache.hc.core5.http.message.BufferedHeader;
+import org.apache.hc.core5.http.nio.AsyncEntityProducer;
 import org.apache.hc.core5.http.nio.support.BasicRequestProducer;
 import org.apache.hc.core5.util.CharArrayBuffer;
 import org.mozilla.javascript.Function;
@@ -192,7 +192,7 @@ public abstract class BaseRequest implements IScriptable, IJavaScriptType
 		this.usePreemptiveAuthentication = b;
 	}
 
-	protected HttpEntity buildEntity() throws Exception
+	protected AsyncEntityProducer buildEntityProducer() throws Exception
 	{
 		return null;
 	}
@@ -201,8 +201,6 @@ public abstract class BaseRequest implements IScriptable, IJavaScriptType
 		FunctionDefinition successFunctionDef, FunctionDefinition errorFunctionDef, Object[] callbackArgs, boolean waitForResult) throws Exception
 	{
 		HttpClientContext context = null;
-		HttpEntity entity = buildEntity();
-		if (entity != null) method.setEntity(entity);
 
 		Iterator<String> it = headers.keySet().iterator();
 		while (it.hasNext())
@@ -250,7 +248,7 @@ public abstract class BaseRequest implements IScriptable, IJavaScriptType
 		method.setConfig(requestConfigBuilder.build());
 		final SimpleHttpResponse[] finalResponse = new SimpleHttpResponse[1];
 		final Future<SimpleHttpResponse> future = client.execute(
-			new BasicRequestProducer(method, null),
+			new BasicRequestProducer(method, buildEntityProducer()),
 			SimpleResponseConsumer.create(),
 			new FutureCallback<SimpleHttpResponse>()
 			{
