@@ -25,7 +25,6 @@ import java.util.List;
 
 import org.apache.hc.client5.http.classic.methods.HttpUriRequestBase;
 import org.apache.hc.client5.http.config.RequestConfig.Builder;
-import org.apache.hc.client5.http.entity.UrlEncodedFormEntity;
 import org.apache.hc.client5.http.entity.mime.ByteArrayBody;
 import org.apache.hc.client5.http.entity.mime.FileBody;
 import org.apache.hc.client5.http.entity.mime.HttpMultipartMode;
@@ -34,12 +33,14 @@ import org.apache.hc.client5.http.entity.mime.StringBody;
 import org.apache.hc.client5.http.impl.async.CloseableHttpAsyncClient;
 import org.apache.hc.client5.http.impl.auth.BasicCredentialsProvider;
 import org.apache.hc.core5.http.ContentType;
-import org.apache.hc.core5.http.HttpEntity;
 import org.apache.hc.core5.http.NameValuePair;
-import org.apache.hc.core5.http.io.entity.FileEntity;
-import org.apache.hc.core5.http.io.entity.InputStreamEntity;
-import org.apache.hc.core5.http.io.entity.StringEntity;
+import org.apache.hc.core5.http.io.entity.BufferedHttpEntity;
 import org.apache.hc.core5.http.message.BasicNameValuePair;
+import org.apache.hc.core5.http.nio.AsyncEntityProducer;
+import org.apache.hc.core5.http.nio.entity.BasicAsyncEntityProducer;
+import org.apache.hc.core5.http.nio.entity.FileEntityProducer;
+import org.apache.hc.core5.http.nio.entity.StringAsyncEntityProducer;
+import org.apache.hc.core5.net.WWWFormCodec;
 
 import com.servoy.extensions.plugins.file.JSFile;
 import com.servoy.j2db.util.Debug;
@@ -123,19 +124,23 @@ public class BaseEntityEnclosingRequest extends BaseRequest
 	}
 
 	@Override
-	protected HttpEntity buildEntity() throws Exception
+	protected AsyncEntityProducer buildEntityProducer() throws Exception
 	{
-		HttpEntity entity = null;
+		AsyncEntityProducer entityProducer = null;
 
 		if (files.size() == 0 && !forceMultipart)
 		{
 			if (params != null)
 			{
-				entity = new UrlEncodedFormEntity(params, Charset.forName(charset));
+				entityProducer = new StringAsyncEntityProducer(
+					WWWFormCodec.format(
+						params,
+						charset != null ? Charset.forName(charset) : ContentType.APPLICATION_FORM_URLENCODED.getCharset()),
+					ContentType.APPLICATION_FORM_URLENCODED);
 			}
 			else if (!Utils.stringIsEmpty(bodyContent))
 			{
-				entity = new StringEntity(bodyContent, ContentType.create(bodyMimeType, charset));
+				entityProducer = new StringAsyncEntityProducer(bodyContent, ContentType.create(bodyMimeType, charset));
 				bodyContent = null;
 			}
 		}
@@ -146,14 +151,14 @@ public class BaseEntityEnclosingRequest extends BaseRequest
 			{
 				File f = (File)info.file;
 				String contentType = info.mimeType != null ? info.mimeType : MimeTypes.getContentType(Utils.readFile(f, 32), f.getName());
-				entity = new FileEntity(f, ContentType.create(contentType != null ? contentType : "binary/octet-stream")); //$NON-NLS-1$
+				entityProducer = new FileEntityProducer(f, ContentType.create(contentType != null ? contentType : "binary/octet-stream"));
 			}
 			else if (info.file instanceof JSFile)
 			{
 				JSFile f = (JSFile)info.file;
 				String contentType = info.mimeType != null ? info.mimeType : f.js_getContentType();
-				entity = new InputStreamEntity(f.getAbstractFile().getInputStream(), f.js_size(),
-					ContentType.create(contentType != null ? contentType : "binary/octet-stream")); //$NON-NLS-1$
+				entityProducer = new BasicAsyncEntityProducer(f.jsFunction_getBytes(),
+					ContentType.create(contentType != null ? contentType : "binary/octet-stream"));
 			}
 			else
 			{
@@ -198,11 +203,13 @@ public class BaseEntityEnclosingRequest extends BaseRequest
 					builder.addPart(nvp.getName(), new StringBody(nvp.getValue(), ContentType.create("text/plain", Charset.forName(charset))));
 				}
 			}
-			entity = builder.build();
+			BufferedHttpEntity entity = new BufferedHttpEntity(builder.build());
+
+			entityProducer = new BasicAsyncEntityProducer(Utils.getBytesFromInputStream(entity.getContent()), ContentType.MULTIPART_FORM_DATA);
 		}
 
 		// entity may have been set already, see PutRequest.js_setFile
-		return entity;
+		return entityProducer;
 	}
 
 	/**
