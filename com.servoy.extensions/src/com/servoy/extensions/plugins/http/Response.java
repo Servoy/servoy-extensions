@@ -66,6 +66,11 @@ public class Response implements IScriptable, IJavaScriptType
 
 	public String[] getAllowedMethods()
 	{
+		if (this.res == null)
+		{
+			Debug.error("getAllowedMethods API was called while response is null due to request exception: " + exceptionMessage);
+			return new String[0];
+		}
 		Iterator<Header> it = res.headerIterator(OptionsRequest.OPTIONS_HEADER);
 		Set<String> methods = new HashSet<String>();
 		while (it.hasNext())
@@ -96,6 +101,10 @@ public class Response implements IScriptable, IJavaScriptType
 		{
 			return res.getCode();
 		}
+		else
+		{
+			Debug.error("response.getStatusCode API was called while response is null due to request exception: " + exceptionMessage);
+		}
 		return 0;
 	}
 
@@ -114,6 +123,10 @@ public class Response implements IScriptable, IJavaScriptType
 		{
 			return res.getReasonPhrase();
 		}
+		else
+		{
+			Debug.error("response.getStatusReasonPhrase API was called while response is null due to request exception: " + exceptionMessage);
+		}
 		return null;
 	}
 
@@ -129,7 +142,14 @@ public class Response implements IScriptable, IJavaScriptType
 		{
 			try
 			{
-				response_body = res.getBodyText();
+				if (this.res != null)
+				{
+					response_body = res.getBodyText();
+				}
+				else
+				{
+					Debug.error("response.getResponseBody API was called while response is null due to request exception: " + exceptionMessage);
+				}
 			}
 			catch (Exception e)
 			{
@@ -138,6 +158,7 @@ public class Response implements IScriptable, IJavaScriptType
 			}
 		}
 		return response_body instanceof String ? (String)response_body : "";
+
 	}
 
 	/**
@@ -150,7 +171,14 @@ public class Response implements IScriptable, IJavaScriptType
 	{
 		if (response_body == null)
 		{
-			response_body = res.getBodyBytes();
+			if (this.res != null)
+			{
+				response_body = res.getBodyBytes();
+			}
+			else
+			{
+				Debug.error("response.getMediaData API was called while response is null due to request exception: " + exceptionMessage);
+			}
 		}
 		return response_body instanceof byte[] ? (byte[])response_body : null;
 	}
@@ -181,25 +209,32 @@ public class Response implements IScriptable, IJavaScriptType
 		try
 		{
 			Header[] ha;
-			if (headerName == null)
-			{
-				ha = res.getHeaders();
-			}
-			else
-			{
-				ha = res.getHeaders(headerName);
-			}
 			JSMap sa = new JSMap();
-			for (Header element : ha)
+			if (this.res != null)
 			{
-				if (sa.containsKey(element.getName()))
+				if (headerName == null)
 				{
-					sa.put(element.getName(), Utils.arrayAdd((String[])sa.get(element.getName()), element.getValue(), true));
+					ha = res.getHeaders();
 				}
 				else
 				{
-					sa.put(element.getName(), new String[] { element.getValue() });
+					ha = res.getHeaders(headerName);
 				}
+				for (Header element : ha)
+				{
+					if (sa.containsKey(element.getName()))
+					{
+						sa.put(element.getName(), Utils.arrayAdd((String[])sa.get(element.getName()), element.getValue(), true));
+					}
+					else
+					{
+						sa.put(element.getName(), new String[] { element.getValue() });
+					}
+				}
+			}
+			else
+			{
+				Debug.error("response.getResponseHeaders API was called while response is null due to request exception: " + exceptionMessage);
 			}
 			return sa;
 		}
@@ -218,10 +253,17 @@ public class Response implements IScriptable, IJavaScriptType
 	 */
 	public String js_getCharset()
 	{
-		ContentType contentType = res.getContentType();
-		if (contentType != null)
+		if (this.res != null)
 		{
-			return contentType.getCharset().displayName();
+			ContentType contentType = res.getContentType();
+			if (contentType != null)
+			{
+				return contentType.getCharset().displayName();
+			}
+		}
+		else
+		{
+			Debug.error("response.getCharset API was called while response is null due to request exception: " + exceptionMessage);
 		}
 		return null;
 	}
