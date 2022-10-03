@@ -19,7 +19,6 @@ package com.servoy.extensions.plugins.http;
 
 import java.net.URL;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.Future;
 
@@ -202,10 +201,8 @@ public abstract class BaseRequest implements IScriptable, IJavaScriptType
 	{
 		HttpClientContext context = null;
 
-		Iterator<String> it = headers.keySet().iterator();
-		while (it.hasNext())
+		for (String name : headers.keySet())
 		{
-			String name = it.next();
 			String[] values = headers.get(name);
 			for (String value : values)
 			{
@@ -246,7 +243,7 @@ public abstract class BaseRequest implements IScriptable, IJavaScriptType
 			}
 		}
 		method.setConfig(requestConfigBuilder.build());
-		final SimpleHttpResponse[] finalResponse = new SimpleHttpResponse[1];
+		final Response[] finalResponse = new Response[1];
 		final Future<SimpleHttpResponse> future = client.execute(
 			new BasicRequestProducer(method, buildEntityProducer()),
 			SimpleResponseConsumer.create(),
@@ -256,13 +253,13 @@ public abstract class BaseRequest implements IScriptable, IJavaScriptType
 				@Override
 				public void completed(final SimpleHttpResponse response)
 				{
-					finalResponse[0] = response;
+					finalResponse[0] = new Response(response, method);
 					if (successFunctionDef != null)
 					{
 						IClientPluginAccess access = httpPlugin.getClientPluginAccess();
 						if (access != null)
 						{
-							callbackArgs[0] = new Response(finalResponse[0], method);
+							callbackArgs[0] = finalResponse[0];
 							successFunctionDef.executeAsync(access, callbackArgs);
 						}
 						else
@@ -276,6 +273,7 @@ public abstract class BaseRequest implements IScriptable, IJavaScriptType
 				@Override
 				public void failed(final Exception ex)
 				{
+					logError(ex, userName, workstation, domain);
 					if (errorFunctionDef != null)
 					{
 						IClientPluginAccess access = httpPlugin.getClientPluginAccess();
@@ -291,19 +289,26 @@ public abstract class BaseRequest implements IScriptable, IJavaScriptType
 									" but the client was already closed");
 						}
 					}
+					else
+					{
+						finalResponse[0] = new Response(ex.getMessage());
+					}
 				}
 
 				@Override
 				public void cancelled()
 				{
-					//System.out.println(request + " cancelled");
+					Debug.error("Request was cancelled while executing " + method.getRequestUri() + " with method " + method.getMethod() + " with user: " +
+						userName + ", workstation: " +
+						workstation + ", domain: " + domain);
+					finalResponse[0] = new Response("Request was cancelled");
 				}
 
 			});
 		if (waitForResult)
 		{
 			future.get();
-			return new Response(finalResponse[0], method);
+			return finalResponse[0];
 		}
 		return null;
 	}
