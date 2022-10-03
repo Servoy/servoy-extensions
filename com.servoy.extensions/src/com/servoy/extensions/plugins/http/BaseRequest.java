@@ -243,6 +243,7 @@ public abstract class BaseRequest implements IScriptable, IJavaScriptType
 			}
 		}
 		method.setConfig(requestConfigBuilder.build());
+		Debug.log("Starting request execution");
 		final Response[] finalResponse = new Response[1];
 		final Future<SimpleHttpResponse> future = client.execute(
 			new BasicRequestProducer(method, buildEntityProducer()),
@@ -253,6 +254,7 @@ public abstract class BaseRequest implements IScriptable, IJavaScriptType
 				@Override
 				public void completed(final SimpleHttpResponse response)
 				{
+					Debug.log("Request execution completed successfully");
 					finalResponse[0] = new Response(response, method);
 					if (successFunctionDef != null)
 					{
@@ -273,6 +275,7 @@ public abstract class BaseRequest implements IScriptable, IJavaScriptType
 				@Override
 				public void failed(final Exception ex)
 				{
+					Debug.log("Request execution failed");
 					logError(ex, userName, workstation, domain);
 					if (errorFunctionDef != null)
 					{
@@ -298,6 +301,7 @@ public abstract class BaseRequest implements IScriptable, IJavaScriptType
 				@Override
 				public void cancelled()
 				{
+					Debug.log("Request execution cancelled");
 					Debug.error("Request was cancelled while executing " + method.getRequestUri() + " with method " + method.getMethod() + " with user: " +
 						userName + ", workstation: " +
 						workstation + ", domain: " + domain);
@@ -307,7 +311,9 @@ public abstract class BaseRequest implements IScriptable, IJavaScriptType
 			});
 		if (waitForResult)
 		{
+			Debug.log("Waiting for request to be executed");
 			future.get();
+			Debug.log("Request execution ended, response:" + finalResponse[0]);
 			return finalResponse[0];
 		}
 		return null;
