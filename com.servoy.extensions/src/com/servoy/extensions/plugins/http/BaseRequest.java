@@ -37,10 +37,9 @@ import org.apache.hc.client5.http.impl.auth.BasicCredentialsProvider;
 import org.apache.hc.client5.http.impl.auth.BasicScheme;
 import org.apache.hc.client5.http.protocol.HttpClientContext;
 import org.apache.hc.core5.concurrent.FutureCallback;
-import org.apache.hc.core5.http.message.BufferedHeader;
+import org.apache.hc.core5.http.HttpHost;
 import org.apache.hc.core5.http.nio.AsyncEntityProducer;
 import org.apache.hc.core5.http.nio.support.BasicRequestProducer;
-import org.apache.hc.core5.util.CharArrayBuffer;
 import org.mozilla.javascript.Function;
 
 import com.servoy.j2db.plugins.IClientPluginAccess;
@@ -232,17 +231,15 @@ public abstract class BaseRequest implements IScriptable, IJavaScriptType
 			{
 				cred = new UsernamePasswordCredentials(userName, password != null ? password.toCharArray() : null);
 			}
-			bcp.setCredentials(new AuthScope(_url.getHost(), _url.getPort()), cred);
+			HttpHost targetHost = new HttpHost(_url.getProtocol(), _url.getHost(), _url.getPort());
+			bcp.setCredentials(new AuthScope(targetHost), cred);
 			context.setCredentialsProvider(bcp);
 
 			if (usePreemptiveAuthentication)
 			{
 				BasicScheme scheme = new BasicScheme();
 				scheme.initPreemptive(cred);
-				String authHeader = scheme.generateAuthResponse(null, method, context);
-				CharArrayBuffer buffer = new CharArrayBuffer(authHeader.length());
-				buffer.append(authHeader);
-				method.addHeader(new BufferedHeader(buffer));
+				context.resetAuthExchange(targetHost, scheme);
 			}
 		}
 		method.setConfig(requestConfigBuilder.build());
@@ -250,6 +247,7 @@ public abstract class BaseRequest implements IScriptable, IJavaScriptType
 		final Future<SimpleHttpResponse> future = client.execute(
 			new BasicRequestProducer(method, buildEntityProducer()),
 			SimpleResponseConsumer.create(),
+			context,
 			new FutureCallback<SimpleHttpResponse>()
 			{
 
