@@ -316,7 +316,7 @@ public abstract class BaseRequest implements IScriptable, IJavaScriptType
 			}
 			catch (Exception ex)
 			{
-
+				logError(ex, userName, workstation, domain);
 			}
 		}
 		return null;
