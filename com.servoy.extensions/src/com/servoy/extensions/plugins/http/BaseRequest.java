@@ -20,6 +20,8 @@ package com.servoy.extensions.plugins.http;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 import org.apache.hc.client5.http.async.methods.SimpleHttpResponse;
@@ -244,7 +246,6 @@ public abstract class BaseRequest implements IScriptable, IJavaScriptType
 		}
 		method.setConfig(requestConfigBuilder.build());
 		Debug.log("Starting request execution");
-		final Response[] finalResponse = new Response[1];
 		final Future<SimpleHttpResponse> future = client.execute(
 			new BasicRequestProducer(method, buildEntityProducer()),
 			SimpleResponseConsumer.create(),
@@ -254,14 +255,12 @@ public abstract class BaseRequest implements IScriptable, IJavaScriptType
 				@Override
 				public void completed(final SimpleHttpResponse response)
 				{
-					Debug.log("Request execution completed successfully");
-					finalResponse[0] = new Response(response, method);
 					if (successFunctionDef != null)
 					{
 						IClientPluginAccess access = httpPlugin.getClientPluginAccess();
 						if (access != null)
 						{
-							callbackArgs[0] = finalResponse[0];
+							callbackArgs[0] = new Response(response, method);
 							successFunctionDef.executeAsync(access, callbackArgs);
 						}
 						else
@@ -275,7 +274,6 @@ public abstract class BaseRequest implements IScriptable, IJavaScriptType
 				@Override
 				public void failed(final Exception ex)
 				{
-					Debug.log("Request execution failed");
 					logError(ex, userName, workstation, domain);
 					if (errorFunctionDef != null)
 					{
@@ -292,29 +290,36 @@ public abstract class BaseRequest implements IScriptable, IJavaScriptType
 									" but the client was already closed");
 						}
 					}
-					else
-					{
-						finalResponse[0] = new Response(ex.getMessage());
-					}
 				}
 
 				@Override
 				public void cancelled()
 				{
-					Debug.log("Request execution cancelled");
 					Debug.error("Request was cancelled while executing " + method.getRequestUri() + " with method " + method.getMethod() + " with user: " +
 						userName + ", workstation: " +
 						workstation + ", domain: " + domain);
-					finalResponse[0] = new Response("Request was cancelled");
 				}
 
 			});
 		if (waitForResult)
 		{
-			Debug.log("Waiting for request to be executed");
-			future.get();
-			Debug.log("Request execution ended, response:" + finalResponse[0]);
-			return finalResponse[0];
+			try
+			{
+				SimpleHttpResponse response = future.get();
+				return new Response(response, method);
+			}
+			catch (ExecutionException ee)
+			{
+				return new Response(ee.getMessage());
+			}
+			catch (CancellationException ce)
+			{
+				return new Response("Request was cancelled");
+			}
+			catch (Exception ex)
+			{
+
+			}
 		}
 		return null;
 	}
@@ -490,7 +495,7 @@ public abstract class BaseRequest implements IScriptable, IJavaScriptType
 
 	}
 
-	private void logError(Exception ex, String username, String workstation, String domain)
+	private void logError(Throwable ex, String username, String workstation, String domain)
 	{
 		Debug.error(
 			"Error executing a request to " + method.getRequestUri() + " with method " + method.getMethod() + " with user: " + username + ", workstation: " +
