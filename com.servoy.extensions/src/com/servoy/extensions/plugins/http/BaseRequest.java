@@ -242,7 +242,6 @@ public abstract class BaseRequest implements IScriptable, IJavaScriptType
 			}
 		}
 		method.setConfig(requestConfigBuilder.build());
-		Debug.log("Starting request execution");
 		final Future<SimpleHttpResponse> future = client.execute(
 			new BasicRequestProducer(method, buildEntityProducer()),
 			SimpleResponseConsumer.create(),
