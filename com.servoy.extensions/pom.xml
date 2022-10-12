@@ -1024,14 +1024,14 @@
             <artifactId>itext</artifactId>
             <version>1</version>
             <scope>system</scope>
-            <systemPath>${basedir}\lib\itext.jar</systemPath>
+            <systemPath>${basedir}/lib/itext.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>poi</groupId>
             <artifactId>poi</artifactId>
             <version>1</version>
             <scope>system</scope>
-            <systemPath>${basedir}\lib\jakarta-poi.jar</systemPath>
+            <systemPath>${basedir}/lib/jakarta-poi.jar</systemPath>
         </dependency>
     </dependencies>
 </project>
