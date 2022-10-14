@@ -20,7 +20,6 @@ package com.servoy.extensions.plugins.http;
 import java.io.File;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.hc.client5.http.classic.methods.HttpUriRequestBase;
@@ -37,9 +36,9 @@ import org.apache.hc.core5.http.NameValuePair;
 import org.apache.hc.core5.http.io.entity.BufferedHttpEntity;
 import org.apache.hc.core5.http.message.BasicNameValuePair;
 import org.apache.hc.core5.http.nio.AsyncEntityProducer;
+import org.apache.hc.core5.http.nio.entity.AsyncEntityProducers;
 import org.apache.hc.core5.http.nio.entity.BasicAsyncEntityProducer;
 import org.apache.hc.core5.http.nio.entity.FileEntityProducer;
-import org.apache.hc.core5.http.nio.entity.StringAsyncEntityProducer;
 import org.apache.hc.core5.net.WWWFormCodec;
 
 import com.servoy.extensions.plugins.file.JSFile;
@@ -132,7 +131,7 @@ public class BaseEntityEnclosingRequest extends BaseRequest
 		{
 			if (params != null)
 			{
-				entityProducer = new StringAsyncEntityProducer(
+				entityProducer = AsyncEntityProducers.create(
 					WWWFormCodec.format(
 						params,
 						charset != null ? Charset.forName(charset) : ContentType.APPLICATION_FORM_URLENCODED.getCharset()),
@@ -140,7 +139,7 @@ public class BaseEntityEnclosingRequest extends BaseRequest
 			}
 			else if (!Utils.stringIsEmpty(bodyContent))
 			{
-				entityProducer = new StringAsyncEntityProducer(bodyContent, ContentType.create(bodyMimeType, charset));
+				entityProducer = AsyncEntityProducers.create(bodyContent, ContentType.create(bodyMimeType, charset));
 				bodyContent = null;
 			}
 		}
@@ -195,10 +194,8 @@ public class BaseEntityEnclosingRequest extends BaseRequest
 			// add the parameters
 			if (params != null)
 			{
-				Iterator<NameValuePair> it = params.iterator();
-				while (it.hasNext())
+				for (NameValuePair nvp : params)
 				{
-					NameValuePair nvp = it.next();
 					// For usual String parameters
 					builder.addPart(nvp.getName(), new StringBody(nvp.getValue(), ContentType.create("text/plain", Charset.forName(charset))));
 				}
