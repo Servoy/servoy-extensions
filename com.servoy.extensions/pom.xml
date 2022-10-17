@@ -3,7 +3,7 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <prerequisites>
-        <maven>3.6.3</maven>
+        <maven>3.8.6</maven>
     </prerequisites>
     <groupId>com.servoy</groupId>
     <artifactId>com.servoy.extensions</artifactId>
@@ -16,17 +16,17 @@
         </repository>
     </repositories>
     <properties>
-        <tycho.version>2.6.0</tycho.version>
+        <tycho.version>2.7.5</tycho.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
         <eclipse.url>https://download.eclipse.org/eclipse/updates/4.25/</eclipse.url>
         <servoy-shiplibs.url>https://developer.servoy.com/p2_repository/ship_plugins/2022.12/</servoy-shiplibs.url>
         <workspace_dir>${project.basedir}/../</workspace_dir>
         <servoy-local.url>${project.baseUri}/target/repository/</servoy-local.url>
         <scribejava.version>8.3.2</scribejava.version>
         <amqp.version>5.16.0</amqp.version>
-        <doc.version>1.5.0</doc.version>
+        <doc.version>1.6.0</doc.version>
         <httpclient.version>5.1.3</httpclient.version>
         <httpcore.version>5.1.4</httpcore.version>
         <pdfbox.version>2.0.27</pdfbox.version>
@@ -90,7 +90,7 @@
                         <configuration>
                             <toolchains>
                                 <jdk>
-                                    <id>JavaSE-1.8</id>
+                                    <id>JavaSE-17</id>
                                 </jdk>
                             </toolchains>
                         </configuration>
@@ -149,6 +149,12 @@
                         </executions>
                     </plugin>
                     <plugin>
+                        <groupId>org.eclipse.tycho</groupId>
+                        <artifactId>tycho-maven-plugin</artifactId>
+                        <version>${tycho.version}</version>
+                        <extensions>true</extensions>
+                    </plugin>
+                    <plugin>
                         <groupId>org.eclipse.tycho.extras</groupId>
                         <artifactId>tycho-eclipserun-plugin</artifactId>
                         <version>${tycho.version}</version>
@@ -177,6 +183,7 @@
                                     <type>eclipse-feature</type>
                                 </dependency>
                             </dependencies>
+                            <executionEnvironment>JavaSE-17</executionEnvironment>
                         </configuration>
                         <executions>
                             <execution>
@@ -273,17 +280,6 @@
                                                     value="all-permissions" />
                                             </manifest>
                                         </jar>
-                                        <exec
-                                            dir="${project.build.directory}/plugins_beans/@{type}/"
-                                            executable="pack200"
-                                            output="${project.build.directory}/@{jarname}_repack200b.txt"
-                                            failonerror="true">
-                                            <arg value="-J-Xmx512m" />
-                                            <arg value="-r" />
-                                            <!-- This may break some features <arg value="-O" /> -->
-                                            <arg
-                                                value="${project.build.directory}/plugins_beans/@{type}/@{jarname}.jar" />
-                                        </exec>
                                         <retry retrycount="3" retrydelay="1000">
                                             <signjar keystore="${jarsigner.keystore}"
                                                 jar="${project.build.directory}/plugins_beans/@{type}/@{jarname}.jar"
@@ -614,151 +610,6 @@
                         <configuration>
                             <target>
                                 <parallel>
-                                    <exec
-                                        dir="${project.build.directory}/plugins_beans/plugins/pdf_output/"
-                                        executable="pack200"
-                                        output="${project.build.directory}/fontbox_repack200b.txt"
-                                        failonerror="true">
-                                        <arg value="-J-Xmx512m" />
-                                        <arg value="-r" />
-                                        <!-- This may break some features <arg value="-O" /> -->
-                                        <arg
-                                            value="${project.build.directory}/plugins_beans/plugins/pdf_output/fontbox.jar" />
-                                    </exec>
-                                    <exec
-                                        dir="${project.build.directory}/plugins_beans/plugins/pdf_output/"
-                                        executable="pack200"
-                                        output="${project.build.directory}/pdfbox_repack200b.txt"
-                                        failonerror="true">
-                                        <arg value="-J-Xmx512m" />
-                                        <arg value="-r" />
-                                        <!-- This may break some features <arg value="-O" /> -->
-                                        <arg
-                                            value="${project.build.directory}/plugins_beans/plugins/pdf_output/pdfbox.jar" />
-                                    </exec>
-                                    <exec
-                                        dir="${project.build.directory}/plugins_beans/plugins/pdf_output/"
-                                        executable="pack200"
-                                        output="${project.build.directory}/bcprov_repack200b.txt"
-                                        failonerror="true">
-                                        <arg value="-J-Xmx512m" />
-                                        <arg value="-r" />
-                                        <!-- This may break some features <arg value="-O" /> -->
-                                        <arg
-                                            value="${project.build.directory}/plugins_beans/plugins/pdf_output/bcprov.jar" />
-                                    </exec>
-                                    <exec
-                                        dir="${project.build.directory}/plugins_beans/plugins/pdf_output/"
-                                        executable="pack200"
-                                        output="${project.build.directory}/bcmail_repack200b.txt"
-                                        failonerror="true">
-                                        <arg value="-J-Xmx512m" />
-                                        <arg value="-r" />
-                                        <!-- This may break some features <arg value="-O" /> -->
-                                        <arg
-                                            value="${project.build.directory}/plugins_beans/plugins/pdf_output/bcmail.jar" />
-                                    </exec>
-                                    <exec
-                                        dir="${project.build.directory}/plugins_beans/plugins/jwt/"
-                                        executable="pack200"
-                                        output="${project.build.directory}/java-jwt_repack200b.txt"
-                                        failonerror="true">
-                                        <arg value="-J-Xmx512m" />
-                                        <arg value="-r" />
-                                        <!-- This may break some features <arg value="-O" /> -->
-                                        <arg
-                                            value="${project.build.directory}/plugins_beans/plugins/jwt/java-jwt.jar" />
-                                    </exec>
-                                    <exec
-                                        dir="${project.build.directory}/plugins_beans/plugins/jackson/"
-                                        executable="pack200"
-                                        output="${project.build.directory}/jackson-annotations_repack200b.txt"
-                                        failonerror="true">
-                                        <arg value="-J-Xmx512m" />
-                                        <arg value="-r" />
-                                        <!-- This may break some features <arg value="-O" /> -->
-                                        <arg
-                                            value="${project.build.directory}/plugins_beans/plugins/jackson/jackson-annotations.jar" />
-                                    </exec>
-                                    <exec
-                                        dir="${project.build.directory}/plugins_beans/plugins/jackson/"
-                                        executable="pack200"
-                                        output="${project.build.directory}/jackson-core_repack200b.txt"
-                                        failonerror="true">
-                                        <arg value="-J-Xmx512m" />
-                                        <arg value="-r" />
-                                        <!-- This may break some features <arg value="-O" /> -->
-                                        <arg
-                                            value="${project.build.directory}/plugins_beans/plugins/jackson/jackson-core.jar" />
-                                    </exec>
-                                    <exec
-                                        dir="${project.build.directory}/plugins_beans/plugins/jackson/"
-                                        executable="pack200"
-                                        output="${project.build.directory}/jackson-databind_repack200b.txt"
-                                        failonerror="true">
-                                        <arg value="-J-Xmx512m" />
-                                        <arg value="-r" />
-                                        <!-- This may break some features <arg value="-O" /> -->
-                                        <arg
-                                            value="${project.build.directory}/plugins_beans/plugins/jackson/jackson-databind.jar" />
-                                    </exec>
-                                    <exec
-                                        dir="${project.build.directory}/plugins_beans/plugins/http/"
-                                        executable="pack200"
-                                        output="${project.build.directory}/http-httpclient5_repack200b.txt"
-                                        failonerror="true">
-                                        <arg value="-J-Xmx512m" />
-                                        <arg value="-r" />
-                                        <!-- This may break some features <arg value="-O" /> -->
-                                        <arg
-                                            value="${project.build.directory}/plugins_beans/plugins/http/httpclient5.jar" />
-                                    </exec>
-                                    <exec
-                                        dir="${project.build.directory}/plugins_beans/plugins/http/"
-                                        executable="pack200"
-                                        output="${project.build.directory}/http-httpcore5_repack200b.txt"
-                                        failonerror="true">
-                                        <arg value="-J-Xmx512m" />
-                                        <arg value="-r" />
-                                        <!-- This may break some features <arg value="-O" /> -->
-                                        <arg
-                                            value="${project.build.directory}/plugins_beans/plugins/http/httpcore5.jar" />
-                                    </exec>
-                                    <exec
-                                        dir="${project.build.directory}/plugins_beans/plugins/http/"
-                                        executable="pack200"
-                                        output="${project.build.directory}/http-httpcore5-h2_repack200b.txt"
-                                        failonerror="true">
-                                        <arg value="-J-Xmx512m" />
-                                        <arg value="-r" />
-                                        <!-- This may break some features <arg value="-O" /> -->
-                                        <arg
-                                            value="${project.build.directory}/plugins_beans/plugins/http/httpcore5-h2.jar" />
-                                    </exec>
-                                    <exec
-                                        dir="${project.build.directory}/plugins_beans/plugins/images/"
-                                        executable="pack200"
-                                        output="${project.build.directory}/metadataextractor_repack200b.txt"
-                                        failonerror="true">
-                                        <arg value="-J-Xmx512m" />
-                                        <arg value="-r" />
-                                        <!-- This may break some features <arg value="-O" /> -->
-                                        <arg
-                                            value="${project.build.directory}/plugins_beans/plugins/images/metadataextractor.jar" />
-                                    </exec>
-                                    <exec
-                                        dir="${project.build.directory}/plugins_beans/plugins/images/"
-                                        executable="pack200"
-                                        output="${project.build.directory}/metadataextractor_repack200b.txt"
-                                        failonerror="true">
-                                        <arg value="-J-Xmx512m" />
-                                        <arg value="-r" />
-                                        <!-- This may break some features <arg value="-O" /> -->
-                                        <arg
-                                            value="${project.build.directory}/plugins_beans/plugins/images/xmpcore.jar" />
-                                    </exec>
-                                </parallel>
-                                <parallel>
                                     <signjar keystore="${jarsigner.keystore}"
                                         jar="${project.build.directory}/plugins_beans/plugins/pdf_output/fontbox.jar"
                                         alias="ServoyClient" storepass="${jarsigner.storepass}"
@@ -926,6 +777,12 @@
             <groupId>org.openid4java</groupId>
             <artifactId>openid4java</artifactId>
             <version>0.9.8</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>xerces</groupId>
+                    <artifactId>xercesImpl</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.quartz-scheduler</groupId>
