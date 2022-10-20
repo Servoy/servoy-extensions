@@ -36,7 +36,7 @@
         <jwks.version>0.21.2</jwks.version>
         <metadataextractor.version>2.18.0</metadataextractor.version>
         <xmpcore.version>6.1.11</xmpcore.version>
-        <rhino.version>1.7.14.s1</rhino.version>
+        <rhino.version>1.7.14.s2</rhino.version>
     </properties>
     <profiles>
         <profile>
