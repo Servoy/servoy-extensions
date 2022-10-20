@@ -17,6 +17,7 @@
 
 package com.servoy.extensions.plugins.http;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -24,8 +25,6 @@ import java.util.List;
 
 import org.apache.hc.client5.http.classic.methods.HttpUriRequestBase;
 import org.apache.hc.client5.http.config.RequestConfig.Builder;
-import org.apache.hc.client5.http.entity.mime.ByteArrayBody;
-import org.apache.hc.client5.http.entity.mime.FileBody;
 import org.apache.hc.client5.http.entity.mime.HttpMultipartMode;
 import org.apache.hc.client5.http.entity.mime.MultipartEntityBuilder;
 import org.apache.hc.client5.http.entity.mime.StringBody;
@@ -33,12 +32,10 @@ import org.apache.hc.client5.http.impl.async.CloseableHttpAsyncClient;
 import org.apache.hc.client5.http.impl.auth.BasicCredentialsProvider;
 import org.apache.hc.core5.http.ContentType;
 import org.apache.hc.core5.http.NameValuePair;
-import org.apache.hc.core5.http.io.entity.BufferedHttpEntity;
 import org.apache.hc.core5.http.message.BasicNameValuePair;
 import org.apache.hc.core5.http.nio.AsyncEntityProducer;
 import org.apache.hc.core5.http.nio.entity.AsyncEntityProducers;
 import org.apache.hc.core5.http.nio.entity.BasicAsyncEntityProducer;
-import org.apache.hc.core5.http.nio.entity.FileEntityProducer;
 import org.apache.hc.core5.net.WWWFormCodec;
 
 import com.servoy.extensions.plugins.file.JSFile;
@@ -150,14 +147,22 @@ public class BaseEntityEnclosingRequest extends BaseRequest
 			{
 				File f = (File)info.file;
 				String contentType = info.mimeType != null ? info.mimeType : MimeTypes.getContentType(Utils.readFile(f, 32), f.getName());
-				entityProducer = new FileEntityProducer(f, ContentType.create(contentType != null ? contentType : "binary/octet-stream"));
+				entityProducer = AsyncEntityProducers.create(f, ContentType.create(contentType != null ? contentType : "binary/octet-stream"));
 			}
 			else if (info.file instanceof JSFile)
 			{
 				JSFile f = (JSFile)info.file;
 				String contentType = info.mimeType != null ? info.mimeType : f.js_getContentType();
-				entityProducer = new BasicAsyncEntityProducer(f.jsFunction_getBytes(),
-					ContentType.create(contentType != null ? contentType : "binary/octet-stream"));
+				File file = f.getFile();
+				if (file != null)
+				{
+					entityProducer = AsyncEntityProducers.create(file, ContentType.create(contentType != null ? contentType : "binary/octet-stream"));
+				}
+				else
+				{
+					entityProducer = new BasicAsyncEntityProducer(f.jsFunction_getBytes(),
+						ContentType.create(contentType != null ? contentType : "binary/octet-stream"));
+				}
 			}
 			else
 			{
@@ -177,14 +182,14 @@ public class BaseEntityEnclosingRequest extends BaseRequest
 				{
 					String contentType = info.mimeType != null ? info.mimeType
 						: MimeTypes.getContentType(Utils.readFile((File)file, 32), ((File)file).getName());
-					builder.addPart(info.parameterName,
-						new FileBody((File)file, contentType != null ? ContentType.create(contentType) : ContentType.DEFAULT_BINARY));
+					builder.addBinaryBody(info.parameterName,
+						(File)file, contentType != null ? ContentType.create(contentType) : ContentType.DEFAULT_BINARY, ((File)file).getName());
 				}
 				else if (file instanceof JSFile)
 				{
 					String contentType = info.mimeType != null ? info.mimeType : ((JSFile)file).js_getContentType();
-					builder.addPart(info.parameterName, new ByteArrayBody(Utils.getBytesFromInputStream(((JSFile)file).getAbstractFile().getInputStream()),
-						ContentType.create(contentType != null ? contentType : "binary/octet-stream"), ((JSFile)file).js_getName()));
+					builder.addBinaryBody(info.parameterName, ((JSFile)file).getAbstractFile().getInputStream(),
+						ContentType.create(contentType != null ? contentType : "binary/octet-stream"), ((JSFile)file).js_getName());
 				}
 				else
 				{
@@ -200,9 +205,11 @@ public class BaseEntityEnclosingRequest extends BaseRequest
 					builder.addPart(nvp.getName(), new StringBody(nvp.getValue(), ContentType.create("text/plain", Charset.forName(charset))));
 				}
 			}
-			BufferedHttpEntity entity = new BufferedHttpEntity(builder.build());
-
-			entityProducer = new BasicAsyncEntityProducer(Utils.getBytesFromInputStream(entity.getContent()), ContentType.MULTIPART_FORM_DATA);
+			// unfortunately there is no easy way to avoid loading all data for async client, see https://issues.apache.org/jira/browse/HTTPASYNC-163
+			ByteArrayOutputStream out = new ByteArrayOutputStream();
+			builder.build().writeTo(out);
+			out.flush();
+			entityProducer = new BasicAsyncEntityProducer(out.toByteArray(), ContentType.MULTIPART_FORM_DATA);
 		}
 
 		// entity may have been set already, see PutRequest.js_setFile
