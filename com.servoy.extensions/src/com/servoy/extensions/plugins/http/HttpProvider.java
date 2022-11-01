@@ -257,8 +257,10 @@ public class HttpProvider implements IReturnedTypesProvider, IScriptable
 
 
 	/**
-	 * Create an http client (like a web browser with session binding) usable todo multiple request/posts in same server session.
-	 * Make sure you call client.close() on it after you used this client object to clean up resources.
+	 * Create an http client (like a web browser with session binding) usable todo multiple request/posts in same server session
+	 * .
+	 * WARNING: Make sure you call client.close() on it after you used this client object to clean up resources.
+	 * Starting a HTTPClient is the same as starting an actual browser without UI!
 	 *
 	 * @sample
 	 * var client = plugins.http.createNewHttpClient();
@@ -272,7 +274,9 @@ public class HttpProvider implements IReturnedTypesProvider, IScriptable
 
 	/**
 	 * Create an http client (like a web browser with session binding) usable todo multiple request/posts in same server session.
-	 * Make sure you call client.close() on it after you used this client object to clean up resources.
+	 *
+	 * WARNING: Make sure you call client.close() on it after you used this client object to clean up resources.
+	 * Starting a HTTPClient is the same as starting an actual browser without UI!
 	 *
 	 * @param config httpclient config
 	 * @sample
