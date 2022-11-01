@@ -31,9 +31,28 @@ public class HttpClientConfig implements IScriptable, IJavaScriptType
 	String protocol;
 	int keepAliveDuration = -1;
 	String userAgent;
+	int maxIOThreadCount = -1;
 
 	public HttpClientConfig()
 	{
+	}
+
+	/**
+	 * Gets/Sets maximum number of input/output threads per client, default value is 2.
+	 *
+	 * @sample
+	 * var config = plugins.http.createNewHttpClientConfig();
+	 * config.maxIOThreadCount = 5;
+	 * var client = plugins.http.createNewHttpClient(config);
+	 */
+	public int js_getMaxIOThreadCount()
+	{
+		return maxIOThreadCount;
+	}
+
+	public void js_setMaxIOThreadCount(int maxIOThreadCount)
+	{
+		this.maxIOThreadCount = maxIOThreadCount;
 	}
 
 	/**

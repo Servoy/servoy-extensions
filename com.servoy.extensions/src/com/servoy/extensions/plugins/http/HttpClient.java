@@ -84,6 +84,8 @@ public class HttpClient implements IScriptable, IJavaScriptType
 		this.httpPlugin = httpPlugin;
 
 		HttpAsyncClientBuilder builder = HttpAsyncClients.custom();
+		builder.setIOReactorConfig(org.apache.hc.core5.reactor.IOReactorConfig.custom().setSoKeepAlive(true)
+			.setIoThreadCount((config != null && config.maxIOThreadCount >= 0) ? config.maxIOThreadCount : 2).build());
 		requestConfigBuilder = RequestConfig.custom();
 		requestConfigBuilder.setCircularRedirectsAllowed(true);
 
@@ -106,7 +108,6 @@ public class HttpClient implements IScriptable, IJavaScriptType
 			TlsStrategy tlsStrat = tlsFactory.build();
 			final PoolingAsyncClientConnectionManager cm = PoolingAsyncClientConnectionManagerBuilder.create()
 				.setTlsStrategy(tlsStrat)
-				//no longer supported  .setDefaultSocketConfig(SocketConfig.custom().setSoKeepAlive(true).build())
 				.setMaxConnPerRoute(5)
 				.build();
 			builder.setConnectionManager(cm);
