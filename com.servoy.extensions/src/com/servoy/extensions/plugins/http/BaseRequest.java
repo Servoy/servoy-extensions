@@ -33,7 +33,6 @@ import org.apache.hc.client5.http.auth.UsernamePasswordCredentials;
 import org.apache.hc.client5.http.classic.methods.HttpUriRequestBase;
 import org.apache.hc.client5.http.config.RequestConfig.Builder;
 import org.apache.hc.client5.http.impl.async.CloseableHttpAsyncClient;
-import org.apache.hc.client5.http.impl.async.HttpAsyncClientBuilder;
 import org.apache.hc.client5.http.impl.auth.BasicCredentialsProvider;
 import org.apache.hc.client5.http.impl.auth.BasicScheme;
 import org.apache.hc.client5.http.protocol.HttpClientContext;
@@ -75,14 +74,7 @@ public abstract class BaseRequest implements IScriptable, IJavaScriptType
 		BasicCredentialsProvider proxyCredentialsProvider)
 	{
 		this.url = url;
-		if (hc == null)
-		{
-			client = HttpAsyncClientBuilder.create().build();
-		}
-		else
-		{
-			client = hc;
-		}
+		client = hc;
 		headers = new HashMap<String, String[]>();
 		this.method = method;
 		this.httpPlugin = httpPlugin;
