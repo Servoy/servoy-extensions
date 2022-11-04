@@ -139,6 +139,10 @@ public class BaseEntityEnclosingRequest extends BaseRequest
 				entityProducer = AsyncEntityProducers.create(bodyContent, ContentType.create(bodyMimeType, charset));
 				bodyContent = null;
 			}
+			else
+			{
+				entityProducer = AsyncEntityProducers.create("");
+			}
 		}
 		else if (files.size() == 1 && (params == null || params.size() == 0) && !forceMultipart)
 		{
