@@ -256,7 +256,7 @@ public class Response implements IScriptable, IJavaScriptType
 		if (this.res != null)
 		{
 			ContentType contentType = res.getContentType();
-			if (contentType != null)
+			if (contentType != null && contentType.getCharset() != null)
 			{
 				return contentType.getCharset().displayName();
 			}
