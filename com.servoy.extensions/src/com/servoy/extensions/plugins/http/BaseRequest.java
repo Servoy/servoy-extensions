@@ -25,7 +25,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 import org.apache.hc.client5.http.async.methods.SimpleHttpResponse;
-import org.apache.hc.client5.http.async.methods.SimpleResponseConsumer;
 import org.apache.hc.client5.http.auth.AuthScope;
 import org.apache.hc.client5.http.auth.Credentials;
 import org.apache.hc.client5.http.auth.NTCredentials;
@@ -236,7 +235,7 @@ public abstract class BaseRequest implements IScriptable, IJavaScriptType
 		method.setConfig(requestConfigBuilder.build());
 		final Future<SimpleHttpResponse> future = client.execute(
 			new BasicRequestProducer(method, buildEntityProducer()),
-			SimpleResponseConsumer.create(),
+			FixedSimpleResponseConsumer.create(),
 			context,
 			new FutureCallback<SimpleHttpResponse>()
 			{
