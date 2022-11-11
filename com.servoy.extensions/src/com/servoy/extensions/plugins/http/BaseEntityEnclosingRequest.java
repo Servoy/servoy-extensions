@@ -17,7 +17,6 @@
 
 package com.servoy.extensions.plugins.http;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -25,9 +24,6 @@ import java.util.List;
 
 import org.apache.hc.client5.http.classic.methods.HttpUriRequestBase;
 import org.apache.hc.client5.http.config.RequestConfig.Builder;
-import org.apache.hc.client5.http.entity.mime.HttpMultipartMode;
-import org.apache.hc.client5.http.entity.mime.MultipartEntityBuilder;
-import org.apache.hc.client5.http.entity.mime.StringBody;
 import org.apache.hc.client5.http.impl.async.CloseableHttpAsyncClient;
 import org.apache.hc.client5.http.impl.auth.BasicCredentialsProvider;
 import org.apache.hc.core5.http.ContentType;
@@ -175,8 +171,7 @@ public class BaseEntityEnclosingRequest extends BaseRequest
 		}
 		else
 		{
-			MultipartEntityBuilder builder = MultipartEntityBuilder.create();
-			builder.setMode(HttpMultipartMode.LEGACY);
+			entityProducer = new MultiPartEntityProducer();
 
 			// For File parameters
 			for (FileInfo info : files)
@@ -186,14 +181,26 @@ public class BaseEntityEnclosingRequest extends BaseRequest
 				{
 					String contentType = info.mimeType != null ? info.mimeType
 						: MimeTypes.getContentType(Utils.readFile((File)file, 32), ((File)file).getName());
-					builder.addBinaryBody(info.parameterName,
-						(File)file, contentType != null ? ContentType.create(contentType) : ContentType.DEFAULT_BINARY, ((File)file).getName());
+					((MultiPartEntityProducer)entityProducer).addProducer(
+						AsyncEntityProducers.create((File)file, contentType != null ? ContentType.create(contentType) : ContentType.DEFAULT_BINARY),
+						info.parameterName, info.fileName);
 				}
 				else if (file instanceof JSFile)
 				{
+					File innerFile = ((JSFile)file).getFile();
 					String contentType = info.mimeType != null ? info.mimeType : ((JSFile)file).js_getContentType();
-					builder.addBinaryBody(info.parameterName, ((JSFile)file).getAbstractFile().getInputStream(),
-						ContentType.create(contentType != null ? contentType : "binary/octet-stream"), ((JSFile)file).js_getName());
+					if (innerFile != null)
+					{
+						((MultiPartEntityProducer)entityProducer)
+							.addProducer(AsyncEntityProducers.create(innerFile, ContentType.create(contentType != null ? contentType : "binary/octet-stream")),
+								info.parameterName, info.fileName);
+					}
+					else
+					{
+						((MultiPartEntityProducer)entityProducer).addProducer(new BasicAsyncEntityProducer(((JSFile)file).jsFunction_getBytes(),
+							ContentType.create(contentType != null ? contentType : "binary/octet-stream")), info.parameterName, info.fileName);
+					}
+
 				}
 				else
 				{
@@ -205,15 +212,12 @@ public class BaseEntityEnclosingRequest extends BaseRequest
 			{
 				for (NameValuePair nvp : params)
 				{
+					((MultiPartEntityProducer)entityProducer)
+						.addProducer(new BasicAsyncEntityProducer(nvp.getValue().getBytes(), ContentType.create("text/plain", Charset.forName(charset))),
+							nvp.getName(), null);
 					// For usual String parameters
-					builder.addPart(nvp.getName(), new StringBody(nvp.getValue(), ContentType.create("text/plain", Charset.forName(charset))));
 				}
 			}
-			// unfortunately there is no easy way to avoid loading all data for async client, see https://issues.apache.org/jira/browse/HTTPASYNC-163
-			ByteArrayOutputStream out = new ByteArrayOutputStream();
-			builder.build().writeTo(out);
-			out.flush();
-			entityProducer = new BasicAsyncEntityProducer(out.toByteArray(), ContentType.MULTIPART_FORM_DATA);
 		}
 
 		// entity may have been set already, see PutRequest.js_setFile
