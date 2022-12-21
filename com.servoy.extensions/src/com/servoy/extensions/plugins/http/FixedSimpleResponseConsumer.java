@@ -18,6 +18,7 @@
 package com.servoy.extensions.plugins.http;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 import org.apache.hc.client5.http.async.methods.SimpleHttpResponse;
@@ -59,7 +60,13 @@ public class FixedSimpleResponseConsumer extends AbstractAsyncResponseConsumer<S
 			// workaround https://issues.apache.org/jira/browse/HTTPCLIENT-2244
 			if (contentType != null && contentType.getCharset() == null)
 			{
-				simpleResponse.setBody(entity, contentType.withCharset(StandardCharsets.ISO_8859_1));
+				Charset defaultCharset = StandardCharsets.ISO_8859_1;
+				ContentType mimeContentType = ContentType.getByMimeType(contentType.getMimeType());
+				if (mimeContentType != null && mimeContentType.getCharset() != null)
+				{
+					defaultCharset = mimeContentType.getCharset();
+				}
+				simpleResponse.setBody(entity, contentType.withCharset(defaultCharset));
 			}
 			else
 			{
