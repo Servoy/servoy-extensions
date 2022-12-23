@@ -78,16 +78,15 @@ public class DataNotifyListener implements IDataNotifyListener
 	}
 
 	@Override
-	public void flushCachedDatabaseData(String dataSource, Object[] tenantValue, BroadcastFilter[] broadcastFilters)
+	public void flushCachedDatabaseData(String dataSource, BroadcastFilter[] broadcastFilters)
 	{
-		sendBytes(new NotifyData(originServerUUID, dataSource, tenantValue, broadcastFilters));
+		sendBytes(new NotifyData(originServerUUID, dataSource, broadcastFilters));
 	}
 
 	@Override
-	public void notifyDataChange(String server_name, String table_name, IDataSet pks, int action, Object[] insertColumnData, Object[] tenantValue,
-		BroadcastFilter[] broadcastFilters)
+	public void notifyDataChange(String server_name, String table_name, IDataSet pks, int action, Object[] insertColumnData, BroadcastFilter[] broadcastFilters)
 	{
-		sendBytes(new NotifyData(originServerUUID, server_name, table_name, pks, action, insertColumnData, tenantValue, broadcastFilters));
+		sendBytes(new NotifyData(originServerUUID, server_name, table_name, pks, action, insertColumnData, broadcastFilters));
 	}
 
 	/**

@@ -32,10 +32,9 @@ public final class NotifyData implements Serializable
 	final int action;
 	final Object[] insertColumnData;
 	final String dataSource;
-	final Object[] tenantData;
 	final BroadcastFilter[] broadcastFilters;
 
-	public NotifyData(String originServerUUID, String server_name, String table_name, IDataSet pks, int action, Object[] insertColumnData, Object[] tenantData,
+	public NotifyData(String originServerUUID, String server_name, String table_name, IDataSet pks, int action, Object[] insertColumnData,
 		BroadcastFilter[] broadcastFilters)
 	{
 		this.originServerUUID = originServerUUID;
@@ -44,20 +43,18 @@ public final class NotifyData implements Serializable
 		this.pks = pks;
 		this.action = action;
 		this.insertColumnData = insertColumnData;
-		this.tenantData = tenantData;
 		this.broadcastFilters = broadcastFilters;
 		this.dataSource = null;
 	}
 
 	/**
 	 * @param dataSource
-	 * @param tenantValue
+	 * @param broadcastFilters
 	 */
-	public NotifyData(String originServerUUID, String dataSource, Object[] tenantValue, BroadcastFilter[] broadcastFilters)
+	public NotifyData(String originServerUUID, String dataSource, BroadcastFilter[] broadcastFilters)
 	{
 		this.originServerUUID = originServerUUID;
 		this.dataSource = dataSource;
-		this.tenantData = tenantValue;
 		this.broadcastFilters = broadcastFilters;
 		this.server_name = null;
 		this.table_name = null;
