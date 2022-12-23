@@ -73,7 +73,7 @@ public class FileServlet extends HttpServlet
 			{
 				String contentType = AbstractFile.getContentType(file);
 				if (contentType != null) resp.setContentType(contentType);
-				resp.setContentLength((int)file.length());
+				resp.setContentLengthLong(file.length());
 				String contentDisposition = req.getParameter("c");
 				if (contentDisposition != null)
 				{
