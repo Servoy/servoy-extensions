@@ -28,6 +28,7 @@ import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.Recoverable;
 import com.rabbitmq.client.RecoverableConnection;
 import com.rabbitmq.client.RecoveryListener;
+import com.servoy.j2db.dataprocessing.BroadcastFilter;
 import com.servoy.j2db.dataprocessing.IDataSet;
 import com.servoy.j2db.plugins.IDataNotifyListener;
 import com.servoy.j2db.util.Debug;
@@ -77,15 +78,15 @@ public class DataNotifyListener implements IDataNotifyListener
 	}
 
 	@Override
-	public void flushCachedDatabaseData(String dataSource, Object[] tenantValue)
+	public void flushCachedDatabaseData(String dataSource, BroadcastFilter[] broadcastFilters)
 	{
-		sendBytes(new NotifyData(originServerUUID, dataSource, tenantValue));
+		sendBytes(new NotifyData(originServerUUID, dataSource, broadcastFilters));
 	}
 
 	@Override
-	public void notifyDataChange(String server_name, String table_name, IDataSet pks, int action, Object[] insertColumnData, Object[] tenantValue)
+	public void notifyDataChange(String server_name, String table_name, IDataSet pks, int action, Object[] insertColumnData, BroadcastFilter[] broadcastFilters)
 	{
-		sendBytes(new NotifyData(originServerUUID, server_name, table_name, pks, action, insertColumnData, tenantValue));
+		sendBytes(new NotifyData(originServerUUID, server_name, table_name, pks, action, insertColumnData, broadcastFilters));
 	}
 
 	/**
