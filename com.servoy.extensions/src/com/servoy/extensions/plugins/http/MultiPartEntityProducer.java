@@ -50,6 +50,7 @@ public class MultiPartEntityProducer implements AsyncEntityProducer
 	int currentIndex = 0;
 	final ByteArrayBuffer boundaryEncoded;
 	final String boundary;
+	long contentLength = -2;
 
 	static final ByteArrayBuffer FIELD_SEP = encode(StandardCharsets.ISO_8859_1, ": ");
 	static final ByteArrayBuffer CR_LF = encode(StandardCharsets.ISO_8859_1, "\r\n");
@@ -106,7 +107,8 @@ public class MultiPartEntityProducer implements AsyncEntityProducer
 	@Override
 	public long getContentLength()
 	{
-		return -1;
+		this.initContentLength();
+		return this.contentLength;
 	}
 
 	@Override
@@ -124,8 +126,8 @@ public class MultiPartEntityProducer implements AsyncEntityProducer
 	@Override
 	public boolean isChunked()
 	{
-		// can it have chunks ?
-		return false;
+		this.initContentLength();
+		return this.contentLength < 0;
 	}
 
 	@Override
@@ -153,35 +155,7 @@ public class MultiPartEntityProducer implements AsyncEntityProducer
 				{
 					if (!headerIsWritten())
 					{
-						writeBytes(TWO_HYPHENS, channel);
-						writeBytes(boundaryEncoded, channel);
-						writeBytes(CR_LF, channel);
-
-						// write content-disposition
-						writeBytes(encode(StandardCharsets.ISO_8859_1, HttpHeaders.CONTENT_DISPOSITION), channel);
-						writeBytes(FIELD_SEP, channel);
-						final CharArrayBuffer buf = new CharArrayBuffer(64);
-						buf.append("form-data");
-						buf.append("; ");
-						final List<NameValuePair> fieldParameters = new ArrayList<>();
-						if (getCurrentProducerName() != null) fieldParameters.add(new BasicNameValuePair("name", getCurrentProducerName()));
-						if (getCurrentProducerFileName() != null) fieldParameters.add(new BasicNameValuePair("filename", getCurrentProducerFileName()));
-
-						if (fieldParameters.size() > 0)
-						{
-							BasicHeaderValueFormatter.INSTANCE.formatParameters(buf, fieldParameters.toArray(new NameValuePair[0]), false);
-						}
-						writeBytes(encode(StandardCharsets.ISO_8859_1, buf.toString()), channel);
-						writeBytes(CR_LF, channel);
-						if (getCurrentProducer().getContentType() != null)
-						{
-							writeBytes(encode(StandardCharsets.ISO_8859_1, HttpHeaders.CONTENT_TYPE), channel);
-							writeBytes(FIELD_SEP, channel);
-							writeBytes(encode(StandardCharsets.ISO_8859_1, getCurrentProducer().getContentType()), channel);
-							writeBytes(CR_LF, channel);
-						}
-
-						writeBytes(CR_LF, channel);
+						MultiPartEntityProducer.this.writePartHeader(channel, getCurrentProducer(), getCurrentProducerName(), getCurrentProducerFileName());
 						markHeaderWritten();
 					}
 					return channel.write(src);
@@ -288,6 +262,105 @@ public class MultiPartEntityProducer implements AsyncEntityProducer
 	@Override
 	public void releaseResources()
 	{
+	}
+
+	private void writePartHeader(DataStreamChannel channel, AsyncEntityProducer producer, String name, String fileName) throws IOException
+	{
+		writeBytes(TWO_HYPHENS, channel);
+		writeBytes(boundaryEncoded, channel);
+		writeBytes(CR_LF, channel);
+
+		// write content-disposition
+		writeBytes(encode(StandardCharsets.ISO_8859_1, HttpHeaders.CONTENT_DISPOSITION), channel);
+		writeBytes(FIELD_SEP, channel);
+		final CharArrayBuffer buf = new CharArrayBuffer(64);
+		buf.append("form-data");
+		buf.append("; ");
+		final List<NameValuePair> fieldParameters = new ArrayList<>();
+		if (name != null) fieldParameters.add(new BasicNameValuePair("name", name));
+		if (fileName != null) fieldParameters.add(new BasicNameValuePair("filename", fileName));
+
+		if (fieldParameters.size() > 0)
+		{
+			BasicHeaderValueFormatter.INSTANCE.formatParameters(buf, fieldParameters.toArray(new NameValuePair[0]), true);
+		}
+		writeBytes(encode(StandardCharsets.ISO_8859_1, buf.toString()), channel);
+		writeBytes(CR_LF, channel);
+		if (producer.getContentType() != null)
+		{
+			writeBytes(encode(StandardCharsets.ISO_8859_1, HttpHeaders.CONTENT_TYPE), channel);
+			writeBytes(FIELD_SEP, channel);
+			writeBytes(encode(StandardCharsets.ISO_8859_1, producer.getContentType()), channel);
+			writeBytes(CR_LF, channel);
+		}
+
+		writeBytes(CR_LF, channel);
+	}
+
+	private void initContentLength()
+	{
+		if (this.contentLength == -2)
+		{
+			long totalContentLength = -1;
+			for (InnerMultiPartAsyncProducer producer : producers)
+			{
+				long innerContentLength = producer.producer.getContentLength();
+				if (innerContentLength == -1)
+				{
+					totalContentLength = -1;
+					break;
+				}
+				totalContentLength += innerContentLength;
+			}
+			if (totalContentLength >= 0)
+			{
+				for (InnerMultiPartAsyncProducer producer : producers)
+				{
+					try
+					{
+						int[] headerLength = new int[] { 0 };
+						this.writePartHeader(new DataStreamChannel()
+						{
+
+							@Override
+							public void endStream() throws IOException
+							{
+
+							}
+
+							@Override
+							public int write(ByteBuffer src) throws IOException
+							{
+								headerLength[0] += src.remaining();
+								return 0;
+							}
+
+							@Override
+							public void requestOutput()
+							{
+
+							}
+
+							@Override
+							public void endStream(List< ? extends Header> trailers) throws IOException
+							{
+
+							}
+						}, producer.producer, producer.name, producer.fileName);
+						totalContentLength += headerLength[0];
+
+					}
+					catch (IOException e)
+					{
+						Debug.error(e);
+					}
+
+					totalContentLength += 2;//CR_LF in endstream
+				}
+				totalContentLength += 6 + this.boundary.length();
+			}
+			this.contentLength = totalContentLength;
+		}
 	}
 
 }
