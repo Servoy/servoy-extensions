@@ -77,7 +77,7 @@ public class MultiPartEntityProducer implements AsyncEntityProducer
 	private String generateBoundary()
 	{
 		final ThreadLocalRandom rand = ThreadLocalRandom.current();
-		final int count = rand.nextInt(30, 41); // a random size from 30 to 40
+		final int count = 40; // rand.nextInt(30, 41); // a random size from 30 to 40
 		final CharBuffer buffer = CharBuffer.allocate(count);
 		while (buffer.hasRemaining())
 		{
