@@ -132,7 +132,8 @@ public class BaseEntityEnclosingRequest extends BaseRequest
 			}
 			else if (!Utils.stringIsEmpty(bodyContent))
 			{
-				entityProducer = AsyncEntityProducers.create(bodyContent, ContentType.create(bodyMimeType, charset));
+				entityProducer = AsyncEntityProducers.create(bodyContent.getBytes(charset != null ? charset : "UTF8"),
+					ContentType.create(bodyMimeType, charset != null ? charset : "UTF8"));
 				bodyContent = null;
 			}
 			else
