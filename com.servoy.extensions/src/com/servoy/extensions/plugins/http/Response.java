@@ -272,7 +272,9 @@ public class Response implements IScriptable, IJavaScriptType
 	 * Needs to be called when not reading content via getResponseBody or getMediaData
 	 * to be able to reuse the client.
 	 * @return true if the entity content is consumed and content stream (if exists) is closed
+	 * @deprecated no longer needed, make sure to call client.close()
 	 */
+	@Deprecated
 	public boolean js_close()
 	{
 		// no longer needed
