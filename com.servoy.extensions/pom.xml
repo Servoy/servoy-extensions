@@ -276,12 +276,11 @@
 											<arg
 												value="${project.build.directory}/plugins_beans/@{type}/@{jarname}.jar" />
 										</exec>
-										<retry retrycount="3" retrydelay="1000">
+										<retry retrycount="5" retrydelay="2000">
 											<signjar keystore="${jarsigner.keystore}"
 												jar="${project.build.directory}/plugins_beans/@{type}/@{jarname}.jar"
 												alias="ServoyClient" storepass="${jarsigner.storepass}"
-												tsaurl="http://sha256timestamp.ws.symantec.com/sha256/timestamp"
-												sigalg="SHA256withRSA" digestalg="SHA-256" />
+												tsaurl="http://timestamp.sectigo.com"/>
 											</retry>
 									</sequential>
 								</macrodef>
@@ -303,7 +302,7 @@
 										file="${project.basedir}/resources/pdf_output/javax.print.StreamPrintServiceFactory" />
 								</copy>
 
-								<parallel>
+								<parallel threadCount="3">
 									<makejar srcdir="agent" />
 									<makejar srcdir="amortization" />
 									<makejar srcdir="broadcaster" />
@@ -714,62 +713,62 @@
                                             value="${project.build.directory}/plugins_beans/plugins/images/xmpcore.jar" />
                                     </exec>
 								</parallel>
-								<parallel>
+								<parallel threadCount="3">
 									<signjar keystore="${jarsigner.keystore}"
 										jar="${project.build.directory}/plugins_beans/plugins/pdf_output/fontbox.jar"
 										alias="ServoyClient" storepass="${jarsigner.storepass}"
-										tsaurl="http://sha256timestamp.ws.symantec.com/sha256/timestamp"
-										sigalg="SHA256withRSA" digestalg="SHA-256" />
+										tsaurl="http://timestamp.sectigo.com"
+										 />
 									<signjar keystore="${jarsigner.keystore}"
 										jar="${project.build.directory}/plugins_beans/plugins/pdf_output/pdfbox.jar"
 										alias="ServoyClient" storepass="${jarsigner.storepass}"
-										tsaurl="http://sha256timestamp.ws.symantec.com/sha256/timestamp"
-										sigalg="SHA256withRSA" digestalg="SHA-256" />
+										tsaurl="http://timestamp.sectigo.com"
+										 />
                                     <signjar keystore="${jarsigner.keystore}"
                                         jar="${project.build.directory}/plugins_beans/plugins/pdf_output/bcprov.jar"
                                         alias="ServoyClient" storepass="${jarsigner.storepass}"
-                                        tsaurl="http://sha256timestamp.ws.symantec.com/sha256/timestamp"
-                                        sigalg="SHA256withRSA" digestalg="SHA-256" />
+                                        tsaurl="http://timestamp.sectigo.com"
+                                         />
                                     <signjar keystore="${jarsigner.keystore}"
                                         jar="${project.build.directory}/plugins_beans/plugins/pdf_output/bcmail.jar"
                                         alias="ServoyClient" storepass="${jarsigner.storepass}"
-                                        tsaurl="http://sha256timestamp.ws.symantec.com/sha256/timestamp"
-                                        sigalg="SHA256withRSA" digestalg="SHA-256" />
+                                        tsaurl="http://timestamp.sectigo.com"
+                                         />
 									<signjar keystore="${jarsigner.keystore}"
 										jar="${project.build.directory}/plugins_beans/plugins/jwt/java-jwt.jar"
 										alias="ServoyClient" storepass="${jarsigner.storepass}"
-										tsaurl="http://sha256timestamp.ws.symantec.com/sha256/timestamp"
-										sigalg="SHA256withRSA" digestalg="SHA-256" />
+										tsaurl="http://timestamp.sectigo.com"
+										 />
 									<signjar keystore="${jarsigner.keystore}"
 										jar="${project.build.directory}/plugins_beans/plugins/jwt/jwks-rsa.jar"
 										alias="ServoyClient" storepass="${jarsigner.storepass}"
-										tsaurl="http://sha256timestamp.ws.symantec.com/sha256/timestamp"
-										sigalg="SHA256withRSA" digestalg="SHA-256" />
+										tsaurl="http://timestamp.sectigo.com"
+										 />
 									<signjar keystore="${jarsigner.keystore}"
 										jar="${project.build.directory}/plugins_beans/plugins/jackson/jackson-annotations.jar"
 										alias="ServoyClient" storepass="${jarsigner.storepass}"
-										tsaurl="http://sha256timestamp.ws.symantec.com/sha256/timestamp"
-										sigalg="SHA256withRSA" digestalg="SHA-256" />
+										tsaurl="http://timestamp.sectigo.com"
+										 />
 									<signjar keystore="${jarsigner.keystore}"
 										jar="${project.build.directory}/plugins_beans/plugins/jackson/jackson-core.jar"
 										alias="ServoyClient" storepass="${jarsigner.storepass}"
-										tsaurl="http://sha256timestamp.ws.symantec.com/sha256/timestamp"
-										sigalg="SHA256withRSA" digestalg="SHA-256" />
+										tsaurl="http://timestamp.sectigo.com"
+										 />
 									<signjar keystore="${jarsigner.keystore}"
 										jar="${project.build.directory}/plugins_beans/plugins/jackson/jackson-databind.jar"
 										alias="ServoyClient" storepass="${jarsigner.storepass}"
-										tsaurl="http://sha256timestamp.ws.symantec.com/sha256/timestamp"
-										sigalg="SHA256withRSA" digestalg="SHA-256" />
+										tsaurl="http://timestamp.sectigo.com"
+										 />
 									<signjar keystore="${jarsigner.keystore}"
                                         jar="${project.build.directory}/plugins_beans/plugins/images/metadataextractor.jar"
                                         alias="ServoyClient" storepass="${jarsigner.storepass}"
-                                        tsaurl="http://sha256timestamp.ws.symantec.com/sha256/timestamp"
-                                        sigalg="SHA256withRSA" digestalg="SHA-256" />
+                                        tsaurl="http://timestamp.sectigo.com"
+                                         />
                                     <signjar keystore="${jarsigner.keystore}"
                                         jar="${project.build.directory}/plugins_beans/plugins/images/xmpcore.jar"
                                         alias="ServoyClient" storepass="${jarsigner.storepass}"
-                                        tsaurl="http://sha256timestamp.ws.symantec.com/sha256/timestamp"
-                                        sigalg="SHA256withRSA" digestalg="SHA-256" />
+                                        tsaurl="http://timestamp.sectigo.com"
+                                         />
 								</parallel>
 							</target>
 						</configuration>
