@@ -32,6 +32,7 @@ public class HttpClientConfig implements IScriptable, IJavaScriptType
 	int keepAliveDuration = -1;
 	String userAgent;
 	int maxIOThreadCount = -1;
+	boolean forceHttp1 = false;
 
 	public HttpClientConfig()
 	{
@@ -54,6 +55,26 @@ public class HttpClientConfig implements IScriptable, IJavaScriptType
 	{
 		this.maxIOThreadCount = maxIOThreadCount;
 	}
+
+	/**
+	 * Force the use of http1, use this if there are problems connecting to a server that does use http/2 but uses old cipher suites
+	 * or if there are other problems like http/2 not setting the content length and the server still wants it.
+	 *
+	 * @sample
+	 * var config = plugins.http.createNewHttpClientConfig();
+	 * config.maxIOThreadCount = 5;
+	 * var client = plugins.http.createNewHttpClient(config);
+	 */
+	public boolean js_getForceHttp1()
+	{
+		return forceHttp1;
+	}
+
+	public void js_setForceHttp1(boolean force)
+	{
+		this.forceHttp1 = force;
+	}
+
 
 	/**
 	 * Gets/Sets which TLS protocol to use, default value is TLS.

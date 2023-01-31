@@ -49,6 +49,7 @@ import org.apache.hc.core5.http.HttpHost;
 import org.apache.hc.core5.http.HttpResponse;
 import org.apache.hc.core5.http.nio.ssl.TlsStrategy;
 import org.apache.hc.core5.http.protocol.HttpContext;
+import org.apache.hc.core5.http2.HttpVersionPolicy;
 import org.apache.hc.core5.reactor.ssl.TlsDetails;
 import org.apache.hc.core5.ssl.SSLContexts;
 import org.apache.hc.core5.util.TimeValue;
@@ -116,26 +117,33 @@ public class HttpClient implements IScriptable, IJavaScriptType
 		{
 			Debug.error("Can't set up ssl socket factory", ex); //$NON-NLS-1$
 		}
-		if (config != null && config.keepAliveDuration >= 0)
+		if (config != null)
 		{
-			builder.setKeepAliveStrategy(new ConnectionKeepAliveStrategy()
+			if (config.keepAliveDuration >= 0)
 			{
-				@Override
-				public TimeValue getKeepAliveDuration(HttpResponse response, HttpContext context)
+				builder.setKeepAliveStrategy(new ConnectionKeepAliveStrategy()
 				{
-					TimeValue duration = DefaultConnectionKeepAliveStrategy.INSTANCE.getKeepAliveDuration(response, context);
-					if (duration != null)
+					@Override
+					public TimeValue getKeepAliveDuration(HttpResponse response, HttpContext context)
 					{
-						return duration;
+						TimeValue duration = DefaultConnectionKeepAliveStrategy.INSTANCE.getKeepAliveDuration(response, context);
+						if (duration != null)
+						{
+							return duration;
+						}
+						return TimeValue.ofMilliseconds(config.keepAliveDuration * 1000);
 					}
-					return TimeValue.ofMilliseconds(config.keepAliveDuration * 1000);
-				}
 
-			});
-		}
-		if (config != null && config.userAgent != null)
-		{
-			builder.setUserAgent(config.userAgent);
+				});
+			}
+			if (config.userAgent != null)
+			{
+				builder.setUserAgent(config.userAgent);
+			}
+			if (config.forceHttp1)
+			{
+				builder.setVersionPolicy(HttpVersionPolicy.FORCE_HTTP_1);
+			}
 		}
 		client = builder.build();
 		client.start();
