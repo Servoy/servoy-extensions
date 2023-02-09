@@ -89,6 +89,7 @@ public class HttpClient implements IScriptable, IJavaScriptType
 			.setIoThreadCount((config != null && config.maxIOThreadCount >= 0) ? config.maxIOThreadCount : 2).build());
 		requestConfigBuilder = RequestConfig.custom();
 		requestConfigBuilder.setCircularRedirectsAllowed(true);
+		if (!config.enableRedirects) requestConfigBuilder.setRedirectsEnabled(false);
 
 		cookieStore = new BasicCookieStore();
 		builder.setDefaultCookieStore(cookieStore);

@@ -33,6 +33,7 @@ public class HttpClientConfig implements IScriptable, IJavaScriptType
 	String userAgent;
 	int maxIOThreadCount = -1;
 	boolean forceHttp1 = false;
+	boolean enableRedirects = true;
 
 	public HttpClientConfig()
 	{
@@ -75,6 +76,23 @@ public class HttpClientConfig implements IScriptable, IJavaScriptType
 		this.forceHttp1 = force;
 	}
 
+	/**
+	 * Sets whether client should follow redirects or you want to do it manually. Default value is true.
+	 *
+	 * @sample
+	 * var config = plugins.http.createNewHttpClientConfig();
+	 * config.enableRedirects = false;
+	 * var client = plugins.http.createNewHttpClient(config);
+	 */
+	public boolean js_getEnableRedirects()
+	{
+		return this.enableRedirects;
+	}
+
+	public void js_setEnableRedirects(boolean enableRedirects)
+	{
+		this.enableRedirects = enableRedirects;
+	}
 
 	/**
 	 * Gets/Sets which TLS protocol to use, default value is TLS.
