@@ -25,6 +25,8 @@ import com.servoy.j2db.dataprocessing.IDataSet;
 
 public final class NotifyData implements Serializable
 {
+	private static final long serialVersionUID = 1L;
+
 	final String originServerUUID;
 	final String server_name;
 	final String table_name;
