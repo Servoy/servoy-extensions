@@ -128,11 +128,11 @@ public class DialogProvider implements IScriptable, IMobileDialogProvider
 	*
 	* @sample
 	* //show dialog
-	* var thePressedButton = plugins.dialogs.showWarningDialog('Title', 'Value not allowed','OK');
+	* var thePressedButton = plugins.dialogs.showWarningDialog('Title', 'Value not allowed','OK', 'Cancel');
 	*
 	* @param dialogTitle Dialog title.
 	* @param dialogMessage Dialog message.
-	* @param buttonsText Array of button texts.
+	* @param buttonsText variable arguments of button texts.
 	*
 	* @return pressed button text
 	*/
@@ -157,7 +157,7 @@ public class DialogProvider implements IScriptable, IMobileDialogProvider
 	 *
 	 * @param dialogTitle Dialog title.
 	 * @param dialogMessage Dialog message.
-	 * @param buttonsText Array of button texts.
+	 * @param buttonsText variable arguments of button texts.
 	 *
 	 * @return pressed button text
 	 */
@@ -179,11 +179,11 @@ public class DialogProvider implements IScriptable, IMobileDialogProvider
 	 *
 	 * @sample
 	 * //show dialog
-	 * var thePressedButton = plugins.dialogs.showErrorDialog('Title', 'Value not allowed','OK');
+	 * var thePressedButton = plugins.dialogs.showErrorDialog('Title', 'Value not allowed','OK', 'Cancel');
 	 *
 	 * @param dialogTitle Dialog title.
 	 * @param dialogMessage Dialog message.
-	 * @param buttonsText Array of button texts.
+	 * @param buttonsText variable arguments of button texts.
 	 *
 	 * @return pressed button text
 	 */
@@ -205,11 +205,11 @@ public class DialogProvider implements IScriptable, IMobileDialogProvider
 	 *
 	 * @sample
 	 * //show dialog
-	 * var thePressedButton = plugins.dialogs.showQuestionDialog('Title', 'Value not allowed','OK');
+	 * var thePressedButton = plugins.dialogs.showQuestionDialog('Title', 'Value not allowed','OK', 'Cancel');
 	 *
 	 * @param dialogTitle Dialog title.
 	 * @param dialogMessage Dialog message.
-	 * @param buttonsText Array of button texts.
+	 * @param buttonsText variable arguments of button texts.
 	 *
 	 * @return pressed button text
 	 */
@@ -355,7 +355,6 @@ public class DialogProvider implements IScriptable, IMobileDialogProvider
 	 * var selectedValue = plugins.dialogs.showSelectDialog('Select','please select a name','jan','johan','sebastiaan');
 	 * //also possible to pass array with options
 	 * //var selectedValue = plugins.dialogs.showSelectDialog('Select','please select a name', new Array('jan','johan','sebastiaan'));
-	 *
 	 * @param dialog_title
 	 * @param msg
 	 * @param options
@@ -376,6 +375,8 @@ public class DialogProvider implements IScriptable, IMobileDialogProvider
 		}
 		Object[] optionsCopy = new String[buttons.size()];
 		buttons.copyInto(optionsCopy);
+		var x = options;
+		showSelectDialog(dialog_title, msg, x);
 		return showSelectDialogEx(dialog_title, msg, optionsCopy);
 	}
 
@@ -421,7 +422,7 @@ public class DialogProvider implements IScriptable, IMobileDialogProvider
 	 * @return selected value or null
 	 */
 	@JSFunction
-	@ServoyClientSupport(ng = true, mc = false, wc = true, sc = true)
+	@ServoyClientSupport(ng = false, mc = false, wc = true, sc = true)
 	public String showSelectDialog(String dialog_title, String msg, Object[] optionArray)
 	{
 		Vector<String> buttons = new Vector<String>();
