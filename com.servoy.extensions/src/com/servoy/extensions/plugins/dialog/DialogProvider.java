@@ -375,8 +375,6 @@ public class DialogProvider implements IScriptable, IMobileDialogProvider
 		}
 		Object[] optionsCopy = new String[buttons.size()];
 		buttons.copyInto(optionsCopy);
-		var x = options;
-		showSelectDialog(dialog_title, msg, x);
 		return showSelectDialogEx(dialog_title, msg, optionsCopy);
 	}
 
@@ -422,7 +420,7 @@ public class DialogProvider implements IScriptable, IMobileDialogProvider
 	 * @return selected value or null
 	 */
 	@JSFunction
-	@ServoyClientSupport(ng = false, mc = false, wc = true, sc = true)
+	@ServoyClientSupport(ng = true, mc = false, wc = true, sc = true)
 	public String showSelectDialog(String dialog_title, String msg, Object[] optionArray)
 	{
 		Vector<String> buttons = new Vector<String>();
