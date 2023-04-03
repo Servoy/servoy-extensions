@@ -63,7 +63,7 @@ public class HttpClientConfig implements IScriptable, IJavaScriptType
 	 *
 	 * @sample
 	 * var config = plugins.http.createNewHttpClientConfig();
-	 * config.maxIOThreadCount = 5;
+	 * config.forceHttp1 = true;
 	 * var client = plugins.http.createNewHttpClient(config);
 	 */
 	public boolean js_getForceHttp1()
