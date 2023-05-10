@@ -42,7 +42,7 @@ public class WorkflowsProvider implements IScriptable, IReturnedTypesProvider
 	{
 		KieServicesConfiguration config = KieServicesFactory.newRestConfiguration(
 			deploymentUrl, user, password);
-		config.setMarshallingFormat(MarshallingFormat.JSON);
+		config.setMarshallingFormat(MarshallingFormat.JAXB);
 		KieServicesClient client = KieServicesFactory.newKieServicesClient(config);
 		return client;
 	}
