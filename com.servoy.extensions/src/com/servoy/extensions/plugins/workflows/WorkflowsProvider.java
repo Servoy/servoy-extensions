@@ -17,7 +17,6 @@
 
 package com.servoy.extensions.plugins.workflows;
 
-import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.KieServicesConfiguration;
 import org.kie.server.client.KieServicesFactory;
@@ -42,7 +41,7 @@ public class WorkflowsProvider implements IScriptable, IReturnedTypesProvider
 	{
 		KieServicesConfiguration config = KieServicesFactory.newRestConfiguration(
 			deploymentUrl, user, password);
-		config.setMarshallingFormat(MarshallingFormat.JAXB);
+		//config.setMarshallingFormat(MarshallingFormat.JAXB);
 		KieServicesClient client = KieServicesFactory.newKieServicesClient(config);
 		return client;
 	}
