@@ -693,6 +693,14 @@
 						          	<outputDirectory>${project.build.directory}/plugins_beans/plugins/workflows</outputDirectory>
 						            <destFileName>jakarta-security-jacc.jar</destFileName>
 								</artifactItem>
+								<artifactItem>
+									<groupId>javax.ws.rs</groupId>
+									<artifactId>javax.ws.rs-api</artifactId>
+									<version>2.1.1</version>
+									<overWrite>true</overWrite>
+						          	<outputDirectory>${project.build.directory}/plugins_beans/plugins/workflows</outputDirectory>
+						            <destFileName>javax-ws-rs.jar</destFileName>
+								</artifactItem>
                              </artifactItems>
                         </configuration>
                     </execution>
@@ -1036,6 +1044,11 @@
 			<groupId>jakarta.ws.rs</groupId>
 			<artifactId>jakarta.ws.rs-api</artifactId>
 			<version>3.1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>javax.ws.rs</groupId>
+			<artifactId>javax.ws.rs-api</artifactId>
+			<version>2.1.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.kie.server</groupId>
