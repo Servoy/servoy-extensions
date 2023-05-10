@@ -701,6 +701,14 @@
 						          	<outputDirectory>${project.build.directory}/plugins_beans/plugins/workflows</outputDirectory>
 						            <destFileName>javax-ws-rs.jar</destFileName>
 								</artifactItem>
+								<artifactItem>
+									<groupId>org.kie.soup</groupId>
+									<artifactId>kie-soup-maven-support</artifactId>
+									<version>${jbpm.version}</version>
+									<overWrite>true</overWrite>
+						          	<outputDirectory>${project.build.directory}/plugins_beans/plugins/workflows</outputDirectory>
+						            <destFileName>kie-soup.jar</destFileName>
+								</artifactItem>
                              </artifactItems>
                         </configuration>
                     </execution>
@@ -1069,6 +1077,11 @@
 			<scope>provided</scope>
 			<optional>true</optional>
 			<version>1.6.1</version> 
+		</dependency>
+		<dependency>
+			<groupId>org.kie.soup</groupId>
+			<artifactId>kie-soup-maven-support</artifactId>
+			<version>${jbpm.version}</version>
 		</dependency>
     </dependencies>
 </project>
