@@ -37,6 +37,7 @@
         <metadataextractor.version>2.18.0</metadataextractor.version>
         <xmpcore.version>6.1.11</xmpcore.version>
         <rhino.version>1.7.14.s3</rhino.version>
+        <jbpm.version>7.73.0.final</jbpm.version>
     </properties>
     <profiles>
         <profile>
@@ -592,7 +593,31 @@
                                     <outputDirectory>${project.build.directory}/plugins_beans/plugins/images</outputDirectory>
                                     <destFileName>xmpcore.jar</destFileName>
                                 </artifactItem>
-                            </artifactItems>
+                                <artifactItem>
+                                    <groupId>org.jbpm</groupId>
+                                    <artifactId>jbpm-bpmn2</artifactId>
+                                    <version>${jbpm.version.version}</version>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>${project.build.directory}/plugins_beans/plugins/workflows</outputDirectory>
+                                    <destFileName>jbpm-bpmn2.jar</destFileName>
+                                </artifactItem>
+                                <artifactItem>
+                                   	<groupId>org.jbpm</groupId>
+    								<artifactId>jbpm-kie-services</artifactId>
+   									<version>${jbpm.version}</version>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>${project.build.directory}/plugins_beans/plugins/workflows</outputDirectory>
+                                    <destFileName>kie-services.jar</destFileName>
+                                </artifactItem>
+                                <artifactItem>
+                                   	<groupId>org.kie.server</groupId>
+    								<artifactId>kie-server-client</artifactId>
+    								<version>${jbpm.version}</version> 
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>${project.build.directory}/plugins_beans/plugins/workflows</outputDirectory>
+                                    <destFileName>kie-server-client.jar</destFileName>
+                                </artifactItem>
+                             </artifactItems>
                         </configuration>
                     </execution>
                 </executions>
@@ -890,5 +915,20 @@
             <scope>system</scope>
             <systemPath>${basedir}/lib/jakarta-poi.jar</systemPath>
         </dependency>
+        <dependency>
+        	<groupId>org.jbpm</groupId>
+            <artifactId>jbpm-bpmn2</artifactId>
+            <version>${jbpm.version}</version>
+ 		</dependency>
+        <dependency>
+    		<groupId>org.jbpm</groupId>
+    		<artifactId>jbpm-kie-services</artifactId>
+   			<version>${jbpm.version}</version> 
+		</dependency>
+		<dependency>
+    		<groupId>org.kie.server</groupId>
+    		<artifactId>kie-server-client</artifactId>
+    		<version>${jbpm.version}</version> 
+		</dependency>
     </dependencies>
 </project>
