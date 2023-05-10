@@ -56,10 +56,11 @@ public class FormPopup implements IScriptable, IJavaScriptType
 	 *
 	 * @param component the form to show
 	 *
+	 * @return this The FormPopup itself
 	 */
-	public void js_component(IComponent component)
+	public FormPopup js_component(IComponent component)
 	{
-
+		return this;
 	}
 
 	/**
@@ -83,10 +84,12 @@ public class FormPopup implements IScriptable, IJavaScriptType
 	 *
 	 * @param width form popup width
 	 *
+	 * @return this The FormPopup itself
+	 *
 	 */
-	public void js_width(int width)
+	public FormPopup js_width(int width)
 	{
-
+		return this;
 	}
 
 	/**
@@ -109,11 +112,13 @@ public class FormPopup implements IScriptable, IJavaScriptType
 	 * plugins.window.createFormPopup(forms.orderPicker).height(100).show();
 	 *
 	 * @param height form popup height
+	 * @return
 	 *
+	 * @return this The FormPopup itself
 	 */
-	public void js_height(int height)
+	public FormPopup js_height(int height)
 	{
-
+		return this;
 	}
 
 	/**
@@ -136,11 +141,14 @@ public class FormPopup implements IScriptable, IJavaScriptType
 	 * plugins.window.createFormPopup(forms.orderPicker).x(100).show();
 	 *
 	 * @param x form popup x location
+	 * @return
+	 *
+	 * @return this The FormPopup itself
 	 *
 	 */
-	public void js_x(int x)
+	public FormPopup js_x(int x)
 	{
-
+		return this;
 	}
 
 	/**
@@ -164,10 +172,12 @@ public class FormPopup implements IScriptable, IJavaScriptType
 	 *
 	 * @param y form popup y location
 	 *
+	 * @return this The FormPopup itself
+	 *
 	 */
-	public void js_y(int y)
+	public FormPopup js_y(int y)
 	{
-
+		return this;
 	}
 
 	/**
@@ -192,10 +202,12 @@ public class FormPopup implements IScriptable, IJavaScriptType
 	 *
 	 * @param showBackdrop form popup showBackdrop
 	 *
+	 * @return this The FormPopup itself
+	 *
 	 */
-	public void js_showBackdrop(boolean showBackdrop)
+	public FormPopup js_showBackdrop(boolean showBackdrop)
 	{
-
+		return this;
 	}
 
 	/**
@@ -219,10 +231,12 @@ public class FormPopup implements IScriptable, IJavaScriptType
 	 *
 	 * @param dataprovider form popup dataprovider
 	 *
+	 * @return this The FormPopup itself
+	 *
 	 */
-	public void js_dataprovider(String dataprovider)
+	public FormPopup js_dataprovider(String dataprovider)
 	{
-
+		return this;
 	}
 
 	/**
@@ -231,7 +245,7 @@ public class FormPopup implements IScriptable, IJavaScriptType
 	 * @sample
 	 * popupform.onClose();
 	 *
-	 * @return Object
+	 * @return Function
 	 */
 	public Function js_onClose()
 	{
@@ -244,11 +258,14 @@ public class FormPopup implements IScriptable, IJavaScriptType
 	 * @sample
 	 * plugins.window.createFormPopup(forms.orderPicker).dataprovider('myid').onClose(closePopupFunction).show();
 	 *
-	 * @param scope form popup scope to modify
+	 * @param function function that needs to be called when closed
+	 *
+	 * @return this The FormPopup itself
 	 *
 	 */
-	public void js_onClose(Function function)
+	public FormPopup js_onClose(Function function)
 	{
+		return this;
 	}
 
 	/**
@@ -272,10 +289,12 @@ public class FormPopup implements IScriptable, IJavaScriptType
 	 *
 	 * @param scope form popup scope to modify
 	 *
+	 * @return this The FormPopup itself
+	 *
 	 */
-	public void js_scope(Object scope)
+	public FormPopup js_scope(Object scope)
 	{
-
+		return this;
 	}
 
 	/**
