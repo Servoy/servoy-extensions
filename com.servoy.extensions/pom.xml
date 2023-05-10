@@ -609,6 +609,105 @@
                                     <outputDirectory>${project.build.directory}/plugins_beans/plugins/workflows</outputDirectory>
                                     <destFileName>kie-server-client.jar</destFileName>
                                 </artifactItem>
+								<artifactItem>
+									<groupId>org.kie</groupId>
+									<artifactId>kie-api</artifactId>
+									<version>${jbpm.version}</version> 
+									<overWrite>true</overWrite>
+						          	<outputDirectory>${project.build.directory}/plugins_beans/plugins/workflows</outputDirectory>
+						            <destFileName>kie-api.jar</destFileName>
+						         </artifactItem>
+								<artifactItem>	
+									<groupId>org.kie</groupId>
+									<artifactId>kie-internal</artifactId>
+									<version>${jbpm.version}</version> 
+									<overWrite>true</overWrite>
+						          	<outputDirectory>${project.build.directory}/plugins_beans/plugins/workflows</outputDirectory>
+						            <destFileName>kie-internal.jar</destFileName>
+								</artifactItem>
+								<artifactItem>
+									<groupId>org.optaplanner</groupId>
+									<artifactId>optaplanner-core</artifactId>
+									<version>${jbpm.version}</version> 
+									<overWrite>true</overWrite>
+						          	<outputDirectory>${project.build.directory}/plugins_beans/plugins/workflows</outputDirectory>
+						            <destFileName>optaplanner-core.jar</destFileName>
+								</artifactItem>
+								<artifactItem>
+									<groupId>org.drools</groupId>
+									<artifactId>drools-core</artifactId>
+									<version>8.38.0.Final</version>
+									<overWrite>true</overWrite>
+						          	<outputDirectory>${project.build.directory}/plugins_beans/plugins/workflows</outputDirectory>
+						            <destFileName>drools-core.jar</destFileName>
+								</artifactItem>
+								
+								
+								
+								<artifactItem>
+									<groupId>org.kie</groupId>
+									<artifactId>kie-dmn-api</artifactId>
+									<version>${jbpm.version}</version>
+									<overWrite>true</overWrite>
+						          	<outputDirectory>${project.build.directory}/plugins_beans/plugins/workflows</outputDirectory>
+						            <destFileName>kie-dmn-api.jar</destFileName>
+								</artifactItem>
+								<!--  kie server dependencies  -->
+								<artifactItem>
+									<groupId>org.kie.server</groupId>
+									<artifactId>kie-server-api</artifactId>
+									<version>${jbpm.version}</version>
+									<overWrite>true</overWrite>
+						          	<outputDirectory>${project.build.directory}/plugins_beans/plugins/workflows</outputDirectory>
+						            <destFileName>kie-server-api.jar</destFileName>
+								</artifactItem>
+								<artifactItem>
+									<groupId>jakarta.ws.rs</groupId>
+									<artifactId>jakarta.ws.rs-api</artifactId>
+									<version>3.1.0</version>
+									<overWrite>true</overWrite>
+						          	<outputDirectory>${project.build.directory}/plugins_beans/plugins/workflows</outputDirectory>
+						            <destFileName>jakarta.ws.rs-api.jar</destFileName>
+								</artifactItem>
+								<artifactItem>
+									<groupId>org.kie.server</groupId>
+									<artifactId>kie-server-common</artifactId>
+									<version>${jbpm.version}</version>
+									<overWrite>true</overWrite>
+						          	<outputDirectory>${project.build.directory}/plugins_beans/plugins/workflows</outputDirectory>
+						            <destFileName>kie-server-common.jar</destFileName>
+								</artifactItem>
+						<!--  JMS  -->
+								<artifactItem>
+									<groupId>jakarta.jms</groupId>
+									<artifactId>jakarta.jms-api</artifactId>
+									<scope>compile</scope>
+									<version>2.0.3</version> 
+									<overWrite>true</overWrite>
+						          	<outputDirectory>${project.build.directory}/plugins_beans/plugins/workflows</outputDirectory>
+						            <destFileName>jakarta.jms-api.jar</destFileName>
+								</artifactItem>
+						<!--  security  -->
+								<artifactItem>
+									<groupId>jakarta.security.jacc</groupId>
+									<artifactId>jakarta.security.jacc-api</artifactId>
+									<scope>provided</scope>
+									<optional>true</optional>
+									<version>1.6.1</version> 
+									<overWrite>true</overWrite>
+						          	<outputDirectory>${project.build.directory}/plugins_beans/plugins/workflows</outputDirectory>
+						            <destFileName>jakarta.security.jacc.jar</destFileName>
+								</artifactItem>
+                                
+                                
+                                
+                                
+                                
+                                
+                                
+                                
+                                
+                                
                              </artifactItems>
                         </configuration>
                     </execution>
