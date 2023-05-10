@@ -309,6 +309,7 @@
                                 <parallel>
                                     <!--									<makejar srcdir="agent" /> -->
                                     <makejar srcdir="amortization" />
+                                    <makejar srcdir="workflows" manifest="${project.basedir}/resources/workflows/MANIFEST.MF" />
                                     <makejar srcdir="broadcaster" />
                                     <makejar srcdir="clientmanager" />
                                     <makejar srcdir="converters" />
