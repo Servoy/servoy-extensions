@@ -17,6 +17,9 @@
 
 package com.servoy.extensions.plugins.window.popupform;
 
+
+import org.mozilla.javascript.Function;
+
 import com.servoy.base.scripting.annotations.ServoyClientSupport;
 import com.servoy.j2db.documentation.ServoyDocumented;
 import com.servoy.j2db.scripting.IJavaScriptType;
@@ -220,6 +223,32 @@ public class FormPopup implements IScriptable, IJavaScriptType
 	public void js_dataprovider(String dataprovider)
 	{
 
+	}
+
+	/**
+	 * Get the registered onClose function.
+	 *
+	 * @sample
+	 * popupform.onClose();
+	 *
+	 * @return Object
+	 */
+	public Function js_onClose()
+	{
+		return null;
+	}
+
+	/**
+	 * Set the onclose function that is called when the closeFormPopup is called.
+	 *
+	 * @sample
+	 * plugins.window.createFormPopup(forms.orderPicker).dataprovider('myid').onClose(closePopupFunction).show();
+	 *
+	 * @param scope form popup scope to modify
+	 *
+	 */
+	public void js_onClose(Function function)
+	{
 	}
 
 	/**
