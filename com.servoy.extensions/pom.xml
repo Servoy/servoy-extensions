@@ -37,7 +37,7 @@
         <metadataextractor.version>2.18.0</metadataextractor.version>
         <xmpcore.version>6.1.11</xmpcore.version>
         <rhino.version>1.7.14.s3</rhino.version>
-        <jbpm.version>7.73.0.final</jbpm.version>
+        <jbpm.version>7.73.0.Final</jbpm.version>
     </properties>
     <profiles>
         <profile>
