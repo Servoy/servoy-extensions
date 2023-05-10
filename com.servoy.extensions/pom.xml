@@ -688,7 +688,6 @@
 								<artifactItem>
 									<groupId>jakarta.security.jacc</groupId>
 									<artifactId>jakarta.security.jacc-api</artifactId>
-									<optional>true</optional>
 									<version>1.6.1</version> 
 									<overWrite>true</overWrite>
 						          	<outputDirectory>${project.build.directory}/plugins_beans/plugins/workflows</outputDirectory>
