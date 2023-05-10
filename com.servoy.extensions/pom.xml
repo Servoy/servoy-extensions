@@ -562,6 +562,14 @@
                                     <outputDirectory>${project.build.directory}/plugins_beans/plugins/jackson</outputDirectory>
                                     <destFileName>jackson-jaxb-annotations.jar</destFileName>
                                 </artifactItem>
+    							 <artifactItem>
+                                    <groupId>com.fasterxml.jackson.datatype</groupId>
+    								<artifactId>jackson-datatype-jsr310</artifactId>
+                                    <version>${fasterxml.version}</version>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>${project.build.directory}/plugins_beans/plugins/jackson</outputDirectory>
+                                    <destFileName>jackson-datatype-jsr310.jar</destFileName>
+                                </artifactItem>
                                 <artifactItem>
                                     <groupId>org.apache.httpcomponents.client5</groupId>
                                     <artifactId>httpclient5</artifactId>
@@ -786,6 +794,11 @@
                                         tsaurl="http://sha256timestamp.ws.symantec.com/sha256/timestamp"
                                         sigalg="SHA256withRSA" digestalg="SHA-256" />
                                     <signjar keystore="${jarsigner.keystore}"
+                                        jar="${project.build.directory}/plugins_beans/plugins/jackson/jackson-datatype-jsr310.jar"
+                                        alias="ServoyClient" storepass="${jarsigner.storepass}"
+                                        tsaurl="http://sha256timestamp.ws.symantec.com/sha256/timestamp"
+                                        sigalg="SHA256withRSA" digestalg="SHA-256" />
+                                    <signjar keystore="${jarsigner.keystore}"
                                         jar="${project.build.directory}/plugins_beans/plugins/http/httpclient5.jar"
                                         alias="ServoyClient" storepass="${jarsigner.storepass}"
                                         tsaurl="http://sha256timestamp.ws.symantec.com/sha256/timestamp"
@@ -994,6 +1007,11 @@
          <dependency>
     		<groupId>com.fasterxml.jackson.module</groupId>
     		<artifactId>jackson-module-jaxb-annotations</artifactId>
+    		<version>${fasterxml.version}</version>
+		</dependency>
+		<dependency>
+    		<groupId>com.fasterxml.jackson.datatype</groupId>
+    		<artifactId>jackson-datatype-jsr310</artifactId>
     		<version>${fasterxml.version}</version>
 		</dependency>
         <dependency>
