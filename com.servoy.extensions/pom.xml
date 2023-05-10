@@ -37,7 +37,7 @@
         <metadataextractor.version>2.18.0</metadataextractor.version>
         <xmpcore.version>6.1.11</xmpcore.version>
         <rhino.version>1.7.14.s3</rhino.version>
-        <jbpm.version>7.73.0.Final</jbpm.version>
+        <jbpm.version>7.72.0.Final</jbpm.version>
     </properties>
     <profiles>
         <profile>
@@ -594,14 +594,6 @@
                                     <destFileName>xmpcore.jar</destFileName>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.jbpm</groupId>
-                                    <artifactId>jbpm-bpmn2</artifactId>
-                                    <version>${jbpm.version.version}</version>
-                                    <overWrite>true</overWrite>
-                                    <outputDirectory>${project.build.directory}/plugins_beans/plugins/workflows</outputDirectory>
-                                    <destFileName>jbpm-bpmn2.jar</destFileName>
-                                </artifactItem>
-                                <artifactItem>
                                    	<groupId>org.jbpm</groupId>
     								<artifactId>jbpm-kie-services</artifactId>
    									<version>${jbpm.version}</version>
@@ -916,11 +908,6 @@
             <systemPath>${basedir}/lib/jakarta-poi.jar</systemPath>
         </dependency>
         <dependency>
-        	<groupId>org.jbpm</groupId>
-            <artifactId>jbpm-bpmn2</artifactId>
-            <version>${jbpm.version}</version>
- 		</dependency>
-        <dependency>
     		<groupId>org.jbpm</groupId>
     		<artifactId>jbpm-kie-services</artifactId>
    			<version>${jbpm.version}</version> 
@@ -953,23 +940,23 @@
 		<dependency>
 			<groupId>org.kie</groupId>
 			<artifactId>kie-dmn-api</artifactId>
-			<version>${jbpm.version}</version> 
+			<version>${jbpm.version}</version>
 		</dependency>
 		<!--  kie server dependencies  -->
 		<dependency>
 			<groupId>org.kie.server</groupId>
 			<artifactId>kie-server-api</artifactId>
-			<version>${jbpm.version}</version> 
+			<version>${jbpm.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>jakarta.ws.rs</groupId>
 			<artifactId>jakarta.ws.rs-api</artifactId>
-			<version>${jbpm.version}</version> 
+			<version>3.1.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.kie.server</groupId>
 			<artifactId>kie-server-common</artifactId>
-			<version>${jbpm.version}</version> 
+			<version>${jbpm.version}</version>
 		</dependency>
 <!--  JMS  -->
 		<dependency>
@@ -984,7 +971,7 @@
 			<artifactId>jakarta.security.jacc-api</artifactId>
 			<scope>provided</scope>
 			<optional>true</optional>
-			<version>2.0.3</version> 
+			<version>1.6.1</version> 
 		</dependency>
     </dependencies>
 </project>
