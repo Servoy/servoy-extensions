@@ -669,7 +669,7 @@
 								<artifactItem>
 									<groupId>org.drools</groupId>
 									<artifactId>drools-core</artifactId>
-									<version>8.38.0.Final</version>
+									<version>${jbpm.version}</version>
 									<overWrite>true</overWrite>
 						          	<outputDirectory>${project.build.directory}/plugins_beans/plugins/workflows</outputDirectory>
 						            <destFileName>drools-core.jar</destFileName>
@@ -1097,7 +1097,7 @@
 		<dependency>
 			<groupId>org.drools</groupId>
 			<artifactId>drools-core</artifactId>
-			<version>8.38.0.Final</version>
+			<version>${jbpm.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.kie</groupId>
