@@ -17,10 +17,15 @@
 
 package com.servoy.extensions.plugins.workflows;
 
+import java.util.List;
+
 import org.kie.server.api.marshalling.MarshallingFormat;
+import org.kie.server.api.model.instance.TaskSummary;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.KieServicesConfiguration;
 import org.kie.server.client.KieServicesFactory;
+import org.kie.server.client.ProcessServicesClient;
+import org.kie.server.client.UserTaskServicesClient;
 import org.mozilla.javascript.annotations.JSFunction;
 
 import com.servoy.j2db.documentation.ServoyDocumented;
@@ -40,6 +45,11 @@ public class WorkflowsProvider implements IScriptable, IReturnedTypesProvider
 	@JSFunction
 	public KieServicesClient createClient(String deploymentUrl, String user, String password)
 	{
+		return getServicesClient(deploymentUrl, user, password);
+	}
+
+	private KieServicesClient getServicesClient(String deploymentUrl, String user, String password)
+	{
 		KieServicesConfiguration config = KieServicesFactory.newRestConfiguration(
 			deploymentUrl, user, password);
 		config.setMarshallingFormat(MarshallingFormat.JSON);
@@ -47,9 +57,37 @@ public class WorkflowsProvider implements IScriptable, IReturnedTypesProvider
 		return client;
 	}
 
+	@JSFunction
+	public ProcessServicesClient getProcessServicesClient(String deploymentUrl, String user, String password)
+	{
+		KieServicesClient client = getServicesClient(deploymentUrl, user, password);
+		return client.getServicesClient(ProcessServicesClient.class);
+	}
+
+	@JSFunction
+	public UserTaskServicesClient getUserTaskServicesClient(String deploymentUrl, String user, String password)
+	{
+		KieServicesClient client = getServicesClient(deploymentUrl, user, password);
+		return client.getServicesClient(UserTaskServicesClient.class);
+	}
+
+	@JSFunction
+	public List<TaskSummary> getAllUserTasks(String deploymentUrl, String user, String password)
+	{
+		return getAllUserTasks(deploymentUrl, user, password, 0, 10);
+	}
+
+	@JSFunction
+	public List<TaskSummary> getAllUserTasks(String deploymentUrl, String user, String password, int page, int pageSize)
+	{
+		KieServicesClient client = getServicesClient(deploymentUrl, user, password);
+		UserTaskServicesClient taskClient = client.getServicesClient(UserTaskServicesClient.class);
+		return taskClient.findTasks(user, Integer.valueOf(page), Integer.valueOf(pageSize));
+	}
+
 	public Class< ? >[] getAllReturnedTypes()
 	{
-		return new Class[] { KieServicesClient.class };
+		return new Class[] { KieServicesClient.class, TaskSummary.class, UserTaskServicesClient.class, ProcessServicesClient.class };
 	}
 }
 
