@@ -127,7 +127,7 @@ public class WorkflowsProvider implements IScriptable, IReturnedTypesProvider
 
 	public Class< ? >[] getAllReturnedTypes()
 	{
-		return new Class[] { KieServicesClient.class, TaskSummary.class, UserTaskServicesClient.class, ProcessServicesClient.class, QueryServicesClient.class };
+		return new Class[] { KieServicesClient.class, TaskSummary.class, UserTaskServicesClient.class, ProcessServicesClient.class, QueryServicesClient.class, RuleServicesClient.class, SolverServicesClient.class, UIServicesClient.class, UserTaskAdminServicesClient.class };
 	}
 }
 
