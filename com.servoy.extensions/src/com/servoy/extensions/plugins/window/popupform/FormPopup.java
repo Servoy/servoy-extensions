@@ -240,7 +240,8 @@ public class FormPopup implements IScriptable, IJavaScriptType
 	}
 
 	/**
-	 * Get the registered onClose function.
+	 * Get/Set the onclose function that is called when the closeFormPopup is called.
+	 * This onClose will get a JSEvent as the first argument, and the return value that is given to the closeFormPopup(retvalue) call.
 	 *
 	 * @sample
 	 * popupform.onClose();
@@ -253,7 +254,8 @@ public class FormPopup implements IScriptable, IJavaScriptType
 	}
 
 	/**
-	 * Set the onclose function that is called when the closeFormPopup is called.
+	 * Get/Set the onclose function that is called when the closeFormPopup is called.
+	 * This onClose will get a JSEvent as the first argument, and the return value that is given to the closeFormPopup(retvalue) call.
 	 *
 	 * @sample
 	 * plugins.window.createFormPopup(forms.orderPicker).dataprovider('myid').onClose(closePopupFunction).show();
