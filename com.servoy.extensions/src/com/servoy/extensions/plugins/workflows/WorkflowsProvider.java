@@ -25,7 +25,12 @@ import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.KieServicesConfiguration;
 import org.kie.server.client.KieServicesFactory;
 import org.kie.server.client.ProcessServicesClient;
+import org.kie.server.client.QueryServicesClient;
+import org.kie.server.client.RuleServicesClient;
+import org.kie.server.client.SolverServicesClient;
+import org.kie.server.client.UIServicesClient;
 import org.kie.server.client.UserTaskServicesClient;
+import org.kie.server.client.admin.UserTaskAdminServicesClient;
 import org.mozilla.javascript.annotations.JSFunction;
 
 import com.servoy.j2db.documentation.ServoyDocumented;
@@ -72,6 +77,41 @@ public class WorkflowsProvider implements IScriptable, IReturnedTypesProvider
 	}
 
 	@JSFunction
+	public QueryServicesClient getQueryServicesClient(String deploymentUrl, String user, String password)
+	{
+		KieServicesClient client = getServicesClient(deploymentUrl, user, password);
+		return client.getServicesClient(QueryServicesClient.class);
+	}
+
+	@JSFunction
+	public RuleServicesClient getRuleServicesClient(String deploymentUrl, String user, String password)
+	{
+		KieServicesClient client = getServicesClient(deploymentUrl, user, password);
+		return client.getServicesClient(RuleServicesClient.class);
+	}
+
+	@JSFunction
+	public SolverServicesClient getSolverServicesClient(String deploymentUrl, String user, String password)
+	{
+		KieServicesClient client = getServicesClient(deploymentUrl, user, password);
+		return client.getServicesClient(SolverServicesClient.class);
+	}
+
+	@JSFunction
+	public UIServicesClient getUIServicesClient(String deploymentUrl, String user, String password)
+	{
+		KieServicesClient client = getServicesClient(deploymentUrl, user, password);
+		return client.getServicesClient(UIServicesClient.class);
+	}
+
+	@JSFunction
+	public UserTaskAdminServicesClient getUserTaskAdminServicesClient(String deploymentUrl, String user, String password)
+	{
+		KieServicesClient client = getServicesClient(deploymentUrl, user, password);
+		return client.getServicesClient(UserTaskAdminServicesClient.class);
+	}
+
+	@JSFunction
 	public List<TaskSummary> getAllUserTasks(String deploymentUrl, String user, String password)
 	{
 		return getAllUserTasks(deploymentUrl, user, password, 0, 10);
@@ -87,7 +127,7 @@ public class WorkflowsProvider implements IScriptable, IReturnedTypesProvider
 
 	public Class< ? >[] getAllReturnedTypes()
 	{
-		return new Class[] { KieServicesClient.class, TaskSummary.class, UserTaskServicesClient.class, ProcessServicesClient.class };
+		return new Class[] { KieServicesClient.class, TaskSummary.class, UserTaskServicesClient.class, ProcessServicesClient.class, QueryServicesClient.class };
 	}
 }
 
