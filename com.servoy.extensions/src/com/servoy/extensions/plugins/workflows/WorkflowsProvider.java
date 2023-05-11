@@ -53,6 +53,14 @@ public class WorkflowsProvider implements IScriptable, IReturnedTypesProvider
 		return getServicesClient(deploymentUrl, user, password);
 	}
 
+
+	@JSFunction
+	public JSServicesClient createServicesClient(String deploymentUrl, String user, String password)
+	{
+		KieServicesClient client = getServicesClient(deploymentUrl, user, password);
+		return new JSServicesClient(client);
+	}
+
 	private KieServicesClient getServicesClient(String deploymentUrl, String user, String password)
 	{
 		KieServicesConfiguration config = KieServicesFactory.newRestConfiguration(
@@ -60,55 +68,6 @@ public class WorkflowsProvider implements IScriptable, IReturnedTypesProvider
 		config.setMarshallingFormat(MarshallingFormat.JSON);
 		KieServicesClient client = KieServicesFactory.newKieServicesClient(config);
 		return client;
-	}
-
-	@JSFunction
-	public ProcessServicesClient getProcessServicesClient(String deploymentUrl, String user, String password)
-	{
-		KieServicesClient client = getServicesClient(deploymentUrl, user, password);
-		return client.getServicesClient(ProcessServicesClient.class);
-	}
-
-	@JSFunction
-	public UserTaskServicesClient getUserTaskServicesClient(String deploymentUrl, String user, String password)
-	{
-		KieServicesClient client = getServicesClient(deploymentUrl, user, password);
-		return client.getServicesClient(UserTaskServicesClient.class);
-	}
-
-	@JSFunction
-	public QueryServicesClient getQueryServicesClient(String deploymentUrl, String user, String password)
-	{
-		KieServicesClient client = getServicesClient(deploymentUrl, user, password);
-		return client.getServicesClient(QueryServicesClient.class);
-	}
-
-	@JSFunction
-	public RuleServicesClient getRuleServicesClient(String deploymentUrl, String user, String password)
-	{
-		KieServicesClient client = getServicesClient(deploymentUrl, user, password);
-		return client.getServicesClient(RuleServicesClient.class);
-	}
-
-	@JSFunction
-	public SolverServicesClient getSolverServicesClient(String deploymentUrl, String user, String password)
-	{
-		KieServicesClient client = getServicesClient(deploymentUrl, user, password);
-		return client.getServicesClient(SolverServicesClient.class);
-	}
-
-	@JSFunction
-	public UIServicesClient getUIServicesClient(String deploymentUrl, String user, String password)
-	{
-		KieServicesClient client = getServicesClient(deploymentUrl, user, password);
-		return client.getServicesClient(UIServicesClient.class);
-	}
-
-	@JSFunction
-	public UserTaskAdminServicesClient getUserTaskAdminServicesClient(String deploymentUrl, String user, String password)
-	{
-		KieServicesClient client = getServicesClient(deploymentUrl, user, password);
-		return client.getServicesClient(UserTaskAdminServicesClient.class);
 	}
 
 	@JSFunction
@@ -127,7 +86,7 @@ public class WorkflowsProvider implements IScriptable, IReturnedTypesProvider
 
 	public Class< ? >[] getAllReturnedTypes()
 	{
-		return new Class[] { KieServicesClient.class, TaskSummary.class, UserTaskServicesClient.class, ProcessServicesClient.class, QueryServicesClient.class, RuleServicesClient.class, SolverServicesClient.class, UIServicesClient.class, UserTaskAdminServicesClient.class };
+		return new Class[] { JSServicesClient.class, KieServicesClient.class, TaskSummary.class, UserTaskServicesClient.class, ProcessServicesClient.class, QueryServicesClient.class, RuleServicesClient.class, SolverServicesClient.class, UIServicesClient.class, UserTaskAdminServicesClient.class };
 	}
 }
 
