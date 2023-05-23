@@ -38,6 +38,11 @@
         <xmpcore.version>6.1.11</xmpcore.version>
         <rhino.version>1.7.14.s3</rhino.version>
         <jbpm.version>7.72.0.Final</jbpm.version>
+        <!--  This has to be in sync with jasperreports version  -->
+        <poi.version>5.2.2</poi.version>
+        <!--  Poi dependencies  -->
+        <math3.version>3.6.1</math3.version>
+        <sparsebitset.version>1.2</sparsebitset.version>
     </properties>
     <profiles>
         <profile>
@@ -322,14 +327,6 @@
                                         <fileset
                                             file="${project.basedir}/resources/excelxport/excelxport.jar.jnlp" />
                                     </copy>
-                                    <copy overwrite="true"
-                                        todir="${project.build.directory}/plugins_beans/plugins/jakarta-poi">
-                                        <fileset file="${project.basedir}/lib/jakarta-poi.jar" />
-                                        <fileset
-                                            file="${project.basedir}/lib/commons-math3.jar" />
-                                        <fileset
-                                            file="${project.basedir}/lib/SparseBitSet.jar" />
-                                    </copy>
                                     <makejar srcdir="file" />
                                     <makejar srcdir="headlessclient" />
                                     <makejar srcdir="http" />
@@ -609,6 +606,38 @@
                                     <overWrite>true</overWrite>
                                     <outputDirectory>${project.build.directory}/plugins_beans/plugins/http</outputDirectory>
                                     <destFileName>httpcore5-h2.jar</destFileName>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.apache.poi</groupId>
+                                    <artifactId>poi</artifactId>
+                                    <version>${poi.version}</version>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>${project.build.directory}/plugins_beans/plugins/jakarta-poi</outputDirectory>
+                                    <destFileName>jakarta-poi.jar</destFileName>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.apache.poi</groupId>
+                                    <artifactId>poi-ooxml</artifactId>
+                                    <version>${poi.version}</version>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>${project.build.directory}/plugins_beans/plugins/jakarta-poi</outputDirectory>
+                                    <destFileName>poi-ooxml.jar</destFileName>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.apache.commons</groupId>
+                                    <artifactId>commons-math3</artifactId>
+                                    <version>${math3.version}</version>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>${project.build.directory}/plugins_beans/plugins/jakarta-poi</outputDirectory>
+                                    <destFileName>commons-math3.jar</destFileName>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>com.zaxxer</groupId>
+                                    <artifactId>SparseBitSet</artifactId>
+                                    <version>${sparsebitset.version}</version>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>${project.build.directory}/plugins_beans/plugins/jakarta-poi</outputDirectory>
+                                    <destFileName>SparseBitSet.jar</destFileName>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>com.drewnoakes</groupId>
@@ -2364,6 +2393,26 @@
                                         alias="ServoyClient" storepass="${jarsigner.storepass}"
                                         tsaurl="http://sha256timestamp.ws.symantec.com/sha256/timestamp"
                                         sigalg="SHA256withRSA" digestalg="SHA-256" />
+                                    <signjar keystore="${jarsigner.keystore}"
+                                        jar="${project.build.directory}/plugins_beans/plugins/jakarta-poi/jakarta-poi.jar"
+                                        alias="ServoyClient" storepass="${jarsigner.storepass}"
+                                        tsaurl="http://sha256timestamp.ws.symantec.com/sha256/timestamp"
+                                        sigalg="SHA256withRSA" digestalg="SHA-256" />
+                                    <signjar keystore="${jarsigner.keystore}"
+                                        jar="${project.build.directory}/plugins_beans/plugins/jakarta-poi/poi-ooxml.jar"
+                                        alias="ServoyClient" storepass="${jarsigner.storepass}"
+                                        tsaurl="http://sha256timestamp.ws.symantec.com/sha256/timestamp"
+                                        sigalg="SHA256withRSA" digestalg="SHA-256" />
+                                    <signjar keystore="${jarsigner.keystore}"
+                                        jar="${project.build.directory}/plugins_beans/plugins/jakarta-poi/commons-math3.jar"
+                                        alias="ServoyClient" storepass="${jarsigner.storepass}"
+                                        tsaurl="http://sha256timestamp.ws.symantec.com/sha256/timestamp"
+                                        sigalg="SHA256withRSA" digestalg="SHA-256" />
+                                    <signjar keystore="${jarsigner.keystore}"
+                                        jar="${project.build.directory}/plugins_beans/plugins/jakarta-poi/SparseBitSet.jar"
+                                        alias="ServoyClient" storepass="${jarsigner.storepass}"
+                                        tsaurl="http://sha256timestamp.ws.symantec.com/sha256/timestamp"
+                                        sigalg="SHA256withRSA" digestalg="SHA-256" />            
                                 </parallel>
                             </target>
                         </configuration>
@@ -2583,11 +2632,24 @@
             <systemPath>${basedir}/lib/itext.jar</systemPath>
         </dependency>
         <dependency>
-            <groupId>poi</groupId>
+            <groupId>org.apache.poi</groupId>
             <artifactId>poi</artifactId>
-            <version>1</version>
-            <scope>system</scope>
-            <systemPath>${basedir}/lib/jakarta-poi.jar</systemPath>
+            <version>${poi.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-ooxml</artifactId>
+            <version>${poi.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-math3</artifactId>
+            <version>${math3.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>SparseBitSet</artifactId>
+            <version>${sparsebitset.version}</version>
         </dependency>
         <dependency>
     		<groupId>org.jbpm</groupId>
