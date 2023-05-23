@@ -199,14 +199,22 @@ public abstract class BaseRequest implements IScriptable, IJavaScriptType
 	{
 		HttpClientContext context = null;
 
+		boolean acceptEncodingAdded = false;
 		for (String name : headers.keySet())
 		{
 			String[] values = headers.get(name);
 			for (String value : values)
 			{
 				method.addHeader(name, value);
+				acceptEncodingAdded = acceptEncodingAdded || "accept-encoding".equalsIgnoreCase(name);
 			}
 		}
+
+		if (!acceptEncodingAdded)
+		{
+			method.addHeader("Accept-Encoding", "gzip");
+		}
+
 		if (proxyCredentialsProvider != null)
 		{
 			context = HttpClientContext.create();
