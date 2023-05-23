@@ -351,7 +351,7 @@ public abstract class BaseRequest implements IScriptable, IJavaScriptType
 		try (InputStream inputStream = new ByteArrayInputStream(response.getBodyBytes());
 			ByteArrayOutputStream outputStream = new ByteArrayOutputStream();)
 		{
-			try (InputStream responseInputStream = isCompressed ? new GZIPInputStream(inputStream) : inputStream)
+			try (InputStream responseInputStream = new GZIPInputStream(inputStream))
 			{
 				byte[] buffer = new byte[1024];
 				int length;
