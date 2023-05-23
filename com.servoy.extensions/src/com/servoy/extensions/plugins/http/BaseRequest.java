@@ -17,12 +17,17 @@
 
 package com.servoy.extensions.plugins.http;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.zip.GZIPInputStream;
 
 import org.apache.hc.client5.http.async.methods.SimpleHttpResponse;
 import org.apache.hc.client5.http.auth.AuthScope;
@@ -36,6 +41,7 @@ import org.apache.hc.client5.http.impl.auth.BasicCredentialsProvider;
 import org.apache.hc.client5.http.impl.auth.BasicScheme;
 import org.apache.hc.client5.http.protocol.HttpClientContext;
 import org.apache.hc.core5.concurrent.FutureCallback;
+import org.apache.hc.core5.http.Header;
 import org.apache.hc.core5.http.HttpHost;
 import org.apache.hc.core5.http.nio.AsyncEntityProducer;
 import org.apache.hc.core5.http.nio.support.BasicRequestProducer;
@@ -248,7 +254,7 @@ public abstract class BaseRequest implements IScriptable, IJavaScriptType
 						IClientPluginAccess access = httpPlugin.getClientPluginAccess();
 						if (access != null)
 						{
-							callbackArgs[0] = new Response(response, method);
+							callbackArgs[0] = new Response(processResponse(response), method);
 							successFunctionDef.executeAsync(access, callbackArgs);
 						}
 						else
@@ -294,7 +300,8 @@ public abstract class BaseRequest implements IScriptable, IJavaScriptType
 			try
 			{
 				SimpleHttpResponse response = future.get();
-				return new Response(response, method);
+				return new Response(processResponse(response), method);
+
 			}
 			catch (ExecutionException ee)
 			{
@@ -310,6 +317,49 @@ public abstract class BaseRequest implements IScriptable, IJavaScriptType
 			}
 		}
 		return null;
+	}
+
+	private SimpleHttpResponse processResponse(SimpleHttpResponse response)
+	{
+		// Check if the response is compressed
+		Header[] responseHeaders = response.getHeaders();
+		String contentEncoding = null;
+		for (Header header : responseHeaders)
+		{
+			if (header.getName().equalsIgnoreCase("Content-Encoding"))
+			{
+				contentEncoding = header.getValue();
+				break;
+			}
+		}
+		boolean isCompressed = contentEncoding != null &&
+			(contentEncoding.equalsIgnoreCase("gzip") || contentEncoding.equalsIgnoreCase("deflate"));
+
+		if (!isCompressed)
+		{
+			return response;
+		}
+
+		try (InputStream inputStream = new ByteArrayInputStream(response.getBodyBytes());
+			ByteArrayOutputStream outputStream = new ByteArrayOutputStream();)
+		{
+			try (InputStream responseInputStream = isCompressed ? new GZIPInputStream(inputStream) : inputStream)
+			{
+				byte[] buffer = new byte[1024];
+				int length;
+				while ((length = responseInputStream.read(buffer)) > 0)
+				{
+					outputStream.write(buffer, 0, length);
+				}
+				String uncompressedResponseBody = outputStream.toString("UTF-8");
+				response.setBody(uncompressedResponseBody, response.getContentType());
+			}
+		}
+		catch (IOException e)
+		{
+			Debug.log("ProcessResponse exception: ", e);
+		}
+		return response;
 	}
 
 	/**
