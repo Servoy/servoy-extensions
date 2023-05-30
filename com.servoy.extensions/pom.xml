@@ -314,7 +314,7 @@
                                 <parallel>
                                     <!--									<makejar srcdir="agent" /> -->
                                     <makejar srcdir="amortization" />
-                                    <makejar srcdir="workflows" manifest="${project.basedir}/resources/workflows/MANIFEST.MF" />
+                                    <!--makejar srcdir="workflows" manifest="${project.basedir}/resources/workflows/MANIFEST.MF" /-->
                                     <makejar srcdir="broadcaster" />
                                     <makejar srcdir="clientmanager" />
                                     <makejar srcdir="converters" />
@@ -655,7 +655,7 @@
                                     <outputDirectory>${project.build.directory}/plugins_beans/plugins/images</outputDirectory>
                                     <destFileName>xmpcore.jar</destFileName>
                                 </artifactItem>
-                                <artifactItem>
+                                <!--artifactItem>
                                    	<groupId>org.jbpm</groupId>
     								<artifactId>jbpm-kie-services</artifactId>
    									<version>${jbpm.version}</version>
@@ -710,9 +710,9 @@
 									<overWrite>true</overWrite>
 						          	<outputDirectory>${project.build.directory}/plugins_beans/plugins/workflows</outputDirectory>
 						            <destFileName>kie-dmn-api.jar</destFileName>
-								</artifactItem>
+								</artifactItem-->
 								<!--  kie server dependencies  -->
-								<artifactItem>
+								<!--artifactItem>
 									<groupId>org.kie.server</groupId>
 									<artifactId>kie-server-api</artifactId>
 									<version>${jbpm.version}</version>
@@ -735,18 +735,18 @@
 									<overWrite>true</overWrite>
 						          	<outputDirectory>${project.build.directory}/plugins_beans/plugins/workflows</outputDirectory>
 						            <destFileName>kie-server-common.jar</destFileName>
-								</artifactItem>
+								</artifactItem-->
 						<!--  JMS  -->
-								<artifactItem>
+								<!--artifactItem>
 									<groupId>jakarta.jms</groupId>
 									<artifactId>jakarta.jms-api</artifactId>
 									<version>2.0.3</version> 
 									<overWrite>true</overWrite>
 						          	<outputDirectory>${project.build.directory}/plugins_beans/plugins/workflows</outputDirectory>
 						            <destFileName>jakarta-jms-api.jar</destFileName>
-								</artifactItem>
+								</artifactItem-->
 						<!--  security  -->
-								<artifactItem>
+								<!--artifactItem>
 									<groupId>jakarta.security.jacc</groupId>
 									<artifactId>jakarta.security.jacc-api</artifactId>
 									<version>1.6.1</version> 
@@ -2289,8 +2289,8 @@
 								<overWrite>true</overWrite>
 								<outputDirectory>${project.build.directory}/plugins_beans/plugins/workflows</outputDirectory>
 								<destFileName>kie-pmml-models-scorecard-evaluator.jar</destFileName>
-							</artifactItem>
-                             </artifactItems>
+							</artifactItem-->
+                        	</artifactItems>
                         </configuration>
                     </execution>
                 </executions>
@@ -2353,7 +2353,7 @@
                                         alias="ServoyClient" storepass="${jarsigner.storepass}"
                                         tsaurl="http://sha256timestamp.ws.symantec.com/sha256/timestamp"
                                         sigalg="SHA256withRSA" digestalg="SHA-256" />
-                                    <signjar keystore="${jarsigner.keystore}"
+                                    <!--signjar keystore="${jarsigner.keystore}"
                                         jar="${project.build.directory}/plugins_beans/plugins/jackson/jackson-jaxb-annotations.jar"
                                         alias="ServoyClient" storepass="${jarsigner.storepass}"
                                         tsaurl="http://sha256timestamp.ws.symantec.com/sha256/timestamp"
@@ -2367,7 +2367,7 @@
                                         jar="${project.build.directory}/plugins_beans/plugins/jackson/jaxb-api.jar"
                                         alias="ServoyClient" storepass="${jarsigner.storepass}"
                                         tsaurl="http://sha256timestamp.ws.symantec.com/sha256/timestamp"
-                                        sigalg="SHA256withRSA" digestalg="SHA-256" />
+                                        sigalg="SHA256withRSA" digestalg="SHA-256" /-->
                                     <signjar keystore="${jarsigner.keystore}"
                                         jar="${project.build.directory}/plugins_beans/plugins/http/httpclient5.jar"
                                         alias="ServoyClient" storepass="${jarsigner.storepass}"
@@ -2594,7 +2594,7 @@
             <artifactId>jackson-core</artifactId>
             <version>${fasterxml.version}</version>
         </dependency>
-         <dependency>
+        <!--dependency>
     		<groupId>com.fasterxml.jackson.module</groupId>
     		<artifactId>jackson-module-jaxb-annotations</artifactId>
     		<version>${fasterxml.version}</version>
@@ -2608,7 +2608,7 @@
     		<groupId>javax.xml.bind</groupId>
     		<artifactId>jaxb-api</artifactId>
     		<version>2.3.1</version>
-		</dependency>
+		</dependency-->
         <dependency>
             <groupId>commons-fileupload</groupId>
             <artifactId>commons-fileupload</artifactId>
