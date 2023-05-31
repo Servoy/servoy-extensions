@@ -355,7 +355,7 @@
                                         <fileset file="${project.basedir}/lib/openid4java.jar" />
                                         <fileset file="${project.basedir}/lib/guice-2.0.jar" />
                                     </copy>
-                                    <makejar srcdir="oauth" manifest="${project.basedir}/resources/oauth/MANIFEST.MF" />
+                                    <makejar srcdir="oauth" />
                                     <makejar srcdir="pdf_forms" />
                                     <copy overwrite="true"
                                         todir="${project.build.directory}/plugins_beans/plugins/adobe_pdf_forms">
@@ -513,45 +513,13 @@
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>com.auth0</groupId>
-                                    <artifactId>java-jwt</artifactId>
-                                    <version>${jwt.version}</version>
-                                    <overWrite>true</overWrite>
-                                    <outputDirectory>${project.build.directory}/plugins_beans/plugins/jwt</outputDirectory>
-                                    <destFileName>java-jwt.jar</destFileName>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>com.auth0</groupId>
                                     <artifactId>jwks-rsa</artifactId>
                                     <version>${jwks.version}</version>
                                     <overWrite>true</overWrite>
                                     <outputDirectory>${project.build.directory}/plugins_beans/plugins/jwt</outputDirectory>
                                     <destFileName>jwks-rsa.jar</destFileName>
                                 </artifactItem>
-                                <artifactItem>
-                                    <groupId>com.fasterxml.jackson.core</groupId>
-                                    <artifactId>jackson-databind</artifactId>
-                                    <version>${fasterxml.version}</version>
-                                    <overWrite>true</overWrite>
-                                    <outputDirectory>${project.build.directory}/plugins_beans/plugins/jackson</outputDirectory>
-                                    <destFileName>jackson-databind.jar</destFileName>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>com.fasterxml.jackson.core</groupId>
-                                    <artifactId>jackson-annotations</artifactId>
-                                    <version>${fasterxml.version}</version>
-                                    <overWrite>true</overWrite>
-                                    <outputDirectory>${project.build.directory}/plugins_beans/plugins/jackson</outputDirectory>
-                                    <destFileName>jackson-annotations.jar</destFileName>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>com.fasterxml.jackson.core</groupId>
-                                    <artifactId>jackson-core</artifactId>
-                                    <version>${fasterxml.version}</version>
-                                    <overWrite>true</overWrite>
-                                    <outputDirectory>${project.build.directory}/plugins_beans/plugins/jackson</outputDirectory>
-                                    <destFileName>jackson-core.jar</destFileName>
-                                </artifactItem>
-                                 <artifactItem>
+                                <!--artifactItem>
                                     <groupId>com.fasterxml.jackson.module</groupId>
     								<artifactId>jackson-module-jaxb-annotations</artifactId>
                                     <version>${fasterxml.version}</version>
@@ -572,7 +540,7 @@
     								<artifactId>jaxb-api</artifactId>
     								<version>2.3.1</version>
                                     <overWrite>true</overWrite>
-                                    <outputDirectory>${project.build.directory}/plugins_beans/plugins/jackson</outputDirectory>
+                                    <outputDirectory>${project.build.directory}/plugins_beans/plugins/workflows</outputDirectory>
                                     <destFileName>jaxb-api.jar</destFileName>
                                 </artifactItem>
                                  <artifactItem>
@@ -580,9 +548,9 @@
     								<artifactId>joda-time</artifactId>
     								<version>2.12.5</version>
                                     <overWrite>true</overWrite>
-                                    <outputDirectory>${project.build.directory}/plugins_beans/plugins/jackson</outputDirectory>
+                                    <outputDirectory>${project.build.directory}/plugins_beans/plugins/workflows</outputDirectory>
                                     <destFileName>joda-time.jar</destFileName>
-                                </artifactItem>
+                                </artifactItem-->
                                 <artifactItem>
                                     <groupId>org.apache.httpcomponents.client5</groupId>
                                     <artifactId>httpclient5</artifactId>
