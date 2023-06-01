@@ -22,10 +22,12 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.sql.Date;
 import java.util.List;
 
+import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLPeerUnverifiedException;
@@ -43,6 +45,7 @@ import org.apache.hc.client5.http.impl.cookie.BasicClientCookie;
 import org.apache.hc.client5.http.impl.nio.PoolingAsyncClientConnectionManager;
 import org.apache.hc.client5.http.impl.nio.PoolingAsyncClientConnectionManagerBuilder;
 import org.apache.hc.client5.http.ssl.ClientTlsStrategyBuilder;
+import org.apache.hc.client5.http.ssl.NoopHostnameVerifier;
 import org.apache.hc.client5.http.ssl.SSLConnectionSocketFactory;
 import org.apache.hc.core5.function.Factory;
 import org.apache.hc.core5.http.HttpHost;
@@ -52,6 +55,7 @@ import org.apache.hc.core5.http.protocol.HttpContext;
 import org.apache.hc.core5.http2.HttpVersionPolicy;
 import org.apache.hc.core5.reactor.ssl.TlsDetails;
 import org.apache.hc.core5.ssl.SSLContexts;
+import org.apache.hc.core5.ssl.TrustStrategy;
 import org.apache.hc.core5.util.TimeValue;
 import org.apache.hc.core5.util.Timeout;
 
@@ -95,14 +99,33 @@ public class HttpClient implements IScriptable, IJavaScriptType
 		builder.setDefaultCookieStore(cookieStore);
 		try
 		{
-			final AllowedCertTrustStrategy allowedCertTrustStrategy = new AllowedCertTrustStrategy();
-			SSLContext sslContext = SSLContexts.custom().loadTrustMaterial(allowedCertTrustStrategy).build();
+			final SSLContext sslContext;
+			final ClientTlsStrategyBuilder tlsFactory;
+			if (config != null & !config.hostValidation)
+			{
+				sslContext = SSLContexts.custom().loadTrustMaterial(new TrustStrategy()
+				{
+					@Override
+					public boolean isTrusted(X509Certificate[] chain, String authType) throws CertificateException
+					{
+						return true; // Trust all certificates
+					}
+				}).build();
+				HostnameVerifier allowAllHosts = new NoopHostnameVerifier();
+				tlsFactory = ClientTlsStrategyBuilder.create().useSystemProperties()
+					.setSslContext(sslContext)
+					.setHostnameVerifier(allowAllHosts)
+					.setTlsDetailsFactory(createFactoryForJava11());
+			}
+			else
+			{
+				final AllowedCertTrustStrategy allowedCertTrustStrategy = new AllowedCertTrustStrategy();
+				sslContext = SSLContexts.custom().loadTrustMaterial(allowedCertTrustStrategy).build();
+				tlsFactory = ClientTlsStrategyBuilder.create().useSystemProperties()
+					.setSslContext(sslContext)
+					.setTlsDetailsFactory(createFactoryForJava11());
+			}
 
-			// no longer supported SSLConnectionSocketFactory socketFactory = new CertificateSSLSocketFactoryHandler(sslContext, allowedCertTrustStrategy, httpPlugin);
-
-			ClientTlsStrategyBuilder tlsFactory = ClientTlsStrategyBuilder.create().useSystemProperties()
-				.setSslContext(sslContext)
-				.setTlsDetailsFactory(createFactoryForJava11());
 			if (config != null && config.protocol != null)
 			{
 				tlsFactory.setTlsVersions(config.protocol);

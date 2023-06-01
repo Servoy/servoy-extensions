@@ -34,6 +34,7 @@ public class HttpClientConfig implements IScriptable, IJavaScriptType
 	int maxIOThreadCount = -1;
 	boolean forceHttp1 = false;
 	boolean enableRedirects = true;
+	boolean hostValidation = true;
 
 	public HttpClientConfig()
 	{
@@ -74,6 +75,24 @@ public class HttpClientConfig implements IScriptable, IJavaScriptType
 	public void js_setForceHttp1(boolean force)
 	{
 		this.forceHttp1 = force;
+	}
+
+	/**
+	 * Disable SSL certificate validation. Use it only for testing purpose.
+	 *
+	 * @sample
+	 * var config = plugins.http.createNewHttpClientConfig();
+	 * config.disableSSL = true;
+	 * var client = plugins.http.createNewHttpClient(config);
+	 */
+	public void js_setHostValidation(boolean validation)
+	{
+		this.hostValidation = validation;
+	}
+
+	public boolean js_getHostValidation()
+	{
+		return hostValidation;
 	}
 
 	/**
