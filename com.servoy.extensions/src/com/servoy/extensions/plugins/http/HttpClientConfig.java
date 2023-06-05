@@ -77,19 +77,19 @@ public class HttpClientConfig implements IScriptable, IJavaScriptType
 		this.forceHttp1 = force;
 	}
 
-	/**
-	 * Disable SSL certificate validation. Use it only for testing purpose.
-	 *
-	 * @sample
-	 * var config = plugins.http.createNewHttpClientConfig();
-	 * config.disableSSL = true;
-	 * var client = plugins.http.createNewHttpClient(config);
-	 */
 	public void js_setHostValidation(boolean validation)
 	{
 		this.hostValidation = validation;
 	}
 
+	/**
+	 * Disable hostname certificate validation. This should be used only for testing purposes, because this is not secure!
+	 *
+	 * @sample
+	 * var config = plugins.http.createNewHttpClientConfig();
+	 * config.hostValidation = true;
+	 * var client = plugins.http.createNewHttpClient(config);
+	 */
 	public boolean js_getHostValidation()
 	{
 		return hostValidation;
