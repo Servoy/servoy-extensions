@@ -87,7 +87,7 @@ public class HttpClientConfig implements IScriptable, IJavaScriptType
 	 *
 	 * @sample
 	 * var config = plugins.http.createNewHttpClientConfig();
-	 * config.hostValidation = true;
+	 * config.hostValidation = false;
 	 * var client = plugins.http.createNewHttpClient(config);
 	 */
 	public boolean js_getHostValidation()
