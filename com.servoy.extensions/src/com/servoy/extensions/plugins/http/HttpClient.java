@@ -101,7 +101,7 @@ public class HttpClient implements IScriptable, IJavaScriptType
 		{
 			final SSLContext sslContext;
 			final ClientTlsStrategyBuilder tlsFactory;
-			if (config != null & !config.hostValidation)
+			if (config != null && !config.hostValidation)
 			{
 				sslContext = SSLContexts.custom().loadTrustMaterial(new TrustStrategy()
 				{
