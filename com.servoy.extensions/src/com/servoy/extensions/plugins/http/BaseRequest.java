@@ -29,6 +29,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.zip.GZIPInputStream;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.hc.client5.http.async.methods.SimpleHttpResponse;
 import org.apache.hc.client5.http.auth.AuthScope;
 import org.apache.hc.client5.http.auth.Credentials;
@@ -348,20 +349,11 @@ public abstract class BaseRequest implements IScriptable, IJavaScriptType
 			return response;
 		}
 
-		try (InputStream inputStream = new ByteArrayInputStream(response.getBodyBytes());
+		try (InputStream responseInputStream = new GZIPInputStream(new ByteArrayInputStream(response.getBodyBytes()));
 			ByteArrayOutputStream outputStream = new ByteArrayOutputStream();)
 		{
-			try (InputStream responseInputStream = new GZIPInputStream(inputStream))
-			{
-				byte[] buffer = new byte[1024];
-				int length;
-				while ((length = responseInputStream.read(buffer)) > 0)
-				{
-					outputStream.write(buffer, 0, length);
-				}
-				String uncompressedResponseBody = outputStream.toString("UTF-8");
-				response.setBody(uncompressedResponseBody, response.getContentType());
-			}
+			IOUtils.copy(responseInputStream, outputStream, 2048);
+			response.setBody(outputStream.toByteArray(), response.getContentType());
 		}
 		catch (IOException e)
 		{
