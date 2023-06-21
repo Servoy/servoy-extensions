@@ -67,6 +67,7 @@ public class RestWSPlugin implements IServerPlugin, IPreShutdownListener
 	private static final String DEPRECATED_CLIENT_POOL_SIZE_PER_SOLUTION_PROPERTY = "rest_ws_plugin_client_pool_size_per_solution";
 	private static final int CLIENT_POOL_SIZE_DEFAULT = 5;
 	private static final String CLIENT_POOL_EXCHAUSTED_ACTION_PROPERTY = "rest_ws_plugin_client_pool_exhausted_action";
+	private static final String CLIENT_MAX_GROW_POOL_SIZE_PROPERTY = "rest_ws_plugin_client_max_grow_pool_size";
 	private static final String ACTION_BLOCK = "block";
 	private static final String ACTION_FAIL = "fail";
 	private static final String ACTION_GROW = "grow";
@@ -107,7 +108,9 @@ public class RestWSPlugin implements IServerPlugin, IPreShutdownListener
 			"Max number of clients per solution used (this defines the number of concurrent requests and licences used per solution), default = " +
 				CLIENT_POOL_SIZE_DEFAULT + ". The same value is used for maximum number of idle clients. In case of " + CLIENT_POOL_EXCHAUSTED_ACTION_PROPERTY +
 				"=" + ACTION_GROW + ", the number of clients may become higher. When running in developer this setting is ignored, pool size will always be 1");
-
+		req.put(CLIENT_MAX_GROW_POOL_SIZE_PROPERTY,
+			"This value is only used when " + CLIENT_POOL_EXCHAUSTED_ACTION_PROPERTY +
+				"=" + ACTION_GROW + ", and it defines the total number of clients to which the pool grows, after this value the pool will block. By default is not defined.");
 		req.put(CLIENT_POOL_EXCHAUSTED_ACTION_PROPERTY, "The following values are supported for this setting:\n" + //
 			ACTION_BLOCK + " (default): requests will wait untill a client becomes available, when running in developer this value will be used\n" + //
 			ACTION_FAIL + ": the request will fail. The API will generate a SERVICE_UNAVAILABLE response (HTTP " + HttpServletResponse.SC_SERVICE_UNAVAILABLE +
@@ -258,6 +261,20 @@ public class RestWSPlugin implements IServerPlugin, IPreShutdownListener
 				else if (ACTION_GROW.equalsIgnoreCase(exchaustedActionCode))
 				{
 					maxTotalPerKey = -1;
+					int maxTotalToGrowPerKey = -1;
+					try
+					{
+						maxTotalToGrowPerKey = Integer
+							.parseInt(application.getSettings().getProperty(CLIENT_MAX_GROW_POOL_SIZE_PROPERTY, "-1").trim());
+					}
+					catch (NumberFormatException nfe)
+					{
+						maxTotalToGrowPerKey = -1;
+					}
+					if (maxTotalToGrowPerKey >= 0)
+					{
+						maxTotalPerKey = maxTotalToGrowPerKey;
+					}
 					if (log.isDebugEnabled()) log.debug("Client pool, exchaustedAction=" + ACTION_GROW);
 				}
 				else
