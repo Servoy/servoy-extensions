@@ -90,15 +90,15 @@ public class ClientManagerProvider implements IScriptable, IReturnedTypesProvide
 	}
 
 	/**
-	 * Get a broadcast object, if no broadcast with this channelName will return null.
+	 * Get a broadcast object with a specific channelName, if no broadcast, will return null.
 	 *
 	 * @sample
 	 * var broadcaster = plugins.clientmanager.getBroadcaster("mychatchannel");
 	 * if (broadcaster) {
-	 * 		block of code to be executed...
+	 * 	block of code to be executed...
 	 * }
 	 *
-	 * @param channelName The channel name where should be listened to (and send messages to)
+	 * @param channelName
 	 * @return BroadCaster
 	 */
 	public Broadcaster js_getBroadcaster(String channelName)
