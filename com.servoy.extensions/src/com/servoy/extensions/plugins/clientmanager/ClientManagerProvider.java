@@ -67,14 +67,14 @@ public class ClientManagerProvider implements IScriptable, IReturnedTypesProvide
 
 
 	/**
-	 * Get a broadcast object giving it a (nick)name and on a specific channel, the callback is used for getting messages of other clients on that channel
+	 * Create a broadcast object giving it a (nick)name and on a specific channel, the callback is used for getting messages of other clients on that channel
 	 * The function gets 3 arguments (nickName, message, channelName)
 	 *
 	 * @sample
 	 * function callback(nickName, message, channelName) {
 	 *    application.output('message received from ' + nickName + ' on channel ' + channelName + ': ' + message)
 	 * }
-	 * var broadcaster = plugins.clientmanager.getBroadcaster("nickname", "mychatchannel", callback);
+	 * var broadcaster = plugins.clientmanager.createBroadcaster("nickname", "mychatchannel", callback);
 	 * broadcaster.broadcastMessage("Hallo");
 	 *
 	 * @param name The nickname for this user on this channel
@@ -82,12 +82,30 @@ public class ClientManagerProvider implements IScriptable, IReturnedTypesProvide
 	 * @param callback The callback when for incomming messages
 	 * @return BroadCaster
 	 */
-	public Broadcaster js_getBroadcaster(String name, String channelName, Function callback)
+	public Broadcaster js_createBroadcaster(String name, String channelName, Function callback)
 	{
 		Broadcaster broadCaster = new Broadcaster(name, channelName, callback, plugin);
 		plugin.addLiveBroadcaster(broadCaster);
 		return broadCaster;
 	}
+
+	/**
+	 * Get a broadcast object, if no broadcast with this channelName will return null.
+	 *
+	 * @sample
+	 * var broadcaster = plugins.clientmanager.getBroadcaster("mychatchannel");
+	 * if (broadcaster) {
+	 * 		block of code to be executed...
+	 * }
+	 *
+	 * @param channelName The channel name where should be listened to (and send messages to)
+	 * @return BroadCaster
+	 */
+	public Broadcaster js_getBroadcaster(String channelName)
+	{
+		return plugin.getBroadcaster(channelName);
+	}
+
 
 	/**
 	 * Returns an array of JSClientInformation elements describing the clients connected to the server. Note this is snapshot information on connected clients, client information will not get updated.

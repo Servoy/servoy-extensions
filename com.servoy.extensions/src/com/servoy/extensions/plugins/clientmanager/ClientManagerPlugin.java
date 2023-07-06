@@ -96,6 +96,20 @@ public class ClientManagerPlugin implements IClientPlugin, IIconProvider
 		liveBroadcasters.add(bc);
 	}
 
+	public Broadcaster getBroadcaster(String channelName)
+	{
+		Broadcaster bc = null;
+		for (Broadcaster livebc : liveBroadcasters)
+		{
+			if (livebc.js_getChannelName().equals(channelName))
+			{
+				bc = livebc;
+				break;
+			}
+		}
+		return bc;
+	}
+
 	void removeLiveBroadcaster(Broadcaster bc)
 	{
 		liveBroadcasters.remove(bc);
