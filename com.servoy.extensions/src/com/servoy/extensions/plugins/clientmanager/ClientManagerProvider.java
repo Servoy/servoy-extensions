@@ -80,7 +80,7 @@ public class ClientManagerProvider implements IScriptable, IReturnedTypesProvide
 	 * @param channelName The channel name where should be listened to (and send messages to)
 	 * @param callback The callback when for incomming messages
 	 * @return BroadCaster
-	 * @deprecated
+	 * @deprecated replaced with plugins.clientmanager.createBroadcaster(name, channelName, callback)
 	 */
 	@Deprecated
 	public Broadcaster js_getBroadcaster(String name, String channelName, Function callback)
