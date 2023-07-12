@@ -7,7 +7,7 @@
 	</prerequisites>
 	<groupId>com.servoy</groupId>
 	<artifactId>com.servoy.extensions</artifactId>
-	<version>2022.3.4.3746_LTS</version>
+	<version>2022.3.5.3747_LTS</version>
 
 	<repositories>
 		<repository>
@@ -796,7 +796,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jarsigner-plugin</artifactId>
-				<version>3.0.0</version>
+				<version>3.0.0.s1</version>
 				<executions>
 					<execution>
 						<id>sign</id>
