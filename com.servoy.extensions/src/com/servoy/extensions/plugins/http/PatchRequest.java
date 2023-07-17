@@ -17,10 +17,10 @@
 
 package com.servoy.extensions.plugins.http;
 
-import org.apache.http.client.config.RequestConfig.Builder;
-import org.apache.http.client.methods.HttpPatch;
-import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.hc.client5.http.classic.methods.HttpPatch;
+import org.apache.hc.client5.http.config.RequestConfig.Builder;
+import org.apache.hc.client5.http.impl.async.CloseableHttpAsyncClient;
+import org.apache.hc.client5.http.impl.auth.BasicCredentialsProvider;
 
 import com.servoy.j2db.documentation.ServoyDocumented;
 
@@ -36,7 +36,7 @@ public class PatchRequest extends BaseEntityEnclosingRequest
 		super();
 	}//only used by script engine
 
-	public PatchRequest(String url, CloseableHttpClient hc, HttpPlugin httpPlugin, Builder requestConfigBuilder,
+	public PatchRequest(String url, CloseableHttpAsyncClient hc, HttpPlugin httpPlugin, Builder requestConfigBuilder,
 		BasicCredentialsProvider proxyCredentialsProvider)
 	{
 		super(url, hc, new HttpPatch(url), httpPlugin, requestConfigBuilder, proxyCredentialsProvider);

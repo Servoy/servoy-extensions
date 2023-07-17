@@ -27,7 +27,7 @@ import java.io.ObjectOutputStream;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 
-import org.apache.http.conn.ssl.TrustStrategy;
+import org.apache.hc.core5.ssl.TrustStrategy;
 
 import com.servoy.j2db.J2DBGlobals;
 import com.servoy.j2db.util.Debug;
@@ -40,7 +40,7 @@ class AllowedCertTrustStrategy implements TrustStrategy
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.apache.http.conn.ssl.TrustStrategy#isTrusted(java.security.cert.X509Certificate[], java.lang.String)
 	 */
 	@Override
@@ -51,7 +51,7 @@ class AllowedCertTrustStrategy implements TrustStrategy
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	public X509Certificate[] getAndClearLastCertificates()
 	{

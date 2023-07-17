@@ -20,10 +20,13 @@ package com.servoy.extensions.plugins.broadcaster;
 import java.io.Serializable;
 import java.util.Arrays;
 
+import com.servoy.j2db.dataprocessing.BroadcastFilter;
 import com.servoy.j2db.dataprocessing.IDataSet;
 
 public final class NotifyData implements Serializable
 {
+	private static final long serialVersionUID = 1L;
+
 	final String originServerUUID;
 	final String server_name;
 	final String table_name;
@@ -31,9 +34,10 @@ public final class NotifyData implements Serializable
 	final int action;
 	final Object[] insertColumnData;
 	final String dataSource;
-	final Object[] tenantData;
+	final BroadcastFilter[] broadcastFilters;
 
-	public NotifyData(String originServerUUID, String server_name, String table_name, IDataSet pks, int action, Object[] insertColumnData, Object[] tenantData)
+	public NotifyData(String originServerUUID, String server_name, String table_name, IDataSet pks, int action, Object[] insertColumnData,
+		BroadcastFilter[] broadcastFilters)
 	{
 		this.originServerUUID = originServerUUID;
 		this.server_name = server_name;
@@ -41,19 +45,19 @@ public final class NotifyData implements Serializable
 		this.pks = pks;
 		this.action = action;
 		this.insertColumnData = insertColumnData;
-		this.tenantData = tenantData;
+		this.broadcastFilters = broadcastFilters;
 		this.dataSource = null;
 	}
 
 	/**
 	 * @param dataSource
-	 * @param tenantValue
+	 * @param broadcastFilters
 	 */
-	public NotifyData(String originServerUUID, String dataSource, Object[] tenantValue)
+	public NotifyData(String originServerUUID, String dataSource, BroadcastFilter[] broadcastFilters)
 	{
 		this.originServerUUID = originServerUUID;
 		this.dataSource = dataSource;
-		this.tenantData = tenantValue;
+		this.broadcastFilters = broadcastFilters;
 		this.server_name = null;
 		this.table_name = null;
 		this.pks = null;

@@ -16,10 +16,10 @@
  */
 package com.servoy.extensions.plugins.http;
 
-import org.apache.http.client.config.RequestConfig.Builder;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.config.RequestConfig.Builder;
+import org.apache.hc.client5.http.impl.async.CloseableHttpAsyncClient;
+import org.apache.hc.client5.http.impl.auth.BasicCredentialsProvider;
 
 import com.servoy.j2db.documentation.ServoyDocumented;
 
@@ -34,7 +34,7 @@ public class PostRequest extends BaseEntityEnclosingRequest
 		super();
 	}//only used by script engine
 
-	public PostRequest(String url, CloseableHttpClient hc, HttpPlugin httpPlugin, Builder requestConfigBuilder,
+	public PostRequest(String url, CloseableHttpAsyncClient hc, HttpPlugin httpPlugin, Builder requestConfigBuilder,
 		BasicCredentialsProvider proxyCredentialsProvider)
 	{
 		super(url, hc, new HttpPost(url), httpPlugin, requestConfigBuilder, proxyCredentialsProvider);

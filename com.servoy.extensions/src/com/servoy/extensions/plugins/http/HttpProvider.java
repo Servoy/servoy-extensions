@@ -30,11 +30,11 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.List;
 
-import org.apache.http.HttpHost;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.config.RequestConfig.Builder;
-import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.hc.client5.http.auth.AuthScope;
+import org.apache.hc.client5.http.auth.UsernamePasswordCredentials;
+import org.apache.hc.client5.http.config.RequestConfig.Builder;
+import org.apache.hc.client5.http.impl.auth.BasicCredentialsProvider;
+import org.apache.hc.core5.http.HttpHost;
 
 import com.servoy.j2db.MediaURLStreamHandler;
 import com.servoy.j2db.documentation.ServoyDocumented;
@@ -216,7 +216,8 @@ public class HttpProvider implements IReturnedTypesProvider, IScriptable
 		if (proxyUser != null)
 		{
 			BasicCredentialsProvider bcp = new BasicCredentialsProvider();
-			bcp.setCredentials(new AuthScope(proxyHost, proxyPort), new UsernamePasswordCredentials(proxyUser, proxyPassword));
+			bcp.setCredentials(new AuthScope(proxyHost, proxyPort),
+				new UsernamePasswordCredentials(proxyUser, proxyPassword != null ? proxyPassword.toCharArray() : null));
 			return bcp;
 		}
 		return null;
@@ -256,8 +257,10 @@ public class HttpProvider implements IReturnedTypesProvider, IScriptable
 
 
 	/**
-	 * Create an http client (like a web browser with session binding) usable todo multiple request/posts in same server session.
-	 * Make sure you call client.close() on it after you used this client object to clean up resources.
+	 * Create an http client (like a web browser with session binding) usable todo multiple request/posts in same server session
+	 * .
+	 * WARNING: Make sure you call client.close() on it after you used this client object to clean up resources.
+	 * Starting a HTTPClient is the same as starting an actual browser without UI!
 	 *
 	 * @sample
 	 * var client = plugins.http.createNewHttpClient();
@@ -271,7 +274,9 @@ public class HttpProvider implements IReturnedTypesProvider, IScriptable
 
 	/**
 	 * Create an http client (like a web browser with session binding) usable todo multiple request/posts in same server session.
-	 * Make sure you call client.close() on it after you used this client object to clean up resources.
+	 *
+	 * WARNING: Make sure you call client.close() on it after you used this client object to clean up resources.
+	 * Starting a HTTPClient is the same as starting an actual browser without UI!
 	 *
 	 * @param config httpclient config
 	 * @sample

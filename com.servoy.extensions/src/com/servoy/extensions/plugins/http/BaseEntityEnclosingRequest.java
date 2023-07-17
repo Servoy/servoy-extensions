@@ -20,27 +20,19 @@ package com.servoy.extensions.plugins.http;
 import java.io.File;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.config.RequestConfig.Builder;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpRequestBase;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.FileEntity;
-import org.apache.http.entity.InputStreamEntity;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.entity.mime.HttpMultipartMode;
-import org.apache.http.entity.mime.MultipartEntityBuilder;
-import org.apache.http.entity.mime.content.ByteArrayBody;
-import org.apache.http.entity.mime.content.FileBody;
-import org.apache.http.entity.mime.content.StringBody;
-import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.protocol.HTTP;
+import org.apache.hc.client5.http.classic.methods.HttpUriRequestBase;
+import org.apache.hc.client5.http.config.RequestConfig.Builder;
+import org.apache.hc.client5.http.impl.async.CloseableHttpAsyncClient;
+import org.apache.hc.client5.http.impl.auth.BasicCredentialsProvider;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.NameValuePair;
+import org.apache.hc.core5.http.message.BasicNameValuePair;
+import org.apache.hc.core5.http.nio.AsyncEntityProducer;
+import org.apache.hc.core5.http.nio.entity.AsyncEntityProducers;
+import org.apache.hc.core5.http.nio.entity.BasicAsyncEntityProducer;
+import org.apache.hc.core5.net.WWWFormCodec;
 
 import com.servoy.extensions.plugins.file.JSFile;
 import com.servoy.j2db.util.Debug;
@@ -54,7 +46,7 @@ public class BaseEntityEnclosingRequest extends BaseRequest
 {
 	private String bodyContent;
 	private String bodyMimeType = ContentType.TEXT_PLAIN.getMimeType();
-	protected String charset = HTTP.UTF_8;
+	protected String charset = "UTF8";
 
 	private List<FileInfo> files;
 	private List<NameValuePair> params;
@@ -64,7 +56,7 @@ public class BaseEntityEnclosingRequest extends BaseRequest
 	{
 	}
 
-	public BaseEntityEnclosingRequest(String url, CloseableHttpClient hc, HttpRequestBase method, HttpPlugin httpPlugin, Builder requestConfigBuilder,
+	public BaseEntityEnclosingRequest(String url, CloseableHttpAsyncClient hc, HttpUriRequestBase method, HttpPlugin httpPlugin, Builder requestConfigBuilder,
 		BasicCredentialsProvider proxyCredentialsProvider)
 	{
 		super(url, hc, method, httpPlugin, requestConfigBuilder, proxyCredentialsProvider);
@@ -124,20 +116,29 @@ public class BaseEntityEnclosingRequest extends BaseRequest
 	}
 
 	@Override
-	protected HttpEntity buildEntity() throws Exception
+	protected AsyncEntityProducer buildEntityProducer() throws Exception
 	{
-		HttpEntity entity = null;
+		AsyncEntityProducer entityProducer = null;
 
 		if (files.size() == 0 && !forceMultipart)
 		{
 			if (params != null)
 			{
-				entity = new UrlEncodedFormEntity(params, charset);
+				entityProducer = AsyncEntityProducers.create(
+					WWWFormCodec.format(
+						params,
+						charset != null ? Charset.forName(charset) : ContentType.APPLICATION_FORM_URLENCODED.getCharset()),
+					ContentType.APPLICATION_FORM_URLENCODED);
 			}
 			else if (!Utils.stringIsEmpty(bodyContent))
 			{
-				entity = new StringEntity(bodyContent, ContentType.create(bodyMimeType, charset));
+				entityProducer = AsyncEntityProducers.create(bodyContent.getBytes(charset != null ? charset : "UTF8"),
+					ContentType.create(bodyMimeType, charset != null ? charset : "UTF8"));
 				bodyContent = null;
+			}
+			else
+			{
+				entityProducer = AsyncEntityProducers.create("");
 			}
 		}
 		else if (files.size() == 1 && (params == null || params.size() == 0) && !forceMultipart)
@@ -147,14 +148,22 @@ public class BaseEntityEnclosingRequest extends BaseRequest
 			{
 				File f = (File)info.file;
 				String contentType = info.mimeType != null ? info.mimeType : MimeTypes.getContentType(Utils.readFile(f, 32), f.getName());
-				entity = new FileEntity(f, ContentType.create(contentType != null ? contentType : "binary/octet-stream")); //$NON-NLS-1$
+				entityProducer = AsyncEntityProducers.create(f, ContentType.create(contentType != null ? contentType : "binary/octet-stream"));
 			}
 			else if (info.file instanceof JSFile)
 			{
 				JSFile f = (JSFile)info.file;
 				String contentType = info.mimeType != null ? info.mimeType : f.js_getContentType();
-				entity = new InputStreamEntity(f.getAbstractFile().getInputStream(), f.js_size(),
-					ContentType.create(contentType != null ? contentType : "binary/octet-stream")); //$NON-NLS-1$
+				File file = f.getFile();
+				if (file != null)
+				{
+					entityProducer = AsyncEntityProducers.create(file, ContentType.create(contentType != null ? contentType : "binary/octet-stream"));
+				}
+				else
+				{
+					entityProducer = new BasicAsyncEntityProducer(f.jsFunction_getBytes(),
+						ContentType.create(contentType != null ? contentType : "binary/octet-stream"));
+				}
 			}
 			else
 			{
@@ -163,8 +172,7 @@ public class BaseEntityEnclosingRequest extends BaseRequest
 		}
 		else
 		{
-			MultipartEntityBuilder builder = MultipartEntityBuilder.create();
-			builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
+			entityProducer = new MultiPartEntityProducer();
 
 			// For File parameters
 			for (FileInfo info : files)
@@ -174,14 +182,26 @@ public class BaseEntityEnclosingRequest extends BaseRequest
 				{
 					String contentType = info.mimeType != null ? info.mimeType
 						: MimeTypes.getContentType(Utils.readFile((File)file, 32), ((File)file).getName());
-					builder.addPart(info.parameterName,
-						new FileBody((File)file, contentType != null ? ContentType.create(contentType) : ContentType.DEFAULT_BINARY));
+					((MultiPartEntityProducer)entityProducer).addProducer(
+						AsyncEntityProducers.create((File)file, contentType != null ? ContentType.create(contentType) : ContentType.DEFAULT_BINARY),
+						info.parameterName, info.fileName);
 				}
 				else if (file instanceof JSFile)
 				{
+					File innerFile = ((JSFile)file).getFile();
 					String contentType = info.mimeType != null ? info.mimeType : ((JSFile)file).js_getContentType();
-					builder.addPart(info.parameterName, new ByteArrayBody(Utils.getBytesFromInputStream(((JSFile)file).getAbstractFile().getInputStream()),
-						ContentType.create(contentType != null ? contentType : "binary/octet-stream"), ((JSFile)file).js_getName()));
+					if (innerFile != null)
+					{
+						((MultiPartEntityProducer)entityProducer)
+							.addProducer(AsyncEntityProducers.create(innerFile, ContentType.create(contentType != null ? contentType : "binary/octet-stream")),
+								info.parameterName, info.fileName);
+					}
+					else
+					{
+						((MultiPartEntityProducer)entityProducer).addProducer(new BasicAsyncEntityProducer(((JSFile)file).jsFunction_getBytes(),
+							ContentType.create(contentType != null ? contentType : "binary/octet-stream")), info.parameterName, info.fileName);
+					}
+
 				}
 				else
 				{
@@ -191,19 +211,18 @@ public class BaseEntityEnclosingRequest extends BaseRequest
 			// add the parameters
 			if (params != null)
 			{
-				Iterator<NameValuePair> it = params.iterator();
-				while (it.hasNext())
+				for (NameValuePair nvp : params)
 				{
-					NameValuePair nvp = it.next();
+					((MultiPartEntityProducer)entityProducer)
+						.addProducer(new BasicAsyncEntityProducer(nvp.getValue().getBytes(), ContentType.create("text/plain", Charset.forName(charset))),
+							nvp.getName(), null);
 					// For usual String parameters
-					builder.addPart(nvp.getName(), new StringBody(nvp.getValue(), ContentType.create("text/plain", Charset.forName(charset))));
 				}
 			}
-			entity = builder.build();
 		}
 
 		// entity may have been set already, see PutRequest.js_setFile
-		return entity;
+		return entityProducer;
 	}
 
 	/**

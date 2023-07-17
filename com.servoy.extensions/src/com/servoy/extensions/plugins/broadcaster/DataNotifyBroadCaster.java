@@ -242,12 +242,12 @@ public class DataNotifyBroadCaster implements IServerPlugin
 								{
 									if (nd.dataSource != null)
 									{
-										dataNotifyService.flushCachedDatabaseData(nd.dataSource, nd.tenantData);
+										dataNotifyService.flushCachedDatabaseData(nd.dataSource, nd.broadcastFilters);
 									}
 									else
 									{
 										dataNotifyService.notifyDataChange(nd.server_name, nd.table_name, nd.pks, nd.action, nd.insertColumnData,
-											nd.tenantData);
+											nd.broadcastFilters);
 									}
 								}
 							}

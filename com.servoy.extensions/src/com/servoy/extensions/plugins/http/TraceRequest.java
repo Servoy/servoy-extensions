@@ -17,10 +17,10 @@
 
 package com.servoy.extensions.plugins.http;
 
-import org.apache.http.client.config.RequestConfig.Builder;
-import org.apache.http.client.methods.HttpTrace;
-import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.hc.client5.http.classic.methods.HttpTrace;
+import org.apache.hc.client5.http.config.RequestConfig.Builder;
+import org.apache.hc.client5.http.impl.async.CloseableHttpAsyncClient;
+import org.apache.hc.client5.http.impl.auth.BasicCredentialsProvider;
 
 import com.servoy.j2db.documentation.ServoyDocumented;
 
@@ -37,7 +37,7 @@ public class TraceRequest extends BaseRequest
 		super();
 	}
 
-	public TraceRequest(String url, CloseableHttpClient hc, HttpPlugin httpPlugin, Builder requestConfigBuilder,
+	public TraceRequest(String url, CloseableHttpAsyncClient hc, HttpPlugin httpPlugin, Builder requestConfigBuilder,
 		BasicCredentialsProvider proxyCredentialsProvider)
 	{
 		super(url, hc, new HttpTrace(url), httpPlugin, requestConfigBuilder, proxyCredentialsProvider);

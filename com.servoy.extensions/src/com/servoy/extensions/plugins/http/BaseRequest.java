@@ -19,22 +19,26 @@ package com.servoy.extensions.plugins.http;
 
 import java.net.URL;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.Credentials;
-import org.apache.http.auth.NTCredentials;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.config.RequestConfig.Builder;
-import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
-import org.apache.http.client.methods.HttpRequestBase;
-import org.apache.http.client.protocol.HttpClientContext;
-import org.apache.http.impl.auth.BasicScheme;
-import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.hc.client5.http.async.methods.SimpleHttpResponse;
+import org.apache.hc.client5.http.auth.AuthScope;
+import org.apache.hc.client5.http.auth.Credentials;
+import org.apache.hc.client5.http.auth.NTCredentials;
+import org.apache.hc.client5.http.auth.UsernamePasswordCredentials;
+import org.apache.hc.client5.http.classic.methods.HttpUriRequestBase;
+import org.apache.hc.client5.http.config.RequestConfig.Builder;
+import org.apache.hc.client5.http.impl.async.CloseableHttpAsyncClient;
+import org.apache.hc.client5.http.impl.auth.BasicCredentialsProvider;
+import org.apache.hc.client5.http.impl.auth.BasicScheme;
+import org.apache.hc.client5.http.protocol.HttpClientContext;
+import org.apache.hc.core5.concurrent.FutureCallback;
+import org.apache.hc.core5.http.HttpHost;
+import org.apache.hc.core5.http.nio.AsyncEntityProducer;
+import org.apache.hc.core5.http.nio.support.BasicRequestProducer;
 import org.mozilla.javascript.Function;
 
 import com.servoy.j2db.plugins.IClientPluginAccess;
@@ -51,8 +55,8 @@ import com.servoy.j2db.util.Utils;
 @SuppressWarnings("nls")
 public abstract class BaseRequest implements IScriptable, IJavaScriptType
 {
-	protected CloseableHttpClient client;
-	protected final HttpRequestBase method;
+	protected CloseableHttpAsyncClient client;
+	protected final HttpUriRequestBase method;
 	protected String url;
 	protected Map<String, String[]> headers;
 	private HttpPlugin httpPlugin;
@@ -65,18 +69,11 @@ public abstract class BaseRequest implements IScriptable, IJavaScriptType
 		method = null;
 	}//only used by script engine
 
-	public BaseRequest(String url, CloseableHttpClient hc, HttpRequestBase method, HttpPlugin httpPlugin, Builder requestConfigBuilder,
+	public BaseRequest(String url, CloseableHttpAsyncClient hc, HttpUriRequestBase method, HttpPlugin httpPlugin, Builder requestConfigBuilder,
 		BasicCredentialsProvider proxyCredentialsProvider)
 	{
 		this.url = url;
-		if (hc == null)
-		{
-			client = HttpClientBuilder.create().build();
-		}
-		else
-		{
-			client = hc;
-		}
+		client = hc;
 		headers = new HashMap<String, String[]>();
 		this.method = method;
 		this.httpPlugin = httpPlugin;
@@ -143,7 +140,7 @@ public abstract class BaseRequest implements IScriptable, IJavaScriptType
 	{
 		try
 		{
-			return executeRequest(userName, password, null, null, false);
+			return executeRequest(userName, password, null, null, false, null, null, null, true);
 		}
 		catch (Exception ex)
 		{
@@ -166,7 +163,7 @@ public abstract class BaseRequest implements IScriptable, IJavaScriptType
 	{
 		try
 		{
-			return executeRequest(userName, password, workstation, domain, true);
+			return executeRequest(userName, password, workstation, domain, true, null, null, null, true);
 		}
 		catch (Exception ex)
 		{
@@ -186,21 +183,18 @@ public abstract class BaseRequest implements IScriptable, IJavaScriptType
 		this.usePreemptiveAuthentication = b;
 	}
 
-	protected HttpEntity buildEntity() throws Exception
+	protected AsyncEntityProducer buildEntityProducer() throws Exception
 	{
 		return null;
 	}
 
-	private Response executeRequest(String userName, String password, String workstation, String domain, boolean windowsAuthentication) throws Exception
+	private Response executeRequest(String userName, String password, String workstation, String domain, boolean windowsAuthentication,
+		FunctionDefinition successFunctionDef, FunctionDefinition errorFunctionDef, Object[] callbackArgs, boolean waitForResult) throws Exception
 	{
 		HttpClientContext context = null;
-		HttpEntity entity = buildEntity();
-		if (entity != null) ((HttpEntityEnclosingRequestBase)method).setEntity(entity);
 
-		Iterator<String> it = headers.keySet().iterator();
-		while (it.hasNext())
+		for (String name : headers.keySet())
 		{
-			String name = it.next();
 			String[] values = headers.get(name);
 			for (String value : values)
 			{
@@ -221,22 +215,101 @@ public abstract class BaseRequest implements IScriptable, IJavaScriptType
 			Credentials cred = null;
 			if (windowsAuthentication)
 			{
-				cred = new NTCredentials(userName, password, workstation, domain);
+				cred = new NTCredentials(userName, password != null ? password.toCharArray() : null, workstation, domain);
 			}
 			else
 			{
-				cred = new UsernamePasswordCredentials(userName, password);
+				cred = new UsernamePasswordCredentials(userName, password != null ? password.toCharArray() : null);
 			}
-			bcp.setCredentials(new AuthScope(_url.getHost(), _url.getPort()), cred);
+			HttpHost targetHost = new HttpHost(_url.getProtocol(), _url.getHost(), _url.getPort());
+			bcp.setCredentials(new AuthScope(targetHost), cred);
 			context.setCredentialsProvider(bcp);
 
 			if (usePreemptiveAuthentication)
 			{
-				method.addHeader(new BasicScheme().authenticate(cred, method, context));
+				BasicScheme scheme = new BasicScheme();
+				scheme.initPreemptive(cred);
+				context.resetAuthExchange(targetHost, scheme);
 			}
 		}
 		method.setConfig(requestConfigBuilder.build());
-		return new Response(client.execute(method, context), method);
+		final Future<SimpleHttpResponse> future = client.execute(
+			new BasicRequestProducer(method, buildEntityProducer()),
+			FixedSimpleResponseConsumer.create(),
+			context,
+			new FutureCallback<SimpleHttpResponse>()
+			{
+
+				@Override
+				public void completed(final SimpleHttpResponse response)
+				{
+					if (successFunctionDef != null)
+					{
+						IClientPluginAccess access = httpPlugin.getClientPluginAccess();
+						if (access != null)
+						{
+							callbackArgs[0] = new Response(response, method);
+							successFunctionDef.executeAsync(access, callbackArgs);
+						}
+						else
+						{
+							Debug.log(
+								"Callback for request: " + method.getRequestUri() + " was given: " + successFunctionDef + " but the client was already closed");
+						}
+					}
+				}
+
+				@Override
+				public void failed(final Exception ex)
+				{
+					logError(ex, userName, workstation, domain);
+					if (errorFunctionDef != null)
+					{
+						IClientPluginAccess access = httpPlugin.getClientPluginAccess();
+						if (access != null)
+						{
+							callbackArgs[0] = ex.getMessage();
+							errorFunctionDef.executeAsync(access, callbackArgs);
+						}
+						else
+						{
+							Debug.log(
+								"Error callback for request: " + method.getRequestUri() + " was given: " + errorFunctionDef +
+									" but the client was already closed");
+						}
+					}
+				}
+
+				@Override
+				public void cancelled()
+				{
+					Debug.error("Request was cancelled while executing " + method.getRequestUri() + " with method " + method.getMethod() + " with user: " +
+						userName + ", workstation: " +
+						workstation + ", domain: " + domain);
+				}
+
+			});
+		if (waitForResult)
+		{
+			try
+			{
+				SimpleHttpResponse response = future.get();
+				return new Response(response, method);
+			}
+			catch (ExecutionException ee)
+			{
+				return new Response(ee.getMessage());
+			}
+			catch (CancellationException ce)
+			{
+				return new Response("Request was cancelled");
+			}
+			catch (Exception ex)
+			{
+				logError(ex, userName, workstation, domain);
+			}
+		}
+		return null;
 	}
 
 	/**
@@ -383,59 +456,39 @@ public abstract class BaseRequest implements IScriptable, IJavaScriptType
 		}
 		final Object[] callbackArgs = convertedThereAndBackAgainPlusOne != null ? convertedThereAndBackAgainPlusOne : new Object[1];
 
-		Runnable runnable = new Runnable()
+		try
 		{
-			public void run()
+			executeRequest(username, password, workstation, domain, windowsAuthentication, successFunctionDef, errorFunctionDef,
+				callbackArgs, false);
+		}
+		catch (final Exception ex)
+		{
+			logError(ex, username, workstation, domain);
+			if (errorFunctionDef != null)
 			{
-				try
+				IClientPluginAccess access = httpPlugin.getClientPluginAccess();
+				if (access != null)
 				{
-					final Response response = executeRequest(username, password, workstation, domain, windowsAuthentication);
-
-					if (successFunctionDef != null)
-					{
-						IClientPluginAccess access = httpPlugin.getClientPluginAccess();
-						if (access != null)
-						{
-							callbackArgs[0] = response;
-							successFunctionDef.executeAsync(access, callbackArgs);
-						}
-						else
-						{
-							Debug.log("Callback for request: " + method.getURI() + " was given: " + successFunctionDef + " but the client was already closed");
-						}
-					}
-					else
-					{
-						response.js_close();
-					}
+					callbackArgs[0] = ex.getMessage();
+					errorFunctionDef.executeAsync(access, callbackArgs);
 				}
-				catch (final Exception ex)
+				else
 				{
-					logError(ex, username, workstation, domain);
-					if (errorFunctionDef != null)
-					{
-						IClientPluginAccess access = httpPlugin.getClientPluginAccess();
-						if (access != null)
-						{
-							callbackArgs[0] = ex.getMessage();
-							errorFunctionDef.executeAsync(access, callbackArgs);
-						}
-						else
-						{
-							Debug.log(
-								"Error callback for request: " + method.getURI() + " was given: " + errorFunctionDef + " but the client was already closed");
-						}
-					}
+					Debug.log(
+						"Error callback for request: " + method.getRequestUri() + " was given: " + errorFunctionDef +
+							" but the client was already closed");
 				}
 			}
-		};
-		httpPlugin.getExecutor().execute(runnable);
+		}
+
 	}
 
-	private void logError(Exception ex, String username, String workstation, String domain)
+	private void logError(Throwable ex, String username, String workstation, String domain)
 	{
-		Debug.error("Error executing a request to " + method.getURI() + " with method " + method.getMethod() + " with user: " + username + ", workstation: " +
-			workstation + ", domain: " + domain, ex);
+		Debug.error(
+			"Error executing a request to " + method.getRequestUri() + " with method " + method.getMethod() + " with user: " + username + ", workstation: " +
+				workstation + ", domain: " + domain,
+			ex);
 	}
 
 }

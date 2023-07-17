@@ -31,9 +31,67 @@ public class HttpClientConfig implements IScriptable, IJavaScriptType
 	String protocol;
 	int keepAliveDuration = -1;
 	String userAgent;
+	int maxIOThreadCount = -1;
+	boolean forceHttp1 = false;
+	boolean enableRedirects = true;
 
 	public HttpClientConfig()
 	{
+	}
+
+	/**
+	 * Gets/Sets maximum number of input/output threads per client, default value is 2.
+	 *
+	 * @sample
+	 * var config = plugins.http.createNewHttpClientConfig();
+	 * config.maxIOThreadCount = 5;
+	 * var client = plugins.http.createNewHttpClient(config);
+	 */
+	public int js_getMaxIOThreadCount()
+	{
+		return maxIOThreadCount;
+	}
+
+	public void js_setMaxIOThreadCount(int maxIOThreadCount)
+	{
+		this.maxIOThreadCount = maxIOThreadCount;
+	}
+
+	/**
+	 * Force the use of http1, use this if there are problems connecting to a server that does use http/2 but uses old cipher suites
+	 * or if there are other problems like http/2 not setting the content length and the server still wants it.
+	 *
+	 * @sample
+	 * var config = plugins.http.createNewHttpClientConfig();
+	 * config.maxIOThreadCount = 5;
+	 * var client = plugins.http.createNewHttpClient(config);
+	 */
+	public boolean js_getForceHttp1()
+	{
+		return forceHttp1;
+	}
+
+	public void js_setForceHttp1(boolean force)
+	{
+		this.forceHttp1 = force;
+	}
+
+	/**
+	 * Sets whether client should follow redirects or you want to do it manually. Default value is true.
+	 *
+	 * @sample
+	 * var config = plugins.http.createNewHttpClientConfig();
+	 * config.enableRedirects = false;
+	 * var client = plugins.http.createNewHttpClient(config);
+	 */
+	public boolean js_getEnableRedirects()
+	{
+		return this.enableRedirects;
+	}
+
+	public void js_setEnableRedirects(boolean enableRedirects)
+	{
+		this.enableRedirects = enableRedirects;
 	}
 
 	/**

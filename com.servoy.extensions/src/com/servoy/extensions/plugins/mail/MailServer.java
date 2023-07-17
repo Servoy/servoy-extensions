@@ -1,5 +1,5 @@
 /*
- This file belongs to the Servoy development and deployment environment, Copyright (C) 1997-2010 Servoy BV
+w This file belongs to the Servoy development and deployment environment, Copyright (C) 1997-2010 Servoy BV
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU Affero General Public License as published by the Free
@@ -19,6 +19,7 @@ package com.servoy.extensions.plugins.mail;
 import java.io.ByteArrayInputStream;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -27,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.StringTokenizer;
+import java.util.stream.Stream;
 
 import javax.activation.DataHandler;
 import javax.mail.FetchProfile;
@@ -39,6 +41,7 @@ import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.mail.Store;
 import javax.mail.Transport;
+import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
@@ -214,9 +217,15 @@ public class MailServer implements IMailService, IServerPlugin
 		{
 			String[] from_array = from.split(",");
 			message.setFrom(new InternetAddress(from_array[0]));
-			if (from_array.length > 1) reply = from_array[1];
+			if (from_array.length > 1)
+			{
+				message.setReplyTo(Stream
+					.of(Arrays.copyOfRange(from_array, 1, from_array.length))
+					.map(this::StringToInternetAddress)
+					.filter(address -> address != null)
+					.toArray(InternetAddress[]::new));
+			}
 		}
-		if (reply != null) message.setReplyTo(new InternetAddress[] { new InternetAddress(reply) });
 		message.setSentDate(new Date());
 		String overrideAddress = properties.getProperty("mail.development.override.address");
 		String overrideFeedback = null;
@@ -266,10 +275,9 @@ public class MailServer implements IMailService, IServerPlugin
 				htmlBodyPart.setContent(html, htmlContentType);
 				htmlMultipart.addBodyPart(htmlBodyPart);
 
-				Iterator<MimeBodyPart> iterator = embeddedImages.iterator();
-				while (iterator.hasNext())
+				for (MimeBodyPart embeddedImage : embeddedImages)
 				{
-					htmlMultipart.addBodyPart(iterator.next());
+					htmlMultipart.addBodyPart(embeddedImage);
 				}
 			}
 		}
@@ -609,5 +617,18 @@ public class MailServer implements IMailService, IServerPlugin
 	public String getPluginProperty(String propertyName)
 	{
 		return settings.getProperty(propertyName);
+	}
+
+	private InternetAddress StringToInternetAddress(String address)
+	{
+		try
+		{
+			return new InternetAddress(address);
+		}
+		catch (AddressException ex)
+		{
+			Debug.error("StringToInternetAddress " + ex.getMessage(), ex);
+			return null;
+		}
 	}
 }

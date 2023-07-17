@@ -17,20 +17,17 @@
 
 package com.servoy.extensions.plugins.http;
 
-import java.io.BufferedInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
-import java.util.zip.GZIPInputStream;
 
-import org.apache.http.Header;
-import org.apache.http.HeaderElement;
-import org.apache.http.HeaderIterator;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.util.EntityUtils;
+import org.apache.hc.client5.http.async.methods.SimpleHttpResponse;
+import org.apache.hc.client5.http.classic.methods.HttpUriRequest;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.Header;
+import org.apache.hc.core5.http.HeaderElement;
+import org.apache.hc.core5.http.message.BasicHeaderValueParser;
+import org.apache.hc.core5.http.message.ParserCursor;
 
 import com.servoy.j2db.documentation.ServoyDocumented;
 import com.servoy.j2db.scripting.IJavaScriptType;
@@ -46,7 +43,7 @@ import com.servoy.j2db.util.Utils;
 @ServoyDocumented
 public class Response implements IScriptable, IJavaScriptType
 {
-	private HttpResponse res;
+	private SimpleHttpResponse res;
 	private Object response_body = null;
 	private HttpUriRequest request;
 	private String exceptionMessage;
@@ -61,7 +58,7 @@ public class Response implements IScriptable, IJavaScriptType
 		this.exceptionMessage = exceptionMessage;
 	}
 
-	public Response(HttpResponse response, HttpUriRequest request)
+	public Response(SimpleHttpResponse response, HttpUriRequest request)
 	{
 		this.res = response;
 		this.request = request;
@@ -69,12 +66,18 @@ public class Response implements IScriptable, IJavaScriptType
 
 	public String[] getAllowedMethods()
 	{
-		HeaderIterator it = res.headerIterator(OptionsRequest.OPTIONS_HEADER);
+		if (this.res == null)
+		{
+			Debug.error("getAllowedMethods API was called while response is null due to request exception: " + exceptionMessage);
+			return new String[0];
+		}
+		Iterator<Header> it = res.headerIterator(OptionsRequest.OPTIONS_HEADER);
 		Set<String> methods = new HashSet<String>();
 		while (it.hasNext())
 		{
-			Header header = it.nextHeader();
-			HeaderElement[] elements = header.getElements();
+			Header header = it.next();
+			ParserCursor cursor = new ParserCursor(0, header.getValue().length());
+			HeaderElement[] elements = BasicHeaderValueParser.INSTANCE.parseElements(header.getValue(), cursor);
 			for (HeaderElement element : elements)
 			{
 				methods.add(element.getName());
@@ -96,7 +99,11 @@ public class Response implements IScriptable, IJavaScriptType
 	{
 		if (res != null)
 		{
-			return res.getStatusLine().getStatusCode();
+			return res.getCode();
+		}
+		else
+		{
+			Debug.error("response.getStatusCode API was called while response is null due to request exception: " + exceptionMessage);
 		}
 		return 0;
 	}
@@ -114,7 +121,11 @@ public class Response implements IScriptable, IJavaScriptType
 	{
 		if (res != null)
 		{
-			return res.getStatusLine().getReasonPhrase();
+			return res.getReasonPhrase();
+		}
+		else
+		{
+			Debug.error("response.getStatusReasonPhrase API was called while response is null due to request exception: " + exceptionMessage);
 		}
 		return null;
 	}
@@ -131,15 +142,23 @@ public class Response implements IScriptable, IJavaScriptType
 		{
 			try
 			{
-				response_body = EntityUtils.toString(res.getEntity());
+				if (this.res != null)
+				{
+					response_body = res.getBodyText();
+				}
+				else
+				{
+					Debug.error("response.getResponseBody API was called while response is null due to request exception: " + exceptionMessage);
+				}
 			}
 			catch (Exception e)
 			{
-				Debug.error("Error when getting response body for: " + (request != null ? request.getURI() : "unknown request"), e); //$NON-NLS-1$
+				Debug.error("Error when getting response body for: " + (request != null ? request.getRequestUri() : "unknown request"), e); //$NON-NLS-1$
 				response_body = "";
 			}
 		}
 		return response_body instanceof String ? (String)response_body : "";
+
 	}
 
 	/**
@@ -152,26 +171,13 @@ public class Response implements IScriptable, IJavaScriptType
 	{
 		if (response_body == null)
 		{
-			try
+			if (this.res != null)
 			{
-				ByteArrayOutputStream sb = new ByteArrayOutputStream();
-				InputStream is = null;
-				Header contentEncoding = res.getFirstHeader("Content-Encoding");
-				boolean gziped = contentEncoding == null ? false : "gzip".equalsIgnoreCase(contentEncoding.getValue());
-				is = res.getEntity().getContent();
-				if (gziped)
-				{
-					is = new GZIPInputStream(is);
-				}
-				BufferedInputStream bis = new BufferedInputStream(is);
-				Utils.streamCopy(bis, sb);
-				bis.close();
-				is.close();
-				response_body = sb.toByteArray();
+				response_body = res.getBodyBytes();
 			}
-			catch (IOException e)
+			else
 			{
-				Debug.error("Error when getting media data  for: " + (request != null ? request.getURI() : "unknown request"), e); //$NON-NLS-1$
+				Debug.error("response.getMediaData API was called while response is null due to request exception: " + exceptionMessage);
 			}
 		}
 		return response_body instanceof byte[] ? (byte[])response_body : null;
@@ -203,31 +209,38 @@ public class Response implements IScriptable, IJavaScriptType
 		try
 		{
 			Header[] ha;
-			if (headerName == null)
-			{
-				ha = res.getAllHeaders();
-			}
-			else
-			{
-				ha = res.getHeaders(headerName);
-			}
 			JSMap sa = new JSMap();
-			for (Header element : ha)
+			if (this.res != null)
 			{
-				if (sa.containsKey(element.getName()))
+				if (headerName == null)
 				{
-					sa.put(element.getName(), Utils.arrayAdd((String[])sa.get(element.getName()), element.getValue(), true));
+					ha = res.getHeaders();
 				}
 				else
 				{
-					sa.put(element.getName(), new String[] { element.getValue() });
+					ha = res.getHeaders(headerName);
 				}
+				for (Header element : ha)
+				{
+					if (sa.containsKey(element.getName()))
+					{
+						sa.put(element.getName(), Utils.arrayAdd((String[])sa.get(element.getName()), element.getValue(), true));
+					}
+					else
+					{
+						sa.put(element.getName(), new String[] { element.getValue() });
+					}
+				}
+			}
+			else
+			{
+				Debug.error("response.getResponseHeaders API was called while response is null due to request exception: " + exceptionMessage);
 			}
 			return sa;
 		}
 		catch (Exception e)
 		{
-			Debug.error("Error when getting response headers for: " + (request != null ? request.getURI() : "unknown request"), e); //$NON-NLS-1$
+			Debug.error("Error when getting response headers for: " + (request != null ? request.getRequestUri() : "unknown request"), e); //$NON-NLS-1$
 		}
 		return null;
 	}
@@ -240,26 +253,32 @@ public class Response implements IScriptable, IJavaScriptType
 	 */
 	public String js_getCharset()
 	{
-		return EntityUtils.getContentCharSet(res.getEntity());
+		if (this.res != null)
+		{
+			ContentType contentType = res.getContentType();
+			if (contentType != null && contentType.getCharset() != null)
+			{
+				return contentType.getCharset().displayName();
+			}
+		}
+		else
+		{
+			Debug.error("response.getCharset API was called while response is null due to request exception: " + exceptionMessage);
+		}
+		return null;
 	}
 
 	/**
 	 * Needs to be called when not reading content via getResponseBody or getMediaData
 	 * to be able to reuse the client.
 	 * @return true if the entity content is consumed and content stream (if exists) is closed
+	 * @deprecated no longer needed, make sure to call client.close() when you don't use the client anymore which was used to create this Response
 	 */
+	@Deprecated
 	public boolean js_close()
 	{
-		try
-		{
-			EntityUtils.consume(res.getEntity());
-			return true;
-		}
-		catch (IOException e)
-		{
-			Debug.trace("close error with " + (request != null ? request.getURI() : "unknown request"), e); //$NON-NLS-1$
-		}
-		return false;
+		// no longer needed
+		return true;
 	}
 
 	/**
