@@ -7,7 +7,7 @@
     </prerequisites>
     <groupId>com.servoy</groupId>
     <artifactId>com.servoy.extensions</artifactId>
-    <version>2023.3.2.3844</version>
+    <version>2023.3.3.3845_LTS</version>
     <repositories>
         <repository>
             <id>developer_repo</id>
@@ -36,7 +36,7 @@
         <jwks.version>0.21.3</jwks.version>
         <metadataextractor.version>2.18.0</metadataextractor.version>
         <xmpcore.version>6.1.11</xmpcore.version>
-        <rhino.version>1.7.14.s3</rhino.version>
+        <rhino.version>1.7.14.s5</rhino.version>
     </properties>
     <profiles>
         <profile>
