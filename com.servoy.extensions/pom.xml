@@ -20,13 +20,13 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
-        <eclipse.url>https://download.eclipse.org/eclipse/updates/4.25/</eclipse.url>
-        <servoy-shiplibs.url>https://developer.servoy.com/p2_repository/ship_plugins/2022.12/</servoy-shiplibs.url>
+        <eclipse.url>https://download.eclipse.org/eclipse/updates/4.28/</eclipse.url>
+        <servoy-shiplibs.url>https://developer.servoy.com/p2_repository/ship_plugins/2023.06/</servoy-shiplibs.url>
         <workspace_dir>${project.basedir}/../</workspace_dir>
         <servoy-local.url>${project.baseUri}/target/repository/</servoy-local.url>
         <scribejava.version>8.3.3</scribejava.version>
         <amqp.version>5.16.0</amqp.version>
-        <doc.version>1.6.0</doc.version>
+        <doc.version>1.6.1</doc.version>
         <httpclient.version>5.1.3</httpclient.version>
         <httpcore.version>5.1.4</httpcore.version>
         <pdfbox.version>2.0.27</pdfbox.version>
@@ -36,7 +36,7 @@
         <jwks.version>0.21.3</jwks.version>
         <metadataextractor.version>2.18.0</metadataextractor.version>
         <xmpcore.version>6.1.11</xmpcore.version>
-        <rhino.version>1.7.14.s4</rhino.version>
+        <rhino.version>1.7.14.s5</rhino.version>
         <jbpm.version>7.72.0.Final</jbpm.version>
         <!--  This has to be in sync with jasperreports version  -->
         <poi.version>5.2.2</poi.version>
@@ -2438,6 +2438,12 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-pool2</artifactId>
             <version>2.11.1</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/commons-io/commons-io -->
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.13.0</version>
         </dependency>
         <dependency>
             <groupId>com.servoy</groupId>
