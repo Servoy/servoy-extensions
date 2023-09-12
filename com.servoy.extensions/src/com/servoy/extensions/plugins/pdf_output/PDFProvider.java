@@ -362,15 +362,17 @@ public class PDFProvider implements IScriptable
 	 * @param pdf_form the PDF Form to convert
 	 * @param pdf_password the password to use
 	 * @param field_values the field values to use
+	 * @param partialFlattening if true, only flatten the fields set as values, the rest remain unchanged
 	 */
 	@ServoyClientSupport(ng = true, wc = true, sc = true)
-	public byte[] js_convertProtectedPDFFormToPDFDocument(byte[] pdf_form, String pdf_password, Object field_values)
+	public byte[] js_convertProtectedPDFFormToPDFDocument(byte[] pdf_form, String pdf_password, Object field_values, boolean partialFlattening)
 	{
 		try
 		{
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			PdfReader reader = new PdfReader(pdf_form, pdf_password != null ? pdf_password.getBytes() : null);
 			PdfStamper stamp = new PdfStamper(reader, baos);
+			List<String> fieldNames = new ArrayList<String>();
 			if (field_values != null)
 			{
 				AcroFields form = stamp.getAcroFields();
@@ -378,11 +380,19 @@ public class PDFProvider implements IScriptable
 				{
 					FdfReader fdf = new FdfReader((String)field_values);
 					form.setFields(fdf);
+					if (partialFlattening)
+					{
+						fieldNames.addAll(fdf.getFields().keySet());
+					}
 				}
 				else if (field_values instanceof byte[])
 				{
 					FdfReader fdf = new FdfReader((byte[])field_values);
 					form.setFields(fdf);
+					if (partialFlattening)
+					{
+						fieldNames.addAll(fdf.getFields().keySet());
+					}
 				}
 				else if (field_values instanceof Object[])
 				{
@@ -399,6 +409,10 @@ public class PDFProvider implements IScriptable
 								if (field != null && value != null)
 								{
 									form.setField(field.toString(), value.toString());
+									if (partialFlattening)
+									{
+										fieldNames.add(field.toString());
+									}
 								}
 							}
 //							else if (row.length >= 3)
@@ -410,12 +424,31 @@ public class PDFProvider implements IScriptable
 						{
 							String s = (String)obj;
 							int idx = s.indexOf('=');
-							form.setField(s.substring(0, idx), s.substring(idx + 1));
+							String key = s.substring(0, idx);
+							form.setField(key, s.substring(idx + 1));
+							if (partialFlattening)
+							{
+								fieldNames.add(key);
+							}
 						}
 					}
 				}
 			}
 			stamp.setFormFlattening(true);
+			if (partialFlattening)
+			{
+				try
+				{
+					for (String name : fieldNames)
+					{
+						stamp.partialFormFlattening(name);
+					}
+				}
+				catch (Exception ex)
+				{
+					Debug.error(ex);
+				}
+			}
 			stamp.close();
 			return baos.toByteArray();
 		}
@@ -424,6 +457,12 @@ public class PDFProvider implements IScriptable
 			Debug.error(e);
 			throw new RuntimeException("Error converting pdf form to pdf document", e); //$NON-NLS-1$
 		}
+	}
+
+	@ServoyClientSupport(ng = true, wc = true, sc = true)
+	public byte[] js_convertProtectedPDFFormToPDFDocument(byte[] pdf_form, String pdf_password, Object field_values)
+	{
+		return js_convertProtectedPDFFormToPDFDocument(pdf_form, pdf_password, field_values, false);
 	}
 
 	/**
