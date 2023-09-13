@@ -345,7 +345,7 @@ public class PDFProvider implements IScriptable
 	}
 
 	/**
-	 * Convert a protected PDF form to a PDF document.
+	 * Convert a protected PDF form to a PDF document. Can specify if all fields or just specified fields will be flattened.
 	 *
 	 * @sample
 	 * var pdfform = plugins.file.readFile('c:/temp/1040a-form.pdf');
@@ -361,7 +361,7 @@ public class PDFProvider implements IScriptable
 	 *
 	 * @param pdf_form the PDF Form to convert
 	 * @param pdf_password the password to use
-	 * @param field_values the field values to use
+	 * @param field_values the field values to use. If partialFlattening is true, only these fields will be flattened.
 	 * @param partialFlattening if true, only flatten the fields set as values, the rest remain unchanged
 	 */
 	@ServoyClientSupport(ng = true, wc = true, sc = true)
@@ -459,6 +459,25 @@ public class PDFProvider implements IScriptable
 		}
 	}
 
+	/**
+	 * Convert a protected PDF form to a PDF document. By default, all fields of the pdf form will be flattened.
+	 *
+	 * @sample
+	 * var pdfform = plugins.file.readFile('c:/temp/1040a-form.pdf');
+	 * //var field_values = plugins.file.readFile('c:/temp/1040a-data.fdf');//read adobe fdf values or
+	 * var field_values = new Array()//construct field values
+	 * field_values[0] = 'f1-1=John C.J.'
+	 * field_values[1] = 'f1-2=Longlasting'
+	 * var result_pdf_doc = plugins.pdf_output.convertProtectedPDFFormToPDFDocument(pdfform, 'pdf_password', field_values)
+	 * if (result_pdf_doc != null)
+	 * {
+	 * 	plugins.file.writeFile('c:/temp/1040a-flatten.pdf', result_pdf_doc)
+	 * }
+	 *
+	 * @param pdf_form the PDF Form to convert
+	 * @param pdf_password the password to use
+	 * @param field_values the field values to use
+	 */
 	@ServoyClientSupport(ng = true, wc = true, sc = true)
 	public byte[] js_convertProtectedPDFFormToPDFDocument(byte[] pdf_form, String pdf_password, Object field_values)
 	{
@@ -466,7 +485,7 @@ public class PDFProvider implements IScriptable
 	}
 
 	/**
-	 * Convert a PDF form to a PDF document.
+	 * Convert a PDF form to a PDF document. By default, all fields of the pdf form will be flattened.
 	 *
 	 * @sample
 	 * var pdfform = plugins.file.readFile('c:/temp/1040a-form.pdf');
@@ -487,6 +506,31 @@ public class PDFProvider implements IScriptable
 	public byte[] js_convertPDFFormToPDFDocument(byte[] pdf_form, Object field_values)
 	{
 		return js_convertProtectedPDFFormToPDFDocument(pdf_form, null, field_values);
+	}
+
+	/**
+	 * Convert a PDF form to a PDF document. The PDF form can be have all the fields flattened or just the fields specified by values.
+	 *
+	 * @sample
+	 * var pdfform = plugins.file.readFile('c:/temp/1040a-form.pdf');
+	 * //var field_values = plugins.file.readFile('c:/temp/1040a-data.fdf');//read adobe fdf values or
+	 * var field_values = new Array()//construct field values
+	 * field_values[0] = 'f1-1=John C.J.'
+	 * field_values[1] = 'f1-2=Longlasting'
+	 * var result_pdf_doc = plugins.pdf_output.convertPDFFormToPDFDocument(pdfform, field_values)
+	 * if (result_pdf_doc != null)
+	 * {
+	 * 	plugins.file.writeFile('c:/temp/1040a-flatten.pdf', result_pdf_doc)
+	 * }
+	 *
+	 * @param pdf_form the PDF Form to convert
+	 * @param field_values the values to use. If partialFlattening is true, only these fields will be flattened.
+	 * @param partialFlattening if true, only flatten the fields set as values, the rest remain unchanged
+	 */
+	@ServoyClientSupport(ng = true, wc = true, sc = true)
+	public byte[] js_convertPDFFormToPDFDocument(byte[] pdf_form, Object field_values, boolean partialFlattening)
+	{
+		return js_convertProtectedPDFFormToPDFDocument(pdf_form, null, field_values, partialFlattening);
 	}
 
 	/**
