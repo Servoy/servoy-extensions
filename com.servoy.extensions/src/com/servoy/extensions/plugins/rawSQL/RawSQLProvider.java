@@ -368,7 +368,7 @@ public class RawSQLProvider implements IScriptable
 	}
 
 	/**
-	 * Flush cached database data. Use with extreme care, its affecting the performance of clients!
+	 * Flush cached database data. Use with extreme care, its affecting the performance of clients! This method will take into account tenants, just like databroadcast from user interface.
 	 *
 	 * @sampleas js_executeSQL(String,String,String)
 	 *
@@ -380,13 +380,11 @@ public class RawSQLProvider implements IScriptable
 		try
 		{
 			ServerMapping serverMapping = getServerMapping(serverName);
-			if (serverMapping.transactionID != null)
-			{
-				// flush data locally within the transaction
-				plugin.getClientPluginAccess().getDatabaseManager().notifyDataChange(
-					DataSourceUtils.createDBTableDataSource(serverMapping.localServername, tableName), null, 0);
-			}
-			return getSQLService().flushAllClientsCache(plugin.getClientPluginAccess().getClientID(), true, serverMapping.remoteServername, tableName,
+			// flush data locally
+			plugin.getClientPluginAccess().getDatabaseManager().notifyDataChange(
+				DataSourceUtils.createDBTableDataSource(serverMapping.localServername, tableName), null, 0);
+			// notifySelf = false so that the client id is sent as well (needed for tenant id)
+			return getSQLService().flushAllClientsCache(plugin.getClientPluginAccess().getClientID(), false, serverMapping.remoteServername, tableName,
 				serverMapping.transactionID);
 		}
 		catch (Exception ex)
@@ -398,7 +396,7 @@ public class RawSQLProvider implements IScriptable
 	}
 
 	/**
-	 * Notify clients about changes in records, based on pk(s). Use with extreme care, its affecting the performance of clients!
+	 * Notify clients about changes in records, based on pk(s). Use with extreme care, its affecting the performance of clients! This method will take into account tenants, just like databroadcast from user interface.
 	 *
 	 * @sample
 	 * /****************************************************************************
