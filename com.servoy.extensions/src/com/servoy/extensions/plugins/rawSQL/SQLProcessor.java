@@ -216,7 +216,7 @@ public class SQLProcessor implements ISQLService, IServerPlugin
 
 		if (Utils.getAsBoolean(application.getSettings().getProperty("servoy.rawSQL.allowClientCacheFlushes", "true"))) //$NON-NLS-1$ //$NON-NLS-2$
 		{
-			return ApplicationServerRegistry.get().getDataServer().notifyDataChange(notifySelf ? null : client_id, server_name, tableName, pks, action,
+			return ApplicationServerRegistry.get().getDataServer().notifyDataChange(client_id, notifySelf, server_name, tableName, pks, action,
 				transaction_id);
 		}
 		return false;
