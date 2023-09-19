@@ -25,6 +25,7 @@ import com.servoy.j2db.dataprocessing.IDataSet;
 
 public final class NotifyData implements Serializable
 {
+	// IF NEW FIELDS ARE ADDED TO THIS CLASS THEN MAKE SURE TO HANDLE THIS Serialization in a special serialize methods!
 	private static final long serialVersionUID = 1L;
 
 	final String originServerUUID;
