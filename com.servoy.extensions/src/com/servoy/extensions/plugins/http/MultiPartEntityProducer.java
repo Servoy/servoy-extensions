@@ -286,14 +286,17 @@ public class MultiPartEntityProducer implements AsyncEntityProducer
 		}
 		writeBytes(encode(StandardCharsets.ISO_8859_1, buf.toString()), channel);
 		writeBytes(CR_LF, channel);
-		if (producer.getContentType() != null)
+		// make it like HttpMultipartMode.BROWSER_COMPATIBLE, only send content-type for files
+		if (fileName != null)
 		{
-			writeBytes(encode(StandardCharsets.ISO_8859_1, HttpHeaders.CONTENT_TYPE), channel);
-			writeBytes(FIELD_SEP, channel);
-			writeBytes(encode(StandardCharsets.ISO_8859_1, producer.getContentType()), channel);
-			writeBytes(CR_LF, channel);
+			if (producer.getContentType() != null)
+			{
+				writeBytes(encode(StandardCharsets.ISO_8859_1, HttpHeaders.CONTENT_TYPE), channel);
+				writeBytes(FIELD_SEP, channel);
+				writeBytes(encode(StandardCharsets.ISO_8859_1, producer.getContentType()), channel);
+				writeBytes(CR_LF, channel);
+			}
 		}
-
 		writeBytes(CR_LF, channel);
 	}
 
