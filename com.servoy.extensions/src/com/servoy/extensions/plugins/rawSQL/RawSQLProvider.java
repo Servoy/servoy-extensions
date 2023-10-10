@@ -368,7 +368,7 @@ public class RawSQLProvider implements IScriptable
 	}
 
 	/**
-	 * Flush cached database data. Use with extreme care, its affecting the performance of clients!
+	 * Flush cached database data. Use with extreme care, its affecting the performance of clients! This method will take into account tenants, just like databroadcast from user interface.
 	 *
 	 * @sampleas js_executeSQL(String,String,String)
 	 *
@@ -398,7 +398,7 @@ public class RawSQLProvider implements IScriptable
 	}
 
 	/**
-	 * Notify clients about changes in records, based on pk(s). Use with extreme care, its affecting the performance of clients!
+	 * Notify clients about changes in records, based on pk(s). Use with extreme care, its affecting the performance of clients! This method will take into account tenants, just like databroadcast from user interface.
 	 *
 	 * @sample
 	 * /****************************************************************************
