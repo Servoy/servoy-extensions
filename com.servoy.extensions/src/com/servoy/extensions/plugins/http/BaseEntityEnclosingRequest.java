@@ -20,7 +20,9 @@ package com.servoy.extensions.plugins.http;
 import java.io.File;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.hc.client5.http.classic.methods.HttpUriRequestBase;
 import org.apache.hc.client5.http.config.RequestConfig.Builder;
@@ -49,7 +51,7 @@ public class BaseEntityEnclosingRequest extends BaseRequest
 	protected String charset = "UTF8";
 
 	private List<FileInfo> files;
-	private List<NameValuePair> params;
+	private Map<NameValuePair, String> params;
 	private boolean forceMultipart = false;
 
 	public BaseEntityEnclosingRequest()
@@ -126,7 +128,7 @@ public class BaseEntityEnclosingRequest extends BaseRequest
 			{
 				entityProducer = AsyncEntityProducers.create(
 					WWWFormCodec.format(
-						params,
+						params.keySet(),
 						charset != null ? Charset.forName(charset) : ContentType.APPLICATION_FORM_URLENCODED.getCharset()),
 					ContentType.APPLICATION_FORM_URLENCODED);
 			}
@@ -184,7 +186,7 @@ public class BaseEntityEnclosingRequest extends BaseRequest
 						: MimeTypes.getContentType(Utils.readFile((File)file, 32), ((File)file).getName());
 					((MultiPartEntityProducer)entityProducer).addProducer(
 						AsyncEntityProducers.create((File)file, contentType != null ? ContentType.create(contentType) : ContentType.DEFAULT_BINARY),
-						info.parameterName, info.fileName);
+						info.parameterName, info.fileName, true);
 				}
 				else if (file instanceof JSFile)
 				{
@@ -194,12 +196,12 @@ public class BaseEntityEnclosingRequest extends BaseRequest
 					{
 						((MultiPartEntityProducer)entityProducer)
 							.addProducer(AsyncEntityProducers.create(innerFile, ContentType.create(contentType != null ? contentType : "binary/octet-stream")),
-								info.parameterName, info.fileName);
+								info.parameterName, info.fileName, true);
 					}
 					else
 					{
 						((MultiPartEntityProducer)entityProducer).addProducer(new BasicAsyncEntityProducer(((JSFile)file).jsFunction_getBytes(),
-							ContentType.create(contentType != null ? contentType : "binary/octet-stream")), info.parameterName, info.fileName);
+							ContentType.create(contentType != null ? contentType : "binary/octet-stream")), info.parameterName, info.fileName, true);
 					}
 
 				}
@@ -211,11 +213,14 @@ public class BaseEntityEnclosingRequest extends BaseRequest
 			// add the parameters
 			if (params != null)
 			{
-				for (NameValuePair nvp : params)
+				for (NameValuePair nvp : params.keySet())
 				{
+					String mimeType = params.get(nvp);
 					((MultiPartEntityProducer)entityProducer)
-						.addProducer(new BasicAsyncEntityProducer(nvp.getValue().getBytes(), ContentType.create("text/plain", Charset.forName(charset))),
-							nvp.getName(), null);
+						.addProducer(
+							new BasicAsyncEntityProducer(nvp.getValue().getBytes(),
+								ContentType.create(mimeType != null ? mimeType : "text/plain", Charset.forName(charset))),
+							nvp.getName(), null, mimeType != null);
 					// For usual String parameters
 				}
 			}
@@ -453,9 +458,9 @@ public class BaseEntityEnclosingRequest extends BaseRequest
 		{
 			if (params == null)
 			{
-				params = new ArrayList<NameValuePair>();
+				params = new HashMap<NameValuePair, String>();
 			}
-			params.add(new BasicNameValuePair(name, value));
+			params.put(new BasicNameValuePair(name, value), null);
 			return true;
 		}
 
@@ -468,4 +473,29 @@ public class BaseEntityEnclosingRequest extends BaseRequest
 		return false;
 	}
 
+	/**
+	 * Add a parameter to the post.<br/><br/>
+	 *
+	 * If there is also at least one file added to this request using addFile(...) then a multi-part post will be generated.
+	 * The multipart element will also contain content-type header, set from mimeType and charset. By default, this header is not present.
+	 *
+	 * @sample
+	 * poster.addParameter('name','value','text/plain')
+	 *
+	 * @param name
+	 * @param value
+	 */
+	public boolean js_addParameter(String name, String value, String mimeType)
+	{
+		if (name != null)
+		{
+			if (params == null)
+			{
+				params = new HashMap<NameValuePair, String>();
+			}
+			params.put(new BasicNameValuePair(name, value), mimeType);
+			return true;
+		}
+		return false;
+	}
 }
