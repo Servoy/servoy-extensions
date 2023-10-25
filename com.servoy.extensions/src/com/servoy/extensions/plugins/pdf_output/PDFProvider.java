@@ -32,6 +32,7 @@ import java.util.Map;
 
 import javax.imageio.ImageIO;
 
+import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.rendering.PDFRenderer;
 import org.mozilla.javascript.Scriptable;
@@ -1113,7 +1114,7 @@ public class PDFProvider implements IScriptable
 	@ServoyClientSupport(ng = true, wc = true, sc = true)
 	public byte[] js_getThumbnailImage(byte[] data, int pageNumber, int dpi) throws Exception
 	{
-		PDDocument pdfDoc = PDDocument.load(data);
+		PDDocument pdfDoc = Loader.loadPDF(data);
 		PDFRenderer pdfRenderer = new PDFRenderer(pdfDoc);
 		BufferedImage myImage = pdfRenderer.renderImageWithDPI(pageNumber, dpi);
 		ByteArrayOutputStream baos = new ByteArrayOutputStream(myImage.getData().getDataBuffer().getSize());
@@ -1139,7 +1140,7 @@ public class PDFProvider implements IScriptable
 	@ServoyClientSupport(ng = true, wc = true, sc = true)
 	public int js_getNumberOfPages(byte[] data) throws IOException
 	{
-		PDDocument pdfDoc = PDDocument.load(data);
+		PDDocument pdfDoc = Loader.loadPDF(data);
 		int pages = pdfDoc.getNumberOfPages();
 		pdfDoc.close();
 		return pages;
