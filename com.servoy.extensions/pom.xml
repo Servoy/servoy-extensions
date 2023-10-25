@@ -502,6 +502,14 @@
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.apache.pdfbox</groupId>
+                                    <artifactId>pdfbox-io</artifactId>
+                                    <version>${pdfbox.version}</version>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>${project.build.directory}/plugins_beans/plugins/pdf_output</outputDirectory>
+                                    <destFileName>pdfbox-io.jar</destFileName>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.apache.pdfbox</groupId>
                                     <artifactId>fontbox</artifactId>
                                     <version>${fontbox.version}</version>
                                     <overWrite>true</overWrite>
@@ -2296,6 +2304,11 @@
                                         sigalg="SHA256withRSA" digestalg="SHA-256" />
                                     <signjar keystore="${jarsigner.keystore}"
                                         jar="${project.build.directory}/plugins_beans/plugins/pdf_output/pdfbox.jar"
+                                        alias="ServoyClient" storepass="${jarsigner.storepass}"
+                                        tsaurl="http://sha256timestamp.ws.symantec.com/sha256/timestamp"
+                                        sigalg="SHA256withRSA" digestalg="SHA-256" />
+                                    <signjar keystore="${jarsigner.keystore}"
+                                        jar="${project.build.directory}/plugins_beans/plugins/pdf_output/pdfbox-io.jar"
                                         alias="ServoyClient" storepass="${jarsigner.storepass}"
                                         tsaurl="http://sha256timestamp.ws.symantec.com/sha256/timestamp"
                                         sigalg="SHA256withRSA" digestalg="SHA-256" />
