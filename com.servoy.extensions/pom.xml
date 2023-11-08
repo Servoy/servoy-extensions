@@ -41,7 +41,6 @@
         <!--  Poi dependencies  -->
         <math3.version>3.6.1</math3.version>
         <sparsebitset.version>1.3</sparsebitset.version>
-        <jtokkit.version>0.6.1</jtokkit.version>
     </properties>
     <profiles>
         <profile>
@@ -644,14 +643,6 @@
                                     <overWrite>true</overWrite>
                                     <outputDirectory>${project.build.directory}/plugins_beans/plugins/images</outputDirectory>
                                     <destFileName>xmpcore.jar</destFileName>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>com.knuddels</groupId>
-                                    <artifactId>jtokkit</artifactId>
-                                    <version>${jtokkit.version}</version>
-                                    <overWrite>true</overWrite>
-                                    <outputDirectory>${project.build.directory}/plugins_beans/plugins/aibridge</outputDirectory>
-                                    <destFileName>jtokkit-${jtokkit.version}.jar</destFileName>
                                 </artifactItem>
                                 <!--artifactItem>
                                    	<groupId>org.jbpm</groupId>
@@ -2396,11 +2387,6 @@
                                         alias="ServoyClient" storepass="${jarsigner.storepass}"
                                         tsaurl="http://sha256timestamp.ws.symantec.com/sha256/timestamp"
                                         sigalg="SHA256withRSA" digestalg="SHA-256" />     
-                                    <signjar keystore="${jarsigner.keystore}"
-                                        jar="${project.build.directory}/plugins_beans/plugins/aibridge.jar"
-                                        alias="ServoyClient" storepass="${jarsigner.storepass}"
-                                        tsaurl="http://sha256timestamp.ws.symantec.com/sha256/timestamp"
-                                        sigalg="SHA256withRSA" digestalg="SHA-256" />       
                                 </parallel>
                             </target>
                         </configuration>
@@ -2587,11 +2573,6 @@
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>
             <version>${fasterxml.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.knuddels</groupId>
-            <artifactId>jtokkit</artifactId>
-            <version>${jtokkit.version}</version>
         </dependency>
         <!--dependency>
     		<groupId>com.fasterxml.jackson.module</groupId>
