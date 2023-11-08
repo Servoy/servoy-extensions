@@ -156,7 +156,7 @@
 	<target	name="_all_common_plugins"
 			    depends="agent.jar,broadcaster.jar,clientmanager.jar,dialog.jar,http.jar,mail.jar,tabxport.jar,excelxport.jar,pdf_output.jar,file.jar,scheduler.jar,
 			 	   pdf_forms.jar,dbtreeview.jar,jfxpanel.jar,amortization.jar,spellcheck.jar,images.jar,window.jar,udp.jar,rawSQL.jar,openid.jar,
-			 	   xmlreader.jar,serialize.jar,default_validators.jar,converters.jar,rest_ws.jar,headlessclient.jar"
+			 	   xmlreader.jar,serialize.jar,default_validators.jar,converters.jar,rest_ws.jar,headlessclient.jar,aibridge.jar"
 	>
 		<!--<ant target="clean"/>-->
 	</target>
@@ -232,6 +232,28 @@
 			<fileset file="resources/http/http.jar.jnlp"/>
 		</copy>
 		<delete dir="${tempForJar.dir}"/>
+	</target>
+	
+	<target name="aibridge.jar" depends="compile">
+			<delete dir="${tempForJar.dir}"/>
+			<mkdir dir="${tempForJar.dir}"/>
+			<delete file="${plugins.dir}/aibridge.jar" quiet="true"/>
+			<copy overwrite="true" todir="${tempForJar.dir}/com/servoy/extensions/plugins/aibridge">
+				<fileset dir="${src_plugins.dir}/aibridge">
+					<patternset refid="javaGif.sources"/>
+					<include name="**/servoy-*.xml"/>
+				</fileset>
+			</copy>
+			<copy overwrite="true" todir="${tempForJar.dir}/com/servoy/extensions/plugins/aibridge">
+				<fileset dir="${bin_plugins.dir}/aibridge">
+					<filename name="**/*.class"/>
+				</fileset>
+			</copy>
+			<jar	destfile="${plugins.dir}/aibridge.jar"
+					basedir="${tempForJar.dir}"
+					duplicate="fail"
+			/>
+			<delete dir="${tempForJar.dir}"/>
 	</target>
 
 	<target name="openid.jar" depends="compile">
