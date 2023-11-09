@@ -89,6 +89,19 @@ public class HttpClient implements IScriptable, IJavaScriptType
 		this.httpPlugin = httpPlugin;
 
 		HttpAsyncClientBuilder builder = HttpAsyncClients.custom();
+		if (config != null && (config.maxConnectionsPerRoute >= 0 || config.maxTotalConnections >= 0))
+		{
+			PoolingAsyncClientConnectionManagerBuilder connectionManagerBuilder = PoolingAsyncClientConnectionManagerBuilder.create();
+			if (config.maxTotalConnections >= 0)
+			{
+				connectionManagerBuilder.setMaxConnTotal(config.maxTotalConnections);
+			}
+			if (config.maxConnectionsPerRoute >= 0)
+			{
+				connectionManagerBuilder.setMaxConnPerRoute(config.maxConnectionsPerRoute);
+			}
+			builder.setConnectionManager(connectionManagerBuilder.build());
+		}
 		builder.setIOReactorConfig(org.apache.hc.core5.reactor.IOReactorConfig.custom().setSoKeepAlive(true)
 			.setIoThreadCount((config != null && config.maxIOThreadCount >= 0) ? config.maxIOThreadCount : 2).build());
 		requestConfigBuilder = RequestConfig.custom();

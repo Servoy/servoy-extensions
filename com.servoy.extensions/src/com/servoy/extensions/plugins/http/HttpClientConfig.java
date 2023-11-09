@@ -35,6 +35,8 @@ public class HttpClientConfig implements IScriptable, IJavaScriptType
 	boolean forceHttp1 = false;
 	boolean enableRedirects = true;
 	boolean hostValidation = true;
+	int maxTotalConnections = -1;
+	int maxConnectionsPerRoute = -1;
 
 	public HttpClientConfig()
 	{
@@ -56,6 +58,42 @@ public class HttpClientConfig implements IScriptable, IJavaScriptType
 	public void js_setMaxIOThreadCount(int maxIOThreadCount)
 	{
 		this.maxIOThreadCount = maxIOThreadCount;
+	}
+
+	/**
+	 * Gets/Sets maximum number of connections used by Connection Manager.
+	 *
+	 * @sample
+	 * var config = plugins.http.createNewHttpClientConfig();
+	 * config.maxTotalConnections = 5;
+	 * var client = plugins.http.createNewHttpClient(config);
+	 */
+	public int js_getMaxTotalConnections()
+	{
+		return maxTotalConnections;
+	}
+
+	public void js_setMaxTotalConnections(int maxTotalConnections)
+	{
+		this.maxTotalConnections = maxTotalConnections;
+	}
+
+	/**
+	 * Gets/Sets maximum number of connections per route used by Connection Manager.
+	 *
+	 * @sample
+	 * var config = plugins.http.createNewHttpClientConfig();
+	 * config.maxConnectionsPerRoute = 2;
+	 * var client = plugins.http.createNewHttpClient(config);
+	 */
+	public int js_getMaxConnectionsPerRoute()
+	{
+		return maxConnectionsPerRoute;
+	}
+
+	public void js_setMaxConnectionsPerRoute(int maxConnectionsPerRoute)
+	{
+		this.maxConnectionsPerRoute = maxConnectionsPerRoute;
 	}
 
 	/**
