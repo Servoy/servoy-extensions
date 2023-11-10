@@ -484,6 +484,7 @@ public class BaseEntityEnclosingRequest extends BaseRequest
 	 *
 	 * @param name
 	 * @param value
+	 * @param mimeType
 	 */
 	public boolean js_addParameter(String name, String value, String mimeType)
 	{
