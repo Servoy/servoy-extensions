@@ -23,7 +23,7 @@
         <workspace_dir>${project.basedir}/../</workspace_dir>
         <servoy-local.url>${project.baseUri}/target/repository/</servoy-local.url>
         <scribejava.version>8.3.3</scribejava.version>
-        <amqp.version>5.19.0</amqp.version>
+        <amqp.version>5.20.0</amqp.version>
         <doc.version>1.6.1</doc.version>
         <httpclient.version>5.2.1</httpclient.version>
         <httpcore.version>5.2.3</httpcore.version>
@@ -2469,7 +2469,7 @@
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
-            <version>2.14.0</version>
+            <version>2.15.0</version>
         </dependency>
         <dependency>
             <groupId>com.servoy</groupId>
