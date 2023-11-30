@@ -5,3 +5,4 @@ servoy-extension.xml
 /build
 /target/
 /servoy.log
+/test.jpage
