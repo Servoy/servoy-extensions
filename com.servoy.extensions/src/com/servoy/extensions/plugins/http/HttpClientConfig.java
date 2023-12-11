@@ -37,6 +37,7 @@ public class HttpClientConfig implements IScriptable, IJavaScriptType
 	boolean hostValidation = true;
 	int maxTotalConnections = -1;
 	int maxConnectionsPerRoute = -1;
+	boolean multiPartLegacyMode = false;
 
 	public HttpClientConfig()
 	{
@@ -203,5 +204,23 @@ public class HttpClientConfig implements IScriptable, IJavaScriptType
 	public void js_setUserAgent(String user_agent)
 	{
 		this.userAgent = user_agent;
+	}
+
+	/**
+	 * Sets whether multipart request should be written in one go(not using buffering). Default value is false.
+	 *
+	 * @sample
+	 * var config = plugins.http.createNewHttpClientConfig();
+	 * config.multiPartLegacyMode = true;
+	 * var client = plugins.http.createNewHttpClient(config);
+	 */
+	public boolean js_getMultiPartLegacyMode()
+	{
+		return this.multiPartLegacyMode;
+	}
+
+	public void js_setMultiPartLegacyMode(boolean multiPartLegacyMode)
+	{
+		this.multiPartLegacyMode = multiPartLegacyMode;
 	}
 }

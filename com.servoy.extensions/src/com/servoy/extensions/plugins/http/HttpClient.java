@@ -78,6 +78,7 @@ public class HttpClient implements IScriptable, IJavaScriptType
 	private String proxyPassword;
 	private String proxyHost;
 	private int proxyPort = 8080;
+	private boolean multiPartLegacyMode = false;
 
 	public HttpClient(HttpPlugin httpPlugin)
 	{
@@ -87,7 +88,10 @@ public class HttpClient implements IScriptable, IJavaScriptType
 	public HttpClient(HttpPlugin httpPlugin, HttpClientConfig config)
 	{
 		this.httpPlugin = httpPlugin;
-
+		if (config != null)
+		{
+			this.multiPartLegacyMode = config.multiPartLegacyMode;
+		}
 		HttpAsyncClientBuilder builder = HttpAsyncClients.custom();
 		if (config != null && (config.maxConnectionsPerRoute >= 0 || config.maxTotalConnections >= 0))
 		{
@@ -406,7 +410,7 @@ public class HttpClient implements IScriptable, IJavaScriptType
 	public PostRequest js_createPostRequest(String url)
 	{
 		return new PostRequest(url, client, httpPlugin, requestConfigBuilder,
-			HttpProvider.setHttpClientProxy(requestConfigBuilder, url, proxyUser, proxyPassword, proxyHost, proxyPort));
+			HttpProvider.setHttpClientProxy(requestConfigBuilder, url, proxyUser, proxyPassword, proxyHost, proxyPort), this.multiPartLegacyMode);
 	}
 
 	/**
