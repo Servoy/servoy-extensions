@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.Writer;
+import java.nio.file.Paths;
 import java.rmi.RemoteException;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -107,7 +108,6 @@ public class PDFServlet extends HttpServlet
 		String base = request.getScheme() + "://" + hostname;
 		// fix for bad pdf behavior, if we add default port it will not work!!!!!
 		if (port != 80 && port != 443) base += ":" + port;
-		String uri = request.getRequestURI();//with servlet name
 		String path = request.getPathInfo(); //without servlet name
 
 		Connection conn = null;
@@ -162,7 +162,7 @@ public class PDFServlet extends HttpServlet
 							{
 								outputFDF = new FDFDoc();
 							}
-
+							String uri = Paths.get(request.getRequestURI()).normalize().toString().replace('\\', '/'); //with servlet name
 							String sub = uri.substring(0, uri.length() - path.length());
 							String url = base + sub + "/pdf_forms/pdf_process_data";
 
