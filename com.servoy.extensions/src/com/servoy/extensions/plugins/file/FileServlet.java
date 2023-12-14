@@ -21,6 +21,7 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -58,7 +59,7 @@ public class FileServlet extends HttpServlet
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
 	{
-		String pathInfo = req.getPathInfo();
+		String pathInfo = Paths.get(req.getPathInfo()).normalize().toString().replace('\\', '/');
 		if (pathInfo.startsWith("/file/"))
 		{
 			String filePath = pathInfo.substring(5);
