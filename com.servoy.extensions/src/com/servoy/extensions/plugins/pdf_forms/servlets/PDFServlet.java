@@ -41,6 +41,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.apache.commons.text.StringEscapeUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -187,7 +188,8 @@ public class PDFServlet extends HttpServlet
 							String filename = "fromdb";
 							boolean skipButton = false;
 							Statement st2 = conn.createStatement();
-							ResultSet rs2 = st2.executeQuery("select filename,skip_placing_submit_button from pdf_templates where template_id = " + template_id);
+							ResultSet rs2 = st2
+								.executeQuery("select filename,skip_placing_submit_button from pdf_templates where template_id = " + template_id);
 							if (rs2.next())
 							{
 								filename = rs2.getString(1);
@@ -221,10 +223,10 @@ public class PDFServlet extends HttpServlet
 									{
 										sb.append("var inch = 72;\n");
 										sb.append("var aRect = this.getPageBox( {nPage: 0} );\n");
-										sb.append("aRect[0] = 1;\n");//.5*inch; // position rectangle (.5 inch, .5 inch) 
-										sb.append("aRect[2] = aRect[0]+.5*inch;\n"); // from upper left hand corner of page. 
-										sb.append("aRect[1] -= 1;//.5*inch;\n"); // Make it .5 inch wide 
-										sb.append("aRect[3] = aRect[1] - 24;\n");// and 24 points high 
+										sb.append("aRect[0] = 1;\n");//.5*inch; // position rectangle (.5 inch, .5 inch)
+										sb.append("aRect[2] = aRect[0]+.5*inch;\n"); // from upper left hand corner of page.
+										sb.append("aRect[1] -= 1;//.5*inch;\n"); // Make it .5 inch wide
+										sb.append("aRect[3] = aRect[1] - 24;\n");// and 24 points high
 										//							sb.append("var aRect2 = this.getPageBox( {nPage: 0} );\n");
 										//							sb.append("aRect2[0] = .5*inch; // position rectangle (.5 inch, .5 inch)\n");
 										//							sb.append("aRect2[2] = aRect2[0]+.5*inch; // from upper left hand corner of page.\n");
@@ -263,10 +265,8 @@ public class PDFServlet extends HttpServlet
 
 								if (sb.length() != 0) outputFDF.SetOnImportJavaScript(sb.toString(), false);
 
-								Iterator<String> it = values.keySet().iterator();
-								while (it.hasNext())
+								for (String name : values.keySet())
 								{
-									String name = it.next();
 									outputFDF.SetValue(name, values.get(name));
 								}
 							}
@@ -286,16 +286,15 @@ public class PDFServlet extends HttpServlet
 								buffer.append("<xfa:datasets xmlns:xfa=\"http://www.xfa.org/schema/xfa-data/1.0/\">\n");
 								buffer.append("<xfa:data>\n");
 								buffer.append("<form>\n");
-								Iterator<String> it = values.keySet().iterator();
-								while (it.hasNext())
+								for (String name : values.keySet())
 								{
-									String name = it.next();
 									buffer.append("<" + name + ">" + values.get(name) + "</" + name + ">\n");
 								}
 								buffer.append("</form>\n");
 								buffer.append("</xfa:data>\n");
 								buffer.append("</xfa:datasets>\n");
-								buffer.append("<pdf href=\"" + templateLocation.replace("&", "&amp;") + "\" xmlns=\"http://ns.adobe.com/xdp/pdf/\">\n");
+								buffer
+									.append("<pdf href=\"" + StringEscapeUtils.escapeHtml4(templateLocation) + "\" xmlns=\"http://ns.adobe.com/xdp/pdf/\">\n");
 								buffer.append("</pdf>\n");
 								buffer.append("</xdp:xdp>");
 								out.print(buffer.toString());
@@ -425,7 +424,7 @@ public class PDFServlet extends HttpServlet
 //				{
 //					String element = (String) itt.next();
 //					System.out.println(element+" "+FdfInput.GetValue(element));
-//				}			
+//				}
 
 				String s_action_id = request.getParameter("action_id");
 
