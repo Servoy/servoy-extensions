@@ -391,7 +391,7 @@ public class PDFServlet extends HttpServlet
 		{
 			if (path == null)
 			{
-				response.sendRedirect(request.getRequestURI() + "/");
+				response.sendRedirect(URLEncoder.encode(request.getRequestURI(), "UTF-8") + "/");
 				return;
 			}
 			else if ("/".equals(path))
