@@ -288,7 +288,8 @@ public class PDFServlet extends HttpServlet
 								buffer.append("<form>\n");
 								for (String name : values.keySet())
 								{
-									buffer.append("<" + name + ">" + values.get(name) + "</" + name + ">\n");
+									buffer.append("<" + StringEscapeUtils.escapeHtml4(name) + ">" + StringEscapeUtils.escapeHtml4(values.get(name)) + "</" +
+										StringEscapeUtils.escapeHtml4(name) + ">\n");
 								}
 								buffer.append("</form>\n");
 								buffer.append("</xfa:data>\n");
