@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.Writer;
+import java.net.URLEncoder;
 import java.nio.file.Paths;
 import java.rmi.RemoteException;
 import java.sql.Connection;
@@ -117,7 +118,7 @@ public class PDFServlet extends HttpServlet
 			// Determine target page.
 			if (path == null)
 			{
-				response.sendRedirect(request.getRequestURI() + "/");
+				response.sendRedirect(URLEncoder.encode(request.getRequestURI(), "UTF-8") + "/");
 				return;
 			}
 			else if ("/".equals(path))
@@ -585,7 +586,7 @@ public class PDFServlet extends HttpServlet
 
 					if (redirect_url != null)
 					{
-						response.sendRedirect(redirect_url);
+						response.sendRedirect(URLEncoder.encode(redirect_url, "UTF-8"));
 					}
 					else
 					{
