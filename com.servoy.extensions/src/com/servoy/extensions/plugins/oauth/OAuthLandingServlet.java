@@ -77,7 +77,7 @@ public class OAuthLandingServlet extends HttpServlet
 		out.println("<head>");
 		out.println("<script type=\"text/javascript\">");
 		out.println("function redirectToSolution() {");
-		out.println(" var url = '" + StringEscapeUtils.escapeHtml4(url.toString()) + "'+window.location.hash.substring(1);");
+		out.println(" var url = '" + StringEscapeUtils.escapeEcmaScript(url.toString()) + "'+window.location.hash.substring(1);");
 		out.println("  window.location.href = url;");
 		out.println("  }");
 		out.println(" window.onload = redirectToSolution;");
