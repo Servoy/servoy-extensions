@@ -103,7 +103,7 @@ public class MultiPartEntityProducer implements AsyncEntityProducer
 	@Override
 	public String getContentType()
 	{
-		return ContentType.MULTIPART_FORM_DATA.withParameters(new BasicNameValuePair("boundary", this.boundary)).toString();
+		return ContentType.create("multipart/form-data", new BasicNameValuePair("boundary", this.boundary)).toString();
 	}
 
 	@Override
