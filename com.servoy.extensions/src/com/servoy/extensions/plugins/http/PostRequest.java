@@ -35,9 +35,9 @@ public class PostRequest extends BaseEntityEnclosingRequest
 	}//only used by script engine
 
 	public PostRequest(String url, CloseableHttpAsyncClient hc, HttpPlugin httpPlugin, Builder requestConfigBuilder,
-		BasicCredentialsProvider proxyCredentialsProvider, boolean multiPartLegacyMode)
+		BasicCredentialsProvider proxyCredentialsProvider)
 	{
-		super(url, hc, new HttpPost(url), httpPlugin, requestConfigBuilder, proxyCredentialsProvider, multiPartLegacyMode);
+		super(url, hc, new HttpPost(url), httpPlugin, requestConfigBuilder, proxyCredentialsProvider);
 	}
 
 }

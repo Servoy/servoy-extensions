@@ -50,6 +50,7 @@ import org.apache.hc.client5.http.ssl.SSLConnectionSocketFactory;
 import org.apache.hc.core5.function.Factory;
 import org.apache.hc.core5.http.HttpHost;
 import org.apache.hc.core5.http.HttpResponse;
+import org.apache.hc.core5.http.config.Http1Config;
 import org.apache.hc.core5.http.nio.ssl.TlsStrategy;
 import org.apache.hc.core5.http.protocol.HttpContext;
 import org.apache.hc.core5.http2.HttpVersionPolicy;
@@ -78,7 +79,6 @@ public class HttpClient implements IScriptable, IJavaScriptType
 	private String proxyPassword;
 	private String proxyHost;
 	private int proxyPort = 8080;
-	private boolean multiPartLegacyMode = false;
 
 	public HttpClient(HttpPlugin httpPlugin)
 	{
@@ -88,10 +88,6 @@ public class HttpClient implements IScriptable, IJavaScriptType
 	public HttpClient(HttpPlugin httpPlugin, HttpClientConfig config)
 	{
 		this.httpPlugin = httpPlugin;
-		if (config != null)
-		{
-			this.multiPartLegacyMode = config.multiPartLegacyMode;
-		}
 		HttpAsyncClientBuilder builder = HttpAsyncClients.custom();
 		if (config != null && (config.maxConnectionsPerRoute >= 0 || config.maxTotalConnections >= 0))
 		{
@@ -185,7 +181,13 @@ public class HttpClient implements IScriptable, IJavaScriptType
 			{
 				builder.setVersionPolicy(HttpVersionPolicy.FORCE_HTTP_1);
 			}
+			if (config.multiPartLegacyMode)
+			{
+				// write everything in one chunk
+				builder.setHttp1Config(Http1Config.custom().setChunkSizeHint(Integer.MAX_VALUE).build());
+			}
 		}
+
 		client = builder.build();
 		client.start();
 	}
@@ -410,7 +412,7 @@ public class HttpClient implements IScriptable, IJavaScriptType
 	public PostRequest js_createPostRequest(String url)
 	{
 		return new PostRequest(url, client, httpPlugin, requestConfigBuilder,
-			HttpProvider.setHttpClientProxy(requestConfigBuilder, url, proxyUser, proxyPassword, proxyHost, proxyPort), this.multiPartLegacyMode);
+			HttpProvider.setHttpClientProxy(requestConfigBuilder, url, proxyUser, proxyPassword, proxyHost, proxyPort));
 	}
 
 	/**

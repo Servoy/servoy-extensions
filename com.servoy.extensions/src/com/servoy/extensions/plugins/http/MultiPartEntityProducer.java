@@ -58,7 +58,6 @@ public class MultiPartEntityProducer implements AsyncEntityProducer
 
 	private final static char[] MULTIPART_CHARS = "-_1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 		.toCharArray();
-	private final boolean writeAtOnce;
 
 	static ByteArrayBuffer encode(
 		final Charset charset, final String string)
@@ -69,9 +68,8 @@ public class MultiPartEntityProducer implements AsyncEntityProducer
 		return bab;
 	}
 
-	public MultiPartEntityProducer(boolean writeAtOnce)
+	public MultiPartEntityProducer()
 	{
-		this.writeAtOnce = writeAtOnce;
 		this.boundary = this.generateBoundary();
 		this.boundaryEncoded = encode(StandardCharsets.ISO_8859_1, this.boundary);
 	}
@@ -141,53 +139,7 @@ public class MultiPartEntityProducer implements AsyncEntityProducer
 	@Override
 	public void produce(final DataStreamChannel channel) throws IOException
 	{
-		if (writeAtOnce)
-		{
-			for (InnerMultiPartAsyncProducer producer : this.producers)
-			{
-				this.writePartHeader(channel, producer.producer, producer.name, producer.fileName,
-					producer.writeContentType);
-				boolean[] writeEnded = new boolean[] { false };
-				while (!writeEnded[0])
-				{
-					producer.producer.produce(new DataStreamChannel()
-					{
-
-						@Override
-						public void requestOutput()
-						{
-							channel.requestOutput();
-						}
-
-						@Override
-						public int write(final ByteBuffer src) throws IOException
-						{
-							return channel.write(src);
-						}
-
-						@Override
-						public void endStream(final List< ? extends Header> p) throws IOException
-						{
-							writeEnded[0] = true;
-							producer.producer.releaseResources();
-						}
-
-						@Override
-						public void endStream() throws IOException
-						{
-							endStream(null);
-						}
-					});
-				}
-				writeBytes(CR_LF, channel);
-			}
-			writeBytes(TWO_HYPHENS, channel);
-			writeBytes(boundaryEncoded, channel);
-			writeBytes(TWO_HYPHENS, channel);
-			writeBytes(CR_LF, channel);
-			channel.endStream();
-		}
-		else if (getCurrentProducer() != null)
+		if (getCurrentProducer() != null)
 		{
 			getCurrentProducer().produce(new DataStreamChannel()
 			{

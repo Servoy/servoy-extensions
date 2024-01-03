@@ -53,7 +53,6 @@ public class BaseEntityEnclosingRequest extends BaseRequest
 	private List<FileInfo> files;
 	private Map<NameValuePair, String> params;
 	private boolean forceMultipart = false;
-	private boolean multiPartLegacyMode = false;
 
 	public BaseEntityEnclosingRequest()
 	{
@@ -62,15 +61,7 @@ public class BaseEntityEnclosingRequest extends BaseRequest
 	public BaseEntityEnclosingRequest(String url, CloseableHttpAsyncClient hc, HttpUriRequestBase method, HttpPlugin httpPlugin, Builder requestConfigBuilder,
 		BasicCredentialsProvider proxyCredentialsProvider)
 	{
-		this(url, hc, method, httpPlugin, requestConfigBuilder,
-			proxyCredentialsProvider, false);
-	}
-
-	public BaseEntityEnclosingRequest(String url, CloseableHttpAsyncClient hc, HttpUriRequestBase method, HttpPlugin httpPlugin, Builder requestConfigBuilder,
-		BasicCredentialsProvider proxyCredentialsProvider, boolean multiPartLegacyMode)
-	{
 		super(url, hc, method, httpPlugin, requestConfigBuilder, proxyCredentialsProvider);
-		this.multiPartLegacyMode = multiPartLegacyMode;
 		clearFiles();
 	}
 
@@ -183,7 +174,7 @@ public class BaseEntityEnclosingRequest extends BaseRequest
 		}
 		else
 		{
-			entityProducer = new MultiPartEntityProducer(this.multiPartLegacyMode);
+			entityProducer = new MultiPartEntityProducer();
 
 			// For File parameters
 			for (FileInfo info : files)
