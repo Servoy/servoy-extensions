@@ -81,7 +81,7 @@ public class ClientManagerProvider implements IScriptable, IReturnedTypesProvide
 	 * @param callback The callback when for incomming messages
 	 * @return BroadCaster
 	 * @deprecated replaced with plugins.clientmanager.createBroadcaster(name, channelName, callback) to create a channel and
-	 * plugins.clientmanager.getBroadcaster(channelName) to retrieve and send to a channel
+	 * plugins.clientmanager.getOrCreateBroadcaster(name, channelName) to retrieve and send to a channel
 	 */
 	@Deprecated
 	public Broadcaster js_getBroadcaster(String name, String channelName, Function callback)
@@ -91,6 +91,64 @@ public class ClientManagerProvider implements IScriptable, IReturnedTypesProvide
 		return broadCaster;
 	}
 
+	/**
+	 * Get a broadcast object giving it a (nick)name and on a specific channel, the callback is used for getting messages of other clients on that channel
+	 * The function gets 3 arguments (nickName, message, channelName)
+	 *
+	 * @sample
+	 * function callback(nickName, message, channelName) {
+	 *    application.output('message received from ' + nickName + ' on channel ' + channelName + ': ' + message)
+	 * }
+	 * var broadcaster = plugins.clientmanager.getBroadcaster("nickname", "mychatchannel", callback);
+	 * broadcaster.broadcastMessage("Hallo");
+	 *
+	 * @param name The nickname for this user on this channel
+	 * @param channelName The channel name where should be listened to (and send messages to)
+	 * @param callback The callback when for incomming messages
+	 * @return BroadCaster
+	 */
+	public Broadcaster js_getOrCreateBroadcaster(String name, String channelName, Function callback)
+	{
+		Broadcaster broadCaster = plugin.getBroadcaster(name, channelName);
+		if (broadCaster != null)
+		{
+			if (!broadCaster.hasCallback() || (broadCaster.hasCallback() && broadCaster.getCallback() != callback))
+			{
+				broadCaster.addCallback(callback);
+			}
+			return broadCaster;
+		}
+		else
+		{
+			broadCaster = new Broadcaster(name, channelName, callback, plugin);
+			plugin.addLiveBroadcaster(broadCaster);
+			return broadCaster;
+		}
+	}
+
+	/**
+	 * Get a broadcast object giving it a (nick)name and on a specific channel
+	 * var broadcaster = plugins.clientmanager.getBroadcaster("nickname", "mychatchannel");
+	 * broadcaster.broadcastMessage("Hallo");
+	 *
+	 * @param name The nickname for this user on this channel
+	 * @param channelName The channel name where should be listened to (and send messages to)
+	 * @return BroadCaster
+	 */
+	public Broadcaster js_getOrCreateBroadcaster(String name, String channelName)
+	{
+		Broadcaster broadCaster = plugin.getBroadcaster(name, channelName);
+		if (broadCaster != null)
+		{
+			return broadCaster;
+		}
+		else
+		{
+			broadCaster = new Broadcaster(name, channelName, plugin);
+			plugin.addLiveBroadcaster(broadCaster);
+			return broadCaster;
+		}
+	}
 
 	/**
 	 * Create a broadcast object giving it a (nick)name and on a specific channel, the callback is used for getting messages of other clients on that channel
@@ -126,10 +184,12 @@ public class ClientManagerProvider implements IScriptable, IReturnedTypesProvide
 	 *
 	 * @param channelName
 	 * @return BroadCaster
+	 * @deprecated replaced with plugins.clientmanager.getOrCreateBroadcaster(name, channelName) to retrieve and send to a channel
 	 */
+	@Deprecated
 	public Broadcaster js_getBroadcaster(String channelName)
 	{
-		return plugin.getBroadcaster(channelName);
+		return plugin.getBroadcaster(null, channelName);
 	}
 
 

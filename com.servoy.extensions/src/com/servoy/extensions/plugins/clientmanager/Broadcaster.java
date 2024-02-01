@@ -39,19 +39,45 @@ public class Broadcaster implements IBroadcaster, IJavaScriptType
 {
 	private final BroadcastInfo bci;
 	private final ClientManagerPlugin plugin;
-	private final FunctionDefinition fd;
+	private FunctionDefinition fd;
+	private Function cb;
 
 	/**
 	 * @param name
 	 * @param channelName
 	 * @param client
 	 */
-	public Broadcaster(String name, String channelName, Function callback, ClientManagerPlugin plugin)
+	public Broadcaster(String name, String channelName, ClientManagerPlugin plugin)
 	{
 		this.bci = new BroadcastInfo(this, name, channelName);
 		this.plugin = plugin;
+	}
+
+	/**
+	 * @param name
+	 * @param channelName
+	 * @param callback
+	 * @param client
+	 */
+	public Broadcaster(String name, String channelName, Function callback, ClientManagerPlugin plugin)
+	{
+		this(name, channelName, plugin);
+		this.cb = callback;
 		this.fd = new FunctionDefinition(callback);
 
+		registerOnServer();
+	}
+
+	public void addCallback(Function callback)
+	{
+		this.cb = callback;
+		this.fd = new FunctionDefinition(callback);
+
+		registerOnServer();
+	}
+
+	public void registerOnServer()
+	{
 		if (plugin.getClientPluginAccess() instanceof ISmartClientPluginAccess)
 		{
 			try
@@ -71,6 +97,16 @@ public class Broadcaster implements IBroadcaster, IJavaScriptType
 		{
 			e.printStackTrace();
 		}
+	}
+
+	public boolean hasCallback()
+	{
+		return cb != null ? true : false;
+	}
+
+	public Function getCallback()
+	{
+		return cb;
 	}
 
 	/**
