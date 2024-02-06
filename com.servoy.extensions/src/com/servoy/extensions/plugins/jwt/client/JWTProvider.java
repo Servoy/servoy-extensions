@@ -274,7 +274,8 @@ public class JWTProvider implements IScriptable, IReturnedTypesProvider
 	 * @sample plugins.jwt.RSA256('MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAnzyis...', 'MIIEogIBAAKCAQEAnzyis1ZjfNB0bBgKFMSvvkTtwlvB...')
 	 *      .kid('2X9R4H....')
 	 * @param publicKey a String representing the publicKey (mostly used to verify tokens)
-	 * @param privateKey a String representing the privateKey (mostly used to create tokens)
+	 * @param privateKey a String representing the privateKey (mostly used to create tokens).
+	 * 			The private key is assumed to be encoded according to the PKCS #8 standard.
 	 * @return an algorithm used to sign or verify Json Web Tokens.
 	 */
 	@JSFunction
@@ -345,6 +346,7 @@ public class JWTProvider implements IScriptable, IReturnedTypesProvider
 	 *      .kid('2X9R4H....')
 	 * @param publicKey a String representing the publicKey (mostly used to verify tokens)
 	 * @param privateKey a String representing the privateKey (mostly used to create tokens)
+	 *		 The private key is assumed to be encoded according to the PKCS #8 standard.
 	 * @return an algorithm used to sign or verify JSON Web Tokens.
 	 */
 	@JSFunction
@@ -400,6 +402,7 @@ public class JWTProvider implements IScriptable, IReturnedTypesProvider
 	 *      .kid('2X9R4H....')
 	 * @param publicKey a String representing the publicKey (mostly used to verify tokens)
 	 * @param privateKey a String representing the privateKey (mostly used to create tokens)
+	 *		 The private key is assumed to be encoded according to the PKCS #8 standard.
 	 * @return an algorithm used to sign or verify JSON Web Tokens.
 	 */
 	@JSFunction
@@ -454,6 +457,7 @@ public class JWTProvider implements IScriptable, IReturnedTypesProvider
 	 *      .kid('2X9R4H....')
 	 * @param publicKey a String representing the publicKey (mostly used to verify tokens)
 	 * @param privateKey a String representing the privateKey (mostly used to create tokens)
+	 *		 The private key is assumed to be encoded according to the PKCS #8 standard.
 	 * @return an algorithm used to sign or verify JSON Web Tokens.
 	 */
 	@JSFunction
@@ -508,6 +512,7 @@ public class JWTProvider implements IScriptable, IReturnedTypesProvider
 	 *      .kid('2X9R4H....')
 	 * @param publicKey a String representing the publicKey (mostly used to verify tokens)
 	 * @param privateKey a String representing the privateKey (mostly used to create tokens)
+	 *		 The private key is assumed to be encoded according to the PKCS #8 standard.
 	 * @return an algorithm used to sign or verify JSON Web Tokens.
 	 */
 	@JSFunction
@@ -563,6 +568,7 @@ public class JWTProvider implements IScriptable, IReturnedTypesProvider
 	 *      .kid('2X9R4H....')
 	 * @param publicKey a String representing the publicKey (mostly used to verify tokens)
 	 * @param privateKey a String representing the privateKey (mostly used to create tokens)
+	 *		 The private key is assumed to be encoded according to the PKCS #8 standard.
 	 * @return an algorithm used to sign or verify JSON Web Tokens.
 	 */
 	@JSFunction
