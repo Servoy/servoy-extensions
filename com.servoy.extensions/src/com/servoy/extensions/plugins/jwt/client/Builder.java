@@ -20,8 +20,10 @@ package com.servoy.extensions.plugins.jwt.client;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.mozilla.javascript.NativeArray;
+import org.mozilla.javascript.NativeObject;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.annotations.JSFunction;
 
@@ -103,7 +105,42 @@ public class Builder implements IScriptable, IJavaScriptType
 				builder.withArrayClaim(key, convertToStringArray((Object[])value));
 			}
 		}
+		if (value instanceof NativeObject)
+		{
+			builder.withClaim(key, convertMap((Map<String, Object>)value));
+		}
 		return this;
+	}
+
+	private Map<String, Object> convertMap(Map<String, Object> value)
+	{
+		Map<String, Object> result = new HashMap<>();
+		for (Entry<String, Object> pair : value.entrySet())
+		{
+			Object val = pair.getValue();
+			if (val instanceof NativeArray)
+			{
+				val = ((NativeArray)val).unwrap();
+			}
+			if (val instanceof Object[])
+			{
+				if (isNumbersArray((Object[])val))
+				{
+					val = convertToLongArray((Object[])val);
+				}
+				else
+				{
+					val = convertToStringArray((Object[])val);
+				}
+			}
+			if (val instanceof NativeObject)
+			{
+				val = convertMap((Map<String, Object>)val);
+			}
+
+			result.put(pair.getKey(), val);
+		}
+		return result;
 	}
 
 	private Long[] convertToLongArray(Object[] array)
