@@ -40,6 +40,7 @@ import org.apache.hc.client5.http.config.RequestConfig.Builder;
 import org.apache.hc.client5.http.impl.async.CloseableHttpAsyncClient;
 import org.apache.hc.client5.http.impl.auth.BasicCredentialsProvider;
 import org.apache.hc.client5.http.impl.auth.BasicScheme;
+import org.apache.hc.client5.http.impl.auth.CredentialsProviderBuilder;
 import org.apache.hc.client5.http.protocol.HttpClientContext;
 import org.apache.hc.core5.concurrent.FutureCallback;
 import org.apache.hc.core5.http.Header;
@@ -225,7 +226,6 @@ public abstract class BaseRequest implements IScriptable, IJavaScriptType
 		{
 			if (context == null) context = HttpClientContext.create();
 
-			BasicCredentialsProvider bcp = new BasicCredentialsProvider();
 			URL _url = HttpProvider.createURLFromString(url, httpPlugin.getClientPluginAccess());
 			Credentials cred = null;
 			if (windowsAuthentication)
@@ -237,8 +237,7 @@ public abstract class BaseRequest implements IScriptable, IJavaScriptType
 				cred = new UsernamePasswordCredentials(userName, password != null ? password.toCharArray() : null);
 			}
 			HttpHost targetHost = new HttpHost(_url.getProtocol(), _url.getHost(), _url.getPort());
-			bcp.setCredentials(new AuthScope(targetHost), cred);
-			context.setCredentialsProvider(bcp);
+			context.setCredentialsProvider(CredentialsProviderBuilder.create().add(new AuthScope(targetHost), cred).build());
 
 			if (usePreemptiveAuthentication)
 			{
