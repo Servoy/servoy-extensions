@@ -39,6 +39,8 @@
         <jbpm.version>7.74.1.Final</jbpm.version>
         <!--  This has to be in sync with jasperreports version  -->
         <poi.version>5.2.5</poi.version>
+        <curvesapi.version>1.08</curvesapi.version>
+        <xmlbeans.version>5.2.0</xmlbeans.version>
         <!--  Poi dependencies  -->
         <math3.version>3.6.1</math3.version>
         <sparsebitset.version>1.3</sparsebitset.version>
@@ -612,6 +614,30 @@
                                     <overWrite>true</overWrite>
                                     <outputDirectory>${project.build.directory}/plugins_beans/plugins/jakarta-poi</outputDirectory>
                                     <destFileName>poi-ooxml.jar</destFileName>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.apache.poi</groupId>
+                                    <artifactId>poi-ooxml-lite</artifactId>
+                                    <version>${poi.version}</version>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>${project.build.directory}/plugins_beans/plugins/jakarta-poi</outputDirectory>
+                                    <destFileName>poi-ooxml-lite.jar</destFileName>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>com.github.virtuald</groupId>
+                                    <artifactId>curvesapi</artifactId>
+                                    <version>${curvesapi.version}</version>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>${project.build.directory}/plugins_beans/plugins/jakarta-poi</outputDirectory>
+                                    <destFileName>curvesapi.jar</destFileName>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.apache.xmlbeans</groupId>
+                                    <artifactId>xmlbeans</artifactId>
+                                    <version>${xmlbeans.version}</version>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>${project.build.directory}/plugins_beans/plugins/jakarta-poi</outputDirectory>
+                                    <destFileName>xmlbeans.jar</destFileName>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.apache.commons</groupId>
@@ -2621,6 +2647,21 @@
             <groupId>org.apache.poi</groupId>
             <artifactId>poi-ooxml</artifactId>
             <version>${poi.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-ooxml-lite</artifactId>
+            <version>${poi.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.virtuald</groupId>
+            <artifactId>curvesapi</artifactId>
+            <version>${curvesapi.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.xmlbeans</groupId>
+            <artifactId>xmlbeans</artifactId>
+            <version>${xmlbeans.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
