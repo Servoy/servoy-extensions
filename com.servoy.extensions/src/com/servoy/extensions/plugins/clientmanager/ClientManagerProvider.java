@@ -3,6 +3,7 @@ package com.servoy.extensions.plugins.clientmanager;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import org.mozilla.javascript.Function;
@@ -459,5 +460,18 @@ public class ClientManagerProvider implements IScriptable, IReturnedTypesProvide
 		{
 			Debug.error("Exception while shutting down client '" + clientId + "'.", e); //$NON-NLS-1$ //$NON-NLS-2$
 		}
+	}
+
+	public Date js_getServerBuildDate()
+	{
+		try
+		{
+			return plugin.getClientService().getServerBuildDate();
+		}
+		catch (Exception e)
+		{
+			Debug.error("Exception while getting server build date.", e); //$NON-NLS-1$
+		}
+		return null;
 	}
 }

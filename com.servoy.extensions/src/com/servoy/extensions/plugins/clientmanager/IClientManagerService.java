@@ -2,6 +2,7 @@ package com.servoy.extensions.plugins.clientmanager;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
+import java.util.Date;
 
 import com.servoy.j2db.dataprocessing.JSDataSet;
 import com.servoy.j2db.server.shared.IClientInformation;
@@ -29,5 +30,7 @@ public interface IClientManagerService extends Remote
 	JSDataSet getLocks() throws RemoteException;
 
 	void releaseLocks(String client_id) throws RemoteException;
+
+	Date getServerBuildDate();
 
 }

@@ -1,6 +1,7 @@
 package com.servoy.extensions.plugins.clientmanager;
 
 import java.rmi.RemoteException;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -203,4 +204,9 @@ public class ClientManagerServer implements IServerPlugin, IClientManagerService
 		return false;
 	}
 
+	@Override
+	public Date getServerBuildDate()
+	{
+		return application.getServerBuildDate();
+	}
 }
