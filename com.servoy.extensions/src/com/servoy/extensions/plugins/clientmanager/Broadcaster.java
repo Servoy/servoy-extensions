@@ -40,7 +40,6 @@ public class Broadcaster implements IBroadcaster, IJavaScriptType
 	private final BroadcastInfo bci;
 	private final ClientManagerPlugin plugin;
 	private FunctionDefinition fd;
-	private Function cb;
 
 	/**
 	 * @param name
@@ -62,7 +61,6 @@ public class Broadcaster implements IBroadcaster, IJavaScriptType
 	public Broadcaster(String name, String channelName, Function callback, ClientManagerPlugin plugin)
 	{
 		this(name, channelName, plugin);
-		this.cb = callback;
 		this.fd = new FunctionDefinition(callback);
 
 		registerOnServer();
@@ -70,7 +68,6 @@ public class Broadcaster implements IBroadcaster, IJavaScriptType
 
 	public void addCallback(Function callback)
 	{
-		this.cb = callback;
 		this.fd = new FunctionDefinition(callback);
 
 		registerOnServer();
@@ -101,12 +98,12 @@ public class Broadcaster implements IBroadcaster, IJavaScriptType
 
 	public boolean hasCallback()
 	{
-		return cb != null ? true : false;
+		return fd != null;
 	}
 
-	public Function getCallback()
+	public FunctionDefinition getCallback()
 	{
-		return cb;
+		return fd;
 	}
 
 	/**

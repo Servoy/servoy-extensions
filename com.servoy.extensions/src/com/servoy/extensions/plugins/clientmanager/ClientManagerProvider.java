@@ -13,6 +13,7 @@ import com.servoy.base.scripting.annotations.ServoyClientSupport;
 import com.servoy.j2db.dataprocessing.JSDataSet;
 import com.servoy.j2db.dataprocessing.RowManager;
 import com.servoy.j2db.documentation.ServoyDocumented;
+import com.servoy.j2db.scripting.FunctionDefinition;
 import com.servoy.j2db.scripting.IReturnedTypesProvider;
 import com.servoy.j2db.scripting.IScriptable;
 import com.servoy.j2db.server.shared.IClientInformation;
@@ -113,7 +114,7 @@ public class ClientManagerProvider implements IScriptable, IReturnedTypesProvide
 		Broadcaster broadCaster = plugin.getBroadcaster(name, channelName);
 		if (broadCaster != null)
 		{
-			if (!broadCaster.hasCallback() || (broadCaster.hasCallback() && broadCaster.getCallback() != callback))
+			if (!broadCaster.hasCallback() || (broadCaster.hasCallback() && !broadCaster.getCallback().equals(new FunctionDefinition(callback))))
 			{
 				broadCaster.addCallback(callback);
 			}
