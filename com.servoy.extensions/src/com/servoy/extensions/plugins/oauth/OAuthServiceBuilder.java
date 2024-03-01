@@ -371,7 +371,7 @@ public class OAuthServiceBuilder implements IScriptable, IJavaScriptType
 		if (generateGlobalMethods)
 		{
 			sm.newGlobalVariable(GLOBALS_SCOPE, SVY_AUTH_CODE_VAR, IBaseSMVariable.MEDIA);
-			sm.newGlobalMethod(GLOBALS_SCOPE, "function " + deeplink_name + DEFAULT_DEEPLINK_FUNCTION_BODY);
+			sm.newGlobalMethod(GLOBALS_SCOPE, "/**@deeplink*/function " + deeplink_name + DEFAULT_DEEPLINK_FUNCTION_BODY);
 			sm.newGlobalMethod(GLOBALS_SCOPE, DEFAULT_GET_FUNCTION);
 		}
 
@@ -512,7 +512,8 @@ public class OAuthServiceBuilder implements IScriptable, IJavaScriptType
 		if (_state != null) authUrlBuilder.state(_state);
 		if (!additionalParameters.isEmpty()) authUrlBuilder = authUrlBuilder.additionalParams(additionalParameters);
 		if (withPKCE) authUrlBuilder = authUrlBuilder.initPKCE();
-		if (OAuthService.log.isDebugEnabled()) {
+		if (OAuthService.log.isDebugEnabled())
+		{
 			String authURL = authUrlBuilder.build();
 			OAuthService.log.debug("authorization url " + authURL);
 		}
