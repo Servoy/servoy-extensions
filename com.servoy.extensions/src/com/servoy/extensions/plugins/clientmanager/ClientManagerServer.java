@@ -14,6 +14,7 @@ import com.servoy.j2db.plugins.IServerAccess;
 import com.servoy.j2db.plugins.IServerPlugin;
 import com.servoy.j2db.plugins.PluginException;
 import com.servoy.j2db.server.shared.IClientInformation;
+import com.servoy.j2db.server.shared.ServerDeployDate;
 import com.servoy.j2db.util.Debug;
 
 public class ClientManagerServer implements IServerPlugin, IClientManagerService, IPostInitializeListener
@@ -207,6 +208,6 @@ public class ClientManagerServer implements IServerPlugin, IClientManagerService
 	@Override
 	public Date getServerBuildDate()
 	{
-		return application.getServerBuildDate();
+		return ServerDeployDate.WAR_DATE;
 	}
 }
