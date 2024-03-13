@@ -19,6 +19,7 @@ package com.servoy.extensions.plugins.jwt.client;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -114,7 +115,7 @@ public class Builder implements IScriptable, IJavaScriptType
 
 	private Map<String, Object> convertMap(Map<String, Object> value)
 	{
-		Map<String, Object> result = new HashMap<>();
+		Map<String, Object> result = new LinkedHashMap<>();
 		for (Entry<String, Object> pair : value.entrySet())
 		{
 			Object val = pair.getValue();
