@@ -10,9 +10,9 @@
 	    </servoy>
 	    <lib>
         	<id>com.lowagie.text</id> <!-- most relevant package name in the jar file (no useful MANIFEST.MF listed id available here) -->
-       		<path>application_server/plugins/pdf_output/itext.jar</path>
-      		<version>2.1.7</version>
-       		<min-version>2.1.7</min-version>
+       		<path>application_server/plugins/pdf_output/openpdf.jar</path>
+      		<version>1.3.30</version>
+       		<min-version>1.3.30</min-version>
     	</lib>
     	<lib>
         	<id>org.bouncycastle.bcmail</id> <!-- "Extension-Name" from MANIFEST.MF -->
