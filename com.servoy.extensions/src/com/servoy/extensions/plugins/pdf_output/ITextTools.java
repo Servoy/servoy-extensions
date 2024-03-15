@@ -348,7 +348,8 @@ public class ITextTools
 	 * @throws IOException
 	 * @throws DocumentException
 	 */
-	public static byte[] encrypt(InputStream inputStream, String ownerPassword, String userPassword, int permissions, boolean is128bit, Map< ? , ? > metaData)
+	public static byte[] encrypt(InputStream inputStream, String ownerPassword, String userPassword, int permissions, boolean is128bit,
+		Map<String, String> metaData)
 		throws IOException, DocumentException
 	{
 		PdfReader reader = new PdfReader(inputStream);
@@ -356,7 +357,7 @@ public class ITextTools
 
 		if (metaData != null)
 		{
-			PdfEncryptor.encrypt(reader, outputStream, userPassword.getBytes(), ownerPassword.getBytes(), permissions, is128bit, (HashMap< ? , ? >)metaData);
+			PdfEncryptor.encrypt(reader, outputStream, userPassword.getBytes(), ownerPassword.getBytes(), permissions, is128bit, metaData);
 		}
 		else
 		{
@@ -405,9 +406,9 @@ public class ITextTools
 	 *
 	 * @return a Map constructed from the Scriptable
 	 */
-	public static Map<String, Object> getMapFromScriptable(final Object object)
+	public static Map<String, String> getMapFromScriptable(final Object object)
 	{
-		Map<String, Object> parameters = null;
+		Map<String, String> parameters = null;
 		if ((object != null) && (object instanceof Scriptable))
 		{
 			final Scriptable obj = (Scriptable)object;
@@ -422,7 +423,7 @@ public class ITextTools
 					{
 						if (parameters == null)
 						{
-							parameters = new HashMap<String, Object>();
+							parameters = new HashMap<String, String>();
 						}
 						if (value instanceof NativeArray)
 						{
@@ -441,7 +442,7 @@ public class ITextTools
 							value = Messages.getStringIfPrefix((String)value);
 						}
 
-						parameters.put(key, value);
+						parameters.put(key, value != null ? value.toString() : null);
 					}
 				}
 			}

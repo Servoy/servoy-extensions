@@ -592,7 +592,7 @@ public class PDFProvider implements IScriptable
 
 		if (data == null || metaData == null) throw new IllegalArgumentException("Missing argument"); //$NON-NLS-1$
 
-		Map<String, Object> map = ITextTools.getMapFromScriptable(metaData);
+		Map<String, String> map = ITextTools.getMapFromScriptable(metaData);
 		if (ITextTools.isNullOrEmpty(map)) throw new IllegalArgumentException("No metadata to add"); //$NON-NLS-1$
 
 		ByteArrayInputStream bais = new ByteArrayInputStream(data);
@@ -782,7 +782,7 @@ public class PDFProvider implements IScriptable
 		{
 			sec = sec | PdfWriter.ALLOW_SCREENREADERS;
 		}
-		Map<String, Object> map = ITextTools.getMapFromScriptable(metaData);
+		Map<String, String> map = ITextTools.getMapFromScriptable(metaData);
 
 		ByteArrayInputStream bais = new ByteArrayInputStream(data);
 		return ITextTools.encrypt(bais, ownerPassword, userPassword, sec, is128bit, map);
