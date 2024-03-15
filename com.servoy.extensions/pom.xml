@@ -386,7 +386,7 @@
                                     </copy>
                                     <copy overwrite="true"
                                         todir="${project.build.directory}/plugins_beans/plugins/pdf_output">
-                                        <fileset file="${project.basedir}/lib/itext.jar" />
+                                        <fileset file="${project.basedir}/lib/openpdf.jar" />
                                     </copy>
                                     <makejar srcdir="rawSQL" />
                                     <makejar srcdir="rest_ws" />
@@ -2632,11 +2632,11 @@
             <version>${xmpcore.version}</version>
         </dependency>
         <dependency>
-            <groupId>itext</groupId>
-            <artifactId>itext</artifactId>
-            <version>1.3.1</version>
+            <groupId>openpdf</groupId>
+            <artifactId>openpdf</artifactId>
+            <version>1.3.30</version>
             <scope>system</scope>
-            <systemPath>${basedir}/lib/itext.jar</systemPath>
+            <systemPath>${basedir}/lib/openpdf.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>org.apache.poi</groupId>
