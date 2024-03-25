@@ -7,7 +7,7 @@
 	</prerequisites>
 	<groupId>com.servoy</groupId>
 	<artifactId>com.servoy.extensions</artifactId>
-	<version>2022.3.7.3749_LTS</version>
+	<version>2022.3.8.3750_LTS</version>
 
 	<repositories>
 		<repository>
