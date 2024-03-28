@@ -301,7 +301,7 @@ public class MultiPartEntityProducer implements AsyncEntityProducer
 	{
 		if (this.contentLength == -2)
 		{
-			long totalContentLength = -1;
+			long totalContentLength = 0;
 			for (InnerMultiPartAsyncProducer producer : producers)
 			{
 				long innerContentLength = producer.producer.getContentLength();
