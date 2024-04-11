@@ -31,6 +31,6 @@ public interface IClientManagerService extends Remote
 
 	void releaseLocks(String client_id) throws RemoteException;
 
-	Date getServerBuildDate();
+	Date getServerBuildDate() throws RemoteException;
 
 }
