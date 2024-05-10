@@ -199,6 +199,35 @@ public class OAuthService implements IScriptable, IJavaScriptType
 	}
 
 	/**
+	 * Obtains a new access token based on the refresh token, if the OAuth api supports it.
+	 * @sample
+	 * accessToken = service.refreshToken(theRefreshToken, scope);
+	 *
+	 * @param refreshToken the refresh token string
+	 * @param scope optional, if missing then the default scope configured on the service is used
+	 * @return The new access token issued by the authorization server
+	 * @throws Exception if refreshing the token failed
+	 */
+	@JSFunction
+	public String refreshToken(String refreshToken, String scope) throws Exception
+	{
+		try
+		{
+			accessToken = service.refreshAccessToken(refreshToken, scope != null ? scope : service.getDefaultScope());
+			if (accessToken != null && accessToken.getExpiresIn() != null)
+			{
+				this.accessTokenExpire = System.currentTimeMillis() + accessToken.getExpiresIn().longValue() * 1000;
+			}
+			return accessToken.getAccessToken();
+		}
+		catch (Exception e)
+		{
+			log.error("Could not get a new access token", e);
+			throw new Exception("Could not get a new access token  " + e.getMessage());
+		}
+	}
+
+	/**
 	 * Returns the number of seconds left until the access token expires.
 	 * @sample
 	 *  var seconds = service.getAccessExpiresIn();
