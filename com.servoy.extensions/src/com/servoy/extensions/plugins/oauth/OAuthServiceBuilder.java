@@ -63,6 +63,8 @@ public class OAuthServiceBuilder implements IScriptable, IJavaScriptType
 	private String responseType;
 	private String responseMode;
 	private boolean withPKCE = false;
+	private String refreshToken;
+	private String _scope;
 
 	private static final String GET_CODE_METHOD = "getSvyOAuthCode";
 	private static final String SVY_AUTH_CODE_VAR = "svy_authCode";
@@ -135,6 +137,7 @@ public class OAuthServiceBuilder implements IScriptable, IJavaScriptType
 	@JSFunction
 	public OAuthServiceBuilder scope(String scope)
 	{
+		this._scope = scope;
 		builder.withScope(scope);
 		return this;
 	}
@@ -272,6 +275,18 @@ public class OAuthServiceBuilder implements IScriptable, IJavaScriptType
 	}
 
 	/**
+	 * If a refresh token is available, the service can be configured to obtain a new access token without showing the login screen.
+	 * @param token the refresh token
+	 * @return the service builder for method chaining
+	 */
+	@JSFunction
+	public OAuthServiceBuilder refreshToken(String token)
+	{
+		this.refreshToken = token;
+		return this;
+	}
+
+	/**
 	 * Configures the service with Proof Key for Code Exchange, which prevents authorization code interception attacks.
 	 * See more at https://datatracker.ietf.org/doc/html/rfc7636.
 	 * @return the service builder for method chaining
@@ -341,6 +356,25 @@ public class OAuthServiceBuilder implements IScriptable, IJavaScriptType
 
 	private OAuthService build(DefaultApi20 api) throws Exception
 	{
+		if (refreshToken != null)
+		{
+			//first try to refresh the token if possible
+			try
+			{
+				OAuthService service = new OAuthService(builder.build(api), _state);
+				service.refreshToken(refreshToken, _scope);
+				if (_callback != null) executeCallback(service, null);
+				return service;
+			}
+			catch (Exception e)
+			{
+				if (OAuthService.log.isDebugEnabled())
+				{
+					OAuthService.log.debug("Could not refresh the token, need to go through the login process.");
+				}
+			}
+		}
+
 		boolean generateGlobalMethods = _deeplink == null || provider.getPluginAccess().getSolutionModel().getGlobalMethod(GLOBALS_SCOPE, _deeplink) == null;
 		if (generateGlobalMethods && _callback == null)
 		{
@@ -465,16 +499,13 @@ public class OAuthServiceBuilder implements IScriptable, IJavaScriptType
 						}
 					}
 
-					FunctionDefinition fd = new FunctionDefinition(_callback);
 					if (OAuthService.log.isDebugEnabled())
 					{
 						OAuthService.log.debug(
 							"Callback function called in " + (System.currentTimeMillis() - redirectToAuthUrlTime) / 1000 +
 								"s since the beginning of the request.");
 					}
-					fd.executeAsync(provider.getPluginAccess(),
-						new Object[] { errorMessage != null ? Boolean.FALSE : Boolean.TRUE, errorMessage != null ? errorMessage : service });
-					((INGClientPluginAccess)provider.getPluginAccess()).clearUrlState();
+					executeCallback(service, errorMessage);
 				}
 				catch (InterruptedException e)
 				{
@@ -504,6 +535,14 @@ public class OAuthServiceBuilder implements IScriptable, IJavaScriptType
 			return null;
 		}
 		return service;
+	}
+
+	private void executeCallback(OAuthService service, String errorMessage)
+	{
+		FunctionDefinition fd = new FunctionDefinition(_callback);
+		fd.executeAsync(provider.getPluginAccess(),
+			new Object[] { errorMessage != null ? Boolean.FALSE : Boolean.TRUE, errorMessage != null ? errorMessage : service });
+		((INGClientPluginAccess)provider.getPluginAccess()).clearUrlState();
 	}
 
 	private AuthorizationUrlBuilder getAuthUrlBuilder(OAuthService service)
