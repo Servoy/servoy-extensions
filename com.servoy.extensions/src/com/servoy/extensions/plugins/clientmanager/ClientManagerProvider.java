@@ -213,7 +213,6 @@ public class ClientManagerProvider implements IScriptable, IReturnedTypesProvide
 	}
 
 	/**
-	/**
 	 * Returns an array of JSClientInformation elements describing the clients connected to the server filtered by the a client info string.
 	 * This way you can ask for a specific set of clients that have a specific information added to there client information.
 	 * Note this is snapshot information on connected clients, client information will not get updated.
