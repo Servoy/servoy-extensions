@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.concurrent.ExecutionException;
 
-import org.apache.commons.lang3.StringUtils;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.annotations.JSFunction;
 import org.slf4j.Logger;
@@ -40,6 +39,7 @@ import com.servoy.base.scripting.annotations.ServoyClientSupport;
 import com.servoy.j2db.documentation.ServoyDocumented;
 import com.servoy.j2db.scripting.IJavaScriptType;
 import com.servoy.j2db.scripting.IScriptable;
+import com.servoy.j2db.util.Utils;
 
 /**
  * @author emera
@@ -167,7 +167,7 @@ public class OAuthService implements IScriptable, IJavaScriptType
 	public String getRefreshToken() throws Exception
 	{
 		if (accessToken == null) throw new Exception("Could not refresh the access token, the access token was not set on the service.");
-		return !StringUtils.isBlank(accessToken.getRefreshToken()) ? accessToken.getRefreshToken() : _refreshToken;
+		return !Utils.stringIsEmpty(accessToken.getRefreshToken()) ? accessToken.getRefreshToken() : _refreshToken;
 	}
 
 	/**
@@ -182,7 +182,7 @@ public class OAuthService implements IScriptable, IJavaScriptType
 	public String refreshToken() throws Exception
 	{
 		if (accessToken == null) throw new Exception("Could not refresh the access token, the access token was not set on the service.");
-		if (StringUtils.isBlank(accessToken.getRefreshToken()) && StringUtils.isBlank(_refreshToken))
+		if (Utils.stringIsEmpty(accessToken.getRefreshToken()) && Utils.stringIsEmpty(_refreshToken))
 			throw new Exception("Could not refresh the access token, the access token does not contain a refresh token.");
 
 		return refreshToken(accessToken.getRefreshToken(), accessToken.getScope());
@@ -201,7 +201,7 @@ public class OAuthService implements IScriptable, IJavaScriptType
 	@JSFunction
 	public String refreshToken(String refreshToken, String scope) throws Exception
 	{
-		if (StringUtils.isBlank(refreshToken))
+		if (Utils.stringIsEmpty(refreshToken))
 			throw new Exception("Could not refresh the access token, the provided refresh token is blank.");
 
 		try
@@ -213,7 +213,7 @@ public class OAuthService implements IScriptable, IJavaScriptType
 				{
 					this.accessTokenExpire = System.currentTimeMillis() + accessToken.getExpiresIn().longValue() * 1000;
 				}
-				_refreshToken = !StringUtils.isBlank(accessToken.getRefreshToken()) ? accessToken.getRefreshToken() : refreshToken;
+				_refreshToken = !Utils.stringIsEmpty(accessToken.getRefreshToken()) ? accessToken.getRefreshToken() : refreshToken;
 				return accessToken.getAccessToken();
 			}
 			return null;
