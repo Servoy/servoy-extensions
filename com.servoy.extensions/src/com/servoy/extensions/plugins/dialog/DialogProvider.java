@@ -491,6 +491,22 @@ public class DialogProvider implements IScriptable, IMobileDialogProvider
 	@ServoyClientSupport(ng = true, mc = false, wc = true, sc = true)
 	public String showInputDialog(String dialog_title, String msg, String initialValue)
 	{
+		return showInputDialog(dialog_title, msg, initialValue, "text");
+	}
+
+	/**
+	 * @clonedesc showInputDialog()
+	 * @sampleas showInputDialog()
+	 * @param dialog_title
+	 * @param msg
+	 * @param initialValue
+	 * @param inputType the type of the input field, one of: color, date, datetime-local, email, month, number, password, tel, text, time, url, week
+	 * @return input text or null
+	 */
+	@JSFunction
+	@ServoyClientSupport(ng = true, mc = false, wc = false, sc = false)
+	public String showInputDialog(String dialog_title, String msg, String initialValue, String inputType)
+	{
 		if (!SwingUtilities.isEventDispatchThread())
 		{
 			throw new RuntimeException("Can't use the dialog plugin in a none Swing thread/environment");
