@@ -337,7 +337,7 @@
                                     <makejar srcdir="converters" />
                                     <makejar srcdir="validators"
                                         jarname="default_validators" />
-                                    <makejar srcdir="dialog" />
+                                    <!-- <makejar srcdir="dialog" /> -->
                                     <makejar srcdir="excelxport" />
                                     <copy overwrite="true"
                                         todir="${project.build.directory}/plugins_beans/plugins/">
@@ -366,12 +366,13 @@
                                     </copy>
                                     <makejar srcdir="mail"
                                         includes=",META-INF/services/com.servoy.j2db.plugins.IPlugin" />
-                                    <makejar srcdir="openid" />
+                                    <!--  <makejar srcdir="openid" /> 
                                     <copy overwrite="true"
                                         todir="${project.build.directory}/plugins_beans/plugins/openid">
                                         <fileset file="${project.basedir}/lib/openid4java.jar" />
                                         <fileset file="${project.basedir}/lib/guice-2.0.jar" />
                                     </copy>
+                                    -->
                                     <makejar srcdir="oauth" />
                                     <makejar srcdir="pdf_forms" />
                                     <copy overwrite="true"
@@ -420,9 +421,9 @@
                                     </copy>
                                     <makejar srcdir="tabxport" />
                                     <makejar srcdir="udp" />
-                                    <makejar srcdir="window" />
+                                    <!-- <makejar srcdir="window" /> -->
                                     <makejar srcdir="xmlreader" />
-                                    <makejar srcdir="dbtreeview"
+                                    <!-- <makejar srcdir="dbtreeview"
                                         manifest="${project.basedir}/resources/dbtreeview/MANIFEST.MF"
                                         type="beans" />
                                     <makejar srcdir="jfxpanel"
@@ -439,6 +440,7 @@
                                             <exclude name="META-INF/**" />
                                         </patternset>
                                     </unzip>
+                                    -->
                                     <unzip src="${project.basedir}/lib/quartz.jar"
                                         dest="${project.build.directory}/classes">
                                         <patternset>
@@ -2505,11 +2507,6 @@
             <version>1.3.2.s7</version>
         </dependency>
         <dependency>
-            <groupId>com.servoy</groupId>
-            <artifactId>wicket</artifactId>
-            <version>1.4</version>
-        </dependency>
-        <dependency>
             <groupId>com.rabbitmq</groupId>
             <artifactId>amqp-client</artifactId>
             <version>${amqp.version}</version>
@@ -2529,11 +2526,6 @@
             <groupId>org.quartz-scheduler</groupId>
             <artifactId>quartz</artifactId>
             <version>2.3.2</version>
-        </dependency>
-        <dependency>
-            <groupId>com.servoy</groupId>
-            <artifactId>inmethod-grid</artifactId>
-            <version>1.0</version>
         </dependency>
         <dependency>
             <groupId>com.servoy</groupId>
