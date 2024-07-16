@@ -38,6 +38,10 @@ public class HttpClientConfig implements IScriptable, IJavaScriptType
 	int maxTotalConnections = -1;
 	int maxConnectionsPerRoute = -1;
 	boolean multiPartLegacyMode = false;
+	String trustStorePath;
+	String certPassword;
+	String certPath;
+	String trustStorePassword;
 
 	public HttpClientConfig()
 	{
@@ -222,5 +226,97 @@ public class HttpClientConfig implements IScriptable, IJavaScriptType
 	public void js_setMultiPartLegacyMode(boolean multiPartLegacyMode)
 	{
 		this.multiPartLegacyMode = multiPartLegacyMode;
+	}
+
+	/**
+	 * Gets/Sets the certificate path.
+	 * The following sample sets up an HttpClient with custom SSL/TLS configuration using a PKCS12 keystore for client certificates and
+	 * a JKS truststore for trusted certificate authorities.
+	 *
+	 * @sample
+	 * var config = plugins.http.createNewHttpClientConfig();
+	 * config.certPath = "";
+	 * config.certPassword = "";
+	 * config.trustStorePath = "";
+	 * config.trustStorePassword = "";
+	 * var client = plugins.http.createNewHttpClient(config);
+	 */
+	public String js_getCertPath()
+	{
+		return certPath;
+	}
+
+	public void js_setCertPath(String certPath)
+	{
+		this.certPath = certPath;
+	}
+
+	/**
+	 * Gets/Sets the certificate password.
+	 * The following sample sets up an HttpClient with custom SSL/TLS configuration using a PKCS12 keystore for client certificates and
+	 * a JKS truststore for trusted certificate authorities.
+	 *
+	 * @sample
+	 * var config = plugins.http.createNewHttpClientConfig();
+	 * config.certPath = "";
+	 * config.certPassword = "";
+	 * config.trustStorePath = "";
+	 * config.trustStorePassword = "";
+	 * var client = plugins.http.createNewHttpClient(config);
+	 */
+	public String js_getCertPassword()
+	{
+		return certPassword;
+	}
+
+	public void js_setCertPassword(String certPassword)
+	{
+		this.certPassword = certPassword;
+	}
+
+	/**
+	 * Gets/Sets the path to the java truststore where to import the certificate.
+	 * The following sample sets up an HttpClient with custom SSL/TLS configuration using a PKCS12 keystore for client certificates and
+	 * a JKS truststore for trusted certificate authorities.
+	 *
+	 * @sample
+	 * var config = plugins.http.createNewHttpClientConfig();
+	 * config.certPath = "";
+	 * config.certPassword = "";
+	 * config.trustStorePath = "";
+	 * config.trustStorePassword = "";
+	 * var client = plugins.http.createNewHttpClient(config);
+	 */
+	public String js_getTrustStorePath()
+	{
+		return trustStorePath;
+	}
+
+	public void js_setTrustStorePath(String trustStorePath)
+	{
+		this.trustStorePath = trustStorePath;
+	}
+
+	/**
+	 * Gets/Sets the password to the java truststore where to import the certificate.
+	 * The following sample sets up an HttpClient with custom SSL/TLS configuration using a PKCS12 keystore for client certificates and
+	 * a JKS truststore for trusted certificate authorities.
+	 *
+	 * @sample
+	 * var config = plugins.http.createNewHttpClientConfig();
+	 * config.certPath = "";
+	 * config.certPassword = "";
+	 * config.trustStorePath = "";
+	 * config.trustStorePassword = "";
+	 * var client = plugins.http.createNewHttpClient(config);
+	 */
+	public String js_getTrustStorePassword()
+	{
+		return trustStorePassword;
+	}
+
+	public void js_setTrustStorePassword(String trustStorePassword)
+	{
+		this.trustStorePassword = trustStorePassword;
 	}
 }

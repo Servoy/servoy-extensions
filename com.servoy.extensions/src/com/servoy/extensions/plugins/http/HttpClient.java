@@ -17,20 +17,27 @@
 
 package com.servoy.extensions.plugins.http;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.security.KeyStore;
+import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.sql.Date;
 import java.util.List;
 
 import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLPeerUnverifiedException;
+import javax.net.ssl.TrustManagerFactory;
 
 import org.apache.hc.client5.http.ConnectionKeepAliveStrategy;
 import org.apache.hc.client5.http.config.RequestConfig;
@@ -42,7 +49,6 @@ import org.apache.hc.client5.http.impl.async.CloseableHttpAsyncClient;
 import org.apache.hc.client5.http.impl.async.HttpAsyncClientBuilder;
 import org.apache.hc.client5.http.impl.async.HttpAsyncClients;
 import org.apache.hc.client5.http.impl.cookie.BasicClientCookie;
-import org.apache.hc.client5.http.impl.nio.PoolingAsyncClientConnectionManager;
 import org.apache.hc.client5.http.impl.nio.PoolingAsyncClientConnectionManagerBuilder;
 import org.apache.hc.client5.http.ssl.ClientTlsStrategyBuilder;
 import org.apache.hc.client5.http.ssl.NoopHostnameVerifier;
@@ -51,7 +57,6 @@ import org.apache.hc.core5.function.Factory;
 import org.apache.hc.core5.http.HttpHost;
 import org.apache.hc.core5.http.HttpResponse;
 import org.apache.hc.core5.http.config.Http1Config;
-import org.apache.hc.core5.http.nio.ssl.TlsStrategy;
 import org.apache.hc.core5.http.protocol.HttpContext;
 import org.apache.hc.core5.http2.HttpVersionPolicy;
 import org.apache.hc.core5.reactor.ssl.TlsDetails;
@@ -89,19 +94,6 @@ public class HttpClient implements IScriptable, IJavaScriptType
 	{
 		this.httpPlugin = httpPlugin;
 		HttpAsyncClientBuilder builder = HttpAsyncClients.custom();
-		if (config != null && (config.maxConnectionsPerRoute >= 0 || config.maxTotalConnections >= 0))
-		{
-			PoolingAsyncClientConnectionManagerBuilder connectionManagerBuilder = PoolingAsyncClientConnectionManagerBuilder.create();
-			if (config.maxTotalConnections >= 0)
-			{
-				connectionManagerBuilder.setMaxConnTotal(config.maxTotalConnections);
-			}
-			if (config.maxConnectionsPerRoute >= 0)
-			{
-				connectionManagerBuilder.setMaxConnPerRoute(config.maxConnectionsPerRoute);
-			}
-			builder.setConnectionManager(connectionManagerBuilder.build());
-		}
 		builder.setIOReactorConfig(org.apache.hc.core5.reactor.IOReactorConfig.custom().setSoKeepAlive(true)
 			.setIoThreadCount((config != null && config.maxIOThreadCount >= 0) ? config.maxIOThreadCount : 2).build());
 		requestConfigBuilder = RequestConfig.custom();
@@ -110,50 +102,49 @@ public class HttpClient implements IScriptable, IJavaScriptType
 
 		cookieStore = new BasicCookieStore();
 		builder.setDefaultCookieStore(cookieStore);
+
 		try
 		{
-			final SSLContext sslContext;
-			final ClientTlsStrategyBuilder tlsFactory;
-			if (config != null && !config.hostValidation)
+			SSLContext sslContext = null;
+			HostnameVerifier hostnameVerifier = null;
+
+			// Determine SSLContext
+			if (config != null)
 			{
-				sslContext = SSLContexts.custom().loadTrustMaterial(new TrustStrategy()
+				if (config.certPath != null && config.certPassword != null && config.trustStorePath != null && config.trustStorePassword != null)
 				{
-					@Override
-					public boolean isTrusted(X509Certificate[] chain, String authType) throws CertificateException
-					{
-						return true; // Trust all certificates
-					}
-				}).build();
-				HostnameVerifier allowAllHosts = new NoopHostnameVerifier();
-				tlsFactory = ClientTlsStrategyBuilder.create().useSystemProperties()
-					.setSslContext(sslContext)
-					.setHostnameVerifier(allowAllHosts)
-					.setTlsDetailsFactory(createFactoryForJava11());
+					sslContext = createSSLContextWithCert(config);
+				}
+				else if (!config.hostValidation)
+				{
+					sslContext = createTrustAllSSLContext();
+					hostnameVerifier = new NoopHostnameVerifier();
+				}
 			}
 			else
 			{
-				final AllowedCertTrustStrategy allowedCertTrustStrategy = new AllowedCertTrustStrategy();
-				sslContext = SSLContexts.custom().loadTrustMaterial(allowedCertTrustStrategy).build();
-				tlsFactory = ClientTlsStrategyBuilder.create().useSystemProperties()
-					.setSslContext(sslContext)
-					.setTlsDetailsFactory(createFactoryForJava11());
+				sslContext = createAllowedCertSSLContext();
 			}
 
-			if (config != null && config.protocol != null)
+			// Create and configure the TLS strategy
+			ClientTlsStrategyBuilder tlsFactory = createTlsFactory(sslContext, hostnameVerifier, config);
+
+			// Build and configure the ConnectionManager
+			PoolingAsyncClientConnectionManagerBuilder connectionManagerBuilder = PoolingAsyncClientConnectionManagerBuilder.create();
+			if (config != null && config.maxTotalConnections >= 0)
 			{
-				tlsFactory.setTlsVersions(config.protocol);
+				connectionManagerBuilder.setMaxConnTotal(config.maxTotalConnections);
 			}
-			TlsStrategy tlsStrat = tlsFactory.build();
-			final PoolingAsyncClientConnectionManager cm = PoolingAsyncClientConnectionManagerBuilder.create()
-				.setTlsStrategy(tlsStrat)
-				.setMaxConnPerRoute(5)
-				.build();
-			builder.setConnectionManager(cm);
+			int maxConnPerRoute = config != null && config.maxConnectionsPerRoute >= 0 ? config.maxConnectionsPerRoute : 5;
+			connectionManagerBuilder.setMaxConnPerRoute(maxConnPerRoute);
+			connectionManagerBuilder.setTlsStrategy(tlsFactory.build());
+			builder.setConnectionManager(connectionManagerBuilder.build());
 		}
 		catch (Exception ex)
 		{
 			Debug.error("Can't set up ssl socket factory", ex); //$NON-NLS-1$
 		}
+
 		if (config != null)
 		{
 			if (config.keepAliveDuration >= 0)
@@ -191,6 +182,72 @@ public class HttpClient implements IScriptable, IJavaScriptType
 		client = builder.build();
 		client.start();
 	}
+
+	private SSLContext createSSLContextWithCert(HttpClientConfig config) throws Exception
+	{
+		File pKeyFile = new File(config.certPath);
+		KeyStore keyStore = KeyStore.getInstance("PKCS12"); //TODO add to config?
+		try (InputStream keyInput = new FileInputStream(pKeyFile))
+		{
+			keyStore.load(keyInput, config.certPassword.toCharArray());
+		}
+
+		KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+		keyManagerFactory.init(keyStore, config.certPassword.toCharArray());
+
+		KeyStore trustStore = KeyStore.getInstance("JKS"); //TODO add to config?
+		try (InputStream trustInput = new FileInputStream(config.trustStorePath))
+		{
+			trustStore.load(trustInput, config.trustStorePassword.toCharArray());
+		}
+
+		TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+		trustManagerFactory.init(trustStore);
+
+		SSLContext sslContext = SSLContext.getInstance(config.protocol != null ? config.protocol : "TLSv1.2");
+		sslContext.init(keyManagerFactory.getKeyManagers(), trustManagerFactory.getTrustManagers(), new SecureRandom());
+
+		return sslContext;
+	}
+
+	private SSLContext createTrustAllSSLContext() throws Exception
+	{
+		return SSLContexts.custom().loadTrustMaterial(new TrustStrategy()
+		{
+			@Override
+			public boolean isTrusted(X509Certificate[] chain, String authType) throws CertificateException
+			{
+				return true; // Trust all certificates
+			}
+		}).build();
+	}
+
+	private SSLContext createAllowedCertSSLContext() throws Exception
+	{
+		AllowedCertTrustStrategy allowedCertTrustStrategy = new AllowedCertTrustStrategy();
+		return SSLContexts.custom().loadTrustMaterial(allowedCertTrustStrategy).build();
+	}
+
+	private ClientTlsStrategyBuilder createTlsFactory(SSLContext sslContext, HostnameVerifier hostnameVerifier, HttpClientConfig config)
+	{
+		ClientTlsStrategyBuilder tlsFactory = ClientTlsStrategyBuilder.create()
+			.useSystemProperties()
+			.setSslContext(sslContext)
+			.setTlsDetailsFactory(createFactoryForJava11());
+
+		if (hostnameVerifier != null)
+		{
+			tlsFactory.setHostnameVerifier(hostnameVerifier);
+		}
+
+		if (config != null && config.protocol != null)
+		{
+			tlsFactory.setTlsVersions(config.protocol);
+		}
+
+		return tlsFactory;
+	}
+
 
 	/**
 	 * @return
