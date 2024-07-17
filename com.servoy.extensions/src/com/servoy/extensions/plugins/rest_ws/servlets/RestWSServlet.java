@@ -374,14 +374,20 @@ public class RestWSServlet extends HttpServlet
 		boolean reloadSolution = plugin.shouldReloadSolutionAfterRequest();
 		try
 		{
-			plugin.log.trace("DELETE");
-
 			client = getClient(request);
-			if (Boolean.FALSE.equals(wsService(WS_DELETE, null, emptyList(), request, response, client.getLeft())))
+			Object result = wsService(WS_DELETE, null, emptyList(), request, response, client.getLeft());
+
+
+			if (result == null || Boolean.FALSE.equals(result))
 			{
 				sendError(response, HttpServletResponse.SC_NOT_FOUND);
+				return;
 			}
 			HTTPUtils.setNoCacheHeaders(response);
+			if (!Boolean.TRUE.equals(result))
+			{
+				sendResult(request, response, result, CONTENT_DEFAULT);
+			}
 		}
 		catch (ExecFailedException e)
 		{
