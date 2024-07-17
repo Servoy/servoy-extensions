@@ -111,7 +111,7 @@ public class HttpClient implements IScriptable, IJavaScriptType
 			// Determine SSLContext
 			if (config != null)
 			{
-				if (config.certPath != null && config.certPassword != null && config.trustStorePath != null && config.trustStorePassword != null)
+				if (config.certPath != null && config.trustStorePath != null && config.trustStorePassword != null)
 				{
 					sslContext = createSSLContextWithCert(config);
 				}
@@ -189,7 +189,7 @@ public class HttpClient implements IScriptable, IJavaScriptType
 		KeyStore keyStore = KeyStore.getInstance("PKCS12"); //TODO add to config?
 		try (InputStream keyInput = new FileInputStream(pKeyFile))
 		{
-			keyStore.load(keyInput, config.certPassword.toCharArray());
+			keyStore.load(keyInput, config.certPassword != null ? config.certPassword.toCharArray() : null);
 		}
 
 		KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
