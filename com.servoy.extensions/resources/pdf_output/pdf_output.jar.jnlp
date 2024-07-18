@@ -9,12 +9,12 @@
    </information>
    <resources>
       <jar href="/plugins/pdf_output.jar" download="eager" part="pdfoutput" version="%%version%%"/>
-      <jar href="/plugins/pdf_output/itext.jar" download="%%loadmethod%%" part="itext" version="2.1.7"/>
+      <jar href="/plugins/pdf_output/openpdf.jar" download="%%loadmethod%%" part="openpdf" version="1.3.30"/>
       <jar href="/plugins/pdf_output/bcmail.jar" download="%%loadmethod%%" part="bouncycastle" version="1.46.0"/>
       <jar href="/plugins/pdf_output/bcprov.jar" download="%%loadmethod%%" part="bouncycastle" version="1.46.0"/>
       <jar href="/plugins/pdf_output/pdfbox.jar" download="%%loadmethod%%" part="bouncycastle" version="2.0.16"/>
       <jar href="/plugins/pdf_output/fontbox.jar" download="%%loadmethod%%" part="bouncycastle" version="2.0.16"/>
-      <package name="com.lowagie.*" part="itext" recursive="true"/>
+      <package name="com.lowagie.*" part="openpdf" recursive="true"/>
       <package name="org.bouncycastle.*" part="bouncycastle" recursive="true"/>
    </resources>
    <component-desc/>

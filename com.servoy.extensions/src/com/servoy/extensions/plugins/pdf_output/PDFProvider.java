@@ -32,6 +32,7 @@ import java.util.Map;
 
 import javax.imageio.ImageIO;
 
+import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.rendering.PDFRenderer;
 import org.mozilla.javascript.Scriptable;
@@ -345,7 +346,122 @@ public class PDFProvider implements IScriptable
 	}
 
 	/**
-	 * Convert a protected PDF form to a PDF document.
+	 * Convert a protected PDF form to a PDF document. Can specify if all fields or just specified fields will be flattened.
+	 *
+	 * @sample
+	 * var pdfform = plugins.file.readFile('c:/temp/1040a-form.pdf');
+	 * //var field_values = plugins.file.readFile('c:/temp/1040a-data.fdf');//read adobe fdf values or
+	 * var field_values = new Array()//construct field values
+	 * field_values[0] = 'f1-1=John C.J.'
+	 * field_values[1] = 'f1-2=Longlasting'
+	 * var result_pdf_doc = plugins.pdf_output.convertProtectedPDFFormToPDFDocument(pdfform, 'pdf_password', field_values)
+	 * if (result_pdf_doc != null)
+	 * {
+	 * 	plugins.file.writeFile('c:/temp/1040a-flatten.pdf', result_pdf_doc)
+	 * }
+	 *
+	 * @param pdf_form the PDF Form to convert
+	 * @param pdf_password the password to use
+	 * @param field_values the field values to use. If partialFlattening is true, only these fields will be flattened.
+	 * @param partialFlattening if true, only flatten the fields set as values, the rest remain unchanged
+	 */
+	@ServoyClientSupport(ng = true, wc = true, sc = true)
+	public byte[] js_convertProtectedPDFFormToPDFDocument(byte[] pdf_form, String pdf_password, Object field_values, boolean partialFlattening)
+	{
+		try
+		{
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			PdfReader reader = new PdfReader(pdf_form, pdf_password != null ? pdf_password.getBytes() : null);
+			PdfStamper stamp = new PdfStamper(reader, baos);
+			List<String> fieldNames = new ArrayList<String>();
+			if (field_values != null)
+			{
+				AcroFields form = stamp.getAcroFields();
+				if (field_values instanceof String)
+				{
+					FdfReader fdf = new FdfReader((String)field_values);
+					form.setFields(fdf);
+					if (partialFlattening)
+					{
+						fieldNames.addAll(fdf.getFields().keySet());
+					}
+				}
+				else if (field_values instanceof byte[])
+				{
+					FdfReader fdf = new FdfReader((byte[])field_values);
+					form.setFields(fdf);
+					if (partialFlattening)
+					{
+						fieldNames.addAll(fdf.getFields().keySet());
+					}
+				}
+				else if (field_values instanceof Object[])
+				{
+					for (int i = 0; i < ((Object[])field_values).length; i++)
+					{
+						Object obj = ((Object[])field_values)[i];
+						if (obj instanceof Object[])
+						{
+							Object[] row = (Object[])obj;
+							if (row.length >= 2)
+							{
+								Object field = row[0];
+								Object value = row[1];
+								if (field != null && value != null)
+								{
+									form.setField(field.toString(), value.toString());
+									if (partialFlattening)
+									{
+										fieldNames.add(field.toString());
+									}
+								}
+							}
+//							else if (row.length >= 3)
+//							{
+//			                	form.setField(field, value);
+//							}
+						}
+						else if (obj instanceof String)
+						{
+							String s = (String)obj;
+							int idx = s.indexOf('=');
+							String key = s.substring(0, idx);
+							form.setField(key, s.substring(idx + 1));
+							if (partialFlattening)
+							{
+								fieldNames.add(key);
+							}
+						}
+					}
+				}
+			}
+			stamp.setFormFlattening(true);
+			if (partialFlattening)
+			{
+				try
+				{
+					for (String name : fieldNames)
+					{
+						stamp.partialFormFlattening(name);
+					}
+				}
+				catch (Exception ex)
+				{
+					Debug.error(ex);
+				}
+			}
+			stamp.close();
+			return baos.toByteArray();
+		}
+		catch (Exception e)
+		{
+			Debug.error(e);
+			throw new RuntimeException("Error converting pdf form to pdf document", e); //$NON-NLS-1$
+		}
+	}
+
+	/**
+	 * Convert a protected PDF form to a PDF document. By default, all fields of the pdf form will be flattened.
 	 *
 	 * @sample
 	 * var pdfform = plugins.file.readFile('c:/temp/1040a-form.pdf');
@@ -366,68 +482,11 @@ public class PDFProvider implements IScriptable
 	@ServoyClientSupport(ng = true, wc = true, sc = true)
 	public byte[] js_convertProtectedPDFFormToPDFDocument(byte[] pdf_form, String pdf_password, Object field_values)
 	{
-		try
-		{
-			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			PdfReader reader = new PdfReader(pdf_form, pdf_password != null ? pdf_password.getBytes() : null);
-			PdfStamper stamp = new PdfStamper(reader, baos);
-			if (field_values != null)
-			{
-				AcroFields form = stamp.getAcroFields();
-				if (field_values instanceof String)
-				{
-					FdfReader fdf = new FdfReader((String)field_values);
-					form.setFields(fdf);
-				}
-				else if (field_values instanceof byte[])
-				{
-					FdfReader fdf = new FdfReader((byte[])field_values);
-					form.setFields(fdf);
-				}
-				else if (field_values instanceof Object[])
-				{
-					for (int i = 0; i < ((Object[])field_values).length; i++)
-					{
-						Object obj = ((Object[])field_values)[i];
-						if (obj instanceof Object[])
-						{
-							Object[] row = (Object[])obj;
-							if (row.length >= 2)
-							{
-								Object field = row[0];
-								Object value = row[1];
-								if (field != null && value != null)
-								{
-									form.setField(field.toString(), value.toString());
-								}
-							}
-//							else if (row.length >= 3)
-//							{
-//			                	form.setField(field, value);
-//							}
-						}
-						else if (obj instanceof String)
-						{
-							String s = (String)obj;
-							int idx = s.indexOf('=');
-							form.setField(s.substring(0, idx), s.substring(idx + 1));
-						}
-					}
-				}
-			}
-			stamp.setFormFlattening(true);
-			stamp.close();
-			return baos.toByteArray();
-		}
-		catch (Exception e)
-		{
-			Debug.error(e);
-			throw new RuntimeException("Error converting pdf form to pdf document", e); //$NON-NLS-1$
-		}
+		return js_convertProtectedPDFFormToPDFDocument(pdf_form, pdf_password, field_values, false);
 	}
 
 	/**
-	 * Convert a PDF form to a PDF document.
+	 * Convert a PDF form to a PDF document. By default, all fields of the pdf form will be flattened.
 	 *
 	 * @sample
 	 * var pdfform = plugins.file.readFile('c:/temp/1040a-form.pdf');
@@ -448,6 +507,31 @@ public class PDFProvider implements IScriptable
 	public byte[] js_convertPDFFormToPDFDocument(byte[] pdf_form, Object field_values)
 	{
 		return js_convertProtectedPDFFormToPDFDocument(pdf_form, null, field_values);
+	}
+
+	/**
+	 * Convert a PDF form to a PDF document. The PDF form can be have all the fields flattened or just the fields specified by values.
+	 *
+	 * @sample
+	 * var pdfform = plugins.file.readFile('c:/temp/1040a-form.pdf');
+	 * //var field_values = plugins.file.readFile('c:/temp/1040a-data.fdf');//read adobe fdf values or
+	 * var field_values = new Array()//construct field values
+	 * field_values[0] = 'f1-1=John C.J.'
+	 * field_values[1] = 'f1-2=Longlasting'
+	 * var result_pdf_doc = plugins.pdf_output.convertPDFFormToPDFDocument(pdfform, field_values)
+	 * if (result_pdf_doc != null)
+	 * {
+	 * 	plugins.file.writeFile('c:/temp/1040a-flatten.pdf', result_pdf_doc)
+	 * }
+	 *
+	 * @param pdf_form the PDF Form to convert
+	 * @param field_values the values to use. If partialFlattening is true, only these fields will be flattened.
+	 * @param partialFlattening if true, only flatten the fields set as values, the rest remain unchanged
+	 */
+	@ServoyClientSupport(ng = true, wc = true, sc = true)
+	public byte[] js_convertPDFFormToPDFDocument(byte[] pdf_form, Object field_values, boolean partialFlattening)
+	{
+		return js_convertProtectedPDFFormToPDFDocument(pdf_form, null, field_values, partialFlattening);
 	}
 
 	/**
@@ -508,7 +592,7 @@ public class PDFProvider implements IScriptable
 
 		if (data == null || metaData == null) throw new IllegalArgumentException("Missing argument"); //$NON-NLS-1$
 
-		Map<String, Object> map = ITextTools.getMapFromScriptable(metaData);
+		Map<String, String> map = ITextTools.getMapFromScriptable(metaData);
 		if (ITextTools.isNullOrEmpty(map)) throw new IllegalArgumentException("No metadata to add"); //$NON-NLS-1$
 
 		ByteArrayInputStream bais = new ByteArrayInputStream(data);
@@ -698,7 +782,7 @@ public class PDFProvider implements IScriptable
 		{
 			sec = sec | PdfWriter.ALLOW_SCREENREADERS;
 		}
-		Map<String, Object> map = ITextTools.getMapFromScriptable(metaData);
+		Map<String, String> map = ITextTools.getMapFromScriptable(metaData);
 
 		ByteArrayInputStream bais = new ByteArrayInputStream(data);
 		return ITextTools.encrypt(bais, ownerPassword, userPassword, sec, is128bit, map);
@@ -1030,7 +1114,7 @@ public class PDFProvider implements IScriptable
 	@ServoyClientSupport(ng = true, wc = true, sc = true)
 	public byte[] js_getThumbnailImage(byte[] data, int pageNumber, int dpi) throws Exception
 	{
-		PDDocument pdfDoc = PDDocument.load(data);
+		PDDocument pdfDoc = Loader.loadPDF(data);
 		PDFRenderer pdfRenderer = new PDFRenderer(pdfDoc);
 		BufferedImage myImage = pdfRenderer.renderImageWithDPI(pageNumber, dpi);
 		ByteArrayOutputStream baos = new ByteArrayOutputStream(myImage.getData().getDataBuffer().getSize());
@@ -1056,7 +1140,7 @@ public class PDFProvider implements IScriptable
 	@ServoyClientSupport(ng = true, wc = true, sc = true)
 	public int js_getNumberOfPages(byte[] data) throws IOException
 	{
-		PDDocument pdfDoc = PDDocument.load(data);
+		PDDocument pdfDoc = Loader.loadPDF(data);
 		int pages = pdfDoc.getNumberOfPages();
 		pdfDoc.close();
 		return pages;

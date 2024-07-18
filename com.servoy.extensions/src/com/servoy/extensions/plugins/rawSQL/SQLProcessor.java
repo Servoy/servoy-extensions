@@ -109,7 +109,7 @@ public class SQLProcessor implements ISQLService, IServerPlugin
 				{
 					ps = connection.createStatement();
 					long t1 = System.currentTimeMillis();
-					Integer perfUuid = application.addPerformanceTiming(server, sql, 0 - t1, clientId);
+					Long perfUuid = application.addPerformanceTiming(server, sql, 0 - t1, clientId);
 					try
 					{
 						ps.execute(sql);
@@ -132,7 +132,7 @@ public class SQLProcessor implements ISQLService, IServerPlugin
 						((PreparedStatement)ps).setObject(i + 1, data);
 					}
 					long t1 = System.currentTimeMillis();
-					Integer perfUuid = application.addPerformanceTiming(server, sql, 0 - t1, clientId);
+					Long perfUuid = application.addPerformanceTiming(server, sql, 0 - t1, clientId);
 					try
 					{
 						((PreparedStatement)ps).execute();

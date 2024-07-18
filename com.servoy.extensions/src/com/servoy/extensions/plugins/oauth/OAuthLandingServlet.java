@@ -25,6 +25,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.text.StringEscapeUtils;
+
 /**
  * Copies to fragment to the query string and redirects to the solution.
  * @author emera
@@ -75,7 +77,7 @@ public class OAuthLandingServlet extends HttpServlet
 		out.println("<head>");
 		out.println("<script type=\"text/javascript\">");
 		out.println("function redirectToSolution() {");
-		out.println(" var url = '" + url + "'+window.location.hash.substring(1);");
+		out.println(" var url = '" + StringEscapeUtils.escapeEcmaScript(url.toString()) + "'+window.location.hash.substring(1);");
 		out.println("  window.location.href = url;");
 		out.println("  }");
 		out.println(" window.onload = redirectToSolution;");

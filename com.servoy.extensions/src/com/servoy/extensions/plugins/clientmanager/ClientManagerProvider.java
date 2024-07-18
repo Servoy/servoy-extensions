@@ -3,6 +3,7 @@ package com.servoy.extensions.plugins.clientmanager;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import org.mozilla.javascript.Function;
@@ -12,6 +13,7 @@ import com.servoy.base.scripting.annotations.ServoyClientSupport;
 import com.servoy.j2db.dataprocessing.JSDataSet;
 import com.servoy.j2db.dataprocessing.RowManager;
 import com.servoy.j2db.documentation.ServoyDocumented;
+import com.servoy.j2db.scripting.FunctionDefinition;
 import com.servoy.j2db.scripting.IReturnedTypesProvider;
 import com.servoy.j2db.scripting.IScriptable;
 import com.servoy.j2db.server.shared.IClientInformation;
@@ -65,6 +67,31 @@ public class ClientManagerProvider implements IScriptable, IReturnedTypesProvide
 		}
 	}
 
+	/**
+	 * Get a broadcast object giving it a (nick)name and on a specific channel, the callback is used for getting messages of other clients on that channel
+	 * The function gets 3 arguments (nickName, message, channelName)
+	 *
+	 * @sample
+	 * function callback(nickName, message, channelName) {
+	 *    application.output('message received from ' + nickName + ' on channel ' + channelName + ': ' + message)
+	 * }
+	 * var broadcaster = plugins.clientmanager.getBroadcaster("nickname", "mychatchannel", callback);
+	 * broadcaster.broadcastMessage("Hallo");
+	 *
+	 * @param name The nickname for this user on this channel
+	 * @param channelName The channel name where should be listened to (and send messages to)
+	 * @param callback The callback when for incomming messages
+	 * @return BroadCaster
+	 * @deprecated replaced with plugins.clientmanager.createBroadcaster(name, channelName, callback) to create a channel and
+	 * plugins.clientmanager.getOrCreateBroadcaster(name, channelName) to retrieve and send to a channel
+	 */
+	@Deprecated
+	public Broadcaster js_getBroadcaster(String name, String channelName, Function callback)
+	{
+		Broadcaster broadCaster = new Broadcaster(name, channelName, callback, plugin);
+		plugin.addLiveBroadcaster(broadCaster);
+		return broadCaster;
+	}
 
 	/**
 	 * Get a broadcast object giving it a (nick)name and on a specific channel, the callback is used for getting messages of other clients on that channel
@@ -82,12 +109,91 @@ public class ClientManagerProvider implements IScriptable, IReturnedTypesProvide
 	 * @param callback The callback when for incomming messages
 	 * @return BroadCaster
 	 */
-	public Broadcaster js_getBroadcaster(String name, String channelName, Function callback)
+	public Broadcaster js_getOrCreateBroadcaster(String name, String channelName, Function callback)
+	{
+		Broadcaster broadCaster = plugin.getBroadcaster(name, channelName);
+		if (broadCaster != null)
+		{
+			if (!broadCaster.hasCallback() || (broadCaster.hasCallback() && !broadCaster.getCallback().equals(new FunctionDefinition(callback))))
+			{
+				broadCaster.addCallback(callback);
+			}
+			return broadCaster;
+		}
+		else
+		{
+			broadCaster = new Broadcaster(name, channelName, callback, plugin);
+			plugin.addLiveBroadcaster(broadCaster);
+			return broadCaster;
+		}
+	}
+
+	/**
+	 * Get a broadcast object giving it a (nick)name and on a specific channel
+	 * var broadcaster = plugins.clientmanager.getBroadcaster("nickname", "mychatchannel");
+	 * broadcaster.broadcastMessage("Hallo");
+	 *
+	 * @param name The nickname for this user on this channel
+	 * @param channelName The channel name where should be listened to (and send messages to)
+	 * @return BroadCaster
+	 */
+	public Broadcaster js_getOrCreateBroadcaster(String name, String channelName)
+	{
+		Broadcaster broadCaster = plugin.getBroadcaster(name, channelName);
+		if (broadCaster != null)
+		{
+			return broadCaster;
+		}
+		else
+		{
+			broadCaster = new Broadcaster(name, channelName, plugin);
+			plugin.addLiveBroadcaster(broadCaster);
+			return broadCaster;
+		}
+	}
+
+	/**
+	 * Create a broadcast object giving it a (nick)name and on a specific channel, the callback is used for getting messages of other clients on that channel
+	 * The function gets 3 arguments (nickName, message, channelName)
+	 *
+	 * @sample
+	 * function callback(nickName, message, channelName) {
+	 *    application.output('message received from ' + nickName + ' on channel ' + channelName + ': ' + message)
+	 * }
+	 * var broadcaster = plugins.clientmanager.createBroadcaster("nickname", "mychatchannel", callback);
+	 * broadcaster.broadcastMessage("Hallo");
+	 *
+	 * @param name The nickname for this user on this channel
+	 * @param channelName The channel name where should be listened to (and send messages to)
+	 * @param callback The callback when for incomming messages
+	 * @return BroadCaster
+	 */
+	public Broadcaster js_createBroadcaster(String name, String channelName, Function callback)
 	{
 		Broadcaster broadCaster = new Broadcaster(name, channelName, callback, plugin);
 		plugin.addLiveBroadcaster(broadCaster);
 		return broadCaster;
 	}
+
+	/**
+	 * Get a broadcast object with a specific channelName, if no broadcast, will return null.
+	 *
+	 * @sample
+	 * var broadcaster = plugins.clientmanager.getBroadcaster("mychatchannel");
+	 * if (broadcaster) {
+	 * 	block of code to be executed...
+	 * }
+	 *
+	 * @param channelName
+	 * @return BroadCaster
+	 * @deprecated replaced with plugins.clientmanager.getOrCreateBroadcaster(name, channelName) to retrieve and send to a channel
+	 */
+	@Deprecated
+	public Broadcaster js_getBroadcaster(String channelName)
+	{
+		return plugin.getBroadcaster(null, channelName);
+	}
+
 
 	/**
 	 * Returns an array of JSClientInformation elements describing the clients connected to the server. Note this is snapshot information on connected clients, client information will not get updated.
@@ -106,7 +212,6 @@ public class ClientManagerProvider implements IScriptable, IReturnedTypesProvide
 		return js_getConnectedClients(null);
 	}
 
-	/**
 	/**
 	 * Returns an array of JSClientInformation elements describing the clients connected to the server filtered by the a client info string.
 	 * This way you can ask for a specific set of clients that have a specific information added to there client information.
@@ -355,5 +460,18 @@ public class ClientManagerProvider implements IScriptable, IReturnedTypesProvide
 		{
 			Debug.error("Exception while shutting down client '" + clientId + "'.", e); //$NON-NLS-1$ //$NON-NLS-2$
 		}
+	}
+
+	public Date js_getServerBuildDate()
+	{
+		try
+		{
+			return plugin.getClientService().getServerBuildDate();
+		}
+		catch (Exception e)
+		{
+			Debug.error("Exception while getting server build date.", e); //$NON-NLS-1$
+		}
+		return null;
 	}
 }

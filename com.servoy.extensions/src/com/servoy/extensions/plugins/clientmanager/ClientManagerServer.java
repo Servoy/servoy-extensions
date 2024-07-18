@@ -1,6 +1,7 @@
 package com.servoy.extensions.plugins.clientmanager;
 
 import java.rmi.RemoteException;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -13,6 +14,7 @@ import com.servoy.j2db.plugins.IServerAccess;
 import com.servoy.j2db.plugins.IServerPlugin;
 import com.servoy.j2db.plugins.PluginException;
 import com.servoy.j2db.server.shared.IClientInformation;
+import com.servoy.j2db.server.shared.ServerDeployDate;
 import com.servoy.j2db.util.Debug;
 
 public class ClientManagerServer implements IServerPlugin, IClientManagerService, IPostInitializeListener
@@ -203,4 +205,9 @@ public class ClientManagerServer implements IServerPlugin, IClientManagerService
 		return false;
 	}
 
+	@Override
+	public Date getServerBuildDate()
+	{
+		return ServerDeployDate.WAR_DATE;
+	}
 }

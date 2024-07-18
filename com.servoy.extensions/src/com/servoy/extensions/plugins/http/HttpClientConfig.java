@@ -34,6 +34,10 @@ public class HttpClientConfig implements IScriptable, IJavaScriptType
 	int maxIOThreadCount = -1;
 	boolean forceHttp1 = false;
 	boolean enableRedirects = true;
+	boolean hostValidation = true;
+	int maxTotalConnections = -1;
+	int maxConnectionsPerRoute = -1;
+	boolean multiPartLegacyMode = false;
 
 	public HttpClientConfig()
 	{
@@ -58,12 +62,48 @@ public class HttpClientConfig implements IScriptable, IJavaScriptType
 	}
 
 	/**
+	 * Gets/Sets maximum number of connections used by Connection Manager.
+	 *
+	 * @sample
+	 * var config = plugins.http.createNewHttpClientConfig();
+	 * config.maxTotalConnections = 5;
+	 * var client = plugins.http.createNewHttpClient(config);
+	 */
+	public int js_getMaxTotalConnections()
+	{
+		return maxTotalConnections;
+	}
+
+	public void js_setMaxTotalConnections(int maxTotalConnections)
+	{
+		this.maxTotalConnections = maxTotalConnections;
+	}
+
+	/**
+	 * Gets/Sets maximum number of connections per route used by Connection Manager.
+	 *
+	 * @sample
+	 * var config = plugins.http.createNewHttpClientConfig();
+	 * config.maxConnectionsPerRoute = 2;
+	 * var client = plugins.http.createNewHttpClient(config);
+	 */
+	public int js_getMaxConnectionsPerRoute()
+	{
+		return maxConnectionsPerRoute;
+	}
+
+	public void js_setMaxConnectionsPerRoute(int maxConnectionsPerRoute)
+	{
+		this.maxConnectionsPerRoute = maxConnectionsPerRoute;
+	}
+
+	/**
 	 * Force the use of http1, use this if there are problems connecting to a server that does use http/2 but uses old cipher suites
 	 * or if there are other problems like http/2 not setting the content length and the server still wants it.
 	 *
 	 * @sample
 	 * var config = plugins.http.createNewHttpClientConfig();
-	 * config.maxIOThreadCount = 5;
+	 * config.forceHttp1 = true;
 	 * var client = plugins.http.createNewHttpClient(config);
 	 */
 	public boolean js_getForceHttp1()
@@ -74,6 +114,24 @@ public class HttpClientConfig implements IScriptable, IJavaScriptType
 	public void js_setForceHttp1(boolean force)
 	{
 		this.forceHttp1 = force;
+	}
+
+	public void js_setHostValidation(boolean validation)
+	{
+		this.hostValidation = validation;
+	}
+
+	/**
+	 * Disable hostname certificate validation. This should be used only for testing purposes, because this is not secure!
+	 *
+	 * @sample
+	 * var config = plugins.http.createNewHttpClientConfig();
+	 * config.hostValidation = false;
+	 * var client = plugins.http.createNewHttpClient(config);
+	 */
+	public boolean js_getHostValidation()
+	{
+		return hostValidation;
 	}
 
 	/**
@@ -146,5 +204,23 @@ public class HttpClientConfig implements IScriptable, IJavaScriptType
 	public void js_setUserAgent(String user_agent)
 	{
 		this.userAgent = user_agent;
+	}
+
+	/**
+	 * Sets whether multipart request should be written in one go(not using buffering). Default value is false.
+	 *
+	 * @sample
+	 * var config = plugins.http.createNewHttpClientConfig();
+	 * config.multiPartLegacyMode = true;
+	 * var client = plugins.http.createNewHttpClient(config);
+	 */
+	public boolean js_getMultiPartLegacyMode()
+	{
+		return this.multiPartLegacyMode;
+	}
+
+	public void js_setMultiPartLegacyMode(boolean multiPartLegacyMode)
+	{
+		this.multiPartLegacyMode = multiPartLegacyMode;
 	}
 }

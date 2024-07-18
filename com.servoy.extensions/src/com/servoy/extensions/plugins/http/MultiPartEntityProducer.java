@@ -87,9 +87,9 @@ public class MultiPartEntityProducer implements AsyncEntityProducer
 		return buffer.toString();
 	}
 
-	public void addProducer(AsyncEntityProducer producer, String name, String fileName)
+	public void addProducer(AsyncEntityProducer producer, String name, String fileName, boolean writeContentType)
 	{
-		producers.add(new InnerMultiPartAsyncProducer(producer, name, fileName));
+		producers.add(new InnerMultiPartAsyncProducer(producer, name, fileName, writeContentType));
 	}
 
 	@Override
@@ -101,7 +101,7 @@ public class MultiPartEntityProducer implements AsyncEntityProducer
 	@Override
 	public String getContentType()
 	{
-		return ContentType.MULTIPART_FORM_DATA.withParameters(new BasicNameValuePair("boundary", this.boundary)).toString();
+		return ContentType.create("multipart/form-data", new BasicNameValuePair("boundary", this.boundary)).toString();
 	}
 
 	@Override
@@ -155,7 +155,8 @@ public class MultiPartEntityProducer implements AsyncEntityProducer
 				{
 					if (!headerIsWritten())
 					{
-						MultiPartEntityProducer.this.writePartHeader(channel, getCurrentProducer(), getCurrentProducerName(), getCurrentProducerFileName());
+						MultiPartEntityProducer.this.writePartHeader(channel, getCurrentProducer(), getCurrentProducerName(), getCurrentProducerFileName(),
+							getCurrentProducerWriteContentType());
 						markHeaderWritten();
 					}
 					return channel.write(src);
@@ -247,6 +248,15 @@ public class MultiPartEntityProducer implements AsyncEntityProducer
 		return null;
 	}
 
+	private boolean getCurrentProducerWriteContentType()
+	{
+		if (currentIndex < this.producers.size())
+		{
+			return this.producers.get(currentIndex).writeContentType;
+		}
+		return false;
+	}
+
 	void writeBytes(
 		final ByteArrayBuffer b, DataStreamChannel channel) throws IOException
 	{
@@ -264,7 +274,8 @@ public class MultiPartEntityProducer implements AsyncEntityProducer
 	{
 	}
 
-	private void writePartHeader(DataStreamChannel channel, AsyncEntityProducer producer, String name, String fileName) throws IOException
+	private void writePartHeader(DataStreamChannel channel, AsyncEntityProducer producer, String name, String fileName, boolean writeContentType)
+		throws IOException
 	{
 		writeBytes(TWO_HYPHENS, channel);
 		writeBytes(boundaryEncoded, channel);
@@ -286,14 +297,17 @@ public class MultiPartEntityProducer implements AsyncEntityProducer
 		}
 		writeBytes(encode(StandardCharsets.ISO_8859_1, buf.toString()), channel);
 		writeBytes(CR_LF, channel);
-		if (producer.getContentType() != null)
+		// make it like HttpMultipartMode.BROWSER_COMPATIBLE, only send content-type for files
+		if (writeContentType)
 		{
-			writeBytes(encode(StandardCharsets.ISO_8859_1, HttpHeaders.CONTENT_TYPE), channel);
-			writeBytes(FIELD_SEP, channel);
-			writeBytes(encode(StandardCharsets.ISO_8859_1, producer.getContentType()), channel);
-			writeBytes(CR_LF, channel);
+			if (producer.getContentType() != null)
+			{
+				writeBytes(encode(StandardCharsets.ISO_8859_1, HttpHeaders.CONTENT_TYPE), channel);
+				writeBytes(FIELD_SEP, channel);
+				writeBytes(encode(StandardCharsets.ISO_8859_1, producer.getContentType()), channel);
+				writeBytes(CR_LF, channel);
+			}
 		}
-
 		writeBytes(CR_LF, channel);
 	}
 
@@ -346,7 +360,7 @@ public class MultiPartEntityProducer implements AsyncEntityProducer
 							{
 
 							}
-						}, producer.producer, producer.name, producer.fileName);
+						}, producer.producer, producer.name, producer.fileName, producer.writeContentType);
 						totalContentLength += headerLength[0];
 
 					}
@@ -369,13 +383,15 @@ class InnerMultiPartAsyncProducer
 {
 	AsyncEntityProducer producer;
 	boolean initialized = false;
+	boolean writeContentType = false;
 	String name;
 	String fileName;
 
-	public InnerMultiPartAsyncProducer(AsyncEntityProducer producer, String name, String fileName)
+	public InnerMultiPartAsyncProducer(AsyncEntityProducer producer, String name, String fileName, boolean writeContentType)
 	{
 		this.producer = producer;
 		this.name = name;
 		this.fileName = fileName;
+		this.writeContentType = writeContentType;
 	}
 }
