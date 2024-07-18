@@ -186,16 +186,16 @@ public class HttpClient implements IScriptable, IJavaScriptType
 	private SSLContext createSSLContextWithCert(HttpClientConfig config) throws Exception
 	{
 		File pKeyFile = new File(config.certPath);
-		KeyStore keyStore = KeyStore.getInstance("PKCS12"); //TODO add to config?
+		KeyStore keyStore = KeyStore.getInstance("PKCS12");
 		try (InputStream keyInput = new FileInputStream(pKeyFile))
 		{
 			keyStore.load(keyInput, config.certPassword != null ? config.certPassword.toCharArray() : null);
 		}
 
 		KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
-		keyManagerFactory.init(keyStore, config.certPassword.toCharArray());
+		keyManagerFactory.init(keyStore, config.certPassword != null ? config.certPassword.toCharArray() : null);
 
-		KeyStore trustStore = KeyStore.getInstance("JKS"); //TODO add to config?
+		KeyStore trustStore = KeyStore.getInstance("JKS");
 		try (InputStream trustInput = new FileInputStream(config.trustStorePath))
 		{
 			trustStore.load(trustInput, config.trustStorePassword.toCharArray());
