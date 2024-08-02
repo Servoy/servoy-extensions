@@ -409,16 +409,6 @@
                                         <fileset
                                             file="${project.basedir}/resources/serialize/serialize.jar.jnlp" />
                                     </copy>
-                                    <makejar srcdir="spellcheck" />
-                                    <copy overwrite="true"
-                                        todir="${project.build.directory}/plugins_beans/plugins/spellcheck">
-                                        <fileset file="${project.basedir}/lib/RapidSpell*.jar" />
-                                    </copy>
-                                    <copy overwrite="true"
-                                        todir="${project.build.directory}/plugins_beans/plugins/spellcheck">
-                                        <fileset
-                                            file="${project.basedir}/resources/spellcheck/*.dict" />
-                                    </copy>
                                     <makejar srcdir="tabxport" />
                                     <makejar srcdir="udp" />
                                     <!-- <makejar srcdir="window" /> -->
