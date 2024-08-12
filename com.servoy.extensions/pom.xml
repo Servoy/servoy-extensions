@@ -2666,7 +2666,7 @@
             <artifactId>SparseBitSet</artifactId>
             <version>${sparsebitset.version}</version>
         </dependency>
-	<dependency>
+	   <dependency>
         	<groupId>org.bouncycastle</groupId>
                 <artifactId>bcprov-jdk18on</artifactId>
                 <version>${bouncy.version}</version>
@@ -2675,6 +2675,11 @@
                 <groupId>org.bouncycastle</groupId>
                 <artifactId>bcmail-jdk18on</artifactId>
                 <version>${bouncy.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-text</artifactId>
+            <version>1.12.0</version>
         </dependency>
         <dependency>
     		<groupId>org.jbpm</groupId>

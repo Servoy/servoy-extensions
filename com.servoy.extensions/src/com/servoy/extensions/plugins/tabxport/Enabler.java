@@ -37,9 +37,9 @@ public class Enabler implements IReturnedTypesProvider, IScriptable
 	private JMenuItem exp;
 	private IApplication application;
 
-	Enabler()
+	public Enabler()
 	{
-		//only for use in eclipse
+		// only used in eclipse and when docs want to look at IReturnedTypesProvider.getAllReturnedTypes()
 	}
 
 	Enabler(JMenuItem imp, JMenuItem exp, IApplication application)

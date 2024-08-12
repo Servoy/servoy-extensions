@@ -114,13 +114,13 @@ public class HeadlessClientProvider implements IScriptable, IReturnedTypesProvid
 	}
 
 	/**
-	 * Creates a headless client on the server that will open the given solution.
+	 * Creates a headless client on the server that will open the given solution.<br/>
 	 * The clientId of this client can be stored in the database to be shared between clients so that that specific client can be used
-	 * over multiple clients later on, or picked up later on by this client. (Even after restart of this client)
+	 * over multiple clients later on, or picked up later on by this client. (Even after restart of this client)<br/><br/>
 	 *
 	 * NOTE: in the developer this will only load one solution in debug mode when it is the current active solution or a module of the active solution.
-	 * So calling createClient with the same or another solution/module will replace the existig debug client.
-	 * You can load any solution (and have multily  JSClient instances) from the workspace when you pass "nodebug" as last argument in the arguments list (it should still use the same resources project).
+	 * So calling createClient with the same or another solution/module will replace the existing debug client.
+	 * You can load any solution (and have multiple JSClient instances) from the workspace when you pass "nodebug" as last argument in the arguments list (it should still use the same resources project).
 	 * But then you won't be able to debug it, breakpoints won't hit.
 	 *
 	 * @sample

@@ -48,6 +48,11 @@ public class JWTProvider implements IScriptable, IReturnedTypesProvider
 	private IJWTService jwtService;
 	public static final Logger log = LoggerFactory.getLogger("plugin.jwt");
 
+	public JWTProvider()
+	{
+		plugin = null; // this is just for temporary instantiations where docs need to call IReturnedTypesProvider.getAllReturnedTypes()
+	}
+
 	public JWTProvider(JWTPlugin jwtPlugin)
 	{
 		this.plugin = jwtPlugin;

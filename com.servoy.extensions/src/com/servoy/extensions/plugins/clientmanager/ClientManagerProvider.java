@@ -194,7 +194,6 @@ public class ClientManagerProvider implements IScriptable, IReturnedTypesProvide
 		return plugin.getBroadcaster(null, channelName);
 	}
 
-
 	/**
 	 * Returns an array of JSClientInformation elements describing the clients connected to the server. Note this is snapshot information on connected clients, client information will not get updated.
 	 *

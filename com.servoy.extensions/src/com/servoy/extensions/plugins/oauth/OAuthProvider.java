@@ -42,6 +42,11 @@ public class OAuthProvider implements IScriptable, IReturnedTypesProvider
 	private static final String SOLUTION_PATH = "solution/";
 	private final OAuthPlugin plugin;
 
+	public OAuthProvider()
+	{
+		this.plugin = null; // this is just for temporary instantiations where docs need to call IReturnedTypesProvider.getAllReturnedTypes()
+	}
+
 	public OAuthProvider(OAuthPlugin oAuthPlugin)
 	{
 		this.plugin = oAuthPlugin;
