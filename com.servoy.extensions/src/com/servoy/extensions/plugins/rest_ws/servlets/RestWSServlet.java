@@ -370,12 +370,13 @@ public class RestWSServlet extends HttpServlet
 	@Override
 	protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
 	{
+		plugin.log.error("DELETE called CP1");
 		Pair<IHeadlessClient, String> client = null;
 		boolean reloadSolution = plugin.shouldReloadSolutionAfterRequest();
 		try
 		{
 
-			plugin.log.error("DELETE called");
+			plugin.log.error("DELETE called CP2");
 
 			client = getClient(request);
 
