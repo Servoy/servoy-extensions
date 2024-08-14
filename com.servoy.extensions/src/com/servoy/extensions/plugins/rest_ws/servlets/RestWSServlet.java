@@ -370,44 +370,26 @@ public class RestWSServlet extends HttpServlet
 	@Override
 	protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
 	{
-		plugin.log.error("DELETE called CP1");
 		Pair<IHeadlessClient, String> client = null;
 		boolean reloadSolution = plugin.shouldReloadSolutionAfterRequest();
 		try
 		{
-
-			plugin.log.error("DELETE called CP2");
-
 			client = getClient(request);
 
 			Object result = wsService(WS_DELETE, null, emptyList(), request, response, client.getLeft());
 
 			if (Boolean.FALSE.equals(result))
 			{
-				plugin.log.error("DELETE called - result is false");
 				sendError(response, HttpServletResponse.SC_NOT_FOUND);
 			}
 			else
 			{
-				plugin.log.error("DELETE called - result is true");
-				plugin.log.error("Response: " + response.toString());
 				HTTPUtils.setNoCacheHeaders(response);
 				if (!Boolean.TRUE.equals(result))
 				{
 					sendResult(request, response, result, CONTENT_DEFAULT);
 				}
 			}
-
-//			if (result == null || Boolean.FALSE.equals(result))
-//			{
-//				sendError(response, HttpServletResponse.SC_NOT_FOUND);
-//				return;
-//			}
-//			HTTPUtils.setNoCacheHeaders(response);
-//			if (!Boolean.TRUE.equals(result))
-//			{
-//				sendResult(request, response, result, CONTENT_DEFAULT);
-//			}
 		}
 		catch (ExecFailedException e)
 		{
