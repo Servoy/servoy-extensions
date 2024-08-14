@@ -375,19 +375,21 @@ public class RestWSServlet extends HttpServlet
 		try
 		{
 
-			plugin.log.trace("DELETE called");
+			plugin.log.error("DELETE called");
 
 			client = getClient(request);
 
 			Object result = wsService(WS_DELETE, null, emptyList(), request, response, client.getLeft());
 
-			if (Boolean.FALSE.equals(wsService(WS_DELETE, null, emptyList(), request, response, client.getLeft())))
+			if (Boolean.FALSE.equals(result))
 			{
+				plugin.log.error("DELETE called - result is false");
 				sendError(response, HttpServletResponse.SC_NOT_FOUND);
 			}
 			else
 			{
-				plugin.log.trace("Response: " + response.toString());
+				plugin.log.error("DELETE called - result is true");
+				plugin.log.error("Response: " + response.toString());
 				HTTPUtils.setNoCacheHeaders(response);
 				if (!Boolean.TRUE.equals(result))
 				{
