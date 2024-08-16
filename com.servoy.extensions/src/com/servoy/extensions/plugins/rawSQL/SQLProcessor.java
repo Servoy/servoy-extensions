@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import com.servoy.j2db.dataprocessing.IDataSet;
+import com.servoy.j2db.dataprocessing.ISQLActionTypes;
 import com.servoy.j2db.persistence.RepositoryException;
 import com.servoy.j2db.plugins.IServerAccess;
 import com.servoy.j2db.plugins.IServerPlugin;
@@ -216,6 +217,11 @@ public class SQLProcessor implements ISQLService, IServerPlugin
 
 		if (Utils.getAsBoolean(application.getSettings().getProperty("servoy.rawSQL.allowClientCacheFlushes", "true"))) //$NON-NLS-1$ //$NON-NLS-2$
 		{
+			if (pks == null && action == ISQLActionTypes.NO_ACTION)
+			{
+				Debug.log("Full flush on all clients is requested (server:" + server_name + ", table:" + tableName +
+					"), a server plugin like RawSQL most likly requested this. (severe performance hit for the server)");
+			}
 			return ApplicationServerRegistry.get().getDataServer().notifyDataChange(client_id, notifySelf, server_name, tableName, pks, action,
 				transaction_id);
 		}
