@@ -201,11 +201,14 @@ public class DataNotifyBroadCaster implements IServerPlugin
 						@Override
 						public void handleRecoveryStarted(Recoverable recoverable)
 						{
+							Debug.log("RabbitMQ connection is in recovery mode," + exchangeName + " " + routingKey + " for the datanotify listener");
 						}
 
 						@Override
 						public void handleRecovery(Recoverable recoverable)
 						{
+							Debug.log("RabbitMQ connection is in recovery mode," + exchangeName + " " + routingKey +
+								" for the datanotify listener, sending a flush all for all datasources");
 							// when a connection is recovered, we don't know what we missed so the only thing to do is a full flush
 							// of all the touched datasources.
 							String[] datasources = dataNotifyService.getUsedDataSources();
