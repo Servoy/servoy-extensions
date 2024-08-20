@@ -62,11 +62,13 @@ public class DataNotifyListener implements IDataNotifyListener
 				@Override
 				public void handleRecoveryStarted(Recoverable recoverable)
 				{
+					Debug.log("RabbitMQ connection is in recovery mode," + exchangeName + " " + routingKey + " for the datanotify sender");
 				}
 
 				@Override
 				public void handleRecovery(Recoverable recoverable)
 				{
+					Debug.log("RabbitMQ connection is recovered," + exchangeName + " " + routingKey + " for the datanotify sender");
 					sendFailedList();
 				}
 			});
