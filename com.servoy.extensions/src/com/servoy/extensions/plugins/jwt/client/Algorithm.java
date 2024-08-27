@@ -196,7 +196,8 @@ public class Algorithm implements IScriptable, IJavaScriptType
 				}
 				if (pwd == null)
 				{
-					JWTProvider.log.error("Cannot create a HMAC algorithm, the password was not specified.");
+					JWTProvider.log.error(
+						"Cannot create a HMAC algorithm, please make sure the password(xxx) is called for the builder or that the admin page has the 'jwt.secret.password' set.");
 					return false;
 				}
 			}
