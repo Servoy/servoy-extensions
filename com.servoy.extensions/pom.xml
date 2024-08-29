@@ -307,7 +307,7 @@
                                             <signjar keystore="${jarsigner.keystore}"
                                                 jar="${project.build.directory}/plugins_beans/@{type}/@{jarname}.jar"
                                                 alias="ServoyClient" storepass="${jarsigner.storepass}"
-                                                tsaurl="http://sha256timestamp.ws.symantec.com/sha256/timestamp"
+                                                tsaurl="http://timestamp.sectigo.com"
                                                 sigalg="SHA256withRSA" digestalg="SHA-256" />
                                         </retry>
                                         <delete quiet="true" dir="${project.build.directory}/tmp_@{type}_@{jarname}" />
