@@ -37,6 +37,7 @@
         <bouncy.version>1.78.1</bouncy.version>
         <xmpcore.version>6.1.11</xmpcore.version>
         <rhino.version>1.7.15.s1</rhino.version>
+        <tsaUrl>http://timestamp.digicert.com</tsaUrl>
         <jbpm.version>7.74.1.Final</jbpm.version>
         <!--  This has to be in sync with jasperreports version  -->
         <poi.version>5.2.5</poi.version>
@@ -307,7 +308,7 @@
                                             <signjar keystore="${jarsigner.keystore}"
                                                 jar="${project.build.directory}/plugins_beans/@{type}/@{jarname}.jar"
                                                 alias="ServoyClient" storepass="${jarsigner.storepass}"
-                                                tsaurl="http://sha256timestamp.ws.symantec.com/sha256/timestamp"
+                                                tsaurl="${tsaUrl}"
                                                 sigalg="SHA256withRSA" digestalg="SHA-256" />
                                         </retry>
                                         <delete quiet="true" dir="${project.build.directory}/tmp_@{type}_@{jarname}" />
@@ -2328,92 +2329,92 @@
                                     <signjar keystore="${jarsigner.keystore}"
                                         jar="${project.build.directory}/plugins_beans/plugins/pdf_output/fontbox.jar"
                                         alias="ServoyClient" storepass="${jarsigner.storepass}"
-                                        tsaurl="http://sha256timestamp.ws.symantec.com/sha256/timestamp"
+                                        tsaurl="${tsaUrl}"
                                         sigalg="SHA256withRSA" digestalg="SHA-256" />
                                     <signjar keystore="${jarsigner.keystore}"
                                         jar="${project.build.directory}/plugins_beans/plugins/pdf_output/pdfbox.jar"
                                         alias="ServoyClient" storepass="${jarsigner.storepass}"
-                                        tsaurl="http://sha256timestamp.ws.symantec.com/sha256/timestamp"
+                                        tsaurl="${tsaUrl}"
                                         sigalg="SHA256withRSA" digestalg="SHA-256" />
                                     <signjar keystore="${jarsigner.keystore}"
                                         jar="${project.build.directory}/plugins_beans/plugins/pdf_output/pdfbox-io.jar"
                                         alias="ServoyClient" storepass="${jarsigner.storepass}"
-                                        tsaurl="http://sha256timestamp.ws.symantec.com/sha256/timestamp"
+                                        tsaurl="${tsaUrl}"
                                         sigalg="SHA256withRSA" digestalg="SHA-256" />
                                     <signjar keystore="${jarsigner.keystore}"
                                         jar="${project.build.directory}/plugins_beans/plugins/pdf_output/bcprov.jar"
                                         alias="ServoyClient" storepass="${jarsigner.storepass}"
-                                        tsaurl="http://sha256timestamp.ws.symantec.com/sha256/timestamp"
+                                        tsaurl="${tsaUrl}"
                                         sigalg="SHA256withRSA" digestalg="SHA-256" />
                                     <signjar keystore="${jarsigner.keystore}"
                                         jar="${project.build.directory}/plugins_beans/plugins/pdf_output/bcmail.jar"
                                         alias="ServoyClient" storepass="${jarsigner.storepass}"
-                                        tsaurl="http://sha256timestamp.ws.symantec.com/sha256/timestamp"
+                                        tsaurl="${tsaUrl}"
                                         sigalg="SHA256withRSA" digestalg="SHA-256" />
                                     <signjar keystore="${jarsigner.keystore}"
                                         jar="${project.build.directory}/plugins_beans/plugins/jwt/jwks-rsa.jar"
                                         alias="ServoyClient" storepass="${jarsigner.storepass}"
-                                        tsaurl="http://sha256timestamp.ws.symantec.com/sha256/timestamp"
+                                        tsaurl="${tsaUrl}"
                                         sigalg="SHA256withRSA" digestalg="SHA-256" />
                                     <!--signjar keystore="${jarsigner.keystore}"
                                         jar="${project.build.directory}/plugins_beans/plugins/jackson/jackson-jaxb-annotations.jar"
                                         alias="ServoyClient" storepass="${jarsigner.storepass}"
-                                        tsaurl="http://sha256timestamp.ws.symantec.com/sha256/timestamp"
+                                        tsaurl="${tsaUrl}"
                                         sigalg="SHA256withRSA" digestalg="SHA-256" />
                                     <signjar keystore="${jarsigner.keystore}"
                                         jar="${project.build.directory}/plugins_beans/plugins/jackson/jackson-datatype-jsr310.jar"
                                         alias="ServoyClient" storepass="${jarsigner.storepass}"
-                                        tsaurl="http://sha256timestamp.ws.symantec.com/sha256/timestamp"
+                                        tsaurl="${tsaUrl}"
                                         sigalg="SHA256withRSA" digestalg="SHA-256" />
                                     <signjar keystore="${jarsigner.keystore}"
                                         jar="${project.build.directory}/plugins_beans/plugins/jackson/jaxb-api.jar"
                                         alias="ServoyClient" storepass="${jarsigner.storepass}"
-                                        tsaurl="http://sha256timestamp.ws.symantec.com/sha256/timestamp"
+                                        tsaurl="${tsaUrl}"
                                         sigalg="SHA256withRSA" digestalg="SHA-256" /-->
                                     <signjar keystore="${jarsigner.keystore}"
                                         jar="${project.build.directory}/plugins_beans/plugins/http/httpclient5.jar"
                                         alias="ServoyClient" storepass="${jarsigner.storepass}"
-                                        tsaurl="http://sha256timestamp.ws.symantec.com/sha256/timestamp"
+                                        tsaurl="${tsaUrl}"
                                         sigalg="SHA256withRSA" digestalg="SHA-256" />
                                     <signjar keystore="${jarsigner.keystore}"
                                         jar="${project.build.directory}/plugins_beans/plugins/http/httpcore5.jar"
                                         alias="ServoyClient" storepass="${jarsigner.storepass}"
-                                        tsaurl="http://sha256timestamp.ws.symantec.com/sha256/timestamp"
+                                        tsaurl="${tsaUrl}"
                                         sigalg="SHA256withRSA" digestalg="SHA-256" />
                                     <signjar keystore="${jarsigner.keystore}"
                                         jar="${project.build.directory}/plugins_beans/plugins/http/httpcore5-h2.jar"
                                         alias="ServoyClient" storepass="${jarsigner.storepass}"
-                                        tsaurl="http://sha256timestamp.ws.symantec.com/sha256/timestamp"
+                                        tsaurl="${tsaUrl}"
                                         sigalg="SHA256withRSA" digestalg="SHA-256" />
                                     <signjar keystore="${jarsigner.keystore}"
                                         jar="${project.build.directory}/plugins_beans/plugins/images/metadataextractor.jar"
                                         alias="ServoyClient" storepass="${jarsigner.storepass}"
-                                        tsaurl="http://sha256timestamp.ws.symantec.com/sha256/timestamp"
+                                        tsaurl="${tsaUrl}"
                                         sigalg="SHA256withRSA" digestalg="SHA-256" />
                                     <signjar keystore="${jarsigner.keystore}"
                                         jar="${project.build.directory}/plugins_beans/plugins/images/xmpcore.jar"
                                         alias="ServoyClient" storepass="${jarsigner.storepass}"
-                                        tsaurl="http://sha256timestamp.ws.symantec.com/sha256/timestamp"
+                                        tsaurl="${tsaUrl}"
                                         sigalg="SHA256withRSA" digestalg="SHA-256" />
                                     <signjar keystore="${jarsigner.keystore}"
                                         jar="${project.build.directory}/plugins_beans/plugins/jakarta-poi/jakarta-poi.jar"
                                         alias="ServoyClient" storepass="${jarsigner.storepass}"
-                                        tsaurl="http://sha256timestamp.ws.symantec.com/sha256/timestamp"
+                                        tsaurl="${tsaUrl}"
                                         sigalg="SHA256withRSA" digestalg="SHA-256" />
                                     <signjar keystore="${jarsigner.keystore}"
                                         jar="${project.build.directory}/plugins_beans/plugins/jakarta-poi/poi-ooxml.jar"
                                         alias="ServoyClient" storepass="${jarsigner.storepass}"
-                                        tsaurl="http://sha256timestamp.ws.symantec.com/sha256/timestamp"
+                                        tsaurl="${tsaUrl}"
                                         sigalg="SHA256withRSA" digestalg="SHA-256" />
                                     <signjar keystore="${jarsigner.keystore}"
                                         jar="${project.build.directory}/plugins_beans/plugins/jakarta-poi/commons-math3.jar"
                                         alias="ServoyClient" storepass="${jarsigner.storepass}"
-                                        tsaurl="http://sha256timestamp.ws.symantec.com/sha256/timestamp"
+                                        tsaurl="${tsaUrl}"
                                         sigalg="SHA256withRSA" digestalg="SHA-256" />
                                     <signjar keystore="${jarsigner.keystore}"
                                         jar="${project.build.directory}/plugins_beans/plugins/jakarta-poi/SparseBitSet.jar"
                                         alias="ServoyClient" storepass="${jarsigner.storepass}"
-                                        tsaurl="http://sha256timestamp.ws.symantec.com/sha256/timestamp"
+                                        tsaurl="${tsaUrl}"
                                         sigalg="SHA256withRSA" digestalg="SHA-256" />     
                                 </parallel>
                             </target>
