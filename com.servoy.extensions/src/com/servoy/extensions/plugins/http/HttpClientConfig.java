@@ -275,29 +275,6 @@ public class HttpClientConfig implements IScriptable, IJavaScriptType
 	}
 
 	/**
-	 * Gets/Sets the path to the java truststore where to import the certificate.
-	 * The following sample sets up an HttpClient with custom SSL/TLS configuration using a PKCS12 keystore for client certificates and
-	 * a JKS truststore for trusted certificate authorities.
-	 *
-	 * @sample
-	 * var config = plugins.http.createNewHttpClientConfig();
-	 * config.certPath = "";
-	 * config.certPassword = "";
-	 * config.trustStorePath = "";
-	 * config.trustStorePassword = "";
-	 * var client = plugins.http.createNewHttpClient(config);
-	 */
-	public String js_getTrustStorePath()
-	{
-		return trustStorePath;
-	}
-
-	public void js_setTrustStorePath(String trustStorePath)
-	{
-		this.trustStorePath = trustStorePath;
-	}
-
-	/**
 	 * Gets/Sets the password to the java truststore where to import the certificate.
 	 * The following sample sets up an HttpClient with custom SSL/TLS configuration using a PKCS12 keystore for client certificates and
 	 * a JKS truststore for trusted certificate authorities.
