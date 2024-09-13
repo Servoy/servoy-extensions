@@ -111,7 +111,7 @@ public class HttpClient implements IScriptable, IJavaScriptType
 			// Determine SSLContext
 			if (config != null)
 			{
-				if (config.certPath != null && config.trustStorePath != null && config.trustStorePassword != null)
+				if (config.certPath != null)
 				{
 					sslContext = createSSLContextWithCert(config);
 				}
@@ -196,9 +196,12 @@ public class HttpClient implements IScriptable, IJavaScriptType
 		keyManagerFactory.init(keyStore, config.certPassword != null ? config.certPassword.toCharArray() : null);
 
 		KeyStore trustStore = KeyStore.getInstance("JKS");
-		try (InputStream trustInput = new FileInputStream(config.trustStorePath))
+		String relativeCacertsPath = "/lib/security/cacerts/".replace("/", File.separator);
+		String cacerts = System.getProperty("java.home") + relativeCacertsPath;
+		try (InputStream trustInput = new FileInputStream(cacerts))
 		{
-			trustStore.load(trustInput, config.trustStorePassword.toCharArray());
+			String password = config.trustStorePassword != null ? config.trustStorePassword : "changeit";
+			trustStore.load(trustInput, password.toCharArray());
 		}
 
 		TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
