@@ -237,7 +237,6 @@ public class HttpClientConfig implements IScriptable, IJavaScriptType
 	 * var config = plugins.http.createNewHttpClientConfig();
 	 * config.certPath = "";
 	 * config.certPassword = "";
-	 * config.trustStorePath = "";
 	 * config.trustStorePassword = "";
 	 * var client = plugins.http.createNewHttpClient(config);
 	 */
@@ -260,7 +259,6 @@ public class HttpClientConfig implements IScriptable, IJavaScriptType
 	 * var config = plugins.http.createNewHttpClientConfig();
 	 * config.certPath = "";
 	 * config.certPassword = "";
-	 * config.trustStorePath = "";
 	 * config.trustStorePassword = "";
 	 * var client = plugins.http.createNewHttpClient(config);
 	 */
@@ -283,7 +281,6 @@ public class HttpClientConfig implements IScriptable, IJavaScriptType
 	 * var config = plugins.http.createNewHttpClientConfig();
 	 * config.certPath = "";
 	 * config.certPassword = "";
-	 * config.trustStorePath = "";
 	 * config.trustStorePassword = "";
 	 * var client = plugins.http.createNewHttpClient(config);
 	 */
