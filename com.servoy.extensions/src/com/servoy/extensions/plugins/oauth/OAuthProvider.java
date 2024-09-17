@@ -32,6 +32,7 @@ import com.servoy.j2db.scripting.IReturnedTypesProvider;
 import com.servoy.j2db.scripting.IScriptable;
 
 /**
+ * OAuth plugin.
  * @author emera
  */
 @ServoyClientSupport(ng = true, wc = false, sc = false)

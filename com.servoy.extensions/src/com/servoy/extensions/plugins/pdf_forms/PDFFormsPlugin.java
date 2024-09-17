@@ -28,6 +28,7 @@ import com.servoy.j2db.plugins.PluginException;
 import com.servoy.j2db.preference.PreferencePanel;
 
 /**
+ * PDF forms plugin
  * @author jblok
  */
 @ServoyDocumented
@@ -46,8 +47,8 @@ public class PDFFormsPlugin implements IServerPlugin
 	public Map getRequiredPropertyNames()
 	{
 		HashMap req = new HashMap();
-		req.put(PDFServlet.SERVER_NAME_PROPERTY, "The name of the server to locate the required pdf_form_values,pdf_templates,pdf_actions SQL tabels"); //$NON-NLS-1$ 
-		req.put(PDFServlet.TEMPLATE_LOCATION_PROPERTY, "The url to retrieve the pdf templates(using file name from database)"); //$NON-NLS-1$ 
+		req.put(PDFServlet.SERVER_NAME_PROPERTY, "The name of the server to locate the required pdf_form_values,pdf_templates,pdf_actions SQL tabels"); //$NON-NLS-1$
+		req.put(PDFServlet.TEMPLATE_LOCATION_PROPERTY, "The url to retrieve the pdf templates(using file name from database)"); //$NON-NLS-1$
 		return req;
 	}
 

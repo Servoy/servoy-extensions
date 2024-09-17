@@ -23,6 +23,10 @@ import com.servoy.j2db.documentation.ServoyDocumented;
 import com.servoy.j2db.scripting.IScriptable;
 import com.servoy.j2db.util.Debug;
 
+/**
+ * UDP packet.
+ *
+ */
 @ServoyDocumented(scriptingName = "JSPacket")
 public class JSPacket implements IScriptable
 {
@@ -123,7 +127,7 @@ public class JSPacket implements IScriptable
 
 	/**
 	 * Returns the length of the packet in bytes.
-	 * 
+	 *
 	 * @sampleas js_getHost()
 	 */
 	public int js_getLength()
@@ -133,7 +137,7 @@ public class JSPacket implements IScriptable
 
 	/**
 	 * Returns the port where the packet originated from.
-	 * 
+	 *
 	 * @sampleas js_getHost()
 	 */
 	public int js_getPort()
@@ -143,7 +147,7 @@ public class JSPacket implements IScriptable
 
 	/**
 	 * Reads an 8 bits byte value from the packet, starting from the current index. Advances the index with one position.
-	 * 
+	 *
 	 * @sampleas js_getIndex()
 	 */
 	public int js_readByte()
@@ -153,7 +157,7 @@ public class JSPacket implements IScriptable
 
 	/**
 	 * Reads a 32 bits int value from the packet, starting from the current index. Advances the index with 4 positions.
-	 * 
+	 *
 	 * @sampleas js_getIndex()
 	 */
 	public int js_readInt()
@@ -163,7 +167,7 @@ public class JSPacket implements IScriptable
 
 	/**
 	 * Reads a 32 bits short value from the packet, starting from the current index. Advances the index with 2 positions.
-	 * 
+	 *
 	 * @sampleas js_getIndex()
 	 */
 	public int js_readShort()
@@ -174,7 +178,7 @@ public class JSPacket implements IScriptable
 	/**
 	 * @clonedesc js_readUTF()
 	 * @sampleas js_readUTF()
-	 * 
+	 *
 	 * @param length
 	 */
 	public String js_readUTF(int length)
@@ -184,7 +188,7 @@ public class JSPacket implements IScriptable
 
 	/**
 	 * Reads a UTF-8 string from the packet, starting from the current index. If an argument is specified, then it represents the length (in UTF-8 encoded bytes, not characters) of the string to read. If no argument is specified, then first a 32 bits (4 byte) int is read from the packet and that will be the byte length of the string. Advances the index with a number of positions that depends on the length of the read string.
-	 * 
+	 *
 	 * @sampleas js_getHost()
 	 */
 	public String js_readUTF()
@@ -215,7 +219,7 @@ public class JSPacket implements IScriptable
 	 * 	plugins.udp.stopSocket();
 	 * }
 	 *
-	 * @param number 
+	 * @param number
 	 */
 	public void js_writeByte(int number)
 	{
@@ -224,9 +228,9 @@ public class JSPacket implements IScriptable
 
 	/**
 	 * Writes an array of bytes into the packet, at the current index. The index is advanced with a number of positions equal to the length of the written array.
-	 * 
+	 *
 	 * @sampleas js_writeByte(int)
-	 * 
+	 *
 	 * @param bytes
 	 */
 	public void js_writeBytes(byte[] bytes)
@@ -236,9 +240,9 @@ public class JSPacket implements IScriptable
 
 	/**
 	 * Writes a 32 bits int into the packet, at the current index. The index is advances with 4 positions.
-	 * 
+	 *
 	 * @sampleas js_writeByte(int)
-	 * 
+	 *
 	 * @param number
 	 */
 	public void js_writeInt(int number)
@@ -248,9 +252,9 @@ public class JSPacket implements IScriptable
 
 	/**
 	 * Writes a 16 bits short value into the packet, at the current index. The index is advances with 2 positions.
-	 * 
+	 *
 	 * @sampleas js_writeByte(int)
-	 * 
+	 *
 	 * @param number
 	 */
 	public void js_writeShort(int number)
@@ -262,7 +266,7 @@ public class JSPacket implements IScriptable
 	 * Writes an UTF-8 encoded string into the packet, at the current index. First the length of the string is written on 4 bytes, then the string is written. The index is advanced with a number of positions equal to the length of the string plus 4.
 	 *
 	 * @sampleas js_writeByte(int)
-	 * 
+	 *
 	 * @param string
 	 */
 	public int js_writeUTF(String string)

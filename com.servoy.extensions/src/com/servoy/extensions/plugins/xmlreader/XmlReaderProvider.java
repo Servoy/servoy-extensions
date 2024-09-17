@@ -36,6 +36,7 @@ import com.servoy.j2db.scripting.IScriptable;
 import com.servoy.j2db.util.Debug;
 
 /**
+ * XML parsing object.
  * @author jcompagner
  */
 @SuppressWarnings("nls")
@@ -60,7 +61,7 @@ public class XmlReaderProvider implements IScriptable, IReturnedTypesProvider
 	 * var xmlNodes = plugins.XmlReader.readXmlDocumentFromFile(xmlFile);
 	 * var childNodes = xmlNodes[0].getChildNodes();
 	 *
-	 * @param argument 
+	 * @param argument
 	 */
 	public XmlNode[] js_readXmlDocumentFromFile(Object argument)
 	{
@@ -81,7 +82,7 @@ public class XmlReaderProvider implements IScriptable, IReturnedTypesProvider
 	 * '<author>Cheryl Owens and others</author><nrPages>492</nrPages></book></books>';
 	 * var xmlNodes = plugins.XmlReader.readXmlDocumentFromString(xmlString);
 	 *
-	 * @param argument 
+	 * @param argument
 	 */
 	public XmlNode[] js_readXmlDocumentFromString(String argument)
 	{

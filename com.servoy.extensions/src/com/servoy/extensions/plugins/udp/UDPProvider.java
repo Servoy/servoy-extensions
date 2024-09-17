@@ -33,6 +33,10 @@ import com.servoy.j2db.scripting.IReturnedTypesProvider;
 import com.servoy.j2db.scripting.IScriptable;
 import com.servoy.j2db.util.Debug;
 
+/**
+ * UDP plugin.
+ *
+ */
 @ServoyDocumented(publicName = UDPPlugin.PLUGIN_NAME, scriptingName = "plugins." + UDPPlugin.PLUGIN_NAME)
 public class UDPProvider implements IScriptable, IReturnedTypesProvider
 {
@@ -62,7 +66,7 @@ public class UDPProvider implements IScriptable, IReturnedTypesProvider
 	 * @param port_number the local port that this UDP socket will bind to.
 	 * @param method_to_call_when_packet_received_and_buffer_is_empty when the socket receives one or more packages, it calls this method once.
 	 * The method will no longer be called even if new packages are received - until a call to {@link UDPProvider#js_getReceivedPacket()} returns null. So you should
-	 * consume all available packets before you expect this method to be called again. 
+	 * consume all available packets before you expect this method to be called again.
 	 */
 	public boolean js_startSocket(int port_number, Object method_to_call_when_packet_received_and_buffer_is_empty)
 	{
@@ -178,7 +182,7 @@ public class UDPProvider implements IScriptable, IReturnedTypesProvider
 	 * packet.writeUTF('hello world!')
 	 * plugins.udp.testPacket(packet)
 	 *
-	 * @param packet 
+	 * @param packet
 	 */
 	public boolean js_testPacket(JSPacket packet)
 	{

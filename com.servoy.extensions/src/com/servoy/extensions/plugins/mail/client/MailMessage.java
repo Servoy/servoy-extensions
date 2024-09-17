@@ -25,7 +25,7 @@ import com.servoy.j2db.documentation.ServoyDocumented;
 import com.servoy.j2db.scripting.IJavaScriptType;
 
 /**
- * Container class for an email
+ * Container object for an email.
  * @author jblok
  */
 @ServoyDocumented
@@ -143,7 +143,7 @@ public class MailMessage implements Serializable, IJavaScriptType
 	 * Returns a Date instace corresponding to the moment when the message was received.
 	 *
 	 * @deprecated No longer supported. Try using  {@link #getHeaders()} for approximate results.
-	 * 
+	 *
 	 * @sampleas js_getAttachments()
 	 */
 	@Deprecated

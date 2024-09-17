@@ -31,6 +31,7 @@ import com.servoy.j2db.scripting.IScriptable;
 import com.servoy.j2db.util.gui.SnapShot;
 
 /**
+ * Images plugin scripting object.
  * @author jcompagner
  */
 @ServoyDocumented(publicName = ImagePlugin.PLUGIN_NAME, scriptingName = "plugins." + ImagePlugin.PLUGIN_NAME)
@@ -65,10 +66,10 @@ public class ImageProvider implements IScriptable, IReturnedTypesProvider
 
 	/**
 	 * Creates a javascript image from the given bean/applet/form_element.
-	 * 
+	 *
 	 * @deprecated Replaced by {@link #getImage(Object)}
-	 * 
-	 * @param obj bean/imageObj/element 
+	 *
+	 * @param obj bean/imageObj/element
 	 */
 	@Deprecated
 	public JSImage js_createJPGImage(Object obj)
@@ -83,11 +84,11 @@ public class ImageProvider implements IScriptable, IReturnedTypesProvider
 
 	/**
 	 * @deprecated Replaced by {@link #getImage(Object)}
-	 * 
+	 *
 	 * @clonedesc js_createJPGImage(Object)
 	 * @sampleas js_createJPGImage(Object)
 	 *
-	 * @param object bean/imageObj/element 
+	 * @param object bean/imageObj/element
 	 * @param width
 	 * @param height
 	 */
@@ -109,13 +110,13 @@ public class ImageProvider implements IScriptable, IReturnedTypesProvider
 	 * var height = image.getHeight();
 	 * var contentType = image.getContentType();
 	 * var scaled_image = image.resize(30, 30);
-	 * 
+	 *
 	 * var snapshot_image = plugins.images.getImage(forms.companyReports.elements.employeesChartBean);
 	 * var tempFile = plugins.file.createTempFile('bean_snapshot','.jpg')
 	 * plugins.file.writeFile(tempFile, snapshot_image.getData())
 	 * application.setStatusText('Wrote file: '+tempFile)
 	 *
-	 * @param object file/byte_array/bean/applet/form_element 
+	 * @param object file/byte_array/bean/applet/form_element
 	 */
 	public JSImage js_getImage(Object object)
 	{

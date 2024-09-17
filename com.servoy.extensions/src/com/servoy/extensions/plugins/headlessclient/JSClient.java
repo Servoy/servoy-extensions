@@ -33,6 +33,10 @@ import com.servoy.j2db.scripting.IScriptable;
 import com.servoy.j2db.scripting.JSEvent;
 import com.servoy.j2db.util.Debug;
 
+/**
+ * Headless client wrapper, to be used from headless client plugin.
+ *
+ */
 @ServoyDocumented
 public class JSClient implements IScriptable, IConstantsObject
 {

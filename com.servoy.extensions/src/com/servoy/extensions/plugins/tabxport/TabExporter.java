@@ -27,6 +27,7 @@ import com.servoy.j2db.documentation.ServoyDocumented;
 import com.servoy.j2db.scripting.IScriptable;
 
 /**
+ * Csv file exporter of an Servoy FoundSet
  * @author lvostinar
  *
  */

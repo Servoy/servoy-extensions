@@ -73,6 +73,10 @@ import com.servoy.j2db.scripting.IScriptable;
 import com.servoy.j2db.util.Debug;
 import com.servoy.j2db.util.Utils;
 
+/**
+ * Wrapper against Apache HttpClient that can execute various http requests.
+ *
+ */
 @ServoyDocumented
 public class HttpClient implements IScriptable, IJavaScriptType
 {

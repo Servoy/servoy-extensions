@@ -23,6 +23,9 @@ import org.mozilla.javascript.annotations.JSFunction;
 import com.servoy.j2db.documentation.ServoyDocumented;
 import com.servoy.j2db.scripting.IScriptable;
 
+/**
+ * The representation of a rest-ws client, only valid while running in a REST-WS request.
+ */
 @ServoyDocumented(publicName = RestWSClientPlugin.PLUGIN_NAME, scriptingName = "plugins." + RestWSClientPlugin.PLUGIN_NAME)
 public class RestWSClientProvider implements IScriptable
 {

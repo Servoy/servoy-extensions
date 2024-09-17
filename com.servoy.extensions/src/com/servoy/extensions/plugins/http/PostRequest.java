@@ -24,6 +24,8 @@ import org.apache.hc.client5.http.impl.auth.BasicCredentialsProvider;
 import com.servoy.j2db.documentation.ServoyDocumented;
 
 /**
+ * Http Post request.
+ *
  * @author jblok
  */
 @ServoyDocumented

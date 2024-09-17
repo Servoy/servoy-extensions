@@ -25,8 +25,8 @@ import org.apache.hc.client5.http.impl.auth.BasicCredentialsProvider;
 import com.servoy.j2db.documentation.ServoyDocumented;
 
 /**
+ * Delete http request.
  * @author pbakker
- *
  */
 @ServoyDocumented
 public class DeleteRequest extends BaseEntityEnclosingRequest

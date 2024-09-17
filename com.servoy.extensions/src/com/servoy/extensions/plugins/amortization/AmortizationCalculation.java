@@ -34,6 +34,8 @@ import com.servoy.j2db.util.Debug;
 import com.servoy.j2db.util.SafeArrayList;
 
 /**
+ * An amortization calculation.
+ *
  * @author sebster
  */
 @ServoyDocumented
@@ -69,30 +71,30 @@ public class AmortizationCalculation implements IScriptable, IConstantsObject
 
 	/**
 	 * The numeric constant used to identify a daily period.
-	 * 
+	 *
 	 * @sample
 	 * var c = plugins.amortization.newCalculation();
-	 * c.addPayment(500, new Date(2005, 1, 28), null, 
-	 * 			plugins.amortization.AmortizationCalculation.PERIOD_DAILY, 5, 
+	 * c.addPayment(500, new Date(2005, 1, 28), null,
+	 * 			plugins.amortization.AmortizationCalculation.PERIOD_DAILY, 5,
 	 * 			plugins.amortization.AmortizationCalculation.STARTDAY_NORMAL);
-	 * 
+	 *
 	 * var c2 = plugins.amortization.newCalculation();
 	 * c2.addPayment(300, new Date(2006, 11, 24), new Date(2006, 12, 24),
-	 * 			plugins.amortization.AmortizationCalculation.PERIOD_BI_MONTHLY, 
+	 * 			plugins.amortization.AmortizationCalculation.PERIOD_BI_MONTHLY,
 	 * 			plugins.amortization.AmortizationCalculation.NUMBER_UNLIMITED, 30);
 	 */
 	public static final int PERIOD_DAILY = 365;
 
 	/**
 	 * The numeric constant used to identify a weekly period.
-	 * 
+	 *
 	 * @sampleas {@link #PERIOD_DAILY}
 	 */
 	public static final int PERIOD_WEEKLY = 52;
 
 	/**
 	 * The numeric constant used to identify a two-weekly period (once every two weeks).
-	 * 
+	 *
 	 * @sampleas {@link #PERIOD_DAILY}
 	 */
 	public static final int PERIOD_TWO_WEEKLY = 26;
@@ -100,63 +102,63 @@ public class AmortizationCalculation implements IScriptable, IConstantsObject
 	/**
 	 * The numeric constant used to identify a bi-monthly period (twice every month).
 	 * TODO: this period is not supported yet.
-	 * 
+	 *
 	 * @sampleas {@link #PERIOD_DAILY}
 	 */
 	public static final int PERIOD_BI_MONTHLY = 24;
 
 	/**
 	 * The numeric constant used to identify a four-weekly period (once every four weeks).
-	 * 
+	 *
 	 * @sampleas {@link #PERIOD_DAILY}
 	 */
 	public static final int PERIOD_FOUR_WEEKLY = 13;
 
 	/**
 	 * The numeric constant used to identify a monthly period.
-	 * 
+	 *
 	 * @sampleas {@link #PERIOD_DAILY}
 	 */
 	public static final int PERIOD_MONTHLY = 12;
 
 	/**
 	 * The numeric constant used to identify a two-monthly period (once every two months).
-	 * 
+	 *
 	 * @sampleas {@link #PERIOD_DAILY}
 	 */
 	public static final int PERIOD_TWO_MONTHLY = 6;
 
 	/**
 	 * The numeric constant used to identify a quarterly period (once every three months).
-	 * 
+	 *
 	 * @sampleas {@link #PERIOD_DAILY}
 	 */
 	public static final int PERIOD_QUARTERLY = 4;
 
 	/**
 	 * The numeric constant used to identify a four-monthly period (once every four months).
-	 * 
+	 *
 	 * @sampleas {@link #PERIOD_DAILY}
 	 */
 	public static final int PERIOD_FOUR_MONTHLY = 3;
 
 	/**
 	 * The numeric constant used to identify a bi-annual period (twice every year).
-	 * 
+	 *
 	 * @sampleas {@link #PERIOD_DAILY}
 	 */
 	public static final int PERIOD_BI_ANNUALLY = 2;
 
 	/**
 	 * The numeric constant used to identify an annual period.
-	 * 
+	 *
 	 * @sampleas {@link #PERIOD_DAILY}
 	 */
 	public static final int PERIOD_ANNUALY = 1;
 
 	/**
 	 * The numeric constant used to identify that there is no period.
-	 * 
+	 *
 	 * @sampleas {@link #PERIOD_DAILY}
 	 */
 	public static final int PERIOD_NONE = 0;
@@ -164,7 +166,7 @@ public class AmortizationCalculation implements IScriptable, IConstantsObject
 
 	/**
 	 * The numeric constant used to identify an unlimited number of repeated events.
-	 * 
+	 *
 	 * @sampleas {@link #PERIOD_DAILY}
 	 */
 	public static final int NUMBER_UNLIMITED = -1;
@@ -173,7 +175,7 @@ public class AmortizationCalculation implements IScriptable, IConstantsObject
 	/**
 	 * The numeric constant used to identify that the same start day should be used as
 	 * the day of the month of the starting date of the event.
-	 * 
+	 *
 	 * @sampleas {@link #PERIOD_DAILY}
 	 */
 	public static final int STARTDAY_NORMAL = -1;
@@ -225,8 +227,8 @@ public class AmortizationCalculation implements IScriptable, IConstantsObject
 	 * c.addLoan(2000, new Date(2005, 0, 1));
 	 * c.addPayment(500, new Date(2005, 1, 28), null, 12, 5, 31);
 	 *
-	 * @param newPeriod 
-	 * @param date 
+	 * @param newPeriod
+	 * @param date
 	 */
 	public boolean js_addCompoundPeriodChange(int newPeriod, Date date)
 	{
@@ -238,12 +240,12 @@ public class AmortizationCalculation implements IScriptable, IConstantsObject
 	 *
 	 * @sampleas js_addCompoundPeriodChange(int, Date)
 	 *
-	 * @param amount 
-	 * @param firstDate 
-	 * @param lastDate 
-	 * @param period 
-	 * @param number 
-	 * @param startday 
+	 * @param amount
+	 * @param firstDate
+	 * @param lastDate
+	 * @param period
+	 * @param number
+	 * @param startday
 	 */
 	public boolean js_addLoan(double amount, Date firstDate, Date lastDate, int period, int number, int startday)
 	{
@@ -253,7 +255,7 @@ public class AmortizationCalculation implements IScriptable, IConstantsObject
 	/**
 	 * @clonedesc js_addLoan(double, Date, Date, int, int, int)
 	 * @sampleas js_addLoan(double, Date, Date, int, int, int)
-	 * 
+	 *
 	 * @param amount
 	 * @param firstDate
 	 * @param lastDate
@@ -268,7 +270,7 @@ public class AmortizationCalculation implements IScriptable, IConstantsObject
 	/**
 	 * @clonedesc js_addLoan(double, Date, Date, int, int, int)
 	 * @sampleas js_addLoan(double, Date, Date, int, int, int)
-	 * 
+	 *
 	 * @param amount
 	 * @param firstDate
 	 * @param lastDate
@@ -282,7 +284,7 @@ public class AmortizationCalculation implements IScriptable, IConstantsObject
 	/**
 	 * @clonedesc js_addLoan(double, Date, Date, int, int, int)
 	 * @sampleas js_addLoan(double, Date, Date, int, int, int)
-	 * 
+	 *
 	 * @param amount
 	 * @param date
 	 */
@@ -296,12 +298,12 @@ public class AmortizationCalculation implements IScriptable, IConstantsObject
 	 *
 	 * @sampleas js_addCompoundPeriodChange(int, Date)
 	 *
-	 * @param amount 
-	 * @param firstDate 
-	 * @param lastDate 
-	 * @param period 
-	 * @param number 
-	 * @param startday 
+	 * @param amount
+	 * @param firstDate
+	 * @param lastDate
+	 * @param period
+	 * @param number
+	 * @param startday
 	 */
 	public boolean js_addPayment(double amount, Date firstDate, Date lastDate, int period, int number, int startday)
 	{
@@ -311,7 +313,7 @@ public class AmortizationCalculation implements IScriptable, IConstantsObject
 	/**
 	 * @clonedesc js_addPayment(double, Date, Date, int, int, int)
 	 * @sampleas js_addPayment(double, Date, Date, int, int, int)
-	 * 
+	 *
 	 * @param amount
 	 * @param firstDate
 	 * @param lastDate
@@ -326,7 +328,7 @@ public class AmortizationCalculation implements IScriptable, IConstantsObject
 	/**
 	 * @clonedesc js_addPayment(double, Date, Date, int, int, int)
 	 * @sampleas js_addPayment(double, Date, Date, int, int, int)
-	 * 
+	 *
 	 * @param amount
 	 * @param firstDate
 	 * @param lastDate
@@ -340,7 +342,7 @@ public class AmortizationCalculation implements IScriptable, IConstantsObject
 	/**
 	 * @clonedesc js_addPayment(double, Date, Date, int, int, int)
 	 * @sampleas js_addPayment(double, Date, Date, int, int, int)
-	 * 
+	 *
 	 * @param amount
 	 * @param date
 	 */
@@ -354,8 +356,8 @@ public class AmortizationCalculation implements IScriptable, IConstantsObject
 	 *
 	 * @sampleas js_addCompoundPeriodChange(int, Date)
 	 *
-	 * @param newRate 
-	 * @param date 
+	 * @param newRate
+	 * @param date
 	 */
 	public boolean js_addRateChange(double newRate, Date date)
 	{
@@ -453,7 +455,7 @@ public class AmortizationCalculation implements IScriptable, IConstantsObject
 	 * @sample
 	 * var v_period = plugins.amortization.isValidPeriod(12);
 	 *
-	 * @param period 
+	 * @param period
 	 */
 	public boolean js_isValidPeriod(int period)
 	{
@@ -467,7 +469,7 @@ public class AmortizationCalculation implements IScriptable, IConstantsObject
 	 * //rounds the number up to 34.35
 	 * var rm = plugins.amortization.roundMoney(34.349384);
 	 *
-	 * @param amount 
+	 * @param amount
 	 */
 	public double js_roundMoney(double amount)
 	{
@@ -748,7 +750,7 @@ public class AmortizationCalculation implements IScriptable, IConstantsObject
 			last = calendar;
 			Polynomial deltaInterest = new Polynomial(balancePolynomial);
 			if (rate < 0) // unknown
-			deltaInterest.multiplyByTerm(coefficient, 1);
+				deltaInterest.multiplyByTerm(coefficient, 1);
 			else deltaInterest.multiplyByTerm(coefficient * rate, 0);
 			interestPolynomial.addPolynomial(deltaInterest);
 			balancePolynomial.addPolynomial(interestPolynomial);
@@ -759,7 +761,7 @@ public class AmortizationCalculation implements IScriptable, IConstantsObject
 		double coefficient = (getDays(last, to)) / 365D; // Use 365 day year to determine daily interest rate!
 		Polynomial deltaInterest = new Polynomial(balancePolynomial);
 		if (rate < 0) // unknown
-		deltaInterest.multiplyByTerm(coefficient, 1);
+			deltaInterest.multiplyByTerm(coefficient, 1);
 		else deltaInterest.multiplyByTerm(coefficient * rate, 0);
 		interestPolynomial.addPolynomial(deltaInterest);
 	}
@@ -778,9 +780,9 @@ public class AmortizationCalculation implements IScriptable, IConstantsObject
 
 	/**
 	 * Returns the specified amount rounded to the nearest hundredth.
-	 * 
+	 *
 	 * @param amount the amount to round
-	 * 
+	 *
 	 * @return the amount rounded to the nearest hundredth
 	 */
 	public double roundMoney(double amount)
@@ -790,7 +792,7 @@ public class AmortizationCalculation implements IScriptable, IConstantsObject
 
 	/**
 	 * Add an event to the event list.
-	 * 
+	 *
 	 * @param event the event type
 	 * @param amount the event amount (a double)
 	 * @param firstDate the first date of the event (start date)
@@ -798,7 +800,7 @@ public class AmortizationCalculation implements IScriptable, IConstantsObject
 	 * @param period the period of the event
 	 * @param number the number of times the event occurs
 	 * @param startDay the day of the month the event occurs on
-	 * 
+	 *
 	 * @return true if the event was added, false if there was an error adding the event
 	 */
 	private boolean addEvent(String event, double amount, Date firstDate, Date lastDate, int period, int number, int startDay)
@@ -846,28 +848,30 @@ public class AmortizationCalculation implements IScriptable, IConstantsObject
 
 		// The start day of the month of a periodic event may different from the day of the
 		// month of the first date. If it is not different, then it should be set to
-		// number should be set to -1 or the day of the month of the first date.. If it IS 
-		// different, then the day of the month of the first date must be the last day of the 
+		// number should be set to -1 or the day of the month of the first date.. If it IS
+		// different, then the day of the month of the first date must be the last day of the
 		// month and the number must be greater than this day of the month and at most 31.
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(firstDate);
 		int dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
 		if (startDay == STARTDAY_NORMAL) startDay = dayOfMonth;
-		else if ((startDay != dayOfMonth) && (startDay <= dayOfMonth || startDay > 31 || dayOfMonth != calendar.getActualMaximum(Calendar.DAY_OF_MONTH))) return false;
+		else if ((startDay != dayOfMonth) && (startDay <= dayOfMonth || startDay > 31 || dayOfMonth != calendar.getActualMaximum(Calendar.DAY_OF_MONTH)))
+			return false;
 
 		// Add an event row to events list.
-		events.addRow(new Object[] { event.toLowerCase().intern(), new Double(amount), firstDate, lastDate, new Integer(period), new Integer(number), new Integer(
-			startDay) });
+		events
+			.addRow(new Object[] { event.toLowerCase().intern(), new Double(amount), firstDate, lastDate, new Integer(period), new Integer(number), new Integer(
+				startDay) });
 
 		return true;
 	}
 
 	/**
 	 * Get the exact number of days between two calendars.
-	 * 
+	 *
 	 * @param from the start calendar
 	 * @param to then end calendar
-	 * 
+	 *
 	 * @return the exact number of days between the start and end calendar
 	 */
 	private long getDays(Calendar from, Calendar to)
@@ -880,11 +884,11 @@ public class AmortizationCalculation implements IScriptable, IConstantsObject
 	 * Note that the start day of the period is the day of the month on which the first period started, which may
 	 * be a day that does not exist in every month (i.e., the 29th, 30th, or 31st). Thus the current date could
 	 * be 28-02-2005, the period monthly, and the start day the 31st; the next calendar then would be 31-03-2005.
-	 * 
+	 *
 	 * @param calendar the current date
 	 * @param startDay the start day of the period
 	 * @param period the period
-	 * 
+	 *
 	 * @return the next calendar which is the specified period after the specified calendar
 	 */
 	static Calendar nextCalendar(Calendar calendar, int startDay, int period)
@@ -976,7 +980,7 @@ public class AmortizationCalculation implements IScriptable, IConstantsObject
 	}
 
 	/**
-	 * This class tags an event with a calendar, and allows these events to be 
+	 * This class tags an event with a calendar, and allows these events to be
 	 * compared by their date.
 	 */
 	private class CalendarEvent implements Comparable
@@ -993,7 +997,7 @@ public class AmortizationCalculation implements IScriptable, IConstantsObject
 
 		/**
 		 * Create a new calendar event.
-		 * 
+		 *
 		 * @param calendar the calendar of the calendar event
 		 * @param event the event of the calendar event
 		 */

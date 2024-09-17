@@ -9,6 +9,9 @@ import com.servoy.j2db.documentation.ServoyDocumented;
 import com.servoy.j2db.scripting.IScriptable;
 import com.servoy.j2db.server.shared.IClientInformation;
 
+/*
+ * A scripting object containing Client information.
+ */
 @ServoyDocumented
 @ServoyClientSupport(ng = true, mc = false, wc = true, sc = true)
 public class JSClientInformation implements IScriptable

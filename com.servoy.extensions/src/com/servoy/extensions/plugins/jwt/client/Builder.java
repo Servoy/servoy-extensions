@@ -35,6 +35,8 @@ import com.servoy.j2db.scripting.IJavaScriptType;
 import com.servoy.j2db.scripting.IScriptable;
 
 /**
+ * JWT builder.
+ *
  * @author emera
  */
 @ServoyDocumented(scriptingName = "builder")

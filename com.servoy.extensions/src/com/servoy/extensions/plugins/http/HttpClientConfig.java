@@ -22,8 +22,9 @@ import com.servoy.j2db.scripting.IJavaScriptType;
 import com.servoy.j2db.scripting.IScriptable;
 
 /**
- * @author lvostinar
+ * Contains different settings for configuring HttpClient.
  *
+ * @author lvostinar
  */
 @ServoyDocumented
 public class HttpClientConfig implements IScriptable, IJavaScriptType

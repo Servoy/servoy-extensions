@@ -46,6 +46,7 @@ import com.servoy.j2db.util.Pair;
 import com.servoy.j2db.util.Utils;
 
 /**
+ * HttpClient plugin , can create HttpClient objects in order to execute http requests.
  * @author jblok
  */
 @ServoyDocumented(publicName = HttpPlugin.PLUGIN_NAME, scriptingName = "plugins." + HttpPlugin.PLUGIN_NAME)

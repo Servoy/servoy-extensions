@@ -44,6 +44,7 @@ import com.servoy.j2db.scripting.IScriptable;
 import com.servoy.j2db.solutionmodel.ISolutionModel;
 
 /**
+ * OAuth service builder.
  * @author emera
  */
 @ServoyDocumented(scriptingName = "OAuthServiceBuilder")

@@ -22,6 +22,8 @@ import com.servoy.j2db.documentation.ServoyDocumented;
 import com.servoy.j2db.scripting.IConstantsObject;
 
 /**
+ * JWT claims constants.
+ *
  * @author emera
  */
 @ServoyDocumented(scriptingName = "JWTClaims")

@@ -59,6 +59,7 @@ import com.servoy.j2db.util.Debug;
 import com.servoy.j2db.util.FileChooserUtils;
 
 /**
+ * Pdf plugin, for creating and updating pdf files.
  * @author jblok
  */
 @ServoyDocumented(publicName = PDFPlugin.PLUGIN_NAME, scriptingName = "plugins." + PDFPlugin.PLUGIN_NAME)

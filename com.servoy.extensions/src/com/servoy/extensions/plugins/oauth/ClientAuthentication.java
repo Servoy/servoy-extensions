@@ -21,6 +21,7 @@ import com.servoy.j2db.documentation.ServoyDocumented;
 import com.servoy.j2db.scripting.IConstantsObject;
 
 /**
+ * OAuth authentication schemes constants.
  * @author emera
  */
 @ServoyDocumented(scriptingName = "ClientAuthentication")

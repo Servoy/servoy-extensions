@@ -19,6 +19,10 @@ package com.servoy.extensions.plugins.serialize;
 import com.servoy.j2db.documentation.ServoyDocumented;
 import com.servoy.j2db.scripting.IScriptable;
 
+/**
+ * JSON serializer plugin.
+ *
+ */
 @ServoyDocumented(publicName = SerializePlugin.PLUGIN_NAME, scriptingName = "plugins." + SerializePlugin.PLUGIN_NAME)
 public class SerializeProvider implements IScriptable
 {
@@ -37,7 +41,7 @@ public class SerializeProvider implements IScriptable
 	 * var string_data = plugins.serialize.toJSON(org_array);
 	 * var new_array = plugins.serialize.fromJSON(string_data);
 	 * application.output(new_array.join('#'));
-	 * 
+	 *
 	 * @param obj
 	 */
 	public String js_toJSON(Object obj) throws Exception
@@ -49,7 +53,7 @@ public class SerializeProvider implements IScriptable
 	 * Deserialize from JSON text to an object.
 	 *
 	 * @sampleas js_toJSON(Object)
-	 * 
+	 *
 	 * @param data
 	 */
 	public Object js_fromJSON(String data) throws Exception

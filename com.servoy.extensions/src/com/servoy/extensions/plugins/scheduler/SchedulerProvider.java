@@ -46,6 +46,7 @@ import com.servoy.j2db.scripting.IScriptable;
 import com.servoy.j2db.util.Debug;
 
 /**
+ * Scheduler plugin, used to run background jobs (in headless clients).
  * @author jcompagner
  */
 @ServoyDocumented(publicName = SchedulerPlugin.PLUGIN_NAME, scriptingName = "plugins." + SchedulerPlugin.PLUGIN_NAME)

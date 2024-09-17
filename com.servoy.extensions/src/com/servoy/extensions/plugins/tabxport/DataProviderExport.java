@@ -22,8 +22,8 @@ import com.servoy.j2db.documentation.ServoyDocumented;
 import com.servoy.j2db.scripting.IScriptable;
 
 /**
+ * DataProvider to be exported.
  * @author lvostinar
- *
  */
 @ServoyDocumented(scriptingName = "DataProviderExport")
 @ServoyClientSupport(ng = true, wc = true, sc = true)

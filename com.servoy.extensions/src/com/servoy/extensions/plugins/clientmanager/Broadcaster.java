@@ -30,6 +30,8 @@ import com.servoy.j2db.smart.ISmartClientPluginAccess;
 import com.servoy.j2db.util.Debug;
 
 /**
+ * A scripting object for broadcasting messages to clients.
+ *
  * @author jcompagner
  *
  */

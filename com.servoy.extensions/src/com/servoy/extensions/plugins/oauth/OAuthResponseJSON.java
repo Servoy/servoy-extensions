@@ -31,6 +31,7 @@ import com.servoy.j2db.scripting.IJavaScriptType;
 import com.servoy.j2db.scripting.IScriptable;
 
 /**
+ * OAuth json response.
  * @author emera
  */
 @ServoyDocumented(scriptingName = "OAuthResponseJSON")

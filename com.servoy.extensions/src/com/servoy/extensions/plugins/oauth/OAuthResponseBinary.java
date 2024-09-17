@@ -27,6 +27,7 @@ import com.servoy.j2db.scripting.IJavaScriptType;
 import com.servoy.j2db.scripting.IScriptable;
 
 /**
+ * OAuth binary response.
  * @author emera
  */
 @ServoyDocumented(scriptingName = "OAuthResponseBinary")

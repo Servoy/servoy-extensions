@@ -74,6 +74,8 @@ import com.servoy.j2db.util.Debug;
 import com.servoy.j2db.util.FileChooserUtils;
 
 /**
+ * File plugin.
+ *
  * @author jcompagner
  * @author Servoy Stuff
  */

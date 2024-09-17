@@ -21,6 +21,8 @@ import com.servoy.j2db.util.Debug;
 import com.servoy.j2db.util.Utils;
 
 /**
+ * Client manager scripting object.
+ *
  * @author gerzse
  */
 @ServoyDocumented(publicName = ClientManagerPlugin.PLUGIN_NAME, scriptingName = "plugins." + ClientManagerPlugin.PLUGIN_NAME)
@@ -49,7 +51,7 @@ public class ClientManagerProvider implements IScriptable, IReturnedTypesProvide
 	 *
 	 * @sample
 	 * //Returns true if the server is in maintenance mode, false otherwise.
-	 * if (plugins.maintenance.isInMaintenanceMode())
+	 * if (plugins.clientmanager.isInMaintenanceMode())
 	 * 	application.output("Server is in maintenance mode.");
 	 * else
 	 * 	application.output("Server is not in maintenance mode.");

@@ -23,6 +23,7 @@ import com.servoy.j2db.scripting.IJavaScriptType;
 import com.servoy.j2db.util.MimeTypes;
 
 /**
+ * E-mail attachment object.
  * @author jblok
  */
 @ServoyDocumented(scriptingName = "Attachment")
@@ -118,7 +119,7 @@ public class Attachment implements Serializable, IJavaScriptType
 	}
 
 	/**
-	 * Returns true if this attachment is embedded, false otherwise. Attachments become embedded 
+	 * Returns true if this attachment is embedded, false otherwise. Attachments become embedded
 	 * if they are references through tags from the body text of the message.
 	 *
 	 * @sampleas js_getData()

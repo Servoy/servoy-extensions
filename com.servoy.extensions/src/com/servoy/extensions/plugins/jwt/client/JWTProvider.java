@@ -39,6 +39,7 @@ import com.servoy.j2db.scripting.IScriptable;
 import com.servoy.j2db.util.Utils;
 
 /**
+ * JWT plugin.
  * @author emera
  */
 @ServoyDocumented(publicName = JWTPlugin.PLUGIN_NAME, scriptingName = "plugins." + JWTPlugin.PLUGIN_NAME)

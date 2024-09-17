@@ -42,6 +42,7 @@ import com.servoy.j2db.scripting.IScriptable;
 import com.servoy.j2db.util.Utils;
 
 /**
+ * OAuth service.
  * @author emera
  */
 @ServoyDocumented(scriptingName = "OAuthService")

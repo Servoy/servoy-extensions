@@ -25,8 +25,9 @@ import org.apache.hc.client5.http.impl.auth.BasicCredentialsProvider;
 import com.servoy.j2db.documentation.ServoyDocumented;
 
 /**
- * @author pbakker
+ * Head http request.
  *
+ * @author pbakker
  */
 @ServoyDocumented
 public class HeadRequest extends BaseRequest

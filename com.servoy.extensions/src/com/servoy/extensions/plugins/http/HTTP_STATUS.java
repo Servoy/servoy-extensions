@@ -20,6 +20,10 @@ package com.servoy.extensions.plugins.http;
 import com.servoy.j2db.documentation.ServoyDocumented;
 import com.servoy.j2db.scripting.IPrefixedConstantsObject;
 
+/**
+ * Http status code constants.
+ *
+ */
 @ServoyDocumented
 public class HTTP_STATUS implements ServoyHttpStatus, IPrefixedConstantsObject
 {

@@ -31,7 +31,7 @@ import com.servoy.j2db.scripting.IJavaScriptType;
 import com.servoy.j2db.scripting.IScriptable;
 
 /**
- * The representation of a rest-ws request, only valid while running in a REST-WS request.
+ * The representation of a rest-ws response, only valid while running in a REST-WS request.
  *
  * @author rgansevles
  *

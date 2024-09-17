@@ -26,7 +26,6 @@ import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
-import java.util.Iterator;
 import java.util.TreeMap;
 
 import org.mozilla.javascript.Wrapper;
@@ -46,6 +45,7 @@ import com.servoy.j2db.util.MimeTypes;
 import com.servoy.j2db.util.Utils;
 
 /**
+ * Image wrapper, part of images plugin, for manipulation of an image in scripting.
  * @author jcompagner
  */
 @ServoyDocumented
@@ -390,15 +390,10 @@ public class JSImage implements IScriptable, Wrapper
 			}
 			if (metadata != null)
 			{
-				Iterator<Directory> directories = metadata.getDirectories().iterator();
-				while (directories.hasNext())
+				for (Directory directory : metadata.getDirectories())
 				{
-					Directory directory = directories.next();
-					// iterate through tags and print to System.out
-					Iterator<Tag> tags = directory.getTags().iterator();
-					while (tags.hasNext())
+					for (Tag tag : directory.getTags())
 					{
-						Tag tag = tags.next();
 						// use Tag.toString()
 						if (tag.getDirectoryName().equals("Sony Makernote")) continue;
 						String description = "";

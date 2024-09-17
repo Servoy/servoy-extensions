@@ -23,6 +23,7 @@ import com.servoy.j2db.documentation.ServoyDocumented;
 import com.servoy.j2db.scripting.IPrefixedConstantsObject;
 
 /**
+ * OAuth request types constants.
  * @author emera
  */
 @ServoyDocumented(publicName = "RequestType", scriptingName = "RequestType")

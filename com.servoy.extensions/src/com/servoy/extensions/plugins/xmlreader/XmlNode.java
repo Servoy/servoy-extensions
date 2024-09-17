@@ -27,6 +27,7 @@ import com.servoy.j2db.documentation.ServoyDocumented;
 import com.servoy.j2db.scripting.IScriptable;
 
 /**
+ * XML node.
  * @author jcompagner
  */
 @SuppressWarnings("nls")
@@ -107,9 +108,9 @@ public class XmlNode implements IScriptable
 
 	/**
 	 * Return the value of the named attribute.
-	 * 
+	 *
 	 * @sampleas js_getAttributeNames()
-	 * 
+	 *
 	 * @param attributeName
 	 */
 	public String js_getAttributeValue(String attributeName)

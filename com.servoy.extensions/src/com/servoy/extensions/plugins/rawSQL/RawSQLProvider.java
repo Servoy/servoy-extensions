@@ -29,7 +29,7 @@ import com.servoy.j2db.util.ServoyException;
 import com.servoy.j2db.util.UUID;
 
 /**
- * Rawsql plugin scriptable.
+ * Rawsql plugin scriptable. Can execute sql text against an existing server. Only use this as last resort(other Servoy APis are always preferred)
  *
  * @author jblok
  */
