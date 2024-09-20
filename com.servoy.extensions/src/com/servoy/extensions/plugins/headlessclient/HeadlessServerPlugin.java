@@ -218,9 +218,9 @@ public class HeadlessServerPlugin implements IHeadlessServer, IServerPlugin
 					convertedArgs[i] = getJSONConverter().convertFromJSON(c.getPluginAccess().getDatabaseManager(), args[i]);
 				}
 			}
+			Context.enter();
 			try
 			{
-				Context.enter();
 				return getJSONConverter().convertToJSON(c.getPluginAccess().executeMethod(contextName, methodName, convertedArgs, false));
 			}
 			finally
