@@ -36,7 +36,7 @@
         <metadataextractor.version>2.19.0</metadataextractor.version>
         <bouncy.version>1.78.1</bouncy.version>
         <xmpcore.version>6.1.11</xmpcore.version>
-        <rhino.version>1.7.15.s1</rhino.version>
+        <rhino.version>1.7.15.s2</rhino.version>
         <tsaUrl>http://timestamp.digicert.com</tsaUrl>
         <jbpm.version>7.74.1.Final</jbpm.version>
         <!--  This has to be in sync with jasperreports version  -->
