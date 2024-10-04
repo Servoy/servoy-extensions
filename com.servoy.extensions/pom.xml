@@ -466,30 +466,6 @@
                                     <destFileName>amqp-client.jar</destFileName>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>com.github.scribejava</groupId>
-                                    <artifactId>scribejava-apis</artifactId>
-                                    <version>${scribejava.version}</version>
-                                    <overWrite>true</overWrite>
-                                    <outputDirectory>${project.build.directory}/plugins_beans/plugins/oauth</outputDirectory>
-                                    <destFileName>scribejava-apis.jar</destFileName>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>com.github.scribejava</groupId>
-                                    <artifactId>scribejava-core</artifactId>
-                                    <version>${scribejava.version}</version>
-                                    <overWrite>true</overWrite>
-                                    <outputDirectory>${project.build.directory}/plugins_beans/plugins/oauth</outputDirectory>
-                                    <destFileName>scribejava-core.jar</destFileName>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>com.github.scribejava</groupId>
-                                    <artifactId>scribejava-java8</artifactId>
-                                    <version>${scribejava.version}</version>
-                                    <overWrite>true</overWrite>
-                                    <outputDirectory>${project.build.directory}/plugins_beans/plugins/oauth</outputDirectory>
-                                    <destFileName>scribejava-java8.jar</destFileName>
-                                </artifactItem>
-                                <artifactItem>
                                     <groupId>org.apache.pdfbox</groupId>
                                     <artifactId>pdfbox</artifactId>
                                     <version>${pdfbox.version}</version>
@@ -528,14 +504,6 @@
                                     <overWrite>true</overWrite>
                                     <outputDirectory>${project.build.directory}/plugins_beans/plugins/pdf_output</outputDirectory>
                                     <destFileName>bcmail.jar</destFileName>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>com.auth0</groupId>
-                                    <artifactId>jwks-rsa</artifactId>
-                                    <version>${jwks.version}</version>
-                                    <overWrite>true</overWrite>
-                                    <outputDirectory>${project.build.directory}/plugins_beans/plugins/jwt</outputDirectory>
-                                    <destFileName>jwks-rsa.jar</destFileName>
                                 </artifactItem>
                                 <!--artifactItem>
                                     <groupId>com.fasterxml.jackson.module</groupId>
@@ -2340,11 +2308,6 @@
                                         sigalg="SHA256withRSA" digestalg="SHA-256" />
                                     <signjar keystore="${jarsigner.keystore}"
                                         jar="${project.build.directory}/plugins_beans/plugins/pdf_output/bcmail.jar"
-                                        alias="ServoyClient" storepass="${jarsigner.storepass}"
-                                        tsaurl="${tsaUrl}"
-                                        sigalg="SHA256withRSA" digestalg="SHA-256" />
-                                    <signjar keystore="${jarsigner.keystore}"
-                                        jar="${project.build.directory}/plugins_beans/plugins/jwt/jwks-rsa.jar"
                                         alias="ServoyClient" storepass="${jarsigner.storepass}"
                                         tsaurl="${tsaUrl}"
                                         sigalg="SHA256withRSA" digestalg="SHA-256" />
