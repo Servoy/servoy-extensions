@@ -16,17 +16,22 @@
  */
 package com.servoy.extensions.plugins.file;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Date;
 
 import com.servoy.j2db.documentation.ServoyDocumented;
+import com.servoy.j2db.plugins.IClientPluginAccess;
 import com.servoy.j2db.plugins.IFile;
 import com.servoy.j2db.plugins.IUploadData;
 import com.servoy.j2db.scripting.IJavaScriptType;
 import com.servoy.j2db.scripting.IScriptObject;
 import com.servoy.j2db.scripting.IScriptable;
+import com.servoy.j2db.util.Debug;
 
 /**
  * The {@link IScriptObject} representation of a file, either local, remote or web.
@@ -39,32 +44,31 @@ public class JSFile implements IScriptable, IJavaScriptType, IFile
 {
 	private final IAbstractFile file;
 	private JSFile[] EMPTY;
+	private final IClientPluginAccess application;
 
 	public JSFile()
 	{
 		//for developer scripting introspection only
-		this((File)null);
+		this((File)null, null);
 	}
 
-	public JSFile(File file)
+	public JSFile(File file, IClientPluginAccess application)
 	{
-		this.file = new LocalFile(file);
+		this.file = new LocalFile(file, application);
+		this.application = application;
 	}
 
-	public JSFile(IUploadData upload)
+	public JSFile(IUploadData upload, IClientPluginAccess application)
 	{
-		if (upload.getFile() != null && upload.getFile().getName().equals(upload.getName()))
-		{
-			this.file = new LocalFile(upload.getFile());
-		}
-		else if (upload instanceof IAbstractFile)
+		if (upload instanceof IAbstractFile)
 		{
 			this.file = (IAbstractFile)upload;
 		}
 		else
 		{
-			this.file = new UploadData(upload);
+			this.file = new UploadData(upload, application);
 		}
+		this.application = application;
 	}
 
 	public IAbstractFile getAbstractFile()
@@ -99,7 +103,7 @@ public class JSFile implements IScriptable, IJavaScriptType, IFile
 	 */
 	public JSFile js_getParentFile()
 	{
-		return new JSFile(file.getParentFile());
+		return new JSFile(file.getParentFile(), application);
 	}
 
 	/**
@@ -145,7 +149,7 @@ public class JSFile implements IScriptable, IJavaScriptType, IFile
 	 */
 	public JSFile js_getAbsoluteFile()
 	{
-		return new JSFile(file.getAbsoluteFile());
+		return new JSFile(file.getAbsoluteFile(), application);
 	}
 
 	/**
@@ -330,7 +334,7 @@ public class JSFile implements IScriptable, IJavaScriptType, IFile
 		JSFile[] retArray = new JSFile[files.length];
 		for (int i = 0; i < files.length; i++)
 		{
-			retArray[i] = new JSFile(files[i]);
+			retArray[i] = new JSFile(files[i], application);
 		}
 		return retArray;
 	}
@@ -385,10 +389,92 @@ public class JSFile implements IScriptable, IJavaScriptType, IFile
 			}
 			else
 			{
-				return file.renameTo(new LocalFile(new File((String)destination)));
+				return file.renameTo(new LocalFile(new File((String)destination), application));
 			}
 		}
 		return false;
+	}
+
+	/**
+	 * Return a new JSFile instance that contains a remote file with the content of current JSFile.
+	 * @param fileName
+	 * @return JSFile
+	 */
+	public JSFile js_convertToRemote(String fileName)
+	{
+		File mainFolder = null;
+		try
+		{
+			IFileService service = (IFileService)application.getRemoteService(IFileService.class.getName());
+			mainFolder = service.getDefaultFolder(application.getClientID());
+		}
+		catch (Exception e)
+		{
+			Debug.error(e);
+		}
+		File destFile = new File(mainFolder, fileName);
+		if (!file.exists())
+		{
+			try
+			{
+				file.createNewFile();
+			}
+			catch (IOException e)
+			{
+				Debug.error(e);
+			}
+		}
+		InputStream is = null;
+		OutputStream os = null;
+
+		try
+		{
+			is = getInputStream();
+			if (is != null)
+			{
+				os = new BufferedOutputStream(new FileOutputStream(destFile));
+
+				final byte[] buffer = new byte[FileProvider.CHUNK_BUFFER_SIZE];
+				int read;
+				while ((read = is.read(buffer)) != -1)
+				{
+					os.write(buffer, 0, read);
+				}
+				os.flush();
+			}
+		}
+		catch (final IOException e)
+		{
+			Debug.error(e);
+		}
+		finally
+		{
+			if (is != null)
+			{
+				try
+				{
+					is.close();
+				}
+				catch (final IOException e)
+				{
+				}
+			}
+			if (os != null)
+			{
+				try
+				{
+					os.close();
+				}
+				catch (final IOException e)
+				{
+				}
+			}
+		}
+
+
+		RemoteFile remoteFile = new RemoteFile(destFile, mainFolder, application);
+		JSFile jsfile = new JSFile(remoteFile, application);
+		return jsfile;
 	}
 
 	/**
@@ -477,6 +563,19 @@ public class JSFile implements IScriptable, IJavaScriptType, IFile
 	public boolean js_setBytes(byte[] bytes, boolean createFile)
 	{
 		return file.setBytes(bytes, createFile);
+	}
+
+	/**
+	 * Get a url from file that can be used to download the file in a browser.
+	 * This is a complete url with the server url that is get from application.getServerURL().
+	 * If the file is a remote file will be shared using a default folder that requires no session.
+	 * If the file is a local file will be available only for current client (url contains session id)
+	 *
+	 * @return the url
+	 */
+	public String js_getRemoteUrl() throws Exception
+	{
+		return file.getRemoteUrl();
 	}
 
 	@Override

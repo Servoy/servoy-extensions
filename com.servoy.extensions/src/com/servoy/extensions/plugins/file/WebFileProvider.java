@@ -328,10 +328,9 @@ public class WebFileProvider extends FileProvider
 							{
 								try
 								{
-									IFileService service = getFileService();
-									RemoteFileData remoteFile = new RemoteFileData(dest, FilePluginUtils.constructHierarchy(dest, serverFolder));
-									final JSFile returnedFile = (dest == null) ? null : new JSFile(new RemoteFile(remoteFile, service,
-										plugin.getClientPluginAccess().getClientID()));
+									final JSFile returnedFile = (dest == null) ? null
+										: new JSFile(new RemoteFile(dest, getDefaultFolder(plugin.getClientPluginAccess().getClientID()),
+											plugin.getClientPluginAccess()), plugin.getClientPluginAccess());
 									function.execute(plugin.getClientPluginAccess(), new Object[] { returnedFile, ex }, true);
 								}
 								catch (final Exception e)

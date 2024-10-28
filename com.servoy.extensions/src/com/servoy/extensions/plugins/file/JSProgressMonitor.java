@@ -34,12 +34,13 @@ import com.servoy.j2db.scripting.IScriptable;
  * This class is returned to the Servoy client from the {@link FileProvider} js_streamFilesFromServer or js_streamFilesToServer method<br/>
  * It is used to monitor the uploads/downloads calling back a Servoy method that can then get the status of the transfer(s)<br/>
  * It is called repeatedly by a {@link Timer} when scheduled with a fixed interval to callback the Servoy method provided.
- * 
+ *
  * @since 5.2.1
- * 
+ *
  * @author jcompagner
  * @author Servoy Stuff
  */
+@Deprecated
 @ServoyDocumented
 public class JSProgressMonitor extends TimerTask implements IScriptable, IJavaScriptType
 {
@@ -67,7 +68,7 @@ public class JSProgressMonitor extends TimerTask implements IScriptable, IJavaSc
 
 	/**
 	 * Constructor
-	 * 
+	 *
 	 * @param provider the parent {@link FileProvider}
 	 * @param totalBytes the total number of bytes to transfer, calculated by the parent
 	 * @param totalFiles the total number of files to transfer, calculated by the parent
@@ -98,7 +99,7 @@ public class JSProgressMonitor extends TimerTask implements IScriptable, IJavaSc
 	/**
 	 * @clonedesc js_setProgressCallBack(Function, float)
 	 * @sampleas js_setProgressCallBack(Function, float)
-	 * 
+	 *
 	 * @param function the {@link Function} to call back at the specified interval
 	 * @param interval the interval (in seconds) to use
 	 * @param delay adds a delay for testing purpose in Developer
@@ -305,7 +306,7 @@ public class JSProgressMonitor extends TimerTask implements IScriptable, IJavaSc
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see java.util.TimerTask#run()
 	 */
 	@Override

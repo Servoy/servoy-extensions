@@ -67,8 +67,7 @@ public class FileServlet extends HttpServlet
 			File file = registeredFiles.get(uuidString);
 			if (file == null)
 			{
-				RemoteFileData remoteFileData = fileServerPlugin.getRemoteFileData(app.getServerLocalClientID(), filePath);
-				file = remoteFileData.getFile();
+				file = new File(fileServerPlugin.getDefaultFolder(app.getServerLocalClientID()), filePath);
 			}
 			if (file != null && file.exists() && file.isFile())
 			{

@@ -21,6 +21,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
+import com.servoy.j2db.plugins.IAllWebClientPluginAccess;
+import com.servoy.j2db.plugins.IClientPluginAccess;
 import com.servoy.j2db.plugins.IUploadData;
 import com.servoy.j2db.util.MimeTypes;
 
@@ -33,12 +35,13 @@ import com.servoy.j2db.util.MimeTypes;
  */
 public class UploadData extends AbstractFile
 {
-
+	private final IClientPluginAccess application;
 	private final IUploadData upload;
 
-	public UploadData(IUploadData upload)
+	public UploadData(IUploadData upload, IClientPluginAccess application)
 	{
 		this.upload = upload;
+		this.application = application;
 	}
 
 	@Override
@@ -106,5 +109,13 @@ public class UploadData extends AbstractFile
 		throw new UnsupportedMethodException("JSFile.setBytes() is not web compatible"); //$NON-NLS-1$
 	}
 
-
+	@Override
+	public String getRemoteUrl() throws Exception
+	{
+		if (getFile() != null && getFile().exists() && application instanceof IAllWebClientPluginAccess ngApplication)
+		{
+			return ngApplication.serveResource(getFile(), getContentType(), "inline");
+		}
+		return null;
+	}
 }

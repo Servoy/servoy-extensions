@@ -26,6 +26,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import com.servoy.j2db.plugins.IAllWebClientPluginAccess;
+import com.servoy.j2db.plugins.IClientPluginAccess;
 import com.servoy.j2db.util.Debug;
 import com.servoy.j2db.util.FileChooserUtils;
 
@@ -39,10 +41,12 @@ import com.servoy.j2db.util.FileChooserUtils;
 public class LocalFile implements IAbstractFile
 {
 	private final File file;
+	private final IClientPluginAccess application;
 
-	public LocalFile(File file)
+	public LocalFile(File file, IClientPluginAccess application)
 	{
 		this.file = file;
+		this.application = application;
 	}
 
 	public File getFile()
@@ -80,7 +84,7 @@ public class LocalFile implements IAbstractFile
 
 	public IAbstractFile getParentFile()
 	{
-		return new LocalFile(file.getParentFile());
+		return new LocalFile(file.getParentFile(), application);
 	}
 
 	public String getPath()
@@ -100,7 +104,7 @@ public class LocalFile implements IAbstractFile
 
 	public IAbstractFile getAbsoluteFile()
 	{
-		return new LocalFile(file.getAbsoluteFile());
+		return new LocalFile(file.getAbsoluteFile(), application);
 	}
 
 	public boolean canRead()
@@ -165,7 +169,7 @@ public class LocalFile implements IAbstractFile
 		LocalFile[] files = new LocalFile[listFiles.length];
 		for (int i = 0; i < listFiles.length; i++)
 		{
-			files[i] = new LocalFile(listFiles[i]);
+			files[i] = new LocalFile(listFiles[i], application);
 		}
 		return files;
 	}
@@ -276,4 +280,13 @@ public class LocalFile implements IAbstractFile
 		return false;
 	}
 
+	@Override
+	public String getRemoteUrl() throws Exception
+	{
+		if (file.exists() && application instanceof IAllWebClientPluginAccess ngApplication)
+		{
+			return ngApplication.serveResource(file, getContentType(), "inline");
+		}
+		return null;
+	}
 }

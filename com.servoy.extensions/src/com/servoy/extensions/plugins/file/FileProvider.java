@@ -35,7 +35,6 @@ import java.net.URI;
 import java.net.URL;
 import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
-import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -122,6 +121,7 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 * var d = plugins.file.getDesktopFolder();
 	 * application.output('desktop folder is: ' + d.getAbsolutePath());
 	 */
+	@Deprecated
 	public JSFile js_getDesktopFolder()
 	{
 		FileSystemView fsf = FileSystemView.getFileSystemView();
@@ -131,7 +131,7 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 		File desktopDir = new File(homeDir.getAbsolutePath() + File.separator + "Desktop"); //$NON-NLS-1$
 		if (desktopDir != null && desktopDir.isDirectory())
 		{
-			return new JSFile(desktopDir);
+			return new JSFile(desktopDir, plugin.getClientPluginAccess());
 		}
 		else
 		{
@@ -141,7 +141,7 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 			{
 				if (fsf.isRoot(element))
 				{
-					return new JSFile(element);
+					return new JSFile(element, plugin.getClientPluginAccess());
 				}
 			}
 			return null;
@@ -157,7 +157,7 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 */
 	public JSFile js_getHomeFolder()
 	{
-		return new JSFile(new File(System.getProperty("user.home"))); //$NON-NLS-1$
+		return new JSFile(new File(System.getProperty("user.home")), plugin.getClientPluginAccess()); //$NON-NLS-1$
 	}
 
 	/**
@@ -166,7 +166,7 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	@Deprecated
 	public JSFile js_getHomeDirectory()
 	{
-		return new JSFile(new File(System.getProperty("user.home"))); //$NON-NLS-1$
+		return new JSFile(new File(System.getProperty("user.home")), plugin.getClientPluginAccess()); //$NON-NLS-1$
 	}
 
 	protected File getFileFromArg(Object f, boolean createFileInstance)
@@ -220,6 +220,7 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 * (or access the bytes which will load the big file completely in memory)
 	 *
 	 */
+	@Deprecated
 	@ServoyClientSupport(ng = false, wc = false, sc = true)
 	public Object js_showFileOpenDialog()
 	{
@@ -244,6 +245,7 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 *
 	 * @param selectionMode 0=both,1=Files,2=Dirs
 	 */
+	@Deprecated
 	@ServoyClientSupport(ng = false, wc = false, sc = true)
 	public Object js_showFileOpenDialog(Number selectionMode)
 	{
@@ -283,6 +285,7 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 * @param selectionMode 0=both,1=Files,2=Dirs
 	 * @param startDirectory Path to default folder; null=default/previous
 	 */
+	@Deprecated
 	@ServoyClientSupport(ng = false, wc = false, sc = true)
 	public Object js_showFileOpenDialog(Number selectionMode, String startDirectory)
 	{
@@ -325,6 +328,7 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 * @param startDirectory JSFile instance of default folder, null=default/previous
 	 * @param multiselect true/false
 	 */
+	@Deprecated
 	@ServoyClientSupport(ng = false, wc = false, sc = true)
 	public Object js_showFileOpenDialog(Number selectionMode, JSFile startDirectory, Boolean multiselect)
 	{
@@ -339,6 +343,7 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 * @param startDirectory Path to default folder, null=default/previous
 	 * @param multiselect true/false
 	 */
+	@Deprecated
 	@ServoyClientSupport(ng = false, wc = false, sc = true)
 	public Object js_showFileOpenDialog(Number selectionMode, String startDirectory, Boolean multiselect)
 	{
@@ -384,6 +389,7 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 * @param multiselect true/false
 	 * @param filter A filter or array of filters on the folder files.
 	 */
+	@Deprecated
 	@ServoyClientSupport(ng = false, wc = false, sc = true)
 	public Object js_showFileOpenDialog(Number selectionMode, JSFile startDirectory, Boolean multiselect, Object filter)
 	{
@@ -399,6 +405,7 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 * @param multiselect true/false
 	 * @param filter A filter or array of filters on the folder files.
 	 */
+	@Deprecated
 	@ServoyClientSupport(ng = false, wc = false, sc = true)
 	public Object js_showFileOpenDialog(Number selectionMode, String startDirectory, Boolean multiselect, Object filter)
 	{
@@ -525,7 +532,7 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 						JSFile[] files = new JSFile[fu.length];
 						for (int i = 0; i < fu.length; i++)
 						{
-							files[i] = new JSFile(fu[i]);
+							files[i] = new JSFile(fu[i], access);
 							returnList.add(files[i]);
 						}
 						functionDef.executeSync(plugin.getClientPluginAccess(), new Object[] { files });
@@ -562,7 +569,7 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 				File f = FileChooserUtils.getAReadFile(currentWindow, file, selection, filterA, title);
 				if (f != null)
 				{
-					return new JSFile(f);
+					return new JSFile(f, plugin.getClientPluginAccess());
 				}
 			}
 		}
@@ -787,7 +794,7 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 		JSFile[] jsFiles = new JSFile[files.length];
 		for (int i = 0; i < files.length; i++)
 		{
-			jsFiles[i] = new JSFile(files[i]);
+			jsFiles[i] = new JSFile(files[i], plugin.getClientPluginAccess());
 		}
 		return jsFiles;
 	}
@@ -847,7 +854,7 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	@Deprecated
 	public JSFile js_convertStringToJSFile(String fileName)
 	{
-		return new JSFile(new File(fileName));
+		return new JSFile(new File(fileName), plugin.getClientPluginAccess());
 	}
 
 	/**
@@ -865,9 +872,9 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	public JSFile js_convertToJSFile(Object file)
 	{
 		if (file instanceof JSFile) return (JSFile)file;
-		if (file instanceof File) return new JSFile((File)file);
-		if (file instanceof IUploadData) return new JSFile((IUploadData)file);
-		if (file != null) return new JSFile(new File(file.toString()));
+		if (file instanceof File) return new JSFile((File)file, plugin.getClientPluginAccess());
+		if (file instanceof IUploadData) return new JSFile((IUploadData)file, plugin.getClientPluginAccess());
+		if (file != null) return new JSFile(new File(file.toString()), plugin.getClientPluginAccess());
 		return null;
 	}
 
@@ -1047,7 +1054,7 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	}
 
 	/**
-	 * Creates the folder by the given pathname, including anynecessary but nonexistent parent folders.
+	 * Creates the folder by the given pathname, including any necessary but nonexistent parent folders.
 	 * Note that if this operation fails it may have succeeded in creating some of the necessary parent folders.
 	 * Will return true if it could make this folder or if the folder did already exist.
 	 *
@@ -1195,7 +1202,7 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 		JSFile[] jsRoots = new JSFile[roots.length];
 		for (int i = 0; i < roots.length; i++)
 		{
-			jsRoots[i] = new JSFile(roots[i]);
+			jsRoots[i] = new JSFile(roots[i], plugin.getClientPluginAccess());
 		}
 		return jsRoots;
 	}
@@ -1221,7 +1228,7 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 			f.deleteOnExit();
 			String name = f.getAbsolutePath();
 			tempFiles.put(name, f);
-			return new JSFile(f);
+			return new JSFile(f, plugin.getClientPluginAccess());
 		}
 		catch (Exception e)
 		{
@@ -1973,7 +1980,7 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 		File f = FileChooserUtils.getAWriteFile(currentWindow, file, true, title);
 		if (f != null)
 		{
-			return new JSFile(f);
+			return new JSFile(f, plugin.getClientPluginAccess());
 		}
 		return null;
 	}
@@ -2058,7 +2065,7 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 		File retval = FileChooserUtils.getAReadFile(currentWindow, f, JFileChooser.DIRECTORIES_ONLY, null, title);
 		if (retval != null)
 		{
-			return new JSFile(retval);
+			return new JSFile(retval, plugin.getClientPluginAccess());
 		}
 		return null;
 	}
@@ -2296,10 +2303,8 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 		}
 		try
 		{
-			final IFileService service = getFileService();
-			final String clientId = plugin.getClientPluginAccess().getClientID();
-			final RemoteFileData data = service.getRemoteFileData(clientId, path);
-			return new JSFile(new RemoteFile(data, service, clientId));
+			File mainFolder = getDefaultFolder(plugin.getClientPluginAccess().getClientID());
+			return new JSFile(new RemoteFile(new File(mainFolder, path), mainFolder, plugin.getClientPluginAccess()), plugin.getClientPluginAccess());
 		}
 		catch (Exception ex)
 		{
@@ -2476,13 +2481,22 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 			}
 		}
 
-		String serverFileName = null;
+		RemoteFile remoteFile = null;
+		File mainFolder = null;
+		try
+		{
+			mainFolder = getDefaultFolder(plugin.getClientPluginAccess().getClientID());
+		}
+		catch (Exception e)
+		{
+			Debug.error(e);
+		}
 		if (targetFolder instanceof JSFile)
 		{
 			IAbstractFile abstractFile = ((JSFile)targetFolder).getAbstractFile();
 			if (abstractFile instanceof RemoteFile)
 			{
-				serverFileName = ((RemoteFile)abstractFile).getAbsolutePath();
+				remoteFile = (RemoteFile)abstractFile;
 			}
 			else
 			{
@@ -2491,20 +2505,18 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 		}
 		else
 		{
-			serverFileName = targetFolder.toString();
+			remoteFile = new RemoteFile(new File(mainFolder, targetFolder.toString()), mainFolder, plugin.getClientPluginAccess());
 		}
 		try
 		{
-			final IFileService service = getFileService();
-			final String clientId = plugin.getClientPluginAccess().getClientID();
-			final RemoteFileData[] remoteList = service.getRemoteFolderContent(clientId, serverFileName, fileFilterA, _fileOption, _visibleOption,
+			final RemoteFile[] remoteList = remoteFile.getFolderContent(fileFilterA, _fileOption, _visibleOption,
 				_lockedOption);
 			if (remoteList != null)
 			{
 				final JSFile[] files = new JSFile[remoteList.length];
 				for (int i = 0; i < files.length; i++)
 				{
-					files[i] = new JSFile(new RemoteFile(remoteList[i], service, clientId));
+					files[i] = new JSFile(remoteList[i], plugin.getClientPluginAccess());
 				}
 				return files;
 			}
@@ -2587,6 +2599,7 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 * @param files file(s) to be streamed (can be a String path or a {@link JSFile}) or an Array of these
 	 * @return a {@link JSProgressMonitor} object to allow client to subscribe to progress notifications
 	 */
+	@Deprecated
 	public JSProgressMonitor js_streamFilesToServer(final Object files)
 	{
 		return js_streamFilesToServer(files, null, null);
@@ -2603,6 +2616,7 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 * @param serverFiles can be a JSFile or JSFile[], a String or String[], representing the file name(s) to use on the server
 	 * @return a {@link JSProgressMonitor} object to allow client to subscribe to progress notifications
 	 */
+	@Deprecated
 	public JSProgressMonitor js_streamFilesToServer(final Object files, final Object serverFiles)
 	{
 		return js_streamFilesToServer(files, serverFiles, null);
@@ -2619,6 +2633,7 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 * @param callback the {@link Function} to be called back at the end of the process (for every file); the callback function is invoked with argument the filename that was transfered; an extra second exception parameter can be given if an exception occured
 	 * @return a {@link JSProgressMonitor} object to allow client to subscribe to progress notifications
 	 */
+	@Deprecated
 	public JSProgressMonitor js_streamFilesToServer(final Object files, final Function callback)
 	{
 		return js_streamFilesToServer(files, null, callback);
@@ -2636,6 +2651,7 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 * @param callback the {@link Function} to be called back at the end of the process (for every file); the callback function is invoked with argument the filename that was transfered; an extra second exception parameter can be given if an exception occured
 	 * @return a {@link JSProgressMonitor} object to allow client to subscribe to progress notifications
 	 */
+	@Deprecated
 	public JSProgressMonitor js_streamFilesToServer(final Object files, final Object serverFiles, final Function callback)
 	{
 		if (files != null)
@@ -2670,9 +2686,8 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 				final JSProgressMonitor progressMonitor = new JSProgressMonitor(this, totalBytes, filesToBeStreamed.length);
 				try
 				{
-					final IFileService service = getFileService();
 					plugin.getClientPluginAccess().getExecutor().execute(
-						new ToServerWorker(filesToBeStreamed, serverObjects, function, progressMonitor, service));
+						new ToServerWorker(filesToBeStreamed, serverObjects, function, progressMonitor));
 
 					return progressMonitor;
 				}
@@ -2717,6 +2732,7 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 * @param serverFiles the files on the server that will be transfered to the client, can be a String or a String[]
 	 * @return a {@link JSProgressMonitor} object to allow client to subscribe to progress notifications
 	 */
+	@Deprecated
 	public JSProgressMonitor js_streamFilesFromServer(final Object files, final Object serverFiles)
 	{
 		return js_streamFilesFromServer(files, serverFiles, null);
@@ -2735,6 +2751,7 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 * @param callback the {@link Function} to be called back at the end of the process (for every file); the callback function is invoked with argument the filename that was transfered; an extra second exception parameter can be given if an exception occured
 	 * @return a {@link JSProgressMonitor} object to allow client to subscribe to progress notifications
 	 */
+	@Deprecated
 	@SuppressWarnings("nls")
 	public JSProgressMonitor js_streamFilesFromServer(final Object files, final Object serverFiles, final Function callback)
 	{
@@ -2768,7 +2785,6 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 
 				try
 				{
-					final IFileService service = getFileService();
 					final String clientId = plugin.getClientPluginAccess().getClientID();
 					final RemoteFile[] remoteFiles = new RemoteFile[serverObjects.length];
 					if (serverObjects[0] instanceof JSFile)
@@ -2799,23 +2815,18 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 					}
 					else
 					{
-						String[] serverFileNames = new String[serverObjects.length];
+						File mainFolder = getDefaultFolder(plugin.getClientPluginAccess().getClientID());
 						for (int i = 0; i < serverObjects.length; i++)
 						{
-							serverFileNames[i] = serverObjects[i].toString();
-						}
-						RemoteFileData[] datas = service.getRemoteFileData(clientId, serverFileNames);
-						for (int i = 0; i < datas.length; i++)
-						{
-							remoteFiles[i] = new RemoteFile(datas[i], service, clientId);
-							totalBytes += datas[i].size();
+							remoteFiles[i] = new RemoteFile(new File(mainFolder, serverObjects[i].toString()), mainFolder, plugin.getClientPluginAccess());
+							totalBytes += remoteFiles[i].size();
 							filesToBeStreamed[i] = (i < fileObjects.length && !firstFile.isDirectory()) ? getFileFromArg(fileObjects[i], true)
 								: new File(firstFile, remoteFiles[i].getName());
 						}
 					}
 					JSProgressMonitor progressMonitor = new JSProgressMonitor(this, totalBytes, remoteFiles.length);
 					plugin.getClientPluginAccess().getExecutor().execute(
-						new FromServerWorker(filesToBeStreamed, remoteFiles, function, progressMonitor, service));
+						new FromServerWorker(filesToBeStreamed, remoteFiles, function, progressMonitor));
 					return progressMonitor;
 				}
 				catch (Exception ex)
@@ -2827,15 +2838,10 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 		return null;
 	}
 
-	/**
-	 * Utility method to give access to the {@link IFileService} remote service
-	 * @since Servoy 5.2
-	 *
-	 * @return the service
-	 */
-	protected IFileService getFileService() throws Exception
+	protected File getDefaultFolder(String clientID) throws Exception
 	{
-		return (IFileService)plugin.getClientPluginAccess().getRemoteService(IFileService.class.getName());
+		IFileService service = (IFileService)plugin.getClientPluginAccess().getRemoteService(IFileService.class.getName());
+		return service.getDefaultFolder(clientID);
 	}
 
 	/**
@@ -2907,8 +2913,8 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	{
 		try
 		{
-			final IFileService service = getFileService();
-			return service.getDefaultFolderLocation(plugin.getClientPluginAccess().getClientID());
+			final File mainFolder = getDefaultFolder(plugin.getClientPluginAccess().getClientID());
+			return (mainFolder == null) ? null : mainFolder.getCanonicalPath();
 		}
 		catch (final Exception ex)
 		{
@@ -2928,7 +2934,9 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 *
 	 * @param file the remote file where the url should be generated from. Must be a remote file
 	 * @return the url as a string
+	 * @deprecated replaced by JSFile.getRemoteUrl()
 	 */
+	@Deprecated
 	@SuppressWarnings("nls")
 	public String js_getUrlForRemoteFile(JSFile file) throws Exception
 	{
@@ -2949,7 +2957,10 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 *
 	 * @param file the remote file where the url should be generated from. Must be a remote file
 	 * @return the url as a string
+	 *
+	 * @deprecated replaced by JSFile.getRemoteUrl()
 	 */
+	@Deprecated
 	public String js_getUrlForRemoteFile(String file) throws Exception
 	{
 		return js_getUrlForRemoteFile(js_convertToRemoteJSFile(file));
@@ -3041,7 +3052,7 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	}
 
 	/**
-	 * If the client's solution is closed, the file given to this method wil be deleted.
+	 * If the client's solution is closed, the file given to this method will be deleted.
 	 * This can be a remote or local file.
 	 *
 	 * This can be used to have temp files within a client that will be cleaned up when the solution is closed.
@@ -3069,6 +3080,11 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 			}
 		}
 		trackedFiles.clear();
+		for (File file : tempFiles.values())
+		{
+			file.delete();
+		}
+		tempFiles.clear();
 	}
 
 
@@ -3088,7 +3104,6 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 		private final RemoteFile[] remoteFiles;
 		private final FunctionDefinition function;
 		private final JSProgressMonitor progressMonitor;
-		private final IFileService service;
 
 		/**
 		 * @param files
@@ -3097,14 +3112,12 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 		 * @param progressMonitor
 		 * @param service
 		 */
-		public FromServerWorker(final File[] files, RemoteFile[] remoteFiles, final FunctionDefinition function, final JSProgressMonitor progressMonitor,
-			final IFileService service)
+		public FromServerWorker(final File[] files, RemoteFile[] remoteFiles, final FunctionDefinition function, final JSProgressMonitor progressMonitor)
 		{
 			this.files = files;
 			this.remoteFiles = remoteFiles;
 			this.function = function;
 			this.progressMonitor = progressMonitor;
-			this.service = service;
 		}
 
 		public void run()
@@ -3112,11 +3125,10 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 			try
 			{
 				long totalTransfered = 0L;
-				final String clientId = plugin.getClientPluginAccess().getClientID();
 				for (int i = 0; i < files.length; i++)
 				{
-					UUID uuid = null;
 					OutputStream os = null;
+					InputStream is = null;
 					Exception ex = null;
 					File file = files[i];
 					if (file != null)
@@ -3133,27 +3145,22 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 								progressMonitor.setCurrentTransferred(0L);
 
 								os = new FileOutputStream(file);
-								uuid = service.openTransfer(clientId, remote.getAbsolutePath());
-								if (uuid != null)
+								is = remote.getInputStream();
+								if (is != null)
 								{
-									byte[] bytes = service.readBytes(uuid, CHUNK_BUFFER_SIZE);
-									while (bytes != null && !progressMonitor.js_isCanceled())
+									byte[] buffer = new byte[CHUNK_BUFFER_SIZE];
+									int read;
+									while (((read = is.read(buffer)) != -1) && !progressMonitor.js_isCanceled())
 									{
-										os.write(bytes);
-										totalTransfered += bytes.length;
-										currentTransferred += bytes.length;
+										os.write(buffer);
+										totalTransfered += read;
+										currentTransferred += read;
 										progressMonitor.setTotalTransferred(totalTransfered);
 										progressMonitor.setCurrentTransferred(currentTransferred);
 										if (progressMonitor.getDelay() > 0)
 										{
 											Thread.sleep(progressMonitor.getDelay()); // to test the process
 										}
-										// check for the length (this results in 1 less call to the server)
-										if (bytes.length == CHUNK_BUFFER_SIZE)
-										{
-											bytes = service.readBytes(uuid, CHUNK_BUFFER_SIZE);
-										}
-										else break;
 									}
 								}
 							}
@@ -3165,12 +3172,15 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 						}
 						finally
 						{
-							try
+							if (is != null)
 							{
-								if (uuid != null) service.closeTransfer(uuid);
-							}
-							catch (final RemoteException ignore)
-							{
+								try
+								{
+									is.close();
+								}
+								catch (final IOException e)
+								{
+								}
 							}
 							try
 							{
@@ -3181,7 +3191,7 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 							}
 							if (function != null && !progressMonitor.js_isCanceled())
 							{
-								function.executeAsync(plugin.getClientPluginAccess(), new Object[] { new JSFile(file), ex });
+								function.executeAsync(plugin.getClientPluginAccess(), new Object[] { new JSFile(file, plugin.getClientPluginAccess()), ex });
 							}
 							if (progressMonitor.js_isCanceled())
 							{
@@ -3212,7 +3222,6 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 		private final Object[] serverFiles;
 		private final FunctionDefinition function;
 		private final JSProgressMonitor progressMonitor;
-		private final IFileService service;
 
 		/**
 		 * @param files
@@ -3221,14 +3230,12 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 		 * @param progressMonitor
 		 * @param service
 		 */
-		public ToServerWorker(final File[] files, final Object[] serverFiles, final FunctionDefinition function, final JSProgressMonitor progressMonitor,
-			final IFileService service)
+		public ToServerWorker(final File[] files, final Object[] serverFiles, final FunctionDefinition function, final JSProgressMonitor progressMonitor)
 		{
 			this.files = files;
 			this.serverFiles = serverFiles;
 			this.function = function;
 			this.progressMonitor = progressMonitor;
-			this.service = service;
 		}
 
 		public void run()
@@ -3275,33 +3282,39 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 						progressMonitor.setCurrentTransferred(0L);
 
 						final String clientId = plugin.getClientPluginAccess().getClientID();
-						UUID uuid = null;
-						RemoteFileData remoteFile = null;
+						File mainFolder = null;
+						try
+						{
+							mainFolder = getDefaultFolder(plugin.getClientPluginAccess().getClientID());
+						}
+						catch (Exception e)
+						{
+							Debug.error(e);
+						}
+						File remoteFile = new File(mainFolder, serverFileName);
 						InputStream is = null;
+						OutputStream os = null;
 						Exception ex = null;
 						try
 						{
 							is = new FileInputStream(file);
-							uuid = service.openTransfer(clientId, serverFileName);
-							if (uuid != null)
+							os = new FileOutputStream(remoteFile);
+							byte[] buffer = new byte[CHUNK_BUFFER_SIZE];
+							int read = is.read(buffer);
+							while (read > -1 && !progressMonitor.js_isCanceled())
 							{
-								byte[] buffer = new byte[CHUNK_BUFFER_SIZE];
-								int read = is.read(buffer);
-								while (read > -1 && !progressMonitor.js_isCanceled())
+								os.write(buffer);
+								totalTransfered += read;
+								currentTransferred += read;
+								progressMonitor.setTotalTransferred(totalTransfered);
+								progressMonitor.setCurrentTransferred(currentTransferred);
+
+								if (progressMonitor.getDelay() > 0)
 								{
-									service.writeBytes(uuid, buffer, 0, read);
-									totalTransfered += read;
-									currentTransferred += read;
-									progressMonitor.setTotalTransferred(totalTransfered);
-									progressMonitor.setCurrentTransferred(currentTransferred);
-
-									if (progressMonitor.getDelay() > 0)
-									{
-										Thread.sleep(progressMonitor.getDelay()); // to test the process
-									}
-
-									read = is.read(buffer);
+									Thread.sleep(progressMonitor.getDelay()); // to test the process
 								}
+
+								read = is.read(buffer);
 							}
 						}
 						catch (final Exception e)
@@ -3313,12 +3326,9 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 						{
 							try
 							{
-								if (uuid != null)
-								{
-									remoteFile = (RemoteFileData)service.closeTransfer(uuid);
-								}
+								if (os != null) os.close();
 							}
-							catch (final RemoteException ignore)
+							catch (final IOException ignore)
 							{
 							}
 							try
@@ -3330,20 +3340,15 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 							}
 							if (function != null && !progressMonitor.js_isCanceled())
 							{
-								final JSFile returnedFile = (remoteFile == null) ? null : new JSFile(new RemoteFile(remoteFile, service, clientId));
+								final JSFile returnedFile = (remoteFile == null) ? null
+									: new JSFile(new RemoteFile(remoteFile, mainFolder, plugin.getClientPluginAccess()), plugin.getClientPluginAccess());
 								function.executeAsync(plugin.getClientPluginAccess(), new Object[] { returnedFile, ex });
 							}
 							if (progressMonitor.js_isCanceled())
 							{
-								try
-								{
-									service.delete(clientId, remoteFile.getAbsolutePath());
-									progressMonitor.run();
-									break;
-								}
-								catch (final IOException ignore)
-								{
-								}
+								remoteFile.delete();
+								progressMonitor.run();
+								break;
 							}
 						}
 					}

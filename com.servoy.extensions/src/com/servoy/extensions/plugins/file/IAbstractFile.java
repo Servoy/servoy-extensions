@@ -25,7 +25,7 @@ import com.servoy.j2db.plugins.IUploadData;
 /**
  * General contract for scripting wrappers representing files, either local, remote or web<br/>
  * Emulates the {@link File} class
- * 
+ *
  * @author jcompagner
  * @author Servoy Stuff
  * @since Servoy 5.2
@@ -173,4 +173,5 @@ public interface IAbstractFile extends IUploadData
 	 */
 	boolean setBytes(byte[] bytes, boolean createFile);
 
+	String getRemoteUrl() throws Exception;
 }

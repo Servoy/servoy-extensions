@@ -21,49 +21,21 @@ import java.io.File;
 
 /**
  * Utility class holding methods used by {@link FileServerPlugin} and {@link WebFileProvider}
- * 
+ *
  * @author Servoy Stuff
- * 
+ *
  * @since Servoy 5.2.2
  */
 public class FilePluginUtils
 {
-	/**
-	 * Create a hierarchy of RemoteFileData recursively
-	 * 
-	 * @param f The file to construct the hierarchy for
-	 * @param defaultFolder the default upload folder on the server
-	 * 
-	 * @return the parent of the hierarchy
-	 */
-	public static RemoteFileData constructHierarchy(final File f, final File defaultFolder)
-	{
-		if (f == null) return null;
-		if (defaultFolder.equals(f))
-		{
-			return new RemoteFileData(defaultFolder, null, null);
-		}
-		else
-		{
-			final RemoteFileData parent = constructHierarchy(f.getParentFile(), defaultFolder);
-			if (f.isDirectory())
-			{
-				return new RemoteFileData(f, parent);
-			}
-			else
-			{
-				return parent;
-			}
-		}
-	}
 
 	/**
 	 * Checks that the parent of the file provided is the defaultFolder<br/>
 	 * Added for security check (to prevent traversing the hierarchy of the server up from the defaultFolder).
-	 * 
+	 *
 	 * @param f the file to check for parents
 	 * @param defaultFolder must be a parent of the file
-	 * 
+	 *
 	 * @return true if parent is defaultFolder
 	 */
 	public static boolean checkParentFile(final File f, final File defaultFolder)
@@ -81,9 +53,9 @@ public class FilePluginUtils
 
 	/**
 	 * Check that the path is 'absolute' on the server
-	 * 
+	 *
 	 * @param filePath the file path to check - must start with '/'
-	 * 
+	 *
 	 * @throws IllegalArgumentException if the path doesn't start with '/'
 	 */
 	public static void filePathCheck(final String filePath) throws IllegalArgumentException
