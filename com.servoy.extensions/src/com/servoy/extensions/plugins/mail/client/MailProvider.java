@@ -335,7 +335,7 @@ public class MailProvider implements IReturnedTypesProvider, IScriptable, IJavaS
 		if (addresses == null) return new String[0];
 
 		List<String> retval = new ArrayList<String>();
-		StringTokenizer tk = new StringTokenizer(addresses.toLowerCase(), " ;,<>[]()'\":\n\t\r"); //$NON-NLS-1$
+		StringTokenizer tk = new StringTokenizer(addresses.toLowerCase(), " ;,<>[]()\":\n\t\r"); //$NON-NLS-1$
 		while (tk.hasMoreTokens())
 		{
 			String token = tk.nextToken();
