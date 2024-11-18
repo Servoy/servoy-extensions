@@ -28,9 +28,28 @@ import com.servoy.j2db.documentation.ServoyDocumented;
 import com.servoy.j2db.scripting.IScriptable;
 
 /**
- * Xport menu enabler
- * @author jblok
- */
+* The <code>Xport menu enabler</code> plugin provides tools for exporting and importing data to and from Excel files, offering flexibility in managing worksheets, templates, and data structures. It supports enabling or disabling export and import functionalities through its <code>exportEnabled</code> and <code>importEnabled</code> properties, allowing seamless integration into applications.
+*
+* <h2>Primary Method</h2>
+* <p>
+* The plugin’s primary method, <code>excelExport</code>, facilitates exporting data from specified data sources to Excel files. Users can customize the process by:
+* <ul>
+*   <li>Choosing data attributes</li>
+*   <li>Applying templates</li>
+*   <li>Setting sheet names</li>
+*   <li>Defining column headers</li>
+*   <li>Specifying starting rows and columns</li>
+* </ul>
+* This ensures structured and well-formatted Excel outputs tailored to specific requirements.
+* </p>
+*
+* <h2>Features</h2>
+* <p>
+* With features like template support, custom headers, and flexible positioning, <code>excelxport</code> simplifies the interaction with Excel files. It enhances workflows by enabling dynamic data handling and output formatting, making it an essential tool for data-driven applications requiring Excel integration.
+* </p>
+*
+* @author jblok
+*/
 @ServoyDocumented(publicName = ExcelXportPlugin.PLUGIN_NAME, scriptingName = "plugins." + ExcelXportPlugin.PLUGIN_NAME)
 public class Enabler implements IScriptable
 {
@@ -154,7 +173,7 @@ public class Enabler implements IScriptable
 	 * @param foundSet the foundset on which to export
 	 * @param dataProviderIds the ids of the dataproviders
 	 * @param templateXLS the xls template to export in
-	 * @param sheetName the name of the worksheet 
+	 * @param sheetName the name of the worksheet
 	 */
 	public byte[] js_excelExport(IFoundSet foundSet, String[] dataProviderIds, byte[] templateXLS, String sheetName) throws IOException
 	{
@@ -167,7 +186,7 @@ public class Enabler implements IScriptable
 	 * @param foundSet the foundset on which to export
 	 * @param dataProviderIds the ids of the dataproviders
 	 * @param templateXLS the xls template to export in
-	 * @param sheetName the name of the worksheet 
+	 * @param sheetName the name of the worksheet
 	 */
 	public byte[] js_excelExport(IFoundSet foundSet, String[] dataProviderIds, byte[] templateXLS, String sheetName, String[] outputColumnNames)
 		throws IOException
@@ -181,7 +200,7 @@ public class Enabler implements IScriptable
 	 * @param foundSet the foundset on which to export
 	 * @param dataProviderIds the ids of the dataproviders
 	 * @param templateXLS the xls template to export in
-	 * @param sheetName the name of the worksheet 
+	 * @param sheetName the name of the worksheet
 	 * @param outputColumnNames is used to set the column headers independently from the dataprovider names
 	 * @param startRow row in the foundset at which to start the export
 	 */
@@ -197,11 +216,12 @@ public class Enabler implements IScriptable
 	 * @param foundSet the foundset on which to export
 	 * @param dataProviderIds the ids of the dataproviders
 	 * @param templateXLS the xls template to export in
-	 * @param sheetName the name of the worksheet 
+	 * @param sheetName the name of the worksheet
 	 * @param outputColumnNames is used to set the column headers independently from the dataprovider names
 	 * @param startRow row in the foundset at which to start the export
 	 */
-	public byte[] js_excelExport(IFoundSet foundSet, String[] dataProviderIds, byte[] templateXLS, String sheetName, String[] outputColumnNames, Number startRow)
+	public byte[] js_excelExport(IFoundSet foundSet, String[] dataProviderIds, byte[] templateXLS, String sheetName, String[] outputColumnNames,
+		Number startRow)
 		throws IOException
 	{
 		int _startRow = (startRow == null ? 1 : startRow.intValue());
@@ -214,7 +234,7 @@ public class Enabler implements IScriptable
 	 * @param foundSet the foundset on which to export
 	 * @param dataProviderIds the ids of the dataproviders
 	 * @param templateXLS the xls template to export in
-	 * @param sheetName the name of the worksheet 
+	 * @param sheetName the name of the worksheet
 	 * @param startRow row in the foundset at which to start the export
 	 * @param startColumn column in the foundset at which to start the export
 	 */
@@ -230,7 +250,7 @@ public class Enabler implements IScriptable
 	 * @param foundSet the foundset on which to export
 	 * @param dataProviderIds the ids of the dataproviders
 	 * @param templateXLS the xls template to export in
-	 * @param sheetName the name of the worksheet 
+	 * @param sheetName the name of the worksheet
 	 * @param outputColumnNames is used to set the column headers independently from the dataprovider names
 	 * @param startRow row in the foundset at which to start the export
 	 * @param startColumn column in the foundset at which to start the export

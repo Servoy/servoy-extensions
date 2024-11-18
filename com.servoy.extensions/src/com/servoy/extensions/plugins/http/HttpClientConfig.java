@@ -22,7 +22,33 @@ import com.servoy.j2db.scripting.IJavaScriptType;
 import com.servoy.j2db.scripting.IScriptable;
 
 /**
- * Contains different settings for configuring HttpClient.
+ * The <code>HttpClientConfig</code> object provides configurable properties to manage the behavior of an HTTP client,
+ * including settings for SSL/TLS, connection limits, protocol preferences, and user agent configuration.
+ *
+ * <h2>Functionality</h2>
+ *
+ * <h3>SSL/TLS and Security</h3>
+ * <ul>
+ *   <li><code>certPath</code> and <code>certPassword</code> specify the client certificate location and password.</li>
+ *   <li><code>trustStorePath</code> and <code>trustStorePassword</code> define the truststore for trusted certificates.</li>
+ *   <li><code>protocol</code> sets the TLS protocol, defaulting to TLS.</li>
+ *   <li><code>hostValidation</code> disables hostname validation, primarily for testing purposes.</li>
+ * </ul>
+ *
+ * <h3>Connection Management</h3>
+ * <ul>
+ *   <li><code>keepAliveDuration</code> sets the duration (in seconds) for keeping connections alive.</li>
+ *   <li><code>maxConnectionsPerRoute</code> and <code>maxTotalConnections</code> limit the number of connections managed by the client.</li>
+ *   <li><code>maxIOThreadCount</code> determines the number of input/output threads for the client.</li>
+ * </ul>
+ *
+ * <h3>Additional Features</h3>
+ * <ul>
+ *   <li><code>enableRedirects</code> enables or disables automatic following of HTTP redirects.</li>
+ *   <li><code>forceHttp1</code> forces HTTP/1.1 usage when HTTP/2 compatibility issues arise.</li>
+ *   <li><code>multiPartLegacyMode</code> switches multipart request handling to a non-buffered mode.</li>
+ *   <li><code>userAgent</code> allows customization of the HTTP client’s user agent string.</li>
+ * </ul>
  *
  * @author lvostinar
  */

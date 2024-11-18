@@ -34,7 +34,33 @@ import com.servoy.j2db.util.Debug;
 import com.servoy.j2db.util.SafeArrayList;
 
 /**
- * An amortization calculation.
+ * This module details an amortization calculation system that defines constants for various periodic intervals and events, as well as methods for managing loans, payments, rate changes, and schedule calculations.
+ *
+ * <h2>Constants</h2>
+ * <p>
+ * The module includes constants representing various time periods, such as annual, bi-annual, monthly, and weekly intervals, as well as unique identifiers like <code>NUMBER_UNLIMITED</code> for unlimited occurrences and <code>STARTDAY_NORMAL</code> for consistent start-day tracking. These constants simplify configuring amortization schedules with precise periodicity and event behaviors.
+ * </p>
+ *
+ * <h2>Methods</h2>
+ * <p>
+ * Key methods facilitate:
+ * <ul>
+ *   <li><b>Loan and Payment Management</b>: Functions like <code>addLoan</code> and <code>addPayment</code> support different configurations, including start and end dates, periodic intervals, and repetitions.</li>
+ *   <li><b>Rate Changes and Period Adjustments</b>: <code>addRateChange</code> and <code>addCompoundPeriodChange</code> enable dynamic updates to interest rates and compounding periods.</li>
+ *   <li><b>Amortization Schedule Handling</b>: Methods like <code>calculateAmortizationSchedule</code> and <code>getAmortizationSchedule</code> compute and retrieve detailed schedules, while <code>getRestBalance</code> and <code>solveForUnknown</code> provide insights into financial balances and unknown variables.</li>
+ * </ul>
+ * </p>
+ *
+ * <h2>Features</h2>
+ * <p>
+ * <ul>
+ *   <li>Utilities like <code>isValidPeriod</code> and <code>roundMoney</code> ensure input validity and precision.</li>
+ *   <li>Event management and sorting (<code>sortEvents</code>, <code>getEvents</code>) organize financial activities over time.</li>
+ * </ul>
+ * </p>
+ * <p>
+ * This module streamlines the creation and management of customized amortization schedules with precision and adaptability.
+ * </p>
  *
  * @author sebster
  */
