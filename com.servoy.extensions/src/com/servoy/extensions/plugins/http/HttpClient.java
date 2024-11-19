@@ -30,6 +30,11 @@ import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.sql.Date;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.List;
 
 import javax.net.ssl.HostnameVerifier;
@@ -644,6 +649,48 @@ public class HttpClient implements IScriptable, IJavaScriptType
 			this.proxyHost = null;
 			this.proxyPort = 8080;
 		}
+	}
+
+	/**
+	 * Execute multiple requests at once, each in its own thread and wait for the resposne
+	 * @sample
+	 * var client = plugins.http.createNewHttpClient();
+	 * var getReq1 = client.createGetRequest("http://www.google.com")
+	 * var getReq2 = client.createGetRequest("http://www.yahoo.com")
+	 * var responses = client.executeRequests('username','password','mycomputername','domain', [getReq1, getReq2]);
+	 *
+	 * @param userName the user name
+	 * @param password the password
+	 * @param workstation The workstation the authentication request is originating from.
+	 * @param domain The domain to authenticate within.
+	 * @param responses Array of response objects, matching order of request array
+	 */
+	public Response[] js_executeRequests(String userName, String password, String workstation, String domain, BaseRequest[] requests)
+	{
+		int threadCount = requests.length;
+		ExecutorService executor = Executors.newFixedThreadPool(threadCount);
+		
+		int i;
+		Future<Response>[] threads = new Future[threadCount];
+		for (i = 0; i < threadCount; i++) {
+			Runner r = new Runner(username, password, workstation, domain, requests[i]);
+			threads[i] = executor.submit(r);
+		}
+		
+		Response[] allResp = new Response[threadCount];
+		for (i = 0; i < threadCount; i++) {
+			try {
+				Response resp = threads[i].get();
+				allResp[i] = resp;
+			} catch (InterruptedException | ExecutionException e) {
+				e.printStackTrace();
+				allResp[i] = null;
+			}
+		}
+		
+		executor.shutdown();
+		
+		return allResp;
 	}
 
 	private static final class CertificateSSLSocketFactoryHandler extends SSLConnectionSocketFactory
