@@ -22,7 +22,20 @@ import com.servoy.j2db.documentation.ServoyDocumented;
 import com.servoy.j2db.scripting.IScriptable;
 
 /**
- * DataProvider to be exported.
+ * <p>The <code>DataProviderExport</code> class facilitates the customization of
+ * data exports by allowing the setting of formats, headers, and value lists for
+ * data providers. It is designed for seamless integration with export tools.</p>
+ *
+ * <h2>Functionality</h2>
+ *
+ * <p>The <code>setFormat(format)</code> method applies a specific format to the
+ * data provider's value, enabling control over date, number, or string
+ * representations. Headers can be customized using
+ * <code>setHeaderText(headerText)</code>, which overrides the default data
+ * provider name in the export file. The <code>setValueList(valuelistName)</code>
+ * method maps value lists to data providers, resolving display values for more
+ * readable exports.</p>
+ *
  * @author lvostinar
  */
 @ServoyDocumented(scriptingName = "DataProviderExport")

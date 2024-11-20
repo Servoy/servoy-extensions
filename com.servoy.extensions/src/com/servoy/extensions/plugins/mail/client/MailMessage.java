@@ -25,7 +25,29 @@ import com.servoy.j2db.documentation.ServoyDocumented;
 import com.servoy.j2db.scripting.IJavaScriptType;
 
 /**
- * Container object for an email.
+ * <p>The <code>MailMessage</code> object acts as a container for email messages,
+ * providing methods to retrieve various components of an email. These include
+ * attachments, sender and recipient addresses, email headers, plain text or HTML
+ * content, and metadata like the sent date and subject.</p>
+ *
+ * <h2>Functionality</h2>
+ * <p><code>MailMessage</code> provides a range of methods to interact with email
+ * components. First, <code>getAttachments()</code> returns an array of attachments
+ * in the email. Second, address-related methods such as <code>getFromAddresses()</code>,
+ * <code>getRecipientAddresses()</code>, <code>getCCAddresses()</code>, and
+ * <code>getReplyAddresses()</code> retrieve sender, recipient, CC, and reply-to
+ * addresses respectively. Third, message content is accessible via
+ * <code>getPlainMsg()</code> for plain text and <code>getHtmlMsg()</code> for HTML
+ * content. Finally, metadata such as the subject, sent date, and headers can be
+ * fetched using <code>getSubject()</code>, <code>getSentDate()</code>, and
+ * <code>getHeaders()</code>.</p>
+ *
+ * <p>These methods facilitate comprehensive handling of email messages, including
+ * parsing, processing, and saving data like attachments and content. References to
+ * <a href="../../../servoycore/dev-api/js-lib/date.md">Date</a> and
+ * <a href="../../../servoycore/dev-api/js-lib/string.md">String</a> types in the
+ * methods ensure consistent data handling.</p>
+ *
  * @author jblok
  */
 @ServoyDocumented

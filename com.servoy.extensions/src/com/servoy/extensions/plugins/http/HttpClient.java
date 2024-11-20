@@ -74,8 +74,18 @@ import com.servoy.j2db.util.Debug;
 import com.servoy.j2db.util.Utils;
 
 /**
- * Wrapper against Apache HttpClient that can execute various http requests.
+ * <p>A wrapper fpr <code>Apache HttpClient</code> for executing requests like GET, POST, PUT, and more, with
+ * support for cookies, proxies, and timeouts.</p>
  *
+ * <h2>Features</h2>
+ *
+ * <p>The client facilitates various HTTP requests (e.g., GET, POST, DELETE) and
+ * supports configuration options like cookies, proxy servers, and timeouts. It
+ * enables both synchronous and asynchronous communication, offering flexibility
+ * for different use cases.</p>
+ *
+ * <p>For configuration details, see the
+ * <a href="./httpclientconfig.md">Http client configuration</a> section.</p>
  */
 @ServoyDocumented
 public class HttpClient implements IScriptable, IJavaScriptType

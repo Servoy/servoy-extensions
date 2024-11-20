@@ -21,7 +21,9 @@ import com.servoy.j2db.documentation.ServoyDocumented;
 import com.servoy.j2db.scripting.IPrefixedConstantsObject;
 
 /**
- * Http status code constants.
+ * <p>HTTP status code constants represent predefined numeric codes used to indicate
+ * the result of an HTTP request. They provide a standardized way for servers to
+ * communicate outcomes such as success, client errors, or server errors.</p>
  *
  */
 @ServoyDocumented

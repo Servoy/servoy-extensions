@@ -25,7 +25,20 @@ import org.apache.hc.client5.http.impl.auth.BasicCredentialsProvider;
 import com.servoy.j2db.documentation.ServoyDocumented;
 
 /**
- * Head http request.
+ * <p>The <code>HeadRequest</code> class enables the creation and execution of
+ * HTTP HEAD requests, allowing retrieval of metadata for resources without
+ * fetching their full content. It supports headers, authentication, and both
+ * synchronous and asynchronous execution.</p>
+ *
+ * <h2>Functionality</h2>
+ *
+ * <p>Headers can be added using the <code>addHeader(headerName, value)</code> method.
+ * Requests can be executed synchronously with <code>executeRequest()</code> or
+ * asynchronously through <code>executeAsyncRequest()</code>, which supports success
+ * and error callbacks. Authentication methods include username-password and windows
+ * authentication. The <code>usePreemptiveAuthentication(b)</code> method enables
+ * credentials to be sent in the header, useful for specific server configurations
+ * requiring immediate authorization.</p>
  *
  * @author pbakker
  */

@@ -35,7 +35,20 @@ import com.servoy.j2db.scripting.IJavaScriptType;
 import com.servoy.j2db.scripting.IScriptable;
 
 /**
- * JWT builder.
+ * <p>The <code>JWT Builder</code> facilitates the creation of JSON Web Tokens
+ * by providing methods for setting headers, adding payload claims, and signing
+ * the token with a specified algorithm. Its chaining capabilities enable
+ * streamlined construction of tokens for secure communication.</p>
+ *
+ * <h2>Functionality</h2>
+ *
+ * <p>Headers can be added using the <code>header(key, value)</code> method,
+ * specifying header names and values. Payloads, including claims, can be defined
+ * with <code>payload(payload)</code> or extended using <code>withClaim(key, value)</code>.
+ * For specifying token expiration, the <code>withExpires(expire)</code> method
+ * adds an "exp" claim. The <code>sign(alg)</code> method finalizes the token by
+ * signing it with the chosen algorithm, automatically including the algorithm
+ * ("alg") in the header.</p>
  *
  * @author emera
  */

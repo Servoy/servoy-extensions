@@ -29,12 +29,15 @@ import com.servoy.j2db.plugins.IClientPluginAccess;
 import com.servoy.j2db.plugins.IFile;
 import com.servoy.j2db.plugins.IUploadData;
 import com.servoy.j2db.scripting.IJavaScriptType;
-import com.servoy.j2db.scripting.IScriptObject;
 import com.servoy.j2db.scripting.IScriptable;
 import com.servoy.j2db.util.Debug;
 
 /**
- * The {@link IScriptObject} representation of a file, either local, remote or web.
+ * <p>The <code>JSFile</code> is an <code>IScriptObject</code> representation of a file,
+ * supporting local, remote, and web contexts. It provides functionalities to manipulate
+ * files, such as checking read/write permissions, creating or deleting files, and
+ * managing file properties like size, type, and last modified date. Operations on
+ * directories are also supported, allowing directory creation and listing of contents.</p>
  *
  * @author jcompagner
  * @author Servoy Stuff

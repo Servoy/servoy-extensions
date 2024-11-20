@@ -34,8 +34,20 @@ import com.servoy.j2db.scripting.JSEvent;
 import com.servoy.j2db.util.Debug;
 
 /**
- * Headless client wrapper, to be used from headless client plugin.
+ * <p>The <code>JSClient</code> serves as a wrapper for a headless client, providing
+ * tools to interact with the headless client plugin. Constants like
+ * <code>CALLBACK_EVENT</code> and <code>CALLBACK_EXCEPTION_EVENT</code> help
+ * identify whether callback execution was successful or if an exception occurred.</p>
  *
+ * <p>The client enables several functionalities, such as retrieving its unique
+ * client ID, which can be used for identifying or managing the client. It supports
+ * accessing or modifying data provider values based on a specified context or active
+ * method call, ensuring precise value management.</p>
+ *
+ * <p>The client allows for queuing method calls on the remote server, with / without
+ * a callbacks.Validation checks ensure
+ * that the client is still active and usable, while methods are available to gracefully
+ * or forcefully shut down the client as required.</p>
  */
 @ServoyDocumented
 public class JSClient implements IScriptable, IConstantsObject

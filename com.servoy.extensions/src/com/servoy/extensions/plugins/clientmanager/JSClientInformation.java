@@ -10,7 +10,15 @@ import com.servoy.j2db.scripting.IScriptable;
 import com.servoy.j2db.server.shared.IClientInformation;
 
 /**
- * A scripting object containing Client information.
+ * <p>The <code>JSClientInformation</code> object provides details about client-specific
+ * attributes in a headless or NGClient environment. It includes properties such as
+ * the application type, client ID, host details (address, name, and identifier), and
+ * user-specific information like username, user ID, and login time. It also tracks
+ * client activity, including idle time, last accessed time, and the currently open
+ * solution. For NGClient, it provides additional details like a status line.</p>
+ *
+ * <p>This object enables monitoring and interaction with connected clients in
+ * applications by managing user sessions and client-specific data.</p>
  */
 @ServoyDocumented
 @ServoyClientSupport(ng = true, mc = false, wc = true, sc = true)

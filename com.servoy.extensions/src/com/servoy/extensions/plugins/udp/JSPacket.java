@@ -24,8 +24,18 @@ import com.servoy.j2db.scripting.IScriptable;
 import com.servoy.j2db.util.Debug;
 
 /**
- * UDP packet.
+ * <p>The UDP packet class facilitates handling packet data through a set of
+ * properties and methods designed for reading, writing, and managing byte
+ * arrays. It provides access to metadata such as the originating host, port,
+ * and packet length. The <code>index</code> property tracks the current
+ * position in the byte array, which is automatically updated after each read
+ * or write operation.</p>
  *
+ * <p>Methods include the ability to read and write various data types such
+ * as bytes, integers, shorts, and UTF-8 strings. Additionally, the class supports
+ * extracting the entire byte array of the packet and encoding custom data
+ * for transmission. Advanced use cases involve combining these capabilities
+ * for constructing or parsing complex packet structures.</p>
  */
 @ServoyDocumented(scriptingName = "JSPacket")
 public class JSPacket implements IScriptable

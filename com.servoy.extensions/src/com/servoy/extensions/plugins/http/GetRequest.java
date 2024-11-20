@@ -25,7 +25,23 @@ import org.apache.hc.client5.http.impl.auth.BasicCredentialsProvider;
 import com.servoy.j2db.documentation.ServoyDocumented;
 
 /**
- * Get http request.
+ * <p>The <code>GetRequest</code> class facilitates the creation and execution of
+ * HTTP GET requests with support for custom headers, authentication, and both
+ * synchronous and asynchronous operations.</p>
+ *
+ * <h2>Functionality</h2>
+ *
+ * <p>Headers can be added using the <code>addHeader(headerName, value)</code> method.
+ * Requests support execution in synchronous mode with <code>executeRequest()</code>
+ * or asynchronously via <code>executeAsyncRequest()</code>, which includes success
+ * and error callbacks for handling responses. Authentication options include
+ * username-password combinations and Windows authentication. Preemptive authentication
+ * can be enabled using <code>usePreemptiveAuthentication(b)</code> to send credentials
+ * in the request header for scenarios requiring immediate authorization.</p>
+ *
+ * <p>For further details, refer to the
+ * <a href="../../../../guides/develop/programming-guide/creating-rest-apis.md#supporting-get-requests">
+ * Supporting GET Requests</a> section.</p>
  *
  * @author pbakker
  *

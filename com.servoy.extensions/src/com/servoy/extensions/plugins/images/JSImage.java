@@ -45,7 +45,34 @@ import com.servoy.j2db.util.MimeTypes;
 import com.servoy.j2db.util.Utils;
 
 /**
- * Image wrapper, part of images plugin, for manipulation of an image in scripting.
+ * <p>The <code>JSImage</code> class provides a scripting interface for image
+ * manipulation, enabling operations like resizing, rotating, flipping, and
+ * metadata management. It integrates with the images plugin for streamlined
+ * handling of image files.</p>
+ *
+ * <h2>Functionality</h2>
+ *
+ * <p>The class supports image transformation, including flipping vertically or
+ * horizontally with <code>flip(type)</code> and rotating by a specified number
+ * of degrees using <code>rotate(degrees)</code>. Images can be resized while
+ * maintaining their aspect ratio through <code>resize(width, height)</code>.
+ * Methods like <code>getWidth()</code> and <code>getHeight()</code> retrieve
+ * image dimensions.</p>
+ *
+ * <p>For metadata, <code>getMetaDataProperties()</code> lists available
+ * properties, while <code>getMetaDataDescription(property)</code> and
+ * <code>getMetaDataObject(property)</code> provide detailed information or the
+ * actual metadata object. The <code>getContentType()</code> method fetches the
+ * MIME type of the image, and <code>getData()</code> retrieves the image bytes
+ * for storage or further processing.</p>
+ *
+ * <p>These features enable comprehensive control and management of image files
+ * in scripting environments.</p>
+ *
+ * <p>For more details, please refer to the
+ * <a href="../../../../guides/develop/programming-guide/working-with-files/images.md">
+ * Images plugin</a> section of this documentation.</p>
+ *
  * @author jcompagner
  */
 @ServoyDocumented

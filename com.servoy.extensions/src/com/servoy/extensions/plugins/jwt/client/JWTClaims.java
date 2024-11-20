@@ -22,7 +22,7 @@ import com.servoy.j2db.documentation.ServoyDocumented;
 import com.servoy.j2db.scripting.IConstantsObject;
 
 /**
- * JWT claims constants.
+ * JWT claims define constants representing specific claims within a JSON Web Token (JWT), commonly used to identify aspects such as audience, issuer, and subject of the token.
  *
  * @author emera
  */

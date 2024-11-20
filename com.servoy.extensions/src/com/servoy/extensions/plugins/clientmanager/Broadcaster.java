@@ -30,7 +30,14 @@ import com.servoy.j2db.smart.ISmartClientPluginAccess;
 import com.servoy.j2db.util.Debug;
 
 /**
- * A scripting object for broadcasting messages to clients.
+ * <p>The <code>Broadcaster</code> object facilitates real-time communication and message broadcasting to clients connected to the same channel,
+ * offering methods for message sending, channel management, and listener identification.</p>
+ *
+ * <h2>Functionality</h2>
+ *
+ * <p>Broadcasters can send messages to all other listeners on their channel using the <code>broadcastMessage(message)</code> method.
+ * The object also allows retrieval of the channel's name via <code>getChannelName()</code> and the broadcaster's nickname using <code>getName()</code>.
+ * To clean up resources or stop listening, the <code>destroy()</code> method unregisters the broadcaster from the channel.</p>
  *
  * @author jcompagner
  *

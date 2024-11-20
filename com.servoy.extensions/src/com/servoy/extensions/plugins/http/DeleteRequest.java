@@ -25,7 +25,15 @@ import org.apache.hc.client5.http.impl.auth.BasicCredentialsProvider;
 import com.servoy.j2db.documentation.ServoyDocumented;
 
 /**
- * Delete http request.
+ * <p>The <code>DeleteRequest</code> object facilitates the creation and execution of
+ * HTTP DELETE requests, offering configurable parameters, headers, and authentication
+ * options. It supports both synchronous and asynchronous workflows while accommodating
+ * authentication needs like preemptive authentication and domain-based mechanisms.</p>
+ *
+ * <p>Asynchronous execution options enable efficient response and error handling through
+ * callbacks, while support for enforcing formats such as <code>multipart/form-data</code>
+ * enhances compatibility with various server requirements.</p>
+ *
  * @author pbakker
  */
 @ServoyDocumented

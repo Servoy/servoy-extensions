@@ -21,7 +21,22 @@ import com.servoy.j2db.documentation.ServoyDocumented;
 import com.servoy.j2db.scripting.IConstantsObject;
 
 /**
- * OAuth authentication schemes constants.
+ * <p>The <code>ClientAuthentication</code> class defines constants for OAuth
+ * authentication schemes, enabling standardized handling of client authentication
+ * methods.</p>
+ *
+ * <h2>Constants</h2>
+ *
+ * <ul>
+ *   <li><b>Http_Basic_AuthenticationScheme</b>: Represents the HTTP Basic
+ *   Authentication scheme.</li>
+ *   <li><b>Request_Body_AuthenticationScheme</b>: Represents the Request Body
+ *   Authentication scheme.</li>
+ * </ul>
+ *
+ * <p>For more information, refer to the
+ * <a href="../../../../guides/develop/security/oauth.md">ClientAuthentication OAuth guide</a>.</p>
+ *
  * @author emera
  */
 @ServoyDocumented(scriptingName = "ClientAuthentication")

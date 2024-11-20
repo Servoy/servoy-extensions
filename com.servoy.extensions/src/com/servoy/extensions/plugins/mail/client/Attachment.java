@@ -23,7 +23,17 @@ import com.servoy.j2db.scripting.IJavaScriptType;
 import com.servoy.j2db.util.MimeTypes;
 
 /**
- * E-mail attachment object.
+ * <p>Email attachments can be managed through an object providing methods to access their content, properties, and state.
+ * Attachments can be created using binary or text files and sent as part of an email.</p>
+ *
+ * <h2>Functionality</h2>
+ *
+ * <p>Email attachments support several operations. The <code>getData()</code> method retrieves the content of the attachment as a byte array.
+ * <code>getMimeType()</code> provides the MIME type, useful for identifying file formats. <code>getName()</code> returns the attachment's name for display or logging purposes.
+ * The <code>isEmbedded()</code> method checks if the attachment is embedded in the email body, determined by references in the email's text content.</p>
+ *
+ * <p>These methods enable robust email attachment handling, including retrieving file properties and ensuring proper integration with email body content.</p>
+ *
  * @author jblok
  */
 @ServoyDocumented(scriptingName = "Attachment")
