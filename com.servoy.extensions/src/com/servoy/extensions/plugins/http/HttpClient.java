@@ -759,5 +759,24 @@ public class HttpClient implements IScriptable, IJavaScriptType
 		}
 	}
 
-
+	class Runner implements Callable<Response>{
+		private BaseRequest bs;
+		private String username;
+		private String password;
+		private String workstation;
+		private String domain;
+		
+		Runner(String username, String password, String workstation, String domain, BaseRequest bs){
+			this.username = username;
+			this.password = password;
+			this.workstation = workstation;
+			this.domain = domain;
+			this.bs = bs;
+		}
+		
+		public Response call() {
+			return bs.js_executeRequest(username, password, workstation, domain);
+		}
+	}
+	
 }
