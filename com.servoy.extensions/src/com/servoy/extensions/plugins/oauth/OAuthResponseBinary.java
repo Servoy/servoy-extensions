@@ -27,7 +27,24 @@ import com.servoy.j2db.scripting.IJavaScriptType;
 import com.servoy.j2db.scripting.IScriptable;
 
 /**
- * OAuth binary response.
+ * <p>The <code>OAuthResponseBinary</code> object is used to handle binary responses
+ * during OAuth authentication. It allows developers to retrieve important information
+ * such as the HTTP response code, specific header values, or all headers in the response.
+ * This makes it easier to process and analyze responses from the OAuth service.</p>
+ *
+ * <p>The <code>getCode()</code> method provides the HTTP response code as a number,
+ * enabling developers to determine the success or failure of a request. The
+ * <code>getHeader(name)</code> method retrieves the value of a specific header when
+ * given its name, returning the result as a string. For a comprehensive view of the
+ * response headers, the <code>getHeaders()</code> method returns all headers in an
+ * array format.</p>
+ *
+ * <p>For more information about authentication using the OAuth service, refer to the
+ * <a href="../../../../guides/develop/security/authentication.md#oauth-provider">
+ * Oauth Provider</a> from the
+ * <a href="../../../../guides/develop/security/authentication.md">
+ * Authentication</a> section of this documentation.</p>
+ *
  * @author emera
  */
 @ServoyDocumented(scriptingName = "OAuthResponseBinary")

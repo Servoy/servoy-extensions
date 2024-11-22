@@ -25,7 +25,26 @@ import org.apache.hc.client5.http.impl.auth.BasicCredentialsProvider;
 import com.servoy.j2db.documentation.ServoyDocumented;
 
 /**
- * HTTP Patch request.
+ * <p>The <code>PatchRequest</code> class facilitates handling HTTP PATCH requests for
+ * updating resources on a server. It supports adding files, parameters, and headers to
+ * requests while providing methods to configure the request body and authentication
+ * options.</p>
+ *
+ * <p>Developers can include files in the request with <code>addFile()</code> methods,
+ * which support specifying file details and MIME types. Parameters can be added using
+ * <code>addParameter()</code>, with support for custom MIME types when required. For
+ * configuring request bodies directly, the <code>setBodyContent()</code> method is
+ * available with optional MIME type specifications.</p>
+ *
+ * <p>Requests can be executed synchronously using <code>executeRequest()</code> or
+ * asynchronously with <code>executeAsyncRequest()</code>, offering support for callbacks
+ * to handle responses or errors. Authentication options include preemptive authentication,
+ * Windows authentication, and user credentials, ensuring compatibility with various server
+ * requirements. The <code>forceMultipart()</code> method allows requests to be formatted
+ * as <code>multipart/form-data</code> when needed, even for single-file uploads.</p>
+ *
+ * <p>A sample creating a <code>PatchRequest</code> can be found here:
+ * <a href="./httpclient.md#createpatchrequesturl">createPatchRequest</a>.</p>
  *
  * @author lvostinar
  */

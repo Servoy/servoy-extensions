@@ -59,7 +59,17 @@ import com.servoy.j2db.util.Debug;
 import com.servoy.j2db.util.FileChooserUtils;
 
 /**
- * Pdf plugin, for creating and updating pdf files.
+ * <p>The <code>PDF Output</code> plugin allows for creating, manipulating, and enhancing
+ * PDF files. It includes functionalities such as combining multiple PDFs, adding overlays
+ * or watermarks, numbering pages, and encrypting documents with password protection and
+ * custom permissions. The plugin supports working with both regular and protected PDFs
+ * and provides options for customizing fonts, colors, and layout elements during PDF
+ * manipulations.</p>
+ *
+ * <p>For further details on working with PDF files using this plugin, refer to the
+ * <a href="../../../../guides/develop/programming-guide/working-with-files/pdf.md">
+ * PDF Output Plugin Guide</a>.</p>
+ *
  * @author jblok
  */
 @ServoyDocumented(publicName = PDFPlugin.PLUGIN_NAME, scriptingName = "plugins." + PDFPlugin.PLUGIN_NAME)

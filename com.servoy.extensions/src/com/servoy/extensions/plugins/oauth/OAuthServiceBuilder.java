@@ -44,7 +44,26 @@ import com.servoy.j2db.scripting.IScriptable;
 import com.servoy.j2db.solutionmodel.ISolutionModel;
 
 /**
- * OAuth service builder.
+ * <p>The <code>OAuthServiceBuilder</code> object is used to configure and build
+ * OAuth services for managing authentication flows. It offers a flexible API to
+ * set up various OAuth parameters such as client secrets, scopes, response types,
+ * and token handling. Additionally, it provides advanced features like Proof Key
+ * for Code Exchange (PKCE) and anti-forgery state configuration, ensuring secure
+ * and customizable OAuth implementations.</p>
+ *
+ * <p>Developers can define the required scopes, configure callback functions, and
+ * set domain or tenant information for APIs that support multi-tenant setups. The
+ * builder also supports customization of authorization URLs with additional parameters,
+ * allowing fine-grained control over the OAuth flow. Once configured, the
+ * <code>build(api)</code> method creates an <code>OAuthService</code> object, which can
+ * be used to obtain tokens and access protected resources.</p>
+ *
+ * <p>For additional details about OAuth authentication, refer to the
+ * <a href="../../../../guides/develop/security/authentication.md#oauth-provider">
+ * OAuth provider</a> in the
+ * <a href="../../../../guides/develop/security/authentication.md">
+ * Authentication</a> section of this documentation.</p>
+ *
  * @author emera
  */
 @ServoyDocumented(scriptingName = "OAuthServiceBuilder")

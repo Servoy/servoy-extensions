@@ -25,7 +25,27 @@ import org.apache.hc.client5.http.impl.auth.BasicCredentialsProvider;
 import com.servoy.j2db.documentation.ServoyDocumented;
 
 /**
- * HTTP Options request.
+ * <p>The <code>OptionsRequest</code> class is used to perform HTTP OPTIONS requests,
+ * allowing developers to interact with APIs to determine supported operations on a
+ * resource. It supports synchronous and asynchronous request execution with various
+ * authentication methods, providing flexibility for different use cases.</p>
+ *
+ * <p>Headers can be added to requests using the <code>addHeader(headerName, value)</code>
+ * method, while the <code>executeRequest()</code> and <code>executeAsyncRequest()</code>
+ * methods handle synchronous and asynchronous execution, respectively. Asynchronous
+ * methods include callbacks for success and error handling, ensuring robust response
+ * management. Authentication options, including Windows authentication, are also
+ * supported.</p>
+ *
+ * <p>Additional functionality includes retrieving allowed HTTP methods using
+ * <code>getAllowedMethods(res)</code> and configuring preemptive authentication with
+ * <code>usePreemptiveAuthentication(b)</code>. These features enable efficient API
+ * interaction and streamlined HTTP request handling.</p>
+ *
+ * <p>For an overview of the HTTP client functionality and configuration options, refer
+ * to the <a href="./README.md">HTTP Client</a> and
+ * <a href="./httpclientconfig.md">HTTP Client Config</a> documentation.</p>
+ *
  * @author pbakker
  */
 @ServoyDocumented

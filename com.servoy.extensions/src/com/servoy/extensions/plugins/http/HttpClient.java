@@ -74,7 +74,7 @@ import com.servoy.j2db.util.Debug;
 import com.servoy.j2db.util.Utils;
 
 /**
- * <p>A wrapper fpr <code>Apache HttpClient</code> for executing requests like GET, POST, PUT, and more, with
+ * <p>A wrapper for <code>Apache HttpClient</code> for executing requests like GET, POST, PUT, and more, with
  * support for cookies, proxies, and timeouts.</p>
  *
  * <h2>Features</h2>

@@ -28,7 +28,24 @@ import com.servoy.j2db.scripting.IJavaScriptType;
 import com.servoy.j2db.scripting.IScriptable;
 
 /**
- * OAuth text response.
+ * <p>The <code>OAuthResponseText</code> object is used for handling text-based responses
+ * during OAuth authentication. It provides methods to retrieve the response body,
+ * HTTP status code, and headers, making it easier to process and evaluate the OAuth
+ * service's responses.</p>
+ *
+ * <p>The <code>getBody()</code> method returns the response body as a string, offering
+ * direct access to the textual content. The <code>getCode()</code> method retrieves the
+ * HTTP response code, represented as a number, to assess the success or failure of the
+ * request. For header management, the <code>getHeader(name)</code> method fetches a
+ * specific header's value based on its name, while the <code>getHeaders()</code> method
+ * provides an array containing all response headers.</p>
+ *
+ * <p>For more information about authentication using the OAuth service, refer to the
+ * <a href="../../../../guides/develop/security/authentication.md#oauth-provider">
+ * OAuth Provider</a> from the
+ * <a href="../../../../guides/develop/security/authentication.md">
+ * Authentication</a> section of this documentation.</p>
+ *
  * @author emera
  */
 @ServoyDocumented(scriptingName = "OAuthResponseText")

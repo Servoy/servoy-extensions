@@ -31,7 +31,25 @@ import com.servoy.j2db.scripting.IJavaScriptType;
 import com.servoy.j2db.scripting.IScriptable;
 
 /**
- * OAuth json response.
+ * <p>The <code>OAuthResponseJSON</code> object is designed for handling JSON responses
+ * during OAuth authentication. It provides methods to extract key elements from the
+ * response, such as the body content, HTTP response code, and headers. Additionally,
+ * it allows parsing the response body into a JSON object for easier manipulation.</p>
+ *
+ * <p>The <code>getAsJSON()</code> method converts the response body into a JSON object,
+ * enabling structured data handling. For accessing raw content, the <code>getBody()</code>
+ * method returns the response body as a string. The <code>getCode()</code> method retrieves
+ * the HTTP response code as a number, which is useful for determining the status of the
+ * OAuth transaction. To access specific metadata, the <code>getHeader(name)</code> method
+ * fetches the value of a header by name, while the <code>getHeaders()</code> method returns
+ * all headers in an array format.</p>
+ *
+ * <p>For more information about authentication using the OAuth service, refer to the
+ * <a href="../../../../guides/develop/security/authentication.md#oauth-provider">
+ * OAuth Provider</a> from the
+ * <a href="../../../../guides/develop/security/authentication.md">
+ * Authentication</a> section of this documentation.</p>
+ *
  * @author emera
  */
 @ServoyDocumented(scriptingName = "OAuthResponseJSON")

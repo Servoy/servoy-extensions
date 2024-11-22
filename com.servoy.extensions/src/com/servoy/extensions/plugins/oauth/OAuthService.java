@@ -42,7 +42,27 @@ import com.servoy.j2db.scripting.IScriptable;
 import com.servoy.j2db.util.Utils;
 
 /**
- * OAuth service.
+ * <p>The <code>OAuthService</code> object provides a robust interface for managing
+ * OAuth authentication and handling authorized requests. It allows developers to
+ * create, configure, and execute HTTP requests such as GET, POST, PUT, and DELETE,
+ * ensuring secure access to resources. Developers can also retrieve and manage tokens
+ * for maintaining session continuity with the OAuth provider.</p>
+ *
+ * <p>With methods like <code>createGetRequest()</code> and <code>executeRequest()</code>,
+ * the service supports constructing and executing customized requests. Token management
+ * is facilitated through methods like <code>getAccessToken()</code>, <code>refreshToken()</code>,
+ * and <code>revokeToken()</code>, which ensure proper handling of authentication tokens.
+ * The service also includes utilities for token expiration checks and obtaining OpenID
+ * tokens where supported.</p>
+ *
+ * <p>The <code>OAuthService</code> integrates seamlessly with OAuth flows, enabling
+ * developers to work efficiently with access and refresh tokens, authorization URLs,
+ * and custom request configurations. For additional details about the
+ * <a href="../../../../guides/develop/security/authentication.md#oauth-provider">
+ * OAuth authentication</a>, refer to the
+ * <a href="../../../../guides/develop/security/authentication.md">
+ * Authentication</a> section of this documentation.</p>
+ *
  * @author emera
  */
 @ServoyDocumented(scriptingName = "OAuthService")
