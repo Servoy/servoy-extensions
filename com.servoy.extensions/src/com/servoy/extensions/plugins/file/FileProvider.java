@@ -18,7 +18,6 @@ package com.servoy.extensions.plugins.file;
 
 import java.awt.Desktop;
 import java.awt.Window;
-import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -51,6 +50,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileSystemView;
 
 import org.apache.commons.io.ByteOrderMark;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.input.BOMInputStream;
 import org.mozilla.javascript.Function;
 import org.mozilla.javascript.NativeArray;
@@ -1597,11 +1597,7 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 			}
 			if (file != null && !file.isDirectory())
 			{
-				FileOutputStream fos = new FileOutputStream(file);
-				BufferedOutputStream bos = new BufferedOutputStream(fos);
-				bos.write(data);
-				bos.close();
-				fos.close();
+				FileUtils.writeByteArrayToFile(file, data);
 				return true;
 			}
 			return false;

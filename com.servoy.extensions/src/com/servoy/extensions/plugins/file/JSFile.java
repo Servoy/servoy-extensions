@@ -16,13 +16,14 @@
  */
 package com.servoy.extensions.plugins.file;
 
-import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Date;
+
+import org.apache.commons.io.IOUtils;
 
 import com.servoy.j2db.documentation.ServoyDocumented;
 import com.servoy.j2db.plugins.IClientPluginAccess;
@@ -427,50 +428,17 @@ public class JSFile implements IScriptable, IJavaScriptType, IFile
 				Debug.error(e);
 			}
 		}
-		InputStream is = null;
-		OutputStream os = null;
 
-		try
+		InputStream is = getInputStream();
+		if (is != null)
 		{
-			is = getInputStream();
-			if (is != null)
+			try (is; OutputStream os = new FileOutputStream(destFile))
 			{
-				os = new BufferedOutputStream(new FileOutputStream(destFile));
-
-				final byte[] buffer = new byte[FileProvider.CHUNK_BUFFER_SIZE];
-				int read;
-				while ((read = is.read(buffer)) != -1)
-				{
-					os.write(buffer, 0, read);
-				}
-				os.flush();
+				IOUtils.copyLarge(is, os);
 			}
-		}
-		catch (final IOException e)
-		{
-			Debug.error(e);
-		}
-		finally
-		{
-			if (is != null)
+			catch (final IOException e)
 			{
-				try
-				{
-					is.close();
-				}
-				catch (final IOException e)
-				{
-				}
-			}
-			if (os != null)
-			{
-				try
-				{
-					os.close();
-				}
-				catch (final IOException e)
-				{
-				}
+				Debug.error(e);
 			}
 		}
 
@@ -603,7 +571,7 @@ public class JSFile implements IScriptable, IJavaScriptType, IFile
 	}
 
 	@Override
-	public InputStream getInputStream() throws IOException
+	public InputStream getInputStream()
 	{
 		return file.getInputStream();
 	}

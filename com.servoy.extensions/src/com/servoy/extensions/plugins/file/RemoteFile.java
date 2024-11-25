@@ -22,6 +22,7 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -317,9 +318,16 @@ public class RemoteFile extends AbstractFile
 	}
 
 	@Override
-	public InputStream getInputStream() throws IOException
+	public InputStream getInputStream()
 	{
-		return new BufferedInputStream(new FileInputStream(file));
+		try
+		{
+			return new BufferedInputStream(new FileInputStream(file));
+		}
+		catch (FileNotFoundException e)
+		{
+			return null;
+		}
 	}
 
 	/*

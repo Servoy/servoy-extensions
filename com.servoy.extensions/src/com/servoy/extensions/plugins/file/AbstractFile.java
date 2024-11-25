@@ -213,7 +213,7 @@ public abstract class AbstractFile implements IAbstractFile
 	 *
 	 * @see com.servoy.j2db.plugins.IUploadData#getInputStream()
 	 */
-	public InputStream getInputStream() throws IOException
+	public InputStream getInputStream()
 	{
 		return null;
 	}

@@ -18,7 +18,6 @@
 package com.servoy.extensions.plugins.file;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 
 import com.servoy.j2db.plugins.IAllWebClientPluginAccess;
@@ -99,7 +98,7 @@ public class UploadData extends AbstractFile
 	}
 
 	@Override
-	public InputStream getInputStream() throws IOException
+	public InputStream getInputStream()
 	{
 		return upload.getInputStream();
 	}
