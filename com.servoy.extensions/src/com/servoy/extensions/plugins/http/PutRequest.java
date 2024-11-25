@@ -26,7 +26,22 @@ import com.servoy.extensions.plugins.file.JSFile;
 import com.servoy.j2db.documentation.ServoyDocumented;
 
 /**
- * Http Put request.
+ * <p>The <code>PutRequest</code> class provides functionality for constructing and executing HTTP PUT requests.
+ * It supports adding files, parameters, and headers, with automatic MIME type detection based on file names
+ * or content. Users can override MIME types when needed and include single or multiple files in a PUT request.
+ * Multipart formatting can be enforced to meet server requirements even when only a single item is included.</p>
+ *
+ * <p>The class allows requests to be executed synchronously or asynchronously. Asynchronous execution includes
+ * support for callbacks to handle success and error cases, with optional arguments for distinguishing between
+ * requests in complex scenarios. Synchronous execution returns a <code>Response</code> object for direct
+ * interaction with server replies.</p>
+ *
+ * <p>Authentication options include preemptive credential submission to optimize uploads where servers
+ * require immediate verification.</p>
+ *
+ * <p>The class also provides methods to set body content, specify charsets, and directly assign files for
+ * PUT operations. A sample for creating a <code>PutRequest</code> instance can be found here:
+ * <a href="./httpclient.md#createputrequesturl">createPutRequest</a>.</p>
  *
  * @author pbakker
  *

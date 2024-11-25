@@ -24,7 +24,23 @@ import org.apache.hc.client5.http.impl.auth.BasicCredentialsProvider;
 import com.servoy.j2db.documentation.ServoyDocumented;
 
 /**
- * Http Post request.
+ * <p>The <code>PostRequest</code> class is designed for constructing and executing HTTP POST requests.
+ * It allows adding files, parameters, and headers to requests, with automatic MIME type detection
+ * based on file names or content. Users can override MIME type detection when needed. The class
+ * supports single-file and multipart configurations, with an option to enforce multipart formatting
+ * even for single files or parameters.</p>
+ *
+ * <p>Requests can be executed synchronously or asynchronously. Asynchronous methods allow
+ * non-blocking operations and support callbacks for success and error handling. They also include
+ * support for Windows authentication and additional arguments to differentiate callbacks in complex
+ * workflows. Synchronous methods return a <code>Response</code> object for direct interaction with
+ * server replies.</p>
+ *
+ * <p>The class includes features for setting authentication, such as preemptive credentials, which
+ * are useful for optimizing uploads to servers requiring immediate authentication.</p>
+ *
+ * <p>A sample for creating a <code>PostRequest</code> instance can be found here:
+ * <a href="./httpclient.md#createpostrequesturl">createPostRequest</a>.</p>
  *
  * @author jblok
  */

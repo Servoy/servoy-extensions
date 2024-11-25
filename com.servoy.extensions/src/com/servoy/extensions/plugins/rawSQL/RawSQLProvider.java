@@ -29,7 +29,19 @@ import com.servoy.j2db.util.ServoyException;
 import com.servoy.j2db.util.UUID;
 
 /**
- * Rawsql plugin scriptable. Can execute sql text against an existing server. Only use this as last resort(other Servoy APis are always preferred)
+ * <p>The <code>rawSQL</code> plugin allows developers to execute raw SQL commands and manage advanced
+ * database interactions within Servoy. It is intended for scenarios where built-in APIs are insufficient
+ * and should be used cautiously to avoid data integrity or performance issues. This plugin supports
+ * SQL execution, stored procedure handling, cache management, and data change notifications.</p>
+ *
+ * <p>Developers can use <code>executeSQL</code> to run custom SQL queries or updates, and
+ * <code>executeStoredProcedure</code> to call stored procedures with input and output arguments. The
+ * <code>flushAllClientsCache</code> function ensures that database changes are propagated across
+ * clients, while <code>notifyDataChange</code> informs clients of record updates or deletions based
+ * on primary keys. Additionally, <code>getException</code> provides detailed error information for
+ * debugging failed operations.</p>
+ *
+ * <p>Careful usage of this plugin enables powerful database operations while maintaining system stability.</p>
  *
  * @author jblok
  */
