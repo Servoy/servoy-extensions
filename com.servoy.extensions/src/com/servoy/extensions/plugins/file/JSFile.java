@@ -542,6 +542,8 @@ public class JSFile implements IScriptable, IJavaScriptType, IFile
 	 * If the file is a remote file will be shared using a default folder that requires no session.
 	 * If the file is a local file will be available only for current client (url contains session id)
 	 *
+	 * This just returns the URL (session or static based). If you want to stream a file directly use plugin.file.streamFile where you also can give more options to browser.
+	 *
 	 * @return the url
 	 */
 	public String js_getRemoteUrl() throws Exception
