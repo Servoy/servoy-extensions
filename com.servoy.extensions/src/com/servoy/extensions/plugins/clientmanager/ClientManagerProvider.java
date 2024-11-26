@@ -21,7 +21,16 @@ import com.servoy.j2db.util.Debug;
 import com.servoy.j2db.util.Utils;
 
 /**
- * Client manager scripting object.
+ * <p>The <code>clientmanager</code> plugin facilitates communication and management of
+ * connected clients in Servoy. It supports broadcasting messages using <code>createBroadcaster</code>
+ * and retrieving connected clients with <code>getConnectedClients</code>. Administrators can
+ * send messages to clients via <code>sendMessageToClient</code> or <code>sendMessageToAllClients</code>
+ * and shut down clients using <code>shutDownClient</code> or <code>shutDownAllClients</code>.</p>
+ *
+ * <p>Record locks can be managed with <code>getLocks</code> and <code>releaseLocks</code>,
+ * while <code>isInMaintenanceMode</code> checks server maintenance status. The plugin also
+ * enables advanced messaging through channels with <code>getOrCreateBroadcaster</code>,
+ * making it a powerful tool for client-server management.</p>
  *
  * @author gerzse
  */

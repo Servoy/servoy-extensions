@@ -32,7 +32,27 @@ import com.servoy.j2db.scripting.IReturnedTypesProvider;
 import com.servoy.j2db.scripting.IScriptable;
 
 /**
- * OAuth plugin.
+ * <p>The <code>OAuth</code> plugin simplifies authentication and access to protected resources
+ * using OAuth protocols. It supports integration with predefined OAuth providers or custom APIs,
+ * enabling secure communication between applications and external services. Core functionalities
+ * include creating OAuth services, managing access tokens, and executing authenticated requests.</p>
+ *
+ * <p>OAuth services can be configured through the <code>serviceBuilder</code>, which allows
+ * the definition of parameters such as client ID, client secret, scope, and state for secure
+ * sessions. The service builder also facilitates the integration of callback methods for
+ * handling responses. For more specific use cases, developers can build custom APIs by defining
+ * authorization and token endpoints, ensuring flexibility for various authentication workflows.</p>
+ *
+ * <p>The plugin provides utility methods to streamline the process. It can generate redirect
+ * URLs for configuration on provider platforms and manage token extraction from responses. Once
+ * authenticated, OAuth services enable the execution of HTTP requests to protected endpoints,
+ * supporting various data formats such as JSON and binary. The plugin also facilitates error
+ * handling by capturing and relaying issues related to authentication or access requests.</p>
+ *
+ * <p>By integrating the <code>OAuth</code> plugin, applications can securely authenticate users,
+ * access external APIs, and handle sensitive data interactions while adhering to modern security
+ * standards.</p>
+ *
  * @author emera
  */
 @ServoyClientSupport(ng = true, wc = false, sc = false)

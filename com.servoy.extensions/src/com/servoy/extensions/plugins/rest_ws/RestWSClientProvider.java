@@ -24,7 +24,27 @@ import com.servoy.j2db.documentation.ServoyDocumented;
 import com.servoy.j2db.scripting.IScriptable;
 
 /**
- * The representation of a rest-ws client, only valid while running in a REST-WS request.
+ * <p>The <code>rest_ws</code> client represents a REST-WS client instance, valid only
+ * during a running REST-WS request. It provides methods for managing HTTP cookies,
+ * accessing the current request and response, checking request status, and controlling
+ * the inclusion of user properties in response headers.</p>
+ *
+ * <p>The <code>createCookie(name, value)</code> method creates an HTTP cookie using
+ * specified name and value parameters, which must conform to the cookie specification.
+ * The resulting <code>WsCookie</code> object can be added to a response using
+ * <code>getResponse()</code>. The <code>getRequest()</code> and <code>getResponse()</code>
+ * methods provide access to the current REST-WS request and its corresponding response.
+ * These methods throw exceptions if invoked outside a REST-WS context, ensuring accurate
+ * usage within valid workflows.</p>
+ *
+ * <p>To determine if the client is running in a REST-WS context,
+ * <code>isRunningRequest()</code> returns a boolean value. When enabled, this facilitates
+ * conditional logic based on the REST-WS state.</p>
+ *
+ * <p>Finally, the <code>sendResponseUserPropertiesHeaders(send)</code> method enables
+ * or disables the inclusion of user properties as response headers. By default, these
+ * headers are sent, but this behavior can be controlled using the <code>send</code>
+ * parameter.</p>
  */
 @ServoyDocumented(publicName = RestWSClientPlugin.PLUGIN_NAME, scriptingName = "plugins." + RestWSClientPlugin.PLUGIN_NAME)
 public class RestWSClientProvider implements IScriptable

@@ -23,7 +23,19 @@ import com.servoy.j2db.documentation.ServoyDocumented;
 import com.servoy.j2db.scripting.IPrefixedConstantsObject;
 
 /**
- * OAuth request types constants.
+ * <p><code>OAuth request types</code> are implemented as enumerated constants,
+ * each representing a standard HTTP method. These constants provide a clear
+ * and structured approach to defining request types, ensuring consistency
+ * and reducing ambiguity in OAuth-related API interactions.</p>
+ *
+ * <p>The request types include commonly used HTTP methods such as
+ * <code>DELETE</code>, <code>GET</code>, <code>POST</code>, and <code>PUT</code>,
+ * which handle resource deletion, retrieval, creation, and updates, respectively.
+ * Additional methods like <code>HEAD</code> and <code>OPTIONS</code> are used for
+ * metadata retrieval and discovering supported operations, while <code>PATCH</code>
+ * allows partial updates to resources. <code>TRACE</code> serves diagnostic purposes
+ * by echoing the received request.</p>
+ *
  * @author emera
  */
 @ServoyDocumented(publicName = "RequestType", scriptingName = "RequestType")

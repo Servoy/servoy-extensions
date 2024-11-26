@@ -24,7 +24,22 @@ import com.servoy.j2db.scripting.IReturnedTypesProvider;
 import com.servoy.j2db.scripting.IScriptable;
 
 /**
- * Scripting object for Amortization plugin, for calculation of amortizations.
+ * <p>The <code>amortization</code> plugin in Servoy provides a scripting object for calculating
+ * amortizations, managing polynomials, and performing date calculations. It supports creating
+ * detailed amortization schedules and solving complex financial computations.</p>
+ *
+ * <p>The plugin offers key functionalities, such as creating a new <code>AmortizationCalculation</code>
+ * for managing loans and payments and generating amortization schedules. It allows solving for
+ * unknown interest rates and calculating residual balances with precision. Polynomial operations
+ * include creating, modifying, and evaluating polynomials, finding roots, and computing derivatives.
+ * Utilities for date calculations enable determining next dates based on specified periods,
+ * supporting various interval types like monthly, quarterly, and annual cycles.</p>
+ *
+ * <p>The <code>newCalculation()</code> method creates a customizable amortization instance,
+ * while <code>newPolynomial()</code> generates and manipulates polynomial functions for advanced
+ * mathematical operations. The <code>nextDate()</code> method provides date interval calculations,
+ * useful for managing schedules and understanding payment timelines.</p>
+ *
  * @author sebster
  */
 @ServoyDocumented(publicName = AmortizationPlugin.PLUGIN_NAME, scriptingName = "plugins." + AmortizationPlugin.PLUGIN_NAME)

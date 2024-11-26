@@ -26,7 +26,22 @@ import com.servoy.j2db.scripting.IReturnedTypesProvider;
 import com.servoy.j2db.scripting.IScriptable;
 
 /**
- * Xport menu enabler
+ * <p>The <code>TextXport</code> plugin provides functionality for exporting data from a
+ * foundset into text-based formats like <code>.tab</code> or <code>.csv</code>, enabling
+ * flexible data management. Exports can be customized with separators and headers depending
+ * on requirements.</p>
+ *
+ * <p>TextXport supports two main approaches for exporting data. The <code>createExporter</code>
+ * method allows for setting up complex export configurations, while <code>textExport</code>
+ * methods provide simpler, direct options for exporting with various levels of customization.</p>
+ *
+ * <p>The <code>createExporter</code> method generates an export setup for a specified foundset,
+ * allowing configuration of the data separator and the inclusion of headers. This is useful for
+ * more advanced export workflows. The <code>textExport</code> methods perform direct exports to
+ * text-separated formats, such as tab-separated or comma-separated values. These methods allow
+ * specifying the foundset, data providers, separator, and header options to customize the
+ * exported output.</p>
+ *
  * @author jblok
  */
 @ServoyDocumented(publicName = TextXportPlugin.PLUGIN_NAME, scriptingName = "plugins." + TextXportPlugin.PLUGIN_NAME)

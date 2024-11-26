@@ -26,7 +26,20 @@ import com.servoy.j2db.scripting.IScriptable;
 import com.servoy.j2db.util.Debug;
 
 /**
- * Headless client plugin. Can create headless (no UI) client and execute code in it.
+ * <p>The <code>headlessclient</code> plugin provides functionality to create and manage
+ * headless clients, which operate without a user interface and execute code in an isolated
+ * server-side environment. These clients are particularly useful for running automated
+ * processes or backend operations independently of any user session. They can be created,
+ * retrieved, and reused across multiple sessions or applications.</p>
+ *
+ * <p>The <code>createClient</code> function initializes a new headless client and opens a
+ * specified solution using credentials and optional arguments for the solution's open method.
+ * In developer mode, limitations exist for debugging unless a "nodebug" argument is used.
+ * The <code>getClient</code> function allows retrieval of an existing headless client using
+ * its unique client ID, enabling further operations such as queuing remote methods. The
+ * <code>getOrCreateClient</code> function combines these capabilities by either fetching
+ * an existing client or creating a new one if it does not already exist, ensuring seamless
+ * session management across different application contexts.</p>
  */
 @ServoyDocumented(publicName = HeadlessClientPlugin.PLUGIN_NAME, scriptingName = "plugins." + HeadlessClientPlugin.PLUGIN_NAME)
 public class HeadlessClientProvider implements IScriptable, IReturnedTypesProvider

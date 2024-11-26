@@ -73,7 +73,27 @@ import com.servoy.j2db.util.Debug;
 import com.servoy.j2db.util.FileChooserUtils;
 
 /**
- * File plugin.
+ * <p>The file management plugin offers a comprehensive toolkit for managing files and
+ * folders both locally and remotely. It supports operations such as creating, reading,
+ * modifying, and deleting files while accommodating various formats, including text, binary,
+ * and XML. Advanced features like encoding, content streaming, and size management are also
+ * integrated to enhance file interactions on both the client and server sides.</p>
+ *
+ * <p>Users can perform essential tasks such as <code>appendToTXTFile</code>, <code>writeFile</code>,
+ * and <code>writeXMLFile</code>, which allow appending, creating, or modifying files efficiently.
+ * The plugin also supports creating temporary files through <code>createTempFile</code> and
+ * managing folder contents with <code>getFolderContents</code>. Folder operations include
+ * recursive copying using <code>copyFolder</code> and deletion with <code>deleteFolder</code>,
+ * all while providing detailed file attributes such as modification dates via
+ * <code>getModificationDate</code> and sizes with <code>getFileSize</code>. Flexible filtering
+ * options enable targeted retrieval of folder contents, enhancing workflow precision.</p>
+ *
+ * <p>For interactive use, the plugin facilitates file selection dialogs through
+ * <code>showFileOpenDialog</code>, supporting multiselect and file type filters, with
+ * customizable callback functionality. Large files can be streamed directly to the browser
+ * using <code>streamFile</code> without consuming excessive memory, ensuring optimal performance
+ * for downloads or inline viewing. Temporary file handling via <code>trackFileForDeletion</code>
+ * automates cleanup processes upon solution closure, contributing to resource efficiency.</p>
  *
  * @author jcompagner
  * @author Servoy Stuff

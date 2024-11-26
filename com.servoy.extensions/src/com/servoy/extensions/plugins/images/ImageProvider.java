@@ -31,7 +31,11 @@ import com.servoy.j2db.scripting.IScriptable;
 import com.servoy.j2db.util.gui.SnapShot;
 
 /**
- * Images plugin scripting object.
+ * <p>The <code>images</code> plugin enables manipulation of image resources in Servoy scripting.
+ * It provides functionality to retrieve image objects from various sources like files, byte arrays,
+ * beans, applets, or form elements. These image objects can then be processed further, such as
+ * resizing or retrieving metadata like dimensions and content types.</p>
+ *
  * @author jcompagner
  */
 @ServoyDocumented(publicName = ImagePlugin.PLUGIN_NAME, scriptingName = "plugins." + ImagePlugin.PLUGIN_NAME)

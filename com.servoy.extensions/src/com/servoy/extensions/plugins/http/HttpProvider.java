@@ -46,7 +46,22 @@ import com.servoy.j2db.util.Pair;
 import com.servoy.j2db.util.Utils;
 
 /**
- * HttpClient plugin , can create HttpClient objects in order to execute http requests.
+ * <p>The <code>HttpClient</code> plugin allows the creation of <code>HttpClient</code> objects
+ * to perform HTTP requests, functioning like a web browser without a user interface, with
+ * session binding capabilities. It supports operations such as creating and configuring
+ * clients, fetching media data, and retrieving page HTML. The plugin provides several return
+ * types, including various HTTP request and response objects, cookies, configurations, and
+ * HTTP status codes.</p>
+ *
+ * <p><code>HttpClient</code> objects can be created for executing multiple requests in the
+ * same server session. Users must close these client objects after usage to free resources.
+ * Configurations for <code>HttpClient</code> instances can also be created, allowing customization
+ * of request settings. For fetching binary media data like images, the <code>getMediaData(url)</code>
+ * method is available, ensuring compatibility with HTTPS by requiring known certificates or
+ * enabling prompts for unknown ones. To fetch the entire HTML content of a page, the
+ * <code>getPageData(url)</code> method can be used, with similar considerations for HTTPS
+ * certificates.</p>
+ *
  * @author jblok
  */
 @ServoyDocumented(publicName = HttpPlugin.PLUGIN_NAME, scriptingName = "plugins." + HttpPlugin.PLUGIN_NAME)

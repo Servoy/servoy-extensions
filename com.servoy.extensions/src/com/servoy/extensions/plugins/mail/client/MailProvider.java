@@ -33,7 +33,19 @@ import com.servoy.j2db.util.Debug;
 import com.servoy.j2db.util.Utils;
 
 /**
- * Mail plugin, can send and receive e-mails.
+ * <p>The <code>mail</code> plugin enables sending and receiving emails, with additional
+ * support for attachments, email validation, and property configuration. It supports creating
+ * binary and text-based attachments, specifying MIME types, and handling exceptions that occur
+ * during mail operations. The plugin can process incoming mail from POP3 accounts, with options
+ * for leaving messages on the server, retrieving headers, and filtering by sent date.</p>
+ *
+ * <p>Emails can be sent individually or in bulk. Bulk emails are optimized to prevent responses
+ * such as "out of office" messages. The plugin supports HTML-formatted messages, multiple
+ * recipients, and optional CC/BCC configurations. Additional customization is available through
+ * SMTP host settings and override properties. Attachments can be added as single files or arrays,
+ * providing flexibility for diverse email content. Utility methods like email address validation
+ * and plain address extraction are also available.</p>
+ *
  * @author jblok
  */
 @ServoyDocumented(publicName = MailPlugin.PLUGIN_NAME, scriptingName = "plugins." + MailPlugin.PLUGIN_NAME)

@@ -36,7 +36,11 @@ import com.servoy.j2db.scripting.IScriptable;
 import com.servoy.j2db.util.Debug;
 
 /**
- * XML parsing object.
+ * <p><code>XMLReader</code> is an XML parsing tool designed to process XML data. It provides
+ * two main methods for reading XML content, catering to both file-based and string-based sources.
+ * Both methods provide access to the hierarchical structure of the XML, including child nodes,
+ * attributes, and content, making them versatile for various XML processing needs.</p>
+ *
  * @author jcompagner
  */
 @SuppressWarnings("nls")

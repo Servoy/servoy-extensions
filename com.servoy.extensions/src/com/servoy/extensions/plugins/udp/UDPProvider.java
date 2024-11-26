@@ -34,7 +34,23 @@ import com.servoy.j2db.scripting.IScriptable;
 import com.servoy.j2db.util.Debug;
 
 /**
- * UDP plugin.
+ * <p>The <code>UDP</code> plugin facilitates communication using UDP sockets, enabling the
+ * sending and receiving of data packets. It supports creating and manipulating custom data
+ * packets, starting and stopping sockets, and testing packet handling logic.</p>
+ *
+ * <p>For creating packets, use <code>createNewPacket</code> to initialize an empty packet and
+ * add data such as UTF strings, integers, or bytes. To receive data, use <code>getReceivedPacket</code>,
+ * which retrieves packets from the receive buffer until it is empty. To send data, utilize
+ * <code>sendPacket</code> by specifying the destination IP or hostname and an optional port.
+ * The <code>testPacket</code> function allows for placing test packets in the receive buffer to
+ * validate handling methods.</p>
+ *
+ * <p>Sockets can be managed using <code>startSocket</code> to bind to a specific port and specify
+ * a callback method triggered when packets are received. The <code>stopSocket</code> method halts
+ * the socket’s operation.</p>
+ *
+ * <p>This plugin supports practical use cases like real-time data transfer and network
+ * communication testing.</p>
  *
  */
 @ServoyDocumented(publicName = UDPPlugin.PLUGIN_NAME, scriptingName = "plugins." + UDPPlugin.PLUGIN_NAME)

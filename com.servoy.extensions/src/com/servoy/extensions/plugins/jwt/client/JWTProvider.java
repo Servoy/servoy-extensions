@@ -39,7 +39,24 @@ import com.servoy.j2db.scripting.IScriptable;
 import com.servoy.j2db.util.Utils;
 
 /**
- * JWT plugin.
+ * <p>The <code>JWT</code> plugin facilitates operations involving JSON Web Tokens, such as
+ * creating, signing, and verifying tokens. It provides various algorithms, including
+ * <code>SHA256</code>, <code>SHA384</code>, and <code>SHA512</code> in combination with
+ * <code>ECDSA</code> or <code>RSA</code>, allowing flexible cryptographic operations. These
+ * algorithms can be configured with public and private keys for signing and verification,
+ * or with shared secrets for symmetric encryption.</p>
+ *
+ * <p>Developers can use the <code>builder()</code> method to create tokens dynamically by
+ * specifying payloads and signing them with a chosen algorithm. Alternatively, simplified
+ * methods are available, like <code>create(payload)</code> or <code>create(payload, expiresAt)</code>,
+ * which use pre-configured <code>HmacSHA256</code> algorithms and shared secret keys for signing.</p>
+ *
+ * <p>Token verification can be performed using <code>verify(token)</code> for default algorithms
+ * or <code>verify(token, algorithm)</code> for custom cryptographic configurations. The plugin
+ * also supports building algorithms based on external JSON Web Key Sets (JWKS) using the
+ * <code>JWK(url)</code> method. These features collectively enable robust and secure
+ * token-based authentication systems.</p>
+ *
  * @author emera
  */
 @ServoyDocumented(publicName = JWTPlugin.PLUGIN_NAME, scriptingName = "plugins." + JWTPlugin.PLUGIN_NAME)
