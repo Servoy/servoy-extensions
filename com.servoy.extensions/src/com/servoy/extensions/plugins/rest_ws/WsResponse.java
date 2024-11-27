@@ -31,26 +31,24 @@ import com.servoy.j2db.scripting.IJavaScriptType;
 import com.servoy.j2db.scripting.IScriptable;
 
 /**
- * <p>A <code>ViewRecord</code> represents a row in a <code>ViewFoundSet</code>, with functionality tailored
- * to handle specific record-related operations. Key properties include:</p>
+ * <p>The <code>WsResponse</code> object represents a REST-WS response and is only valid while handling a
+ * REST-WS request. It allows manipulation of response headers, content type, status, and other properties
+ * essential for crafting HTTP responses.</p>
  *
- * <p><code>exception</code>: Provides information on the last exception that occurred for the record.</p>
- * <p><code>foundset</code>: References the parent foundset.</p>
- * <p><code>recordMarkers</code>: Facilitates validation by retaining markers for issues until a record is
- * successfully saved or manually cleared.</p>
+ * <p>The <code>WsResponse</code> object provides several properties to configure the HTTP response. For
+ * instance, <code>characterEncoding</code> sets the MIME charset, such as UTF-8. The <code>contentType</code>
+ * allows specifying the content type of the response, including optional character encoding. The
+ * <code>localeLanguageTag</code> retrieves the locale of the response, and the <code>status</code> property
+ * sets the HTTP status code for the response.</p>
  *
- * <p>The <code>ViewRecord</code> object includes methods for examining and managing record state. For instance:</p>
- * <p><code>getChangedData</code>: Retrieves unsaved changes in a dataset format.</p>
- * <p><code>hasChangedData</code> and <code>isEditing</code>: Determine whether the record has pending
- * modifications.</p>
- * <p><code>createMarkers</code>: Allows manual creation of validation markers.</p>
- * <p><code>revertChanges</code>: Undoes unsaved modifications.</p>
- * <p><code>getPKs</code>: Fetches the primary key values of a record.</p>
- * <p><code>isRelatedFoundSetLoaded</code>: Verifies if a related foundset is already initialized without
- * triggering its load.</p>
+ * <p>Methods like <code>addCookie</code>, <code>addHeader</code>, and <code>setHeader</code> are available
+ * for adding or setting cookies and headers in the response. Additional methods, such as <code>sendError</code>,
+ * allow setting error codes and messages, while <code>setDateHeader</code> and <code>addDateHeader</code>
+ * handle date-related headers. Other methods like <code>getHeader</code> and <code>getHeaderNames</code>
+ * facilitate inspecting headers in the response.</p>
  *
- * <p>For more information on managing records within the context of view foundsets, refer to the
- * <a href="./viewfoundset.md">View foundset</a> section of the documentation.</p>
+ * <p>For overall REST-WS operations, refer to the
+ * <a href="../../../../guides/develop/programming-guide/creating-rest-apis.md">Creating REST API</a> section.</p>
  *
  * @author rgansevles
  *
