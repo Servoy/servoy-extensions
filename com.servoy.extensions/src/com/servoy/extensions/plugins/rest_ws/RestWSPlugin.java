@@ -48,13 +48,11 @@ import com.servoy.j2db.util.Utils;
 import com.servoy.j2db.util.serialize.JSONSerializerWrapper;
 
 /**
- * Servoy Server plugin for the RESTfull webservices servlet.
- * <p>
- * Configuration:
- * <ul>
- * <li>rest_ws_plugin_client_pool_size, default 5
- * <li>rest_ws_plugin_client_pool_exhausted_action [block/fail/grow], default block
- * </ul>
+ * <p>A server plugin designed to facilitate RESTful web services integration.</p>
+ *
+ * <p>Configuration options include settings for client pool management, such as specifying the pool size
+ * (default is 5) and determining the action to take when the pool is exhausted (options include block,
+ * fail, or grow, with block as the default).</p>
  *
  * @see RestWSServlet
  * @author rgansevles
@@ -110,7 +108,8 @@ public class RestWSPlugin implements IServerPlugin, IPreShutdownListener
 				"=" + ACTION_GROW + ", the number of clients may become higher. When running in developer this setting is ignored, pool size will always be 1");
 		req.put(CLIENT_MAX_GROW_POOL_SIZE_PROPERTY,
 			"This value is only used when " + CLIENT_POOL_EXCHAUSTED_ACTION_PROPERTY +
-				"=" + ACTION_GROW + ", and it defines the total number of clients to which the pool grows, after this value the pool will block. By default is not defined.");
+				"=" + ACTION_GROW +
+				", and it defines the total number of clients to which the pool grows, after this value the pool will block. By default is not defined.");
 		req.put(CLIENT_POOL_EXCHAUSTED_ACTION_PROPERTY, "The following values are supported for this setting:\n" + //
 			ACTION_BLOCK + " (default): requests will wait untill a client becomes available, when running in developer this value will be used\n" + //
 			ACTION_FAIL + ": the request will fail. The API will generate a SERVICE_UNAVAILABLE response (HTTP " + HttpServletResponse.SC_SERVICE_UNAVAILABLE +

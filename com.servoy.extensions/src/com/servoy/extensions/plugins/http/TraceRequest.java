@@ -25,7 +25,21 @@ import org.apache.hc.client5.http.impl.auth.BasicCredentialsProvider;
 import com.servoy.j2db.documentation.ServoyDocumented;
 
 /**
- * Http Trace request.
+ * <p>The <code>TraceRequest</code> object enables executing HTTP TRACE requests with advanced configuration
+ * options. It allows adding custom headers, managing authentication credentials, and handling both synchronous
+ * and asynchronous request executions.</p>
+ *
+ * <p>For asynchronous requests, success and error callbacks can be defined to process responses or handle
+ * errors effectively.</p>
+ *
+ * <p>Notable methods include <code>addHeader</code>, which adds custom headers to the request, and
+ * <code>executeRequest</code>, which performs the TRACE request synchronously. The object also supports
+ * asynchronous execution through <code>executeAsyncRequest</code>, providing flexibility for non-blocking
+ * operations. The <code>usePreemptiveAuthentication</code> method can enable credentials to be sent in the
+ * initial request, optimizing performance for specific scenarios.</p>
+ *
+ * <p>For broader context on HTTP operations, refer to the
+ * <a href="./README.md">Http plugin</a> documentation.</p>
  *
  * @author pbakker
  */

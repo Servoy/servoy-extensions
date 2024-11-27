@@ -27,7 +27,17 @@ import com.servoy.j2db.documentation.ServoyDocumented;
 import com.servoy.j2db.scripting.IScriptable;
 
 /**
- * XML node.
+ * <p>XML nodes are structured elements that support interaction and manipulation through various methods.
+ * These methods facilitate operations such as retrieving attribute names and values, accessing child nodes,
+ * obtaining the node name and type, and fetching the text value of an XML node.</p>
+ *
+ * <h2>Functionality</h2>
+ * <p>The <code>getAttributeNames</code> method retrieves all attribute names from the current node, while
+ * <code>getAttributeValue</code> returns the value of a specified attribute. To interact with node
+ * relationships, <code>getChildNodes</code> allows access to all child nodes. Additionally,
+ * <code>getName</code> provides the name of the XML node, and <code>getType</code> identifies its type.
+ * For textual data, <code>getTextValue</code> extracts the text content of the node.</p>
+ *
  * @author jcompagner
  */
 @SuppressWarnings("nls")

@@ -27,7 +27,17 @@ import com.servoy.j2db.documentation.ServoyDocumented;
 import com.servoy.j2db.scripting.IScriptable;
 
 /**
- * Csv file exporter of an Servoy FoundSet
+ * <p>The <code>TabExporter</code> plugin enables exporting data from a Servoy <code>FoundSet</code> into
+ * text-based formats such as CSV or tab-separated files. This is useful for generating reports or sharing
+ * data with external systems.</p>
+ *
+ * <p>The <code>addDataProvider</code> method allows specifying the data providers (columns) from the
+ * <code>FoundSet</code> to include in the export. Each column can be customized with attributes such as
+ * header text, value lists, or date formats, providing flexibility in how data is represented.</p>
+ *
+ * <p>The <code>textExport</code> method generates the export as a text string based on the defined
+ * configuration. This string can then be saved to a file or used directly for sharing or further processing.</p>
+ *
  * @author lvostinar
  *
  */

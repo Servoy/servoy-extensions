@@ -20,8 +20,14 @@ import com.servoy.j2db.documentation.ServoyDocumented;
 import com.servoy.j2db.scripting.IScriptable;
 
 /**
- * JSON serializer plugin.
+ * <p>The <code>serialize</code> plugin provides essential tools for working with JSON data, allowing objects
+ * to be serialized into JSON text and deserialized back into JavaScript objects.</p>
  *
+ * <p>The <code>toJSON</code> method converts a JavaScript object into a JSON string, enabling data to be
+ * stored or transmitted in a lightweight format.</p>
+ *
+ * <p>Conversely, the <code>fromJSON</code> method transforms a JSON string back into its original
+ * JavaScript object representation.</p>
  */
 @ServoyDocumented(publicName = SerializePlugin.PLUGIN_NAME, scriptingName = "plugins." + SerializePlugin.PLUGIN_NAME)
 public class SerializeProvider implements IScriptable

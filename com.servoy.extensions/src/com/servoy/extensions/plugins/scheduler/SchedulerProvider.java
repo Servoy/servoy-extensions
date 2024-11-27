@@ -46,7 +46,25 @@ import com.servoy.j2db.scripting.IScriptable;
 import com.servoy.j2db.util.Debug;
 
 /**
- * Scheduler plugin, used to run background jobs (in headless clients).
+ * <p>The <code>scheduler</code> plugin enables the creation and management of background jobs in headless
+ * clients. It supports both cron-based schedules and custom intervals, allowing for versatile task automation.</p>
+ *
+ * <p>The <code>addCronJob</code> method schedules tasks using cron expressions, with options for specifying
+ * start and end dates, and passing arguments. This method is ideal for periodic tasks such as running jobs
+ * at specific times or intervals.</p>
+ *
+ * <p>For more custom scheduling, the <code>addJob</code> method allows tasks to be scheduled at a specific
+ * start date with options for repetition intervals, counts, and end dates. Additional arguments can be
+ * passed to provide further flexibility in task execution.</p>
+ *
+ * <p>To monitor jobs, the <code>getCurrentJobNames</code> method retrieves active jobs, and
+ * <code>getLastRunJobName</code> provides the most recently executed job. The <code>removeJob</code> method
+ * simplifies job management by enabling the deletion of specific tasks.</p>
+ *
+ * <p>For more information, refer to the
+ * <a href="../../../../guides/develop/programming-guide/automation-and-scheduling/scheduler-api.md">
+ * Scheduler API</a> section of the documentation.</p>
+ *
  * @author jcompagner
  */
 @ServoyDocumented(publicName = SchedulerPlugin.PLUGIN_NAME, scriptingName = "plugins." + SchedulerPlugin.PLUGIN_NAME)
