@@ -30,7 +30,16 @@ import com.servoy.base.scripting.annotations.ServoyClientSupport;
 import com.servoy.j2db.documentation.ServoyDocumented;
 
 /**
- * Enables the use of the OAuth plugin with uncommon providers such as in-house solutions.
+ * <p>The <code>CustomApiBuilder</code> facilitates the configuration of the OAuth plugin for
+ * integration with less common or custom providers, including in-house solutions. This includes
+ * options for parsing and handling tokens, specifying request methods, and configuring
+ * authentication and endpoint URLs for token-related operations such as access, refresh, and
+ * revocation.</p>
+ *
+ * <p>It supports methods to customize the API by enabling access token extraction, specifying
+ * token request methods, defining client authentication mechanisms, and setting up refresh and
+ * revoke token endpoints, allowing integration with a variety of OAuth implementations.</p>
+ *
  * @author emera
  */
 @ServoyDocumented(publicName = "CustomApiBuilder", scriptingName = "CustomApiBuilder")

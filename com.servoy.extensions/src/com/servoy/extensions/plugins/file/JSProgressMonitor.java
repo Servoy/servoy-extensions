@@ -17,7 +17,6 @@
 
 package com.servoy.extensions.plugins.file;
 
-import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -31,9 +30,21 @@ import com.servoy.j2db.scripting.IJavaScriptType;
 import com.servoy.j2db.scripting.IScriptable;
 
 /**
- * This class is returned to the Servoy client from the {@link FileProvider} js_streamFilesFromServer or js_streamFilesToServer method<br/>
- * It is used to monitor the uploads/downloads calling back a Servoy method that can then get the status of the transfer(s)<br/>
- * It is called repeatedly by a {@link Timer} when scheduled with a fixed interval to callback the Servoy method provided.
+ * <p>The <code>JSProgressMonitor</code> class is used to track the progress of file transfers
+ * between the server and the client. It provides functionality for monitoring uploads and
+ * downloads by invoking a callback method at regular intervals. This mechanism allows real-time
+ * tracking of transfer status, including bytes transferred and files processed.</p>
+ *
+ * <h2>Functionality</h2>
+ * <p>The class supports canceling ongoing transfers and checking if the process has finished or
+ * been canceled. It provides detailed insights into the transfer progress, such as the number of
+ * bytes and files already transferred and those remaining. Users can also retrieve the name of
+ * the current file being transferred and its progress details, including bytes transferred and
+ * total bytes.</p>
+ *
+ * <p>The <code>JSProgressMonitor</code> allows setting a progress callback function that is
+ * invoked periodically to update transfer status. This function can be configured with a specific
+ * interval and, optionally, a delay for testing in a developer environment.</p>
  *
  * @since 5.2.1
  *

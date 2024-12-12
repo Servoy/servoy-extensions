@@ -20,7 +20,16 @@ import com.servoy.j2db.documentation.ServoyDocumented;
 import com.servoy.j2db.scripting.IScriptable;
 
 /**
- * gives the Servoy developer access to some Cookie methods for basic cookie operations
+ * <p>The <code>Cookie</code> class provides Servoy developers with methods for performing basic
+ * cookie operations. It allows retrieving details about cookies, including their name, value,
+ * domain, path, and secure attribute. The class is compatible with SmartClient, WebClient, and
+ * NGClient.</p>
+ *
+ * <h2>Functionality</h2>
+ * <p>This class offers methods to access essential properties of a cookie. Developers can
+ * retrieve the cookie’s domain, name, and path to understand its scope and access the value
+ * stored within the cookie. Additionally, it provides the ability to check whether the cookie is
+ * marked as secure, ensuring that it is transmitted over secure protocols.</p>
  *
  * @author paul
  */

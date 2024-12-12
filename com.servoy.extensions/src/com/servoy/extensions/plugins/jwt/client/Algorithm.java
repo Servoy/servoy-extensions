@@ -46,7 +46,14 @@ import com.servoy.j2db.scripting.IJavaScriptType;
 import com.servoy.j2db.scripting.IScriptable;
 
 /**
- * Builder for an algorithm object which is used to sign or verify a JWT token.
+ * <p>The <code>Algorithm</code> builder facilitates the creation of algorithm objects used for
+ * signing or verifying JWT tokens. It provides flexibility in configuring token headers, such as
+ * including a key identifier.</p>
+ *
+ * <p>The <code>kid(kid)</code> method allows setting a key identifier, which will be included in
+ * the token header. The method takes a string representing the private key identifier as its
+ * parameter and returns the algorithm builder to enable method chaining.</p>
+ *
  * @author emera
  */
 @SuppressWarnings("nls")

@@ -24,9 +24,21 @@ import com.servoy.j2db.documentation.ServoyDocumented;
 import com.servoy.j2db.scripting.IScriptable;
 
 /**
- * This class represents a polynomial in one variable.
- * This class is not thread safe.
- * 
+ * <p>The <code>Polynomial</code> class provides a framework for representing and manipulating
+ * polynomials in one variable. It supports essential mathematical operations such as addition,
+ * multiplication, differentiation, and evaluation. The class is designed for single-threaded use.</p>
+ *
+ * <h2>Functionality</h2>
+ * <p>This class enables the addition of polynomials or individual terms, allowing for the
+ * construction of complex polynomial expressions. It supports multiplication with other
+ * polynomials or individual terms, making it versatile for algebraic operations. Additionally,
+ * users can find roots of a polynomial using Newton's method, which provides precision control
+ * through configurable error margins and iteration limits.</p>
+ *
+ * <p>The class also offers methods to compute and retrieve the derivative of a polynomial. The
+ * derivative can be further evaluated at specific points to analyze its behavior. Users can reset
+ * the polynomial to zero when needed, providing a clean state for new calculations. </p>
+ *
  * @author sebster
  */
 @ServoyDocumented(scriptingName = "Polynomial")
@@ -60,7 +72,7 @@ public class Polynomial implements IScriptable
 
 	/**
 	 * Construct a copy of the specified polynomial.
-	 * 
+	 *
 	 * @param polynomial the polynomial to construct a copy of
 	 */
 	public Polynomial(Polynomial polynomial)
@@ -89,7 +101,7 @@ public class Polynomial implements IScriptable
 	 *
 	 * @sampleas js_addTerm(double, int)
 	 *
-	 * @param polynomial 
+	 * @param polynomial
 	 */
 	public void js_addPolynomial(Polynomial polynomial)
 	{
@@ -113,8 +125,8 @@ public class Polynomial implements IScriptable
 	 * }
 	 * application.output(eq.getValue(2));
 	 *
-	 * @param coefficient 
-	 * @param exponent 
+	 * @param coefficient
+	 * @param exponent
 	 */
 	public void js_addTerm(double coefficient, int exponent)
 	{
@@ -143,9 +155,9 @@ public class Polynomial implements IScriptable
 	 * if (deriv.getDerivativeValue(rd) < 0) application.output("Max point.");
 	 * else application.output("Min point.");
 	 *
-	 * @param startValue 
-	 * @param error 
-	 * @param iterations 
+	 * @param startValue
+	 * @param error
+	 * @param iterations
 	 */
 	public double js_findRoot(double startValue, double error, int iterations)
 	{
@@ -167,7 +179,7 @@ public class Polynomial implements IScriptable
 	 *
 	 * @sampleas js_findRoot(double, double, int)
 	 *
-	 * @param x 
+	 * @param x
 	 */
 	public double js_getDerivativeValue(double x)
 	{
@@ -179,7 +191,7 @@ public class Polynomial implements IScriptable
 	 *
 	 * @sampleas js_findRoot(double, double, int)
 	 *
-	 * @param x 
+	 * @param x
 	 */
 	public double js_getValue(double x)
 	{
@@ -204,7 +216,7 @@ public class Polynomial implements IScriptable
 	 * application.output("eq(" + r1 + ")=" + eq.getValue(r1));
 	 * application.output("eq(" + r2 + ")=" + eq.getValue(r2));
 	 *
-	 * @param polynomial 
+	 * @param polynomial
 	 */
 	public void js_multiplyByPolynomial(Polynomial polynomial)
 	{
@@ -216,8 +228,8 @@ public class Polynomial implements IScriptable
 	 *
 	 * @sampleas js_addTerm(double, int)
 	 *
-	 * @param coefficient 
-	 * @param exponent 
+	 * @param coefficient
+	 * @param exponent
 	 */
 	public void js_multiplyByTerm(double coefficient, int exponent)
 	{
@@ -251,7 +263,7 @@ public class Polynomial implements IScriptable
 
 	/**
 	 * Add the specified term to this polynomial.
-	 * 
+	 *
 	 * @param coefficient the coefficient of the term to add
 	 * @param exponent the exponent of the term to add
 	 */
@@ -273,7 +285,7 @@ public class Polynomial implements IScriptable
 
 	/**
 	 * Add the specified term to this polynomial.
-	 * 
+	 *
 	 * @param term the term to add
 	 */
 	private void addTerm(Term term)
@@ -283,7 +295,7 @@ public class Polynomial implements IScriptable
 
 	/**
 	 * Add the specified polynomial to this polynomial.
-	 * 
+	 *
 	 * @param polynomial the polynomial to add
 	 */
 	public void addPolynomial(Polynomial polynomial)
@@ -297,7 +309,7 @@ public class Polynomial implements IScriptable
 
 	/**
 	 * Multiply this polynomial by the specified term.
-	 * 
+	 *
 	 * @param coefficient the coefficient of the term to multiply by
 	 * @param exponent the exponent of the term to multiply by
 	 */
@@ -325,7 +337,7 @@ public class Polynomial implements IScriptable
 
 	/**
 	 * Multiply this polynomial by the specified term.
-	 * 
+	 *
 	 * @param term the term to multiply by
 	 */
 	private void multiplyByTerm(Term term)
@@ -335,7 +347,7 @@ public class Polynomial implements IScriptable
 
 	/**
 	 * Multiply this polynomial by the specified polynomial.
-	 * 
+	 *
 	 * @param polynomial the polynomial to multiply by
 	 */
 	public void multiplyByPolynomial(Polynomial polynomial)
@@ -363,9 +375,9 @@ public class Polynomial implements IScriptable
 
 	/**
 	 * Calculate the value of this polynomial in the specified coordinate.
-	 * 
+	 *
 	 * @param x the coordinate in which to calculate the value of this polynomial
-	 * 
+	 *
 	 * @return the value of this polynomial in the specified coordinate
 	 */
 	public double getValue(double x)
@@ -384,9 +396,9 @@ public class Polynomial implements IScriptable
 
 	/**
 	 * Calculate the value of the derivative of this polynomial in the specified coordinate.
-	 * 
+	 *
 	 * @param x the coordinate in which to calculate the value of the derivative of this polynomial
-	 * 
+	 *
 	 * @return the value of the derivative of this polynomial in the specified coordinate
 	 */
 	public double getDerivativeValue(double x)
@@ -398,7 +410,7 @@ public class Polynomial implements IScriptable
 
 	/**
 	 * Calculate and return the derivative of this polynomial.
-	 * 
+	 *
 	 * @return the derivative of this polynomial
 	 */
 	public Polynomial getDerivative()
@@ -412,11 +424,11 @@ public class Polynomial implements IScriptable
 
 	/**
 	 * Use Newton's method to find a root of this polynomial.
-	 * 
+	 *
 	 * @param root the initial guess for the root
 	 * @param error the maximum allowed error
 	 * @param iterations the maximum allowed number of iterations
-	 * 
+	 *
 	 * @return the value of the root after the specified number of iterations or as
 	 * 		soon as the error condition was satisified; returns Double.NaN if at some
 	 * 		point the derivative was zero
@@ -440,7 +452,7 @@ public class Polynomial implements IScriptable
 	 * Return a string representation of this polynomial as a sum of terms with
 	 * the terms with the smaller exponents to the left of terms with larger
 	 * exponents.
-	 * 
+	 *
 	 * @return a string representation of this polynomial
 	 */
 	@Override
@@ -496,7 +508,7 @@ public class Polynomial implements IScriptable
 	/**
 	 * The Term class represents a term of a polynomial in one variable.
 	 * The term represented is <i>coefficient * x^exponent</i>.
-	 * 
+	 *
 	 * @author sebster
 	 */
 	public class Term implements Comparable
@@ -513,7 +525,7 @@ public class Polynomial implements IScriptable
 
 		/**
 		 * Construct a copy of the specified term.
-		 * 
+		 *
 		 * @param term
 		 */
 		public Term(Term term)
@@ -523,7 +535,7 @@ public class Polynomial implements IScriptable
 
 		/**
 		 * Construct a term with the specified coefficient and exponent.
-		 * 
+		 *
 		 * @param coefficient the coefficient of this term
 		 * @param exponent the exponent of this term
 		 */
@@ -536,7 +548,7 @@ public class Polynomial implements IScriptable
 		/**
 		 * Compare this term to another term. Terms are ordered lexicographically
 		 * by their exponent and coefficient.
-		 * 
+		 *
 		 * @throws NullPointerException if the other object is null
 		 * @throws ClassCastException if the other object is not a Term
 		 */
@@ -548,7 +560,7 @@ public class Polynomial implements IScriptable
 
 		/**
 		 * Returns the string representation coefficient*x^exponent of this term.
-		 * 
+		 *
 		 * @return the string representation of this term
 		 */
 		@Override
