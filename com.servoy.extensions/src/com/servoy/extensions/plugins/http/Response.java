@@ -21,7 +21,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import org.apache.hc.client5.http.async.methods.SimpleHttpResponse;
 import org.apache.hc.client5.http.classic.methods.HttpUriRequest;
 import org.apache.hc.core5.http.ContentType;
 import org.apache.hc.core5.http.Header;
@@ -43,7 +42,7 @@ import com.servoy.j2db.util.Utils;
 @ServoyDocumented
 public class Response implements IScriptable, IJavaScriptType
 {
-	private SimpleHttpResponse res;
+	private FileOrTextHttpResponse response;
 	private Object response_body = null;
 	private HttpUriRequest request;
 	private String exceptionMessage;
@@ -58,20 +57,20 @@ public class Response implements IScriptable, IJavaScriptType
 		this.exceptionMessage = exceptionMessage;
 	}
 
-	public Response(SimpleHttpResponse response, HttpUriRequest request)
+	public Response(FileOrTextHttpResponse response, HttpUriRequest request)
 	{
-		this.res = response;
+		this.response = response;
 		this.request = request;
 	}
 
 	public String[] getAllowedMethods()
 	{
-		if (this.res == null)
+		if (this.response == null)
 		{
 			Debug.error("getAllowedMethods API was called while response is null due to request exception: " + exceptionMessage);
 			return new String[0];
 		}
-		Iterator<Header> it = res.headerIterator(OptionsRequest.OPTIONS_HEADER);
+		Iterator<Header> it = response.headerIterator(OptionsRequest.OPTIONS_HEADER);
 		Set<String> methods = new HashSet<String>();
 		while (it.hasNext())
 		{
@@ -97,9 +96,9 @@ public class Response implements IScriptable, IJavaScriptType
 	 */
 	public int js_getStatusCode()
 	{
-		if (res != null)
+		if (response != null)
 		{
-			return res.getCode();
+			return response.getCode();
 		}
 		else
 		{
@@ -119,9 +118,9 @@ public class Response implements IScriptable, IJavaScriptType
 	 */
 	public String js_getStatusReasonPhrase()
 	{
-		if (res != null)
+		if (response != null)
 		{
-			return res.getReasonPhrase();
+			return response.getReasonPhrase();
 		}
 		else
 		{
@@ -142,9 +141,9 @@ public class Response implements IScriptable, IJavaScriptType
 		{
 			try
 			{
-				if (this.res != null)
+				if (this.response != null)
 				{
-					response_body = res.getBodyText();
+					response_body = response.getBodyText();
 				}
 				else
 				{
@@ -163,6 +162,7 @@ public class Response implements IScriptable, IJavaScriptType
 
 	/**
 	 * Get the content of response as binary data. It also supports gzip-ed content.
+	 * Note this loads all content in memory at once, for large files you should use getFileUpload which allows usage of a temporary file and streaming.
 	 *
 	 * @sample
 	 * var mediaData = response.getMediaData();
@@ -171,9 +171,9 @@ public class Response implements IScriptable, IJavaScriptType
 	{
 		if (response_body == null)
 		{
-			if (this.res != null)
+			if (this.response != null)
 			{
-				response_body = res.getBodyBytes();
+				response_body = response.getBodyBytes();
 			}
 			else
 			{
@@ -210,15 +210,15 @@ public class Response implements IScriptable, IJavaScriptType
 		{
 			Header[] ha;
 			JSMap sa = new JSMap();
-			if (this.res != null)
+			if (this.response != null)
 			{
 				if (headerName == null)
 				{
-					ha = res.getHeaders();
+					ha = response.getHeaders();
 				}
 				else
 				{
-					ha = res.getHeaders(headerName);
+					ha = response.getHeaders(headerName);
 				}
 				for (Header element : ha)
 				{
@@ -253,9 +253,9 @@ public class Response implements IScriptable, IJavaScriptType
 	 */
 	public String js_getCharset()
 	{
-		if (this.res != null)
+		if (this.response != null)
 		{
-			ContentType contentType = res.getContentType();
+			ContentType contentType = response.getContentType();
 			if (contentType != null && contentType.getCharset() != null)
 			{
 				return contentType.getCharset().displayName();
@@ -269,15 +269,16 @@ public class Response implements IScriptable, IJavaScriptType
 	}
 
 	/**
-	 * Needs to be called when not reading content via getResponseBody or getMediaData
-	 * to be able to reuse the client.
-	 * @return true if the entity content is consumed and content stream (if exists) is closed
-	 * @deprecated no longer needed, make sure to call client.close() when you don't use the client anymore which was used to create this Response
+	 * Should be called to delete temporary file that holds the response content. The temporary file is created only for bigger responses.
+	 *
+	 * @return true if the temporary file with response data was deleted
 	 */
-	@Deprecated
 	public boolean js_close()
 	{
-		// no longer needed
+		if (response.getFile() != null)
+		{
+			return response.getFile().delete();
+		}
 		return true;
 	}
 
@@ -291,5 +292,23 @@ public class Response implements IScriptable, IJavaScriptType
 	public String js_getException()
 	{
 		return this.exceptionMessage;
+	}
+
+	/**
+	 * Gets a file upload object (that contains a temporary file), which can be transformed to a JSFile and then used by file plugin.
+	 * If response body is too small, there is no file available (this should be used only for large files), otherwise use getResponseBody or getMediaData.
+	 *
+	 * @sample
+	 * plugins.file.onvertToJSFile(response.getFileUpload());
+	 *
+	 * @return fileupload object
+	 */
+	public JSFileUpload js_getFileUpload()
+	{
+		if (response.getFile() != null)
+		{
+			return new JSFileUpload(response.getFile(), response.getContentType() != null ? response.getContentType().getMimeType() : null);
+		}
+		return null;
 	}
 }

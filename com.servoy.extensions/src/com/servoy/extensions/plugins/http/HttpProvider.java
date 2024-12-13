@@ -321,6 +321,6 @@ public class HttpProvider implements IReturnedTypesProvider, IScriptable
 	 */
 	public Class< ? >[] getAllReturnedTypes()
 	{
-		return new Class[] { PatchRequest.class, PostRequest.class, PutRequest.class, GetRequest.class, DeleteRequest.class, OptionsRequest.class, HeadRequest.class, TraceRequest.class, Cookie.class, Response.class, HttpClient.class, HttpClientConfig.class, HTTP_STATUS.class };
+		return new Class[] { PatchRequest.class, PostRequest.class, PutRequest.class, GetRequest.class, DeleteRequest.class, OptionsRequest.class, HeadRequest.class, TraceRequest.class, Cookie.class, Response.class, HttpClient.class, HttpClientConfig.class, HTTP_STATUS.class, JSFileUpload.class };
 	}
 }

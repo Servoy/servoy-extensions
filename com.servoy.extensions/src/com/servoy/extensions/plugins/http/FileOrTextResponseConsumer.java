@@ -17,33 +17,35 @@
 
 package com.servoy.extensions.plugins.http;
 
+import java.io.File;
 import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
+import java.util.Iterator;
 
-import org.apache.hc.client5.http.async.methods.SimpleHttpResponse;
 import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.Header;
 import org.apache.hc.core5.http.HttpException;
 import org.apache.hc.core5.http.HttpResponse;
 import org.apache.hc.core5.http.nio.AsyncEntityConsumer;
 import org.apache.hc.core5.http.nio.support.AbstractAsyncResponseConsumer;
 import org.apache.hc.core5.http.protocol.HttpContext;
 
+import com.servoy.j2db.util.Pair;
+
 /**
  * @author lvostinar
  *
  */
-public class FixedSimpleResponseConsumer extends AbstractAsyncResponseConsumer<SimpleHttpResponse, byte[]>
+public class FileOrTextResponseConsumer extends AbstractAsyncResponseConsumer<FileOrTextHttpResponse, Pair<byte[], File>>
 {
 
-	FixedSimpleResponseConsumer(final AsyncEntityConsumer<byte[]> entityConsumer)
+	FileOrTextResponseConsumer(final AsyncEntityConsumer<Pair<byte[], File>> entityConsumer)
 	{
 		super(entityConsumer);
 	}
 
-	public static FixedSimpleResponseConsumer create()
+	public static FileOrTextResponseConsumer create()
 	{
-		return new FixedSimpleResponseConsumer(new SimpleAsyncEntityConsumer());
+		return new FileOrTextResponseConsumer(new FileOrBinAsyncEntityConsumer());
 	}
 
 	@Override
@@ -52,28 +54,22 @@ public class FixedSimpleResponseConsumer extends AbstractAsyncResponseConsumer<S
 	}
 
 	@Override
-	protected SimpleHttpResponse buildResult(final HttpResponse response, final byte[] entity, final ContentType contentType)
+	protected FileOrTextHttpResponse buildResult(final HttpResponse response, Pair<byte[], File> content, final ContentType contentType)
 	{
-		final SimpleHttpResponse simpleResponse = SimpleHttpResponse.copy(response);
-		if (entity != null)
+		final FileOrTextHttpResponse copy = new FileOrTextHttpResponse(response.getCode());
+		copy.setVersion(response.getVersion());
+		copy.setReasonPhrase(response.getReasonPhrase());
+		for (final Iterator<Header> it = response.headerIterator(); it.hasNext();)
 		{
-			// workaround https://issues.apache.org/jira/browse/HTTPCLIENT-2244
-			if (contentType != null && contentType.getCharset() == null)
-			{
-				Charset defaultCharset = StandardCharsets.ISO_8859_1;
-				ContentType mimeContentType = ContentType.getByMimeType(contentType.getMimeType());
-				if (mimeContentType != null && mimeContentType.getCharset() != null)
-				{
-					defaultCharset = mimeContentType.getCharset();
-				}
-				simpleResponse.setBody(entity, contentType.withCharset(defaultCharset));
-			}
-			else
-			{
-				simpleResponse.setBody(entity, contentType);
-			}
+			copy.addHeader(it.next());
 		}
-		return simpleResponse;
+		copy.setContentType(contentType);
+		if (content != null)
+		{
+			copy.setBodyBytes(content.getLeft());
+			copy.setFile(content.getRight());
+		}
+		return copy;
 	}
 
 }

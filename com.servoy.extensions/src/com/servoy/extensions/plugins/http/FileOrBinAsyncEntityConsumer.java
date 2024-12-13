@@ -17,7 +17,11 @@
 
 package com.servoy.extensions.plugins.http;
 
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.ByteBuffer;
 
 import org.apache.hc.core5.http.ContentType;
@@ -25,16 +29,22 @@ import org.apache.hc.core5.http.HttpException;
 import org.apache.hc.core5.http.nio.entity.AbstractBinAsyncEntityConsumer;
 import org.apache.hc.core5.util.ByteArrayBuffer;
 
+import com.servoy.j2db.util.Debug;
+import com.servoy.j2db.util.Pair;
+
 /**
  * @author lvostinar
  *
  */
-public class SimpleAsyncEntityConsumer extends AbstractBinAsyncEntityConsumer<byte[]>
+public class FileOrBinAsyncEntityConsumer extends AbstractBinAsyncEntityConsumer<Pair<byte[], File>>
 {
 
 	private final ByteArrayBuffer buffer;
+	private File file;
+	private boolean initialChunk = true;
+	private OutputStream outputStream;
 
-	public SimpleAsyncEntityConsumer()
+	public FileOrBinAsyncEntityConsumer()
 	{
 		super();
 		this.buffer = new ByteArrayBuffer(1024);
@@ -48,7 +58,7 @@ public class SimpleAsyncEntityConsumer extends AbstractBinAsyncEntityConsumer<by
 	@Override
 	protected int capacityIncrement()
 	{
-		return Integer.MAX_VALUE;
+		return 1024 * 1024;
 	}
 
 	@Override
@@ -58,29 +68,58 @@ public class SimpleAsyncEntityConsumer extends AbstractBinAsyncEntityConsumer<by
 		{
 			return;
 		}
-		if (src.hasArray())
+		if (initialChunk && src.remaining() > 10000)
 		{
-			buffer.append(src.array(), src.arrayOffset() + src.position(), src.remaining());
+			initialChunk = false;
+			this.file = File.createTempFile("upload", ".tmp"); //$NON-NLS-1$ //$NON-NLS-2$
+			this.file.deleteOnExit();
+			this.outputStream = new BufferedOutputStream(new FileOutputStream(file));
+		}
+		if (this.outputStream != null)
+		{
+			byte[] bytesArray = new byte[src.remaining()];
+			src.get(bytesArray, 0, bytesArray.length);
+			this.outputStream.write(bytesArray);
 		}
 		else
 		{
-			while (src.hasRemaining())
+			if (src.hasArray())
 			{
-				buffer.append(src.get());
+				buffer.append(src.array(), src.arrayOffset() + src.position(), src.remaining());
+			}
+			else
+			{
+				while (src.hasRemaining())
+				{
+					buffer.append(src.get());
+				}
 			}
 		}
 	}
 
 	@Override
-	protected byte[] generateContent() throws IOException
+	protected Pair<byte[], File> generateContent() throws IOException
 	{
-		return buffer.toByteArray();
+		return file != null ? new Pair<byte[], File>(null, file) : new Pair<byte[], File>(buffer.toByteArray(), null);
 	}
 
 	@Override
 	public void releaseResources()
 	{
 		buffer.clear();
+		if (outputStream != null)
+		{
+			try
+			{
+				outputStream.flush();
+				outputStream.close();
+				outputStream = null;
+			}
+			catch (IOException e)
+			{
+				Debug.error(e);
+			}
+		}
 	}
 
 }

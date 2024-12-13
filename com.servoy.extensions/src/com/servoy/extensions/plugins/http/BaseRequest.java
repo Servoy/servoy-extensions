@@ -30,7 +30,6 @@ import java.util.concurrent.Future;
 import java.util.zip.GZIPInputStream;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.hc.client5.http.async.methods.SimpleHttpResponse;
 import org.apache.hc.client5.http.auth.AuthScope;
 import org.apache.hc.client5.http.auth.Credentials;
 import org.apache.hc.client5.http.auth.NTCredentials;
@@ -247,15 +246,15 @@ public abstract class BaseRequest implements IScriptable, IJavaScriptType
 			}
 		}
 		method.setConfig(requestConfigBuilder.build());
-		final Future<SimpleHttpResponse> future = client.execute(
+		final Future<FileOrTextHttpResponse> future = client.execute(
 			new BasicRequestProducer(method, buildEntityProducer()),
-			FixedSimpleResponseConsumer.create(),
+			FileOrTextResponseConsumer.create(),
 			context,
-			new FutureCallback<SimpleHttpResponse>()
+			new FutureCallback<FileOrTextHttpResponse>()
 			{
 
 				@Override
-				public void completed(final SimpleHttpResponse response)
+				public void completed(final FileOrTextHttpResponse response)
 				{
 					if (successFunctionDef != null)
 					{
@@ -307,7 +306,7 @@ public abstract class BaseRequest implements IScriptable, IJavaScriptType
 		{
 			try
 			{
-				SimpleHttpResponse response = future.get();
+				FileOrTextHttpResponse response = future.get();
 				return new Response(processResponse(response), method);
 
 			}
@@ -327,7 +326,7 @@ public abstract class BaseRequest implements IScriptable, IJavaScriptType
 		return null;
 	}
 
-	private SimpleHttpResponse processResponse(SimpleHttpResponse response)
+	private FileOrTextHttpResponse processResponse(FileOrTextHttpResponse response)
 	{
 		// Check if the response is compressed
 		Header[] responseHeaders = response.getHeaders();
@@ -348,11 +347,12 @@ public abstract class BaseRequest implements IScriptable, IJavaScriptType
 			return response;
 		}
 
+		//TODO should we not load everything in memory here ?
 		try (InputStream responseInputStream = new GZIPInputStream(new ByteArrayInputStream(response.getBodyBytes()));
 			ByteArrayOutputStream outputStream = new ByteArrayOutputStream();)
 		{
 			IOUtils.copy(responseInputStream, outputStream, 2048);
-			response.setBody(outputStream.toByteArray(), response.getContentType());
+			response.setBodyBytes(outputStream.toByteArray());
 		}
 		catch (IOException e)
 		{
