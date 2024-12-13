@@ -29,6 +29,14 @@ import com.servoy.j2db.scripting.IJavaScriptType;
 import com.servoy.j2db.scripting.IScriptable;
 
 /**
+ * <p>The <code>OAuthResponse</code> class is used to handle HTTP responses in the context of
+ * OAuth-based API interactions. It provides mechanisms to retrieve the HTTP status code,
+ * individual header values, and all header names associated with the response.</p>
+ *
+ * <p>Key functionalities include the ability to fetch the HTTP status code through
+ * <code>getCode()</code>, retrieve a specific header value using <code>getHeader(name)</code>,
+ * and obtain a list of all headers with <code>getHeaders()</code>.</p>
+ *
  * @author emera
  */
 @ServoyDocumented(scriptingName = "OAuthResponse")

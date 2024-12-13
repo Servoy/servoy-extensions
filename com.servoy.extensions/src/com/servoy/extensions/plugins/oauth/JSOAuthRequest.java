@@ -26,7 +26,23 @@ import com.servoy.j2db.documentation.ServoyDocumented;
 import com.servoy.j2db.scripting.IScriptable;
 
 /**
- * Wrapper around the scribe OAuthRequest.
+ * <p><code>JSOAuthRequest</code> provides a streamlined way to create and execute OAuth requests
+ * within an application. It supports various HTTP verbs, such as GET, POST, PUT, DELETE, and PATCH,
+ * enabling flexible interactions with OAuth-enabled APIs. This wrapper simplifies the process of
+ * setting up requests by offering methods to add headers, parameters, and payloads.</p>
+ *
+ * <p>Headers can be defined using <code>addHeader</code>, and body parameters can be specified
+ * with <code>addBodyParameter</code>. The <code>setPayload</code> function allows for setting the
+ * request's body payload, useful for scenarios involving larger data transmissions. For adding
+ * parameters, <code>addParameter</code> intelligently determines whether to place the parameter
+ * in the body or as a query string based on the HTTP verb. Additionally,
+ * <code>addQuerystringParameter</code> explicitly manages query string additions.</p>
+ *
+ * <p>The class also supports OAuth-specific parameters like <code>scope</code> and others prefixed
+ * with <code>oauth_</code> through the <code>addOAuthParameter</code> method. The <code>execute</code>
+ * method runs the configured request and returns an <code>OAuthResponse</code> object containing
+ * details such as HTTP status codes and the response body.</p>
+ *
  * @author emera
  */
 @ServoyDocumented(publicName = "OAuthRequest", scriptingName = "OAuthRequest")

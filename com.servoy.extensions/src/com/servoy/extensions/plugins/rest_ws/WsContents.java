@@ -27,7 +27,17 @@ import com.servoy.j2db.scripting.IJavaScriptType;
 import com.servoy.j2db.scripting.IScriptable;
 
 /**
- * The representation of the contents/part of a request.
+ * <p>The <code>WsContents</code> class represents the contents or parts of an HTTP request. It
+ * provides functionality to access metadata and content details of uploaded files or form data
+ * in a request. The contents include attributes such as the content name, field name, content
+ * type, size, and raw byte data. Additionally, it allows retrieval of the content as a string
+ * with a specified encoding.</p>
+ *
+ * <p>Key methods include <code>getName()</code> to get the content name, <code>getFieldName()</code>
+ * to retrieve the field name, <code>getContentType()</code> to access the MIME type, and
+ * <code>getSize()</code> to get the content size in bytes. The class also provides methods like
+ * <code>getBytes()</code> to obtain raw byte data and <code>getString(encoding)</code> to convert
+ * the content into a string using a specified encoding.</p>
  *
  * @author rgansevles
  *

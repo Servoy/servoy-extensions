@@ -22,7 +22,15 @@ import com.servoy.j2db.documentation.ServoyDocumented;
 import com.servoy.j2db.scripting.IConstantsObject;
 
 /**
- * Contains supported OAuth apis.
+ * <p>The <code>OAuthProviders</code> class contains constants representing supported OAuth APIs
+ * that can be used with the Servoy OAuth plugin. These include a range of APIs provided by the
+ * Scribe library, as well as custom additions tailored for specific use cases.</p>
+ *
+ * <p>Supported APIs include popular services such as <code>Google</code>,
+ * <code>Microsoft AD</code>, and <code>LinkedIn</code>, as well as other providers like
+ * <code>GitHub</code>, <code>Dropbox</code>, and <code>Salesforce</code>. Additionally, the class
+ * defines custom integrations for <code>Intuit</code>, <code>Okta</code>, and <code>UPS</code>.</p>
+ *
  * @author emera
  */
 @ServoyDocumented(scriptingName = "OAuthProviders")

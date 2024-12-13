@@ -41,7 +41,20 @@ import com.servoy.j2db.scripting.IScriptable;
 import com.servoy.j2db.scripting.JSMap;
 
 /**
- * The representation of a rest-ws response, only valid while running in a REST-WS request.
+ * <p><code>WsRequest</code> represents an HTTP request in a REST-WS environment, offering
+ * comprehensive methods to retrieve and manipulate request data. The class provides access to
+ * request headers, parameters, cookies, content, and metadata such as character encoding, content
+ * type, and request method. Additionally, it supports retrieving information about the client,
+ * server, and request path.</p>
+ *
+ * <p>Key capabilities include retrieving request headers and their values
+ * (<code>getHeader</code>, <code>getHeaders</code>), managing request parameters
+ * (<code>getParameter</code>, <code>getParameterMap</code>), and accessing cookies
+ * (<code>getCookies</code>). It also allows obtaining the body content of the request
+ * (<code>getContents</code>) and metadata such as the query string (<code>getQueryString</code>),
+ * server name (<code>getServerName</code>), and remote address (<code>getRemoteAddr</code>). The
+ * class also supports advanced features like handling multi-part requests and obtaining localized
+ * language preferences (<code>getLocaleLanguageTag</code>).</p>
  *
  * @author rgansevles
  *
@@ -341,7 +354,7 @@ public class WsRequest implements IScriptable, IJavaScriptType
 	 *
 	 * Returns well-formed IETF BCP 47 language tags representing
 	 * the locales.
-
+	
 	 * @return an array of preferred
 	 * <code>Locale</code> objects for the client
 	 */

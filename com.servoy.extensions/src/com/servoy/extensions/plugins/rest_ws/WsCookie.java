@@ -28,7 +28,16 @@ import com.servoy.j2db.scripting.IScriptable;
 import com.servoy.j2db.scripting.annotations.JSReadonlyProperty;
 
 /**
- * The representation of a http cookie.
+ * <p>An HTTP cookie representation provides methods to manage and manipulate various attributes
+ * of cookies in an application. The cookie includes properties such as <code>name</code> and
+ * <code>value</code>, which hold its key and content respectively. Attributes like
+ * <code>domain</code>, <code>path</code>, and <code>maxAge</code> define the cookie's scope and
+ * lifetime, while flags such as <code>secure</code> and <code>httpOnly</code> enhance security by
+ * restricting the transmission protocol and JavaScript accessibility.</p>
+ *
+ * <p>Additional attributes like <code>comment</code> provide metadata about the cookie's purpose,
+ * and <code>version</code> ensures compatibility with specific cookie protocols. This
+ * representation also supports methods for checking and modifying these attributes dynamically.</p>
  *
  * @author rgansevles
  *

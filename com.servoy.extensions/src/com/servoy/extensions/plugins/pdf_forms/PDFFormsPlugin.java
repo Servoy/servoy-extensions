@@ -28,7 +28,21 @@ import com.servoy.j2db.plugins.PluginException;
 import com.servoy.j2db.preference.PreferencePanel;
 
 /**
- * PDF forms plugin
+ * <p>The <code>PDFFormsPlugin</code> is a server plugin designed to handle PDF forms in the Servoy
+ * environment. It integrates with a Servoy server by registering a web service named
+ * <code>pdf_forms</code> through the <code>PDFServlet</code>. The plugin allows server-side
+ * operations to manage PDF templates, values, and actions stored in SQL tables.</p>
+ *
+ * <p>The plugin provides configuration options via required properties. These include
+ * <code>SERVER_NAME_PROPERTY</code>, which specifies the server used to locate SQL tables, and
+ * <code>TEMPLATE_LOCATION_PROPERTY</code>, which defines the URL for retrieving PDF templates.
+ * Additionally, it allows customizable plugin properties, such as <code>DISPLAY_NAME</code>, set
+ * to "PDF Forms Plugin."</p>
+ *
+ * <p>The plugin lifecycle is defined by methods like <code>initialize()</code> for setup,
+ * <code>load()</code> and <code>unload()</code> for resource management, and
+ * <code>getProperties()</code> for exposing its configuration details.</p>
+ *
  * @author jblok
  */
 @ServoyDocumented

@@ -37,6 +37,23 @@ import com.servoy.j2db.documentation.ServoyDocumented;
 import com.servoy.j2db.scripting.IReturnedTypesProvider;
 import com.servoy.j2db.scripting.IScriptable;
 
+/**
+ * <p>The <code>WorkflowsProvider</code> class, enable interaction with
+ * Kie Services for workflow management. It offers methods to create clients and manage user tasks.</p>
+ *
+ * <h2>Functionality</h2>
+ * <p>The <code>createClient</code> method initializes a <code>KieServicesClient</code> using the
+ * provided deployment URL, user credentials, and a JSON marshalling format. This client serves as
+ * the primary interface for interacting with Kie Services. The <code>createServicesClient</code>
+ * method extends this functionality by wrapping the <code>KieServicesClient</code> in a
+ * <code>JSServicesClient</code>, adding scripting support.</p>
+ *
+ * <p>For task management, <code>getAllUserTasks</code> retrieves user tasks from the service, with
+ * options to specify pagination parameters such as page number and size. These tasks are fetched
+ * using the <code>UserTaskServicesClient</code>. The provider supports fetching additional services
+ * such as <code>ProcessServicesClient</code>, <code>QueryServicesClient</code>, and
+ * <code>UserTaskAdminServicesClient</code> for comprehensive workflow operations.</p>
+ */
 @ServoyDocumented(publicName = WorkflowsPlugin.PLUGIN_NAME, scriptingName = "plugins." + WorkflowsPlugin.PLUGIN_NAME)
 public class WorkflowsProvider implements IScriptable, IReturnedTypesProvider
 {

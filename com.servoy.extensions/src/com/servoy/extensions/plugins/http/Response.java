@@ -36,6 +36,24 @@ import com.servoy.j2db.util.Debug;
 import com.servoy.j2db.util.Utils;
 
 /**
+ * <p>The <code>Response</code> class provides utilities for managing HTTP responses in the Servoy
+ * environment, enabling efficient handling of HTTP interactions. It integrates with Servoy's
+ * scripting and JavaScript support, allowing for seamless debugging and interaction with HTTP
+ * data.</p>
+ *
+ * <p>The class allows retrieval of HTTP status codes and their corresponding reason phrases, which
+ * is useful for identifying issues such as permission errors or malformed requests. For example, it
+ * can return status codes like <code>403</code> along with a reason phrase explaining the specific
+ * error. The response body can be accessed as a string or as binary data, with support for
+ * gzip-encoded content to handle a wide range of response formats.</p>
+ *
+ * <p>Headers can be retrieved in a structured manner as key-value mappings. Additionally,
+ * developers can filter headers by specific names to extract targeted information. The
+ * <code>getCharset</code> method enables retrieval of the response body's character set, ensuring
+ * proper decoding for textual content. The class also provides error handling through the
+ * <code>getException()</code> method, which returns exception messages related to failed
+ * requests.</p>
+ *
  * @author pbakker
  *
  */

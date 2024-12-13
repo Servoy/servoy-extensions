@@ -22,7 +22,11 @@ import com.servoy.j2db.documentation.ServoyDocumented;
 import com.servoy.j2db.scripting.IConstantsObject;
 
 /**
- * Contains supported OAuth Token Extractors.
+ * <p>The <code>OAuthTokenExtractors</code> class provides constants representing supported token
+ * extractors for OAuth implementations. These include <code>OAuth2</code>, <code>OAuthJson</code>,
+ * and <code>OpenIdJson</code> extractors, which handle parsing access tokens in different formats
+ * such as standard OAuth2 and JSON.</p>
+ *
  * @author emera
  */
 @ServoyDocumented(scriptingName = "OAuthTokenExtractors")
