@@ -30,6 +30,15 @@ import com.servoy.j2db.scripting.IJavaScriptType;
 import com.servoy.j2db.util.FileChooserUtils;
 
 /**
+ * <p>The <code>JSFileUpload</code> class is designed to represent and manage files in the context of an upload process.
+ * It provides methods to access key file properties, such as size, name, content type, and the last modified time.
+ * The class encapsulates a <code>File</code> object and its associated metadata, offering a straightforward interface for working
+ * with file data in Java applications.</p>
+ *
+ * <p>By implementing the <code>IUploadData</code>, <code>IJavaScriptType</code>, and <code>IFile</code> interfaces,
+ * it facilitates integration with file handling systems, supporting features such as byte retrieval and input stream access.
+ * It also handles exceptions gracefully, ensuring that file data is retrieved securely, even if the file cannot be found or read.</p>
+ *
  * @author lvostinar
  *
  */
