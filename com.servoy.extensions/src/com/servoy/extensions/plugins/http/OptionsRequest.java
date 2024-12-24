@@ -76,6 +76,8 @@ public class OptionsRequest extends BaseRequest
 	 * @sample
 	 * var supportedOperations = request.getAllowedMethods()
 	 * application.output(supportedOperations.join(','));
+	 *
+	 * @return {String[]} An array of supported HTTP request operations for the given response.
 	 */
 	public String[] js_getAllowedMethods(Response res)
 	{
