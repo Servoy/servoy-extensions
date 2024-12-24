@@ -80,6 +80,8 @@ public class RawSQLProvider implements IScriptable
 	 * If the result from a function was false, it will return the exception object.
 	 *
 	 * @sampleas js_executeSQL(String,String,String)
+	 *
+	 * @return {Exception} The exception object if the result from a function was false, or null if no exception occurred.
 	 */
 	public Exception js_getException()
 	{
@@ -186,6 +188,8 @@ public class RawSQLProvider implements IScriptable
 	 *
 	 * @param serverName the name of the server
 	 * @param sql the sql query to execute
+	 *
+	 * @return {boolean} True if the SQL execution was successful; false otherwise.
 	 */
 	public boolean js_executeSQL(String serverName, String sql)
 	{
@@ -200,6 +204,8 @@ public class RawSQLProvider implements IScriptable
 	 * @param serverName the name of the server
 	 * @param sql the sql query to execute
 	 * @param sql_args the arguments for the query
+	 *
+	 * @return {boolean} True if the SQL execution was successful; false otherwise.
 	 */
 	public boolean js_executeSQL(String serverName, String sql, Object[] sql_args)
 	{
@@ -386,6 +392,8 @@ public class RawSQLProvider implements IScriptable
 	 *
 	 * @param serverName
 	 * @param tableName
+	 *
+	 * @return {boolean} True if the cache was successfully flushed; false otherwise.
 	 */
 	public boolean js_flushAllClientsCache(String serverName, String tableName)
 	{
@@ -431,6 +439,8 @@ public class RawSQLProvider implements IScriptable
 	 * @param tableName
 	 * @param pksDataset
 	 * @param action
+	 *
+	 * @return {boolean} True if the data change notification was successfully sent; false otherwise.
 	 */
 	public boolean js_notifyDataChange(String serverName, String tableName, IDataSet pksDataset, int action)
 	{

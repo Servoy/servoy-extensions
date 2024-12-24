@@ -49,6 +49,8 @@ public class SerializeProvider implements IScriptable
 	 * application.output(new_array.join('#'));
 	 *
 	 * @param obj
+	 *
+	 * @return {String} The JSON string representation of the serialized object.
 	 */
 	public String js_toJSON(Object obj) throws Exception
 	{
@@ -61,6 +63,8 @@ public class SerializeProvider implements IScriptable
 	 * @sampleas js_toJSON(Object)
 	 *
 	 * @param data
+	 *
+	 * @return {Object} The deserialized object from the provided JSON string.
 	 */
 	public Object js_fromJSON(String data) throws Exception
 	{

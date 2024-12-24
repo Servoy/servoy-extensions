@@ -105,6 +105,8 @@ public class MailMessage implements Serializable, IJavaScriptType
 	 * {
 	 * 	application.output("Failed to retrieve messages.");
 	 * }
+	 *
+	 * @return {Attachment[]} An array of Attachment instances corresponding to the attachments of this message.
 	 */
 	public Attachment[] js_getAttachments()
 	{
@@ -115,6 +117,8 @@ public class MailMessage implements Serializable, IJavaScriptType
 	 * Returns a String with all addresses present in the CC field of this message.
 	 *
 	 * @sampleas js_getAttachments()
+	 *
+	 * @return {String} A string containing all addresses in the CC field of this message.
 	 */
 	public String js_getCCAddresses()
 	{
@@ -125,6 +129,8 @@ public class MailMessage implements Serializable, IJavaScriptType
 	 * Returns a String with all addresses present in the From field of this message.
 	 *
 	 * @sampleas js_getAttachments()
+	 *
+	 * @return {String} A string containing all addresses in the From field of this message.
 	 */
 	public String js_getFromAddresses()
 	{
@@ -135,6 +141,8 @@ public class MailMessage implements Serializable, IJavaScriptType
 	 * Returns a String with all headers of this message.
 	 *
 	 * @sampleas js_getAttachments()
+	 *
+	 * @return {String} A string containing all headers of this message.
 	 */
 	public String js_getHeaders()
 	{
@@ -145,6 +153,8 @@ public class MailMessage implements Serializable, IJavaScriptType
 	 * Returns a String with the HTML content of this message.
 	 *
 	 * @sampleas js_getAttachments()
+	 *
+	 * @return {String} The HTML content of this message.
 	 */
 	public String js_getHtmlMsg()
 	{
@@ -155,6 +165,8 @@ public class MailMessage implements Serializable, IJavaScriptType
 	 * Returns a String with the plain content of this message.
 	 *
 	 * @sampleas js_getAttachments()
+	 *
+	 * @return {String} The plain text content of this message.
 	 */
 	public String js_getPlainMsg()
 	{
@@ -167,6 +179,8 @@ public class MailMessage implements Serializable, IJavaScriptType
 	 * @deprecated No longer supported. Try using  {@link #getHeaders()} for approximate results.
 	 *
 	 * @sampleas js_getAttachments()
+	 *
+	 * @return {String} The plain text content of this message.
 	 */
 	@Deprecated
 	public Date js_getReceivedDate()
@@ -178,6 +192,8 @@ public class MailMessage implements Serializable, IJavaScriptType
 	 * Returns a String with all addresses in the To field of this message.
 	 *
 	 * @sampleas js_getAttachments()
+	 *
+	 * @return {String} A string containing all addresses in the To field of this message.
 	 */
 	public String js_getRecipientAddresses()
 	{
@@ -188,6 +204,8 @@ public class MailMessage implements Serializable, IJavaScriptType
 	 * Returns a String with all addresses in the Reply-To field of this message.
 	 *
 	 * @sampleas js_getAttachments()
+	 *
+	 * @return {String} A string containing all addresses in the Reply-To field of this message.
 	 */
 	public String js_getReplyAddresses()
 	{
@@ -198,6 +216,8 @@ public class MailMessage implements Serializable, IJavaScriptType
 	 * Returns a Date instance corresponding to the moment when this message was sent.
 	 *
 	 * @sampleas js_getAttachments()
+	 *
+	 * @return {Date} The date and time when this message was sent.
 	 */
 	public Date js_getSentDate()
 	{
@@ -207,7 +227,9 @@ public class MailMessage implements Serializable, IJavaScriptType
 	/**
 	 * Returns a String with the subject of this message.
 	 *
-	 * @sampleas js_getAttachments()
+	 * @sampleas js_getSubject()
+	 *
+	 * @return {String} The subject of this message.
 	 */
 	public String js_getSubject()
 	{
