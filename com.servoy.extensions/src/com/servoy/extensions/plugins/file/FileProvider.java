@@ -174,6 +174,8 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 * @sample
 	 * var d = plugins.file.getHomeFolder();
 	 * application.output('home folder: ' + d.getAbsolutePath());
+	 *
+	 * @return a JSFile instance representing the home folder of the currently logged-in user.
 	 */
 	public JSFile js_getHomeFolder()
 	{
@@ -252,6 +254,8 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 * @sampleas js_showFileOpenDialog()
 	 *
 	 * @param callbackfunction A function that takes the (JSFile) array of the selected files as first argument
+	 *
+	 * @return a JSFile or an array of JSFiles selected by the user, or null if no file was selected.
 	 */
 	@ServoyClientSupport(ng = true, wc = true, sc = true)
 	public Object js_showFileOpenDialog(Function callbackfunction)
@@ -278,6 +282,8 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 *
 	 * @param selectionMode 0=both,1=Files,2=Dirs
 	 * @param callbackfunction A function that takes the (JSFile) array of the selected files as first argument
+	 *
+	 * @return a JSFile or an array of JSFiles selected by the user, or null if no file was selected.
 	 */
 	@ServoyClientSupport(ng = true, wc = true, sc = true)
 	public Object js_showFileOpenDialog(Number selectionMode, Function callbackfunction)
@@ -291,6 +297,8 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 *
 	 * @param selectionMode 0=both,1=Files,2=Dirs
 	 * @param startDirectory JSFile instance of default folder; null=default/previous
+	 *
+	 * @return a JSFile or an array of JSFiles selected by the user, or null if no file was selected.
 	 */
 	@ServoyClientSupport(ng = false, wc = false, sc = true)
 	public Object js_showFileOpenDialog(Number selectionMode, JSFile startDirectory)
@@ -319,6 +327,8 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 * @param selectionMode 0=both,1=Files,2=Dirs
 	 * @param startDirectory JSFile instance of default folder,null=default/previous
 	 * @param callbackfunction A function that takes the (JSFile) array of the selected files as first argument
+	 *
+	 * @return a JSFile or an array of JSFiles selected by the user, or null if no file was selected.
 	 */
 	@ServoyClientSupport(ng = true, wc = true, sc = true)
 	public Object js_showFileOpenDialog(Number selectionMode, JSFile startDirectory, Function callbackfunction)
@@ -333,6 +343,8 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 * @param selectionMode 0=both,1=Files,2=Dirs
 	 * @param startDirectory Path to default folder,null=default/previous
 	 * @param callbackfunction A function that takes the (JSFile) array of the selected files as first argument
+	 *
+	 * @return a JSFile or an array of JSFiles selected by the user, or null if no file was selected.
 	 */
 	@ServoyClientSupport(ng = true, wc = true, sc = true)
 	public Object js_showFileOpenDialog(Number selectionMode, String startDirectory, Function callbackfunction)
@@ -378,6 +390,8 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 * @param startDirectory JSFile instance of default folder,null=default/previous
 	 * @param multiselect true/false
 	 * @param callbackfunction A function that takes the (JSFile) array of the selected files as first argument
+	 *
+	 * @return a JSFile or an array of JSFiles selected by the user, or null if no file was selected.
 	 */
 	@ServoyClientSupport(ng = true, wc = true, sc = true)
 	public Object js_showFileOpenDialog(Number selectionMode, JSFile startDirectory, Boolean multiselect, Function callbackfunction)
@@ -393,6 +407,8 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 * @param startDirectory Path to default folder,null=default/previous
 	 * @param multiselect true/false
 	 * @param callbackfunction A function that takes the (JSFile) array of the selected files as first argument
+	 *
+	 * @return a JSFile or an array of JSFiles selected by the user, or null if no file was selected.
 	 */
 	@ServoyClientSupport(ng = true, wc = true, sc = true)
 	public Object js_showFileOpenDialog(Number selectionMode, String startDirectory, Boolean multiselect, Function callbackfunction)
@@ -442,6 +458,8 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 * @param multiselect true/false
 	 * @param filter A filter or array of filters on the folder files.
 	 * @param callbackfunction A function that takes the (JSFile) array of the selected files as first argument
+	 *
+	 * @return a JSFile or an array of JSFiles selected by the user, or null if no file was selected.
 	 */
 	@ServoyClientSupport(ng = true, wc = true, sc = true)
 	public Object js_showFileOpenDialog(Number selectionMode, JSFile startDirectory, Boolean multiselect, Object filter, Function callbackfunction)
@@ -458,6 +476,8 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 * @param multiselect true/false
 	 * @param filter A filter or array of filters on the folder files.
 	 * @param callbackfunction A function that takes the (JSFile) array of the selected files as first argument
+	 *
+	 * @return a JSFile or an array of JSFiles selected by the user, or null if no file was selected.
 	 */
 	@ServoyClientSupport(ng = true, wc = true, sc = true)
 	public Object js_showFileOpenDialog(Number selectionMode, String startDirectory, Boolean multiselect, Object filter, Function callbackfunction)
@@ -475,6 +495,8 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 * @param filter A filter or array of filters on the folder files.
 	 * @param callbackfunction A function that takes the (JSFile) array of the selected files as first argument
 	 * @param title The tile of the dialog
+	 *
+	 * @return a JSFile or an array of JSFiles selected by the user, or null if no file was selected.
 	 */
 	@ServoyClientSupport(ng = true, wc = true, sc = true)
 	public Object js_showFileOpenDialog(Number selectionMode, JSFile startDirectory, Boolean multiselect, Object filter, Function callbackfunction,
@@ -493,6 +515,8 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 * @param filter A filter or array of filters on the folder files.
 	 * @param callbackfunction A function that takes the (JSFile) array of the selected files as first argument
 	 * @param title The tile of the dialog
+	 *
+	 * @return a JSFile or an array of JSFiles selected by the user, or null if no file was selected.
 	 */
 	@ServoyClientSupport(ng = true, wc = true, sc = true)
 	public Object js_showFileOpenDialog(Number selectionMode, String startDirectory, Boolean multiselect, Object filter, Function callbackfunction,
@@ -609,6 +633,8 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 * @param fileOption 1=files, 2=dirs
 	 * @param visibleOption 1=visible, 2=nonvisible
 	 * @param lockedOption 1=locked, 2=nonlocked
+	 *
+	 * @return an array of JSFile instances representing the contents of the specified folder that match the given filters.
 	 */
 	public JSFile[] js_getFolderContents(JSFile targetFolder, Object fileFilter, final Number fileOption, final Number visibleOption, final Number lockedOption)
 	{
@@ -624,6 +650,8 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 * @param fileOption 1=files, 2=dirs
 	 * @param visibleOption 1=visible, 2=nonvisible
 	 * @param lockedOption 1=locked, 2=nonlocked
+	 *
+	 * @return an array of JSFile instances representing the contents of the specified folder that match the given filters.
 	 */
 	public JSFile[] js_getFolderContents(String targetFolder, Object fileFilter, final Number fileOption, final Number visibleOption, final Number lockedOption)
 	{
@@ -712,6 +740,8 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 * @param fileFilter Filter or array of filters for files in folder.
 	 * @param fileOption 1=files, 2=dirs
 	 * @param visibleOption 1=visible, 2=nonvisible
+	 *
+	 * @return an array of JSFile instances representing the contents of the specified folder that match the given filters.
 	 */
 	public JSFile[] js_getFolderContents(JSFile targetFolder, Object fileFilter, final Number fileOption, final Number visibleOption)
 	{
@@ -726,6 +756,8 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 * @param fileFilter Filter or array of filters for files in folder.
 	 * @param fileOption 1=files, 2=dirs
 	 * @param visibleOption 1=visible, 2=nonvisible
+	 *
+	 * @return an array of JSFile instances representing the contents of the specified folder that match the given filters.
 	 */
 	public JSFile[] js_getFolderContents(String targetFolder, Object fileFilter, final Number fileOption, final Number visibleOption)
 	{
@@ -739,6 +771,8 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 * @param targetFolder JSFile object.
 	 * @param fileFilter Filter or array of filters for files in folder.
 	 * @param fileOption 1=files, 2=dirs
+	 *
+	 * @return an array of JSFile instances representing the contents of the specified folder that match the given filters.
 	 */
 	public JSFile[] js_getFolderContents(JSFile targetFolder, Object fileFilter, final Number fileOption)
 	{
@@ -752,6 +786,8 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 * @param targetFolder File path.
 	 * @param fileFilter Filter or array of filters for files in folder.
 	 * @param fileOption 1=files, 2=dirs
+	 *
+	 * @return an array of JSFile instances representing the contents of the specified folder that match the given filters.
 	 */
 	public JSFile[] js_getFolderContents(String targetFolder, Object fileFilter, final Number fileOption)
 	{
@@ -764,6 +800,8 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 *
 	 * @param targetFolder JSFile object.
 	 * @param fileFilter Filter or array of filters for files in folder.
+	 *
+	 * @return an array of JSFile instances representing the contents of the specified folder that match the given filters.
 	 */
 	public JSFile[] js_getFolderContents(JSFile targetFolder, Object fileFilter)
 	{
@@ -776,6 +814,8 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 *
 	 * @param targetFolder File path.
 	 * @param fileFilter Filter or array of filters for files in folder.
+	 *
+	 * @return an array of JSFile instances representing the contents of the specified folder that match the given filters.
 	 */
 	public JSFile[] js_getFolderContents(String targetFolder, Object fileFilter)
 	{
@@ -787,6 +827,8 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 * @sampleas js_getFolderContents(JSFile,Object,Number,Number,Number)
 	 *
 	 * @param targetFolder JSFile object.
+	 *
+	 * @return an array of JSFile instances representing the contents of the specified folder that match the given filters.
 	 */
 	public JSFile[] js_getFolderContents(JSFile targetFolder)
 	{
@@ -798,6 +840,8 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 * @sampleas js_getFolderContents(JSFile,Object,Number,Number,Number)
 	 *
 	 * @param targetFolder File path.
+	 *
+	 * @return an array of JSFile instances representing the contents of the specified folder that match the given filters.
 	 */
 	public JSFile[] js_getFolderContents(String targetFolder)
 	{
@@ -834,6 +878,8 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 *
 	 * @param source
 	 * @param destination
+	 *
+	 * @return true if the file was moved successfully; false otherwise.
 	 */
 	public boolean js_moveFile(Object source, Object destination)
 	{
@@ -887,7 +933,7 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 *
 	 * @param file
 	 *
-	 * @return JSFile
+	 * @return a JSFile instance corresponding to the given file representation, or null if conversion is not possible.
 	 */
 	public JSFile js_convertToJSFile(Object file)
 	{
@@ -922,7 +968,7 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 * @param source
 	 * @param destination
 	 *
-	 * @return success boolean
+	 * @return true if the folder was copied successfully; false otherwise.
 	 */
 	public boolean js_copyFolder(Object source, Object destination)
 	{
@@ -990,6 +1036,8 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 *
 	 * @param source
 	 * @param destination
+	 *
+	 * @return true if the file was copied successfully; false otherwise.
 	 */
 	public boolean js_copyFile(Object source, Object destination)
 	{
@@ -1084,6 +1132,8 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 * 	application.output("Folder could not be created.");
 	 *
 	 * @param destination
+	 *
+	 * @return true if the folder was created successfully or already exists; false otherwise.
 	 */
 	public boolean js_createFolder(Object destination)
 	{
@@ -1110,6 +1160,8 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 * plugins.file.deleteFile(file);
 	 *
 	 * @param destination
+	 *
+	 * @return true if the file was successfully deleted; false otherwise.
 	 */
 	public boolean js_deleteFile(Object destination)
 	{
@@ -1132,6 +1184,8 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 *
 	 * @param destination
 	 * @param showWarning
+	 *
+	 * @return true if the file was successfully deleted; false otherwise.
 	 */
 	public boolean js_deleteFolder(Object destination, boolean showWarning)
 	{
@@ -1172,6 +1226,8 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 * application.output('file size: ' + plugins.file.getFileSize(f));
 	 *
 	 * @param fileOrPath can be a (remote) JSFile or a local file path
+	 *
+	 * @return the size of the specified file in bytes, or -1 if the file is invalid.
 	 */
 	public long js_getFileSize(Object fileOrPath)
 	{
@@ -1196,6 +1252,8 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 * application.output('file size: ' + plugins.file.getModificationDate(f));
 	 *
 	 * @param fileOrPath can be a (remote) JSFile or a local file path
+	 *
+	 * @return the last modification date of the specified file, or null if the file is invalid.
 	 */
 	public Date js_getModificationDate(Object fileOrPath)
 	{
@@ -1215,6 +1273,8 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 * var roots = plugins.file.getDiskList();
 	 * for (var i = 0; i < roots.length; i++)
 	 * 	application.output(roots[i].getAbsolutePath());
+	 *
+	 * @return an array of JSFile instances representing the root folders of the file system.
 	 */
 	public JSFile[] js_getDiskList()
 	{
@@ -1237,6 +1297,8 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 *
 	 * @param prefix
 	 * @param suffix
+	 *
+	 * @return a JSFile instance representing the created temporary file.
 	 */
 	@SuppressWarnings("nls")
 	public JSFile js_createTempFile(String prefix, String suffix)
@@ -1268,6 +1330,8 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 * 	application.output("The file could not be created.");
 	 *
 	 * @param targetFile
+	 *
+	 * @return a JSFile instance representing the specified target file.
 	 */
 	public JSFile js_createFile(Object targetFile)
 	{
@@ -1288,7 +1352,7 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 * @param file JSFile
 	 * @param text_data Text to be written.
 	 *
-	 * @return Success boolean.
+	 * @return true if the text data was successfully written to the file; false otherwise.
 	 */
 	public boolean js_writeTXTFile(JSFile file, String text_data)
 	{
@@ -1301,6 +1365,8 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 *
 	 * @param file The file path.
 	 * @param text_data Text to be written.
+	 *
+	 * @return true if the text data was successfully written to the specified file path; false otherwise.
 	 */
 	public boolean js_writeTXTFile(String file, String text_data)
 	{
@@ -1315,7 +1381,7 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 * @param text_data Text to be written.
 	 * @param charsetname Charset name.
 	 *
-	 * @return Success boolean.
+	 * @return true if the text data was successfully written to the specified file; false otherwise.
 	 */
 	public boolean js_writeTXTFile(JSFile file, String text_data, String charsetname)
 	{
@@ -1329,6 +1395,8 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 * @param file The file path.
 	 * @param text_data Text to be written.
 	 * @param charsetname Charset name.
+	 *
+	 * @return true if the text data was successfully written to the specified file path; false otherwise.
 	 */
 	public boolean js_writeTXTFile(String file, String text_data, String charsetname)
 	{
@@ -1344,7 +1412,7 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 * @param charsetname Charset name.
 	 * @param mimeType Content type (used only on web).
 	 *
-	 * @return Success boolean.
+	 * @return true if the text data was successfully written to the specified file; false otherwise.
 	 */
 	public boolean js_writeTXTFile(JSFile file, String text_data, String charsetname, String mimeType)
 	{
@@ -1359,6 +1427,8 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 * @param text_data Text to be written.
 	 * @param charsetname Charset name.
 	 * @param mimeType Content type (used only on web).
+	 *
+	 * @return true if the text data was successfully written to the specified file path; false otherwise.
 	 */
 	public boolean js_writeTXTFile(String file, String text_data, String charsetname, String mimeType)
 	{
@@ -1458,6 +1528,8 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 * @param file a local JSFile
 	 * @param xml_data the xml data to write
 	 * @param encoding the specified encoding
+	 *
+	 * @return true if the XML data was successfully written to the file; false otherwise.
 	 */
 	public boolean js_writeXMLFile(JSFile file, String xml_data, String encoding)
 	{
@@ -1471,6 +1543,8 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 * @param file the file path as a String
 	 * @param xml_data the xml data to write
 	 * @param encoding the specified encoding
+	 *
+	 * @return true if the XML data was successfully written to the specified file path; false otherwise.
 	 */
 	public boolean js_writeXMLFile(String file, String xml_data, String encoding)
 	{
@@ -1495,6 +1569,8 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 *
 	 * @param file a local JSFile
 	 * @param xml_data the xml data to write
+	 *
+	 * @return true if the XML data was successfully written to the specified file; false otherwise.
 	 */
 	public boolean js_writeXMLFile(JSFile file, String xml_data)
 	{
@@ -1507,6 +1583,8 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 *
 	 * @param file the file path as a String
 	 * @param xml_data the xml data to write
+	 *
+	 * @return true if the XML data was successfully written to the specified file path; false otherwise.
 	 */
 	public boolean js_writeXMLFile(String file, String xml_data)
 	{
@@ -1557,6 +1635,8 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 *
 	 * @param file a local JSFile
 	 * @param data the data to be written
+	 *
+	 * @return true if the binary data was successfully written to the file; false otherwise
 	 */
 	public boolean js_writeFile(JSFile file, byte[] data)
 	{
@@ -1569,6 +1649,8 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 *
 	 * @param file the file path as a String
 	 * @param data the data to be written
+	 *
+	 * @return true if the binary data was successfully written to the file path; false otherwise.
 	 */
 	public boolean js_writeFile(String file, byte[] data)
 	{
@@ -1582,6 +1664,8 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 * @param file a local JSFile
 	 * @param data the data to be written
 	 * @param mimeType the mime type (used in Web-Client)
+	 *
+	 * @return true if the binary data was successfully written to the file; false otherwise.
 	 */
 	public boolean js_writeFile(JSFile file, byte[] data, String mimeType)
 	{
@@ -1595,6 +1679,8 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 * @param file the file path as a String
 	 * @param data the data to be written
 	 * @param mimeType the mime type (used in Web-Client)
+	 *
+	 * @return true if the binary data was successfully written to the file path; false otherwise.
 	 */
 	public boolean js_writeFile(String file, byte[] data, String mimeType)
 	{
@@ -1644,6 +1730,7 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 *	plugins.file.openFile(myPDF);
 	 *
 	 * @since 7.3
+	 *
 	 */
 	public boolean js_openFile(JSFile file)
 	{
@@ -1784,8 +1871,9 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 * // Read content from a text file selected from the file open dialog.
 	 * var txtUnknown = plugins.file.readTXTFile();
 	 * application.output(txtUnknown);
+	 *
+	 * @return the content of the selected text file as a String, or null if no file was selected.
 	 */
-
 	public String js_readTXTFile()
 	{
 		return js_readTXTFile((String)null, null);
@@ -1796,6 +1884,8 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 * @sampleas js_readTXTFile()
 	 *
 	 * @param file JSFile.
+	 *
+	 * @return the content of the specified file path as a String, or null if the file is invalid.
 	 */
 	public String js_readTXTFile(JSFile file)
 	{
@@ -1807,6 +1897,8 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 * @sampleas js_readTXTFile()
 	 *
 	 * @param file the file path.
+	 *
+	 * @return the content of the specified file path as a String, or null if the file is invalid.
 	 */
 	public String js_readTXTFile(String file)
 	{
@@ -1819,6 +1911,8 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 *
 	 * @param file JSFile.
 	 * @param charsetname Charset name.
+	 *
+	 * @return the content of the specified file as a String, or null if the file is invalid.
 	 */
 	public String js_readTXTFile(JSFile file, String charsetname)
 	{
@@ -1831,6 +1925,8 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 *
 	 * @param file the file path.
 	 * @param charsetname Charset name.
+	 *
+	 * @return the content of the specified file path as a String, or null if the file is invalid.
 	 */
 	public String js_readTXTFile(String file, String charsetname)
 	{
@@ -1924,6 +2020,8 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 * @sample
 	 * var file = plugins.file.showFileSaveDialog();
 	 * application.output("you've selected file: " + file.getAbsolutePath());
+	 *
+	 * @return a JSFile instance representing the saved file, or null if no file was saved.
 	 */
 	@ServoyClientSupport(mc = false, wc = false, sc = true, ng = false)
 	public JSFile js_showFileSaveDialog()
@@ -1936,6 +2034,8 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 * @sampleas js_showFileSaveDialog()
 	 *
 	 * @param fileNameDir JSFile to save.
+	 *
+	 * @return a JSFile instance representing the saved file, or null if no file was saved.
 	 */
 	@ServoyClientSupport(mc = false, wc = false, sc = true, ng = false)
 	public JSFile js_showFileSaveDialog(JSFile fileNameDir)
@@ -1948,6 +2048,8 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 * @sampleas js_showFileSaveDialog()
 	 *
 	 * @param fileNameDir File (give as file path) to save.
+	 *
+	 * @return a JSFile instance representing the saved file, or null if no file was saved.
 	 */
 	@ServoyClientSupport(mc = false, wc = false, sc = true, ng = false)
 	public JSFile js_showFileSaveDialog(String fileNameDir)
@@ -1960,6 +2062,8 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 * @sampleas js_showFileSaveDialog()
 	 * @param fileNameDir JSFile to save
 	 * @param title Dialog title.
+	 *
+	 * @return a JSFile instance representing the saved file, or null if no file was saved.
 	 */
 	@ServoyClientSupport(mc = false, wc = false, sc = true, ng = false)
 	public JSFile js_showFileSaveDialog(JSFile fileNameDir, String title)
@@ -1972,6 +2076,8 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 * @sampleas js_showFileSaveDialog()
 	 * @param fileNameDir File to save (specified as file path)
 	 * @param title Dialog title.
+	 *
+	 * @return a JSFile instance representing the saved file, or null if no file was saved.
 	 */
 	@ServoyClientSupport(mc = false, wc = false, sc = true, ng = false)
 	public JSFile js_showFileSaveDialog(String fileNameDir, String title)
@@ -2019,6 +2125,8 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 * @sampleas js_showDirectorySelectDialog()
 	 *
 	 * @param directory Default directory as JSFile.
+	 *
+	 * @return a JSFile instance representing the selected directory, or null if no directory was selected.
 	 */
 	@ServoyClientSupport(ng = false, wc = false, sc = true)
 	public JSFile js_showDirectorySelectDialog(JSFile directory)
@@ -2031,6 +2139,8 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 * @sampleas js_showDirectorySelectDialog()
 	 *
 	 * @param directory Default directory as file path.
+	 *
+	 * @return a JSFile instance representing the selected directory, or null if no directory was selected.
 	 */
 	@ServoyClientSupport(ng = false, wc = false, sc = true)
 	public JSFile js_showDirectorySelectDialog(String directory)
@@ -2044,6 +2154,8 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 *
 	 * @param directory Default directory as JSFile.
 	 * @param title Dialog title.
+	 *
+	 * @return a JSFile instance representing the selected directory, or null if no directory was selected.
 	 */
 	@ServoyClientSupport(ng = false, wc = false, sc = true)
 	public JSFile js_showDirectorySelectDialog(JSFile directory, String title)
@@ -2057,6 +2169,8 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 *
 	 * @param directory Default directory as file path.
 	 * @param title Dialog title.
+	 *
+	 * @return a JSFile instance representing the selected directory, or null if no directory was selected.
 	 */
 	@ServoyClientSupport(ng = false, wc = false, sc = true)
 	public JSFile js_showDirectorySelectDialog(String directory, String title)
@@ -2100,6 +2214,8 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 * var bytesUnknownFile = plugins.file.readFile();
 	 * application.output('unknown file size: ' + bytesUnknownFile.length);
 	 *
+	 * @return the content of the selected binary file as a byte array, or null if no file is selected or an error occurs.
+	 *
 	 */
 	public byte[] js_readFile()
 	{
@@ -2111,6 +2227,8 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 * @sampleas js_readFile()
 	 *
 	 * @param file JSFile.
+	 *
+	 * @return the content of the specified binary file as a byte array, or null if the file cannot be read or an error occurs.
 	 */
 	public byte[] js_readFile(JSFile file)
 	{
@@ -2122,6 +2240,8 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 * @sampleas js_readFile()
 	 *
 	 * @param file the file path.
+	 *
+	 * @return the content of the binary file located at the specified file path as a byte array, or null if the file cannot be read or an error occurs.
 	 */
 	public byte[] js_readFile(String file)
 	{
@@ -2134,6 +2254,8 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 *
 	 * @param file JSFile.
 	 * @param size Number of bytes to read.
+	 *
+	 * @return a byte array containing up to the specified number of bytes from the given binary file, or null if the file cannot be read or an error occurs.
 	 */
 	public byte[] js_readFile(JSFile file, long size)
 	{
@@ -2146,6 +2268,8 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 *
 	 * @param file the file path.
 	 * @param size Number of bytes to read.
+	 *
+	 * @return a byte array containing up to the specified number of bytes from the binary file located at the given file path, or null if the file cannot be read or an error occurs.
 	 */
 	public byte[] js_readFile(String file, long size)
 	{
@@ -2253,6 +2377,8 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 * @param file the file path as a String
 	 * @param text the text to append to the file
 	 * @param encoding the encoding to use
+	 *
+	 * @return true if the text is successfully appended to the file located at the specified file path using the given encoding; false otherwise.
 	 */
 	public boolean js_appendToTXTFile(String file, String text, String encoding)
 	{

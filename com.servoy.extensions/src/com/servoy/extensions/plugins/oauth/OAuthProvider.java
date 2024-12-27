@@ -182,7 +182,7 @@ public class OAuthProvider implements IScriptable, IReturnedTypesProvider
 	 * Help method to get the redirect URL which needs to be configured on the OAuth provider application page.
 	 * The url is computed based on what is set on the service builder: deeplink method name, response mode and response type.
 	 * @param builder an OAuth service builder
-	 * @return the redirect url
+	 * @return the redirect URL used by the OAuth service builder.
 	 */
 	@JSFunction
 	public String getUsedRedirectUrl(OAuthServiceBuilder builder)
@@ -257,7 +257,7 @@ public class OAuthProvider implements IScriptable, IReturnedTypesProvider
 	 *
 	 * @param authorizationBaseUrl the base URL where you should redirect your users to authenticate your application
 	 * @param accessTokenEndpoint the URL that receives the access token requests
-	 * @return
+	 * @return a custom API builder for OAuth.
 	 */
 	@JSFunction
 	public CustomApiBuilder customApi(String authorizationBaseUrl, String accessTokenEndpoint)

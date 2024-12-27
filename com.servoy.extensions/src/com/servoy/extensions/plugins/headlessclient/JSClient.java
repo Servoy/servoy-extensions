@@ -100,7 +100,7 @@ public class JSClient implements IScriptable, IConstantsObject
 	 * 	 headlessClient.queueMethod(null, "someRemoteMethod", null, callback);
 	 * }
 	 *
-	 * @return {String} The unique identifier of the client, which can be used to locate the client via the headless client plugin.
+	 * @return The unique identifier of the client, which can be used to locate the client via the headless client plugin.
 	 *
 	 */
 	public String js_getClientID()
@@ -129,7 +129,6 @@ public class JSClient implements IScriptable, IConstantsObject
 	 * @param methodName The method name.
 	 * @param args The arguments that should be passed to the method.
 	 *
-	 * @return {void} No return value; the method is queued for asynchronous execution.
 	 */
 	public void js_queueMethod(final String contextName, final String methodName, final Object[] args)
 	{
@@ -150,7 +149,6 @@ public class JSClient implements IScriptable, IConstantsObject
 	 * @param args The arguments that should be passed to the method.
 	 * @param notifyCallBackMethod The callback method that is called when the execution is finished.
 	 *
-	 * @return {void} No return value; the method is queued for asynchronous execution with a callback on completion or error.
 	 */
 	public void js_queueMethod(final String contextName, final String methodName, final Object[] args, Function notifyCallBackMethod)
 	{
@@ -263,7 +261,7 @@ public class JSClient implements IScriptable, IConstantsObject
 	 *
 	 * @sampleas js_shutdown()
 	 *
-	 * @return {boolean} True if the client is still valid and usable; false otherwise.
+	 * @return True if the client is still valid and usable; false otherwise.
 	 */
 	public boolean js_isValid()
 	{
@@ -311,7 +309,6 @@ public class JSClient implements IScriptable, IConstantsObject
 	 * 	jsclient.queueMethod(null, "remoteMethod", [x], callback);
 	 * }
 	 *
-	 * @return {void} No return value; the client is closed.
 	 */
 	public void js_shutdown()
 	{
@@ -324,7 +321,6 @@ public class JSClient implements IScriptable, IConstantsObject
 	 *
 	 * @param force
 	 *
-	 * @return {void} No return value; the client is closed, optionally forcefully.
 	 */
 	public void js_shutdown(final boolean force)
 	{

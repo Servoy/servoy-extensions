@@ -50,7 +50,7 @@ public class SerializeProvider implements IScriptable
 	 *
 	 * @param obj
 	 *
-	 * @return {String} The JSON string representation of the serialized object.
+	 * @return The JSON string representation of the serialized object.
 	 */
 	public String js_toJSON(Object obj) throws Exception
 	{
@@ -64,7 +64,7 @@ public class SerializeProvider implements IScriptable
 	 *
 	 * @param data
 	 *
-	 * @return {Object} The deserialized object from the provided JSON string.
+	 * @return The deserialized object from the provided JSON string.
 	 */
 	public Object js_fromJSON(String data) throws Exception
 	{

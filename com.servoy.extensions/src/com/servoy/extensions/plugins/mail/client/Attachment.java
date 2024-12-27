@@ -102,6 +102,8 @@ public class Attachment implements Serializable, IJavaScriptType
 	 * 	application.output('invoice attachment size: ' + invoice.getData().length);
 	 * 	application.output('invoice attachment embedded state: ' + invoice.isEmbedded());
 	 * }
+	 *
+	 * @return A byte array containing the content of this attachment.
 	 */
 	public byte[] js_getData()
 	{
@@ -112,6 +114,8 @@ public class Attachment implements Serializable, IJavaScriptType
 	 * Returns the name of this attachment.
 	 *
 	 * @sampleas js_getData()
+	 *
+	 * @return The name of this attachment.
 	 */
 	public String js_getName()
 	{
@@ -122,6 +126,8 @@ public class Attachment implements Serializable, IJavaScriptType
 	 * Returns the Mime type of this attachment.
 	 *
 	 * @sampleas js_getData()
+	 *
+	 * @return The MIME type of this attachment.
 	 */
 	public String js_getMimeType()
 	{
@@ -133,6 +139,8 @@ public class Attachment implements Serializable, IJavaScriptType
 	 * if they are references through tags from the body text of the message.
 	 *
 	 * @sampleas js_getData()
+	 *
+	 * @return true if this attachment is embedded; false otherwise.
 	 */
 	public boolean js_isEmbedded()
 	{

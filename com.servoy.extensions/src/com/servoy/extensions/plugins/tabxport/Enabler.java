@@ -82,6 +82,8 @@ public class Enabler implements IReturnedTypesProvider, IScriptable
 	 * @sample
 	 * plugins.textxport.exportEnabled = true;
 	 * var isEnabled = plugins.textxport.exportEnabled;
+	 *
+	 * @return true if the export feature is enabled; otherwise, false.
 	 */
 	@ServoyClientSupport(ng = false, wc = false, sc = true)
 	public boolean js_getExportEnabled()
@@ -111,6 +113,8 @@ public class Enabler implements IReturnedTypesProvider, IScriptable
 	 * @sample
 	 * plugins.textxport.importEnabled = true;
 	 * var isEnabled = plugins.textxport.importEnabled;
+	 *
+	 * @return true if the import feature is enabled; otherwise, false.
 	 */
 	@ServoyClientSupport(ng = false, wc = false, sc = true)
 	public boolean js_getImportEnabled()
@@ -146,6 +150,8 @@ public class Enabler implements IReturnedTypesProvider, IScriptable
 	 *
 	 * @param foundSet the foundset to export with
 	 * @param dataProviderIds the ids of the dataproviders
+	 *
+	 * @return A String containing the exported text data with default separator (tab) and no header.
 	 */
 	@ServoyClientSupport(ng = true, wc = true, sc = true)
 	public String js_textExport(IFoundSet foundSet, String[] dataProviderIds)
@@ -183,6 +189,8 @@ public class Enabler implements IReturnedTypesProvider, IScriptable
 	 * @param dataProviderIds the ids of the dataproviders
 	 * @param separator the separator of the data
 	 * @param exportHeader true for exporting with the table header, false for not
+	 *
+	 * @return A String containing the exported text data with the specified separator and header (if exportHeader is true).
 	 */
 	@ServoyClientSupport(ng = true, wc = true, sc = true)
 	public String js_textExport(IFoundSet foundSet, String[] dataProviderIds, String separator, boolean exportHeader)
@@ -209,7 +217,7 @@ public class Enabler implements IReturnedTypesProvider, IScriptable
 	 * @param separator the separator of the data
 	 * @param exportHeader export a header
 	 *
-	 * @return exporter object
+	 * @return A TabExporter object for easier export setup.
 	 */
 	@ServoyClientSupport(ng = true, wc = true, sc = true)
 	public TabExporter js_createExporter(IFoundSet foundSet, String separator, boolean exportHeader)

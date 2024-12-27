@@ -118,7 +118,7 @@ public class Broadcaster implements IBroadcaster, IJavaScriptType
 	/**
 	 * Get the (nick) name for this broadcaster that will be send to other channel listeners.
 	 *
-	 * @return String
+	 * @return The (nick) name for this broadcaster that will be sent to other channel listeners
 	 */
 	public String js_getName()
 	{
@@ -128,7 +128,7 @@ public class Broadcaster implements IBroadcaster, IJavaScriptType
 	/**
 	 * get the channel name where this broadcaster listens and sends messages to.
 	 *
-	 * @return String
+	 * @return The channel name where this broadcaster listens and sends messages to.
 	 */
 	public String js_getChannelName()
 	{

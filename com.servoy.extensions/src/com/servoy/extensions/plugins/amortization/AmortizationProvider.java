@@ -121,7 +121,7 @@ public class AmortizationProvider implements IScriptable, IReturnedTypesProvider
 	 * // than 1 or 2 cents due to rounding).
 	 * var rb = c.getRestBalance();
 	 *
-	 * @return {AmortizationCalculation} A new amortization calculation instance.
+	 * @return A new amortization calculation instance.
 	 */
 	public AmortizationCalculation js_newCalculation()
 	{
@@ -184,7 +184,7 @@ public class AmortizationProvider implements IScriptable, IReturnedTypesProvider
 	 * @param period
 	 * @param startday
 	 *
-	 * @return {Date} The next date calculated based on the given period and start day.
+	 * @return The next date calculated based on the given period and start day.
 	 */
 	public Date js_nextDate(Date start_date, int period, int startday)
 	{
@@ -254,7 +254,7 @@ public class AmortizationProvider implements IScriptable, IReturnedTypesProvider
 	 * 	"Ok"
 	 * );
 	 *
-	 * @return {Polynomial} A new polynomial instance initialized to zero.
+	 * @return A new polynomial instance initialized to zero.
 	 */
 	public Polynomial js_newPolynomial()
 	{
@@ -266,7 +266,7 @@ public class AmortizationProvider implements IScriptable, IReturnedTypesProvider
 	 * @sampleas js_newPolynomial()
 	 * @param polynomial
 	 *
-	 * @return {Polynomial} A new polynomial instance, initialized as a copy of the specified polynomial.
+	 * @return A new polynomial instance, initialized as a copy of the specified polynomial.
 	 */
 	public Polynomial js_newPolynomial(Polynomial polynomial)
 	{

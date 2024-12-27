@@ -68,6 +68,8 @@ public class PutRequest extends BaseEntityEnclosingRequest
 	 * putRequest.setFile('c:/temp/manual_01a.doc')
 	 *
 	 * @param filePath
+	 *
+	 * @return true if the file was successfully added; false otherwise.
 	 */
 	public boolean js_setFile(String filePath)
 	{
@@ -82,6 +84,8 @@ public class PutRequest extends BaseEntityEnclosingRequest
 	 * putRequest.setFile(jsFileInstance)
 	 *
 	 * @param file
+	 *
+	 * @return true if the file was successfully added; false otherwise.
 	 */
 	public boolean js_setFile(JSFile file)
 	{

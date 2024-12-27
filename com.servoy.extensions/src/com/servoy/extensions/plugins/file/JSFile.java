@@ -85,7 +85,7 @@ public class JSFile implements IScriptable, IJavaScriptType, IFile
 	 *
 	 * @sampleas js_canRead()
 	 *
-	 * @return {String} The name of the file, which is the last part of the file path (works on remote files too).
+	 * @return The name of the file, which is the last part of the file path (works on remote files too).
 	 */
 	public String js_getName()
 	{
@@ -97,7 +97,7 @@ public class JSFile implements IScriptable, IJavaScriptType, IFile
 	 *
 	 * @sampleas js_getAbsoluteFile()
 	 *
-	 * @return {String} The path of the parent directory of this file (works on remote files too).
+	 * @return The path of the parent directory of this file (works on remote files too).
 	 */
 	public String js_getParent()
 	{
@@ -109,7 +109,7 @@ public class JSFile implements IScriptable, IJavaScriptType, IFile
 	 *
 	 * @sampleas js_getAbsoluteFile()
 	 *
-	 * @return {JSFile} A JSFile instance representing the parent directory of this file (works on remote files too).
+	 * @return A JSFile instance representing the parent directory of this file (works on remote files too).
 	 */
 	public JSFile js_getParentFile()
 	{
@@ -121,7 +121,7 @@ public class JSFile implements IScriptable, IJavaScriptType, IFile
 	 *
 	 * @sampleas js_canRead()
 	 *
-	 * @return {String} The path to the file (works on remote files too).
+	 * @return The path to the file (works on remote files too).
 	 */
 	public String js_getPath()
 	{
@@ -133,7 +133,7 @@ public class JSFile implements IScriptable, IJavaScriptType, IFile
 	 *
 	 * @sampleas js_canRead()
 	 *
-	 * @return {boolean} True if the path is absolute; false otherwise (works on remote files too).
+	 * @return True if the path is absolute; false otherwise (works on remote files too).
 	 */
 	public boolean js_isAbsolute()
 	{
@@ -145,7 +145,7 @@ public class JSFile implements IScriptable, IJavaScriptType, IFile
 	 *
 	 * @sampleas js_canRead()
 	 *
-	 * @return {String} The absolute path of this file (works on remote files too).
+	 * @return The absolute path of this file (works on remote files too).
 	 */
 	public String js_getAbsolutePath()
 	{
@@ -163,7 +163,7 @@ public class JSFile implements IScriptable, IJavaScriptType, IFile
 	 * application.output('parent folder: ' + f.getAbsoluteFile().getParent());
 	 * application.output('parent folder has ' + f.getAbsoluteFile().getParentFile().listFiles().length + ' entries');
 	 *
-	 * @return {JSFile} A JSFile instance representing the absolute form of this file's path (works on remote files too).
+	 * @return A JSFile instance representing the absolute form of this file's path (works on remote files too).
 	 */
 	public JSFile js_getAbsoluteFile()
 	{
@@ -195,7 +195,7 @@ public class JSFile implements IScriptable, IJavaScriptType, IFile
 	 * 	application.output('File/folder not found.');
 	 * }
 	 *
-	 * @return {boolean} True if the file exists and is readable; false otherwise (works on remote files too).
+	 * @return True if the file exists and is readable; false otherwise (works on remote files too).
 	 */
 	public boolean js_canRead()
 	{
@@ -207,7 +207,7 @@ public class JSFile implements IScriptable, IJavaScriptType, IFile
 	 *
 	 * @sampleas js_canRead()
 	 *
-	 * @return {boolean} True if the file exists and can be modified; false otherwise (works on remote files too).
+	 * @return True if the file exists and can be modified; false otherwise (works on remote files too).
 	 */
 	public boolean js_canWrite()
 	{
@@ -219,7 +219,7 @@ public class JSFile implements IScriptable, IJavaScriptType, IFile
 	 *
 	 * @sampleas js_canRead()
 	 *
-	 * @return {boolean} True if the file or directory exists; false otherwise (works on remote files too).
+	 * @return True if the file or directory exists; false otherwise (works on remote files too).
 	 */
 	public boolean js_exists()
 	{
@@ -231,7 +231,7 @@ public class JSFile implements IScriptable, IJavaScriptType, IFile
 	 *
 	 * @sampleas js_canRead()
 	 *
-	 * @return {boolean} True if the file is a directory; false otherwise (works on remote files too).
+	 * @return True if the file is a directory; false otherwise (works on remote files too).
 	 */
 	public boolean js_isDirectory()
 	{
@@ -245,7 +245,7 @@ public class JSFile implements IScriptable, IJavaScriptType, IFile
 	 * var theFile = plugins.file.showFileOpenDialog();
 	 * application.output('The file size in bytes: ' + theFile.getBytes());
 	 *
-	 * @return {byte[]} The contents of the file as a byte array.
+	 * @return The contents of the file as a byte array.
 	 */
 	public byte[] jsFunction_getBytes()
 	{
@@ -257,7 +257,7 @@ public class JSFile implements IScriptable, IJavaScriptType, IFile
 	 *
 	 * @sampleas js_canRead()
 	 *
-	 * @return {boolean} True if the file is a regular file; false otherwise (works on remote files too).
+	 * @return True if the file is a regular file; false otherwise (works on remote files too).
 	 */
 	public boolean js_isFile()
 	{
@@ -269,7 +269,7 @@ public class JSFile implements IScriptable, IJavaScriptType, IFile
 	 *
 	 * @sampleas js_canRead()
 	 *
-	 * @return {boolean} True if the file is hidden; false otherwise (works on remote files too).
+	 * @return True if the file is hidden; false otherwise (works on remote files too).
 	 */
 	public boolean js_isHidden()
 	{
@@ -281,7 +281,7 @@ public class JSFile implements IScriptable, IJavaScriptType, IFile
 	 *
 	 * @sampleas js_canRead()
 	 *
-	 * @return {Date} The date and time of the last modification to the file (works on remote files too).
+	 * @return The date and time of the last modification to the file (works on remote files too).
 	 */
 	public Date js_lastModified()
 	{
@@ -293,7 +293,7 @@ public class JSFile implements IScriptable, IJavaScriptType, IFile
 	 *
 	 * @sampleas js_canRead()
 	 *
-	 * @return {long} The size of the file in bytes; returns 0 if the file does not exist (works on remote files too).
+	 * @return The size of the file in bytes; returns 0 if the file does not exist (works on remote files too).
 	 */
 	public long js_size()
 	{
@@ -308,7 +308,7 @@ public class JSFile implements IScriptable, IJavaScriptType, IFile
 	 * if (!f.exists())
 	 * 	f.createNewFile();
 	 *
-	 * @return {boolean} True if the file was created successfully; false otherwise.
+	 * @return True if the file was created successfully; false otherwise.
 	 */
 	public boolean js_createNewFile() throws IOException
 	{
@@ -318,7 +318,7 @@ public class JSFile implements IScriptable, IJavaScriptType, IFile
 	/**
 	 * @deprecated Replaced by {@link #deleteFile()}.
 	 *
-	 * @return {boolean} True if the file was successfully deleted; false otherwise. (Deprecated: Use {@link #deleteFile()} instead.)
+	 * @return True if the file was successfully deleted; false otherwise. (Deprecated: Use {@link #deleteFile()} instead.)
 	 */
 	@Deprecated
 	public boolean js_delete()
@@ -336,7 +336,7 @@ public class JSFile implements IScriptable, IJavaScriptType, IFile
 	 * if (f && f.exists())
 	 * 	f.deleteFile();
 	 *
-	 * @return {boolean} True if the file was successfully deleted; false otherwise. (Deprecated: Use {@link #deleteFile()} instead.)
+	 * @return True if the file was successfully deleted; false otherwise. (Deprecated: Use {@link #deleteFile()} instead.)
 	 */
 	public boolean js_deleteFile()
 	{
@@ -359,7 +359,7 @@ public class JSFile implements IScriptable, IJavaScriptType, IFile
 	 * for (var i=0; i<files.length; i++)
 	 * 	application.output(files[i].getAbsolutePath());
 	 *
-	 * @return {String[]} An array of file and directory names located inside this directory (works on remote files too).
+	 * @return An array of file and directory names located inside this directory (works on remote files too).
 	 */
 	public String[] js_list()
 	{
@@ -371,7 +371,7 @@ public class JSFile implements IScriptable, IJavaScriptType, IFile
 	 *
 	 * @sampleas js_list()
 	 *
-	 * @return {JSFile[]} An array of JSFile instances representing files and directories located inside this directory (works on remote files too).
+	 * @return An array of JSFile instances representing files and directories located inside this directory (works on remote files too).
 	 */
 	public JSFile[] js_listFiles()
 	{
@@ -394,7 +394,7 @@ public class JSFile implements IScriptable, IJavaScriptType, IFile
 	 * var g = plugins.file.convertToJSFile('one/two/three/four/five');
 	 * g.mkdir(); // This will work because all parent folders are already created.
 	 *
-	 * @return {boolean} True if the directory was successfully created; false otherwise.
+	 * @return True if the directory was successfully created; false otherwise.
 	 */
 	public boolean js_mkdir()
 	{
@@ -406,7 +406,7 @@ public class JSFile implements IScriptable, IJavaScriptType, IFile
 	 *
 	 * @sampleas js_mkdir()
 	 *
-	 * @return {boolean} True if the hierarchy of directories was successfully created; false otherwise.
+	 * @return True if the hierarchy of directories was successfully created; false otherwise.
 	 */
 	public boolean js_mkdirs()
 	{
@@ -424,7 +424,7 @@ public class JSFile implements IScriptable, IJavaScriptType, IFile
 	 * // f.renameTo('/otherstory.txt');
 	 *
 	 * @param destination
-	 * @return {boolean} True if the file was successfully renamed; false otherwise (works on remote files too).
+	 * @return True if the file was successfully renamed; false otherwise (works on remote files too).
 	 */
 	public boolean js_renameTo(Object destination)
 	{
@@ -449,7 +449,7 @@ public class JSFile implements IScriptable, IJavaScriptType, IFile
 	/**
 	 * Return a new JSFile instance that contains a remote file with the content of current JSFile.
 	 * @param fileName
-	 * @return JSFile
+	 * @return A new JSFile instance representing a remote file with the content of the current JSFile.
 	 */
 	public JSFile js_convertToRemote(String fileName)
 	{
@@ -505,7 +505,7 @@ public class JSFile implements IScriptable, IJavaScriptType, IFile
 	 * f.setLastModified(new Date(1999, 5, 21));
 	 *
 	 * @param date
-	 * @return {boolean} True if the last modification date/time was successfully set; false otherwise.
+	 * @return True if the last modification date/time was successfully set; false otherwise.
 	 */
 	public boolean js_setLastModified(Object date)
 	{
@@ -533,7 +533,7 @@ public class JSFile implements IScriptable, IJavaScriptType, IFile
 	 * plugins.file.writeTXTFile(f, 'important data that should not be changed');
 	 * f.setReadOnly();
 	 *
-	 * @return {boolean} True if the readonly attribute was successfully set; false otherwise.
+	 * @return True if the readonly attribute was successfully set; false otherwise.
 	 */
 	public boolean js_setReadOnly()
 	{
@@ -545,7 +545,7 @@ public class JSFile implements IScriptable, IJavaScriptType, IFile
 	 *
 	 * @sampleas js_canRead()
 	 *
-	 * @return {String} The content type of the file (e.g., 'application/pdf') (works on remote files too).
+	 * @return The content type of the file (e.g., 'application/pdf') (works on remote files too).
 	 */
 	public String js_getContentType()
 	{

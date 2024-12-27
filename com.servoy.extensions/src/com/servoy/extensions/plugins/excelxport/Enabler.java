@@ -78,6 +78,8 @@ public class Enabler implements IScriptable
 	 * @sample
 	 * plugins.excelxport.exportEnabled = true;
 	 * var isEnabled = plugins.excelxport.exportEnabled;
+	 *
+	 * @return true if the export feature is enabled; otherwise, false.
 	 */
 	public boolean js_getExportEnabled()
 	{
@@ -105,6 +107,8 @@ public class Enabler implements IScriptable
 	 * @sample
 	 * plugins.excelxport.importEnabled = true;
 	 * var isEnabled = plugins.excelxport.importEnabled;
+	 *
+	 * @return true if the import feature is enabled; otherwise, false.
 	 */
 	public boolean js_getImportEnabled()
 	{
@@ -149,6 +153,8 @@ public class Enabler implements IScriptable
 	 *
 	 * @param foundSet the foundset on which to export
 	 * @param dataProviderIds the ids of the dataproviders
+	 *
+	 * @return A byte array representing the exported Excel data.
 	 */
 	public byte[] js_excelExport(IFoundSet foundSet, String[] dataProviderIds) throws IOException
 	{
@@ -161,6 +167,8 @@ public class Enabler implements IScriptable
 	 * @param foundSet the foundset on which to export
 	 * @param dataProviderIds the ids of the dataproviders
 	 * @param templateXLS the xls template to export in
+	 *
+	 * @return A byte array representing the exported Excel data.
 	 */
 	public byte[] js_excelExport(IFoundSet foundSet, String[] dataProviderIds, byte[] templateXLS) throws IOException
 	{
@@ -174,6 +182,8 @@ public class Enabler implements IScriptable
 	 * @param dataProviderIds the ids of the dataproviders
 	 * @param templateXLS the xls template to export in
 	 * @param sheetName the name of the worksheet
+	 *
+	 * @return A byte array representing the exported Excel data.
 	 */
 	public byte[] js_excelExport(IFoundSet foundSet, String[] dataProviderIds, byte[] templateXLS, String sheetName) throws IOException
 	{
@@ -187,6 +197,8 @@ public class Enabler implements IScriptable
 	 * @param dataProviderIds the ids of the dataproviders
 	 * @param templateXLS the xls template to export in
 	 * @param sheetName the name of the worksheet
+	 *
+	 * @return A byte array representing the exported Excel data.
 	 */
 	public byte[] js_excelExport(IFoundSet foundSet, String[] dataProviderIds, byte[] templateXLS, String sheetName, String[] outputColumnNames)
 		throws IOException
@@ -203,6 +215,8 @@ public class Enabler implements IScriptable
 	 * @param sheetName the name of the worksheet
 	 * @param outputColumnNames is used to set the column headers independently from the dataprovider names
 	 * @param startRow row in the foundset at which to start the export
+	 *
+	 * @return A byte array representing the exported Excel data.
 	 */
 	public byte[] js_excelExport(IFoundSet foundSet, String[] dataProviderIds, byte[] templateXLS, String sheetName, Number startRow) throws IOException
 	{
@@ -219,6 +233,8 @@ public class Enabler implements IScriptable
 	 * @param sheetName the name of the worksheet
 	 * @param outputColumnNames is used to set the column headers independently from the dataprovider names
 	 * @param startRow row in the foundset at which to start the export
+	 *
+	 * @return A byte array representing the exported Excel data.
 	 */
 	public byte[] js_excelExport(IFoundSet foundSet, String[] dataProviderIds, byte[] templateXLS, String sheetName, String[] outputColumnNames,
 		Number startRow)
@@ -237,6 +253,8 @@ public class Enabler implements IScriptable
 	 * @param sheetName the name of the worksheet
 	 * @param startRow row in the foundset at which to start the export
 	 * @param startColumn column in the foundset at which to start the export
+	 *
+	 * @return A byte array representing the exported Excel data.
 	 */
 	public byte[] js_excelExport(IFoundSet foundSet, String[] dataProviderIds, byte[] templateXLS, String sheetName, Number startRow, Number startColumn)
 		throws IOException
@@ -254,6 +272,8 @@ public class Enabler implements IScriptable
 	 * @param outputColumnNames is used to set the column headers independently from the dataprovider names
 	 * @param startRow row in the foundset at which to start the export
 	 * @param startColumn column in the foundset at which to start the export
+	 *
+	 * @return A byte array representing the exported Excel data.
 	 */
 	public byte[] js_excelExport(IFoundSet foundSet, String[] dataProviderIds, byte[] templateXLS, String sheetName, String[] outputColumnNames,
 		Number startRow, Number startColumn) throws IOException

@@ -66,7 +66,7 @@ public class XmlReaderProvider implements IScriptable, IReturnedTypesProvider
 	 * var childNodes = xmlNodes[0].getChildNodes();
 	 *
 	 * @param argument
-	 * @return {XmlNode[]} An array of XmlNode objects representing the parsed XML document read from the file.
+	 * @return An array of XmlNode objects representing the parsed XML document read from the file.
 	 */
 	public XmlNode[] js_readXmlDocumentFromFile(Object argument)
 	{
@@ -88,7 +88,7 @@ public class XmlReaderProvider implements IScriptable, IReturnedTypesProvider
 	 * var xmlNodes = plugins.XmlReader.readXmlDocumentFromString(xmlString);
 	 *
 	 * @param argument
-	 * @return {XmlNode[]} An array of XmlNode objects representing the parsed XML document read from the string.
+	 * @return An array of XmlNode objects representing the parsed XML document read from the string.
 	 */
 	public XmlNode[] js_readXmlDocumentFromString(String argument)
 	{
