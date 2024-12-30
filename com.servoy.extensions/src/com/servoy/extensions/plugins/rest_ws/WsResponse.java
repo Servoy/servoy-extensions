@@ -95,6 +95,8 @@ public class WsResponse implements IScriptable, IJavaScriptType
 	*
 	* @param	sc	the status code
 	*
+	* @return The current HTTP status code of this response.
+	*
 	* @see #sendError
 	*/
 	@JSGetter
@@ -156,6 +158,8 @@ public class WsResponse implements IScriptable, IJavaScriptType
 	 * defined by IANA Character Sets
 	 * (http://www.iana.org/assignments/character-sets)
 	 *
+	 * @return The character encoding (MIME charset) of the response.
+	 *
 	 * @see #setContentType
 	 * @see #setLocale
 	 *
@@ -193,6 +197,8 @@ public class WsResponse implements IScriptable, IJavaScriptType
 	*
 	* @param type a <code>String</code> specifying the MIME
 	* type of the content
+	*
+	* @return The MIME type of the content of this response.
 	*
 	* @see #setLocale
 	* @see #setCharacterEncoding
@@ -328,6 +334,8 @@ public class WsResponse implements IScriptable, IJavaScriptType
 	 *
 	 * <p><b>Note</b>: there is no guarantee that <code>toLanguageTag</code>
 	 * and <code>forLanguageTag</code> will round-trip.
+	 *
+	 * @return The language tag of the locale specified for this response.
 	*/
 	@JSGetter
 	public String getLocaleLanguageTag()
@@ -350,6 +358,8 @@ public class WsResponse implements IScriptable, IJavaScriptType
 	* @return		<code>true</code> if the named response header
 	*			has already been set;
 	* 			<code>false</code> otherwise
+	*
+	* @return True if the specified header is already set in the response; false otherwise.
 	*/
 	@JSFunction
 	public boolean containsHeader(String name)

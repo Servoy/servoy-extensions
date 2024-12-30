@@ -339,6 +339,8 @@ public class HttpClient implements IScriptable, IJavaScriptType
 	 *
 	 * @param cookieName the name of the cookie
 	 * @param cookieValue the value of the cookie
+	 *
+	 * @return true if the cookie was successfully set; otherwise, false.
 	 */
 	public boolean js_setCookie(String cookieName, String cookieValue)
 	{
@@ -352,6 +354,8 @@ public class HttpClient implements IScriptable, IJavaScriptType
 	 * @param cookieName the name of the cookie
 	 * @param cookieValue the value of the cookie
 	 * @param domain the domain
+	 *
+	 * @return true if the cookie was successfully set; otherwise, false.
 	 */
 	public boolean js_setCookie(String cookieName, String cookieValue, String domain)
 	{
@@ -366,6 +370,8 @@ public class HttpClient implements IScriptable, IJavaScriptType
 	 * @param cookieValue the value of the cookie
 	 * @param domain the domain
 	 * @param path the path
+	 *
+	 * @return true if the cookie was successfully set; otherwise, false.
 	 */
 	public boolean js_setCookie(String cookieName, String cookieValue, String domain, String path)
 	{
@@ -381,6 +387,8 @@ public class HttpClient implements IScriptable, IJavaScriptType
 	 * @param domain the domain
 	 * @param path the path
 	 * @param maxAge maximum age of cookie
+	 *
+	 * @return true if the cookie was successfully set; otherwise, false.
 	 */
 	public boolean js_setCookie(String cookieName, String cookieValue, String domain, String path, int maxAge)
 	{
@@ -397,6 +405,8 @@ public class HttpClient implements IScriptable, IJavaScriptType
 	 * @param path the path
 	 * @param maxAge maximum age of cookie
 	 * @param secure true if it is a secure cookie, false otherwise
+	 *
+	 * @return true if the cookie was successfully set; otherwise, false.
 	 */
 	public boolean js_setCookie(String cookieName, String cookieValue, String domain, String path, int maxAge, boolean secure)
 	{
@@ -437,6 +447,8 @@ public class HttpClient implements IScriptable, IJavaScriptType
 	 * 	client.setCookie('JSESSIONID', 'abc', 'localhost', '/', -1, false)
 	 *
 	 * @param cookieName
+	 *
+	 * @return the cookie with the specified name, or null if it does not exist.
 	 */
 	public Cookie js_getCookie(String cookieName)
 	{
@@ -453,6 +465,8 @@ public class HttpClient implements IScriptable, IJavaScriptType
 	 *
 	 * @sample
 	 * var cookies = client.getHttpClientCookies()
+	 *
+	 * @return an array of all cookies currently stored in the client.
 	 */
 	public Cookie[] js_getCookies()
 	{
@@ -482,6 +496,8 @@ public class HttpClient implements IScriptable, IJavaScriptType
 	 * var httpCode = poster.executeRequest(globals.twitterUserName, globals.twitterPassword).getStatusCode(); // httpCode 200 is ok
 	 *
 	 * @param url
+	 *
+	 * @return a PostRequest object for creating a POST request to the specified URL.
 	 */
 	public PostRequest js_createPostRequest(String url)
 	{
@@ -505,6 +521,8 @@ public class HttpClient implements IScriptable, IJavaScriptType
 	 * var content = response.getResponseBody();
 	 *
 	 * @param url
+	 *
+	 * @return a GetRequest object for creating a GET request to the specified URL.
 	 */
 	public GetRequest js_createGetRequest(String url)
 	{
@@ -523,6 +541,8 @@ public class HttpClient implements IScriptable, IJavaScriptType
 	 * var content = response.getResponseBody();
 	 *
 	 * @param url
+	 *
+	 * @return a DeleteRequest object for creating a DELETE request to the specified URL.
 	 */
 	public DeleteRequest js_createDeleteRequest(String url)
 	{
@@ -540,6 +560,8 @@ public class HttpClient implements IScriptable, IJavaScriptType
 	 * var httpCode = request.executeRequest().getStatusCode() // httpCode 200 is ok
 	 *
 	 * @param url
+	 *
+	 * @return a PatchRequest object for creating a PATCH request to the specified URL.
 	 */
 	public PatchRequest js_createPatchRequest(String url)
 	{
@@ -557,6 +579,8 @@ public class HttpClient implements IScriptable, IJavaScriptType
 	 * var httpCode = putRequest.executeRequest().getStatusCode() // httpCode 200 is ok
 	 *
 	 * @param url
+	 *
+	 * @return a PutRequest object for creating a PUT request to the specified URL.
 	 */
 	public PutRequest js_createPutRequest(String url)
 	{
@@ -573,6 +597,8 @@ public class HttpClient implements IScriptable, IJavaScriptType
 	 * var methods = request.getAllowedMethods(request.executeRequest());
 	 *
 	 * @param url
+	 *
+	 * @return an OptionsRequest object for creating an OPTIONS request to the specified URL.
 	 */
 	public OptionsRequest js_createOptionsRequest(String url)
 	{
@@ -591,6 +617,8 @@ public class HttpClient implements IScriptable, IJavaScriptType
 	 * var header = response.getResponseHeaders('last-modified');
 	 *
 	 * @param url
+	 *
+	 * @return a HeadRequest object for creating a HEAD request to the specified URL.
 	 */
 	public HeadRequest js_createHeadRequest(String url)
 	{
@@ -608,6 +636,8 @@ public class HttpClient implements IScriptable, IJavaScriptType
 	 * var content = response.getResponseBody();
 	 *
 	 * @param url
+	 *
+	 * @return a TraceRequest object for creating a TRACE request to the specified URL.
 	 */
 	public TraceRequest js_createTraceRequest(String url)
 	{

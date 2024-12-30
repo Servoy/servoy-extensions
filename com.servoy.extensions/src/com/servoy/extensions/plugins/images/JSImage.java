@@ -133,6 +133,8 @@ public class JSImage implements IScriptable, Wrapper
 	 * Gets the height of this image.
 	 *
 	 * @sampleas js_getContentType()
+	 *
+	 * @return The height of the image in pixels.
 	 */
 	public int js_getHeight()
 	{
@@ -143,6 +145,8 @@ public class JSImage implements IScriptable, Wrapper
 	 * Gets the width of this image.
 	 *
 	 * @sampleas js_getContentType()
+	 *
+	 * @return The width of the image in pixels.
 	 */
 	public int js_getWidth()
 	{
@@ -157,6 +161,8 @@ public class JSImage implements IScriptable, Wrapper
 	 * image = image.resize(200,200);//resizes it to 200,200
 	 * var bytes = image.getData();//gets the image bytes
 	 * plugins.file.writeFile('filename',bytes);//saves the image bytes
+	 *
+	 * @return The image data as a byte array for saving or processing.
 	 */
 	public byte[] js_getData()
 	{
@@ -174,6 +180,8 @@ public class JSImage implements IScriptable, Wrapper
 	 *
 	 * @param width
 	 * @param height
+	 *
+	 * @return A new JSImage instance resized to the specified dimensions, or null if resizing fails.
 	 */
 	public JSImage js_resize(int width, int height)
 	{
@@ -196,6 +204,8 @@ public class JSImage implements IScriptable, Wrapper
 	 * plugins.file.writeFile('filename',bytes);//saves the image bytes
 	 *
 	 * @param degrees
+	 *
+	 * @return A new JSImage instance rotated by the specified degrees.
 	 */
 	public JSImage js_rotate(final double degrees)
 	{
@@ -261,6 +271,8 @@ public class JSImage implements IScriptable, Wrapper
 	 * plugins.file.writeFile('filename',bytes);//saves the image bytes
 	 *
 	 * @param type
+	 *
+	 * @return A new JSImage instance flipped vertically or horizontally, based on the type parameter.
 	 */
 	public JSImage js_flip(int type)
 	{
@@ -304,6 +316,8 @@ public class JSImage implements IScriptable, Wrapper
 	 * var width = image.getWidth();
 	 * var height = image.getHeight();
 	 * var contentType = image.getContentType();
+	 *
+	 * @return The MIME type of the image, such as "image/jpeg" or "image/png", or null if unavailable.
 	 */
 	public String js_getContentType()
 	{
@@ -339,6 +353,8 @@ public class JSImage implements IScriptable, Wrapper
 	 * }
 	 * // Thumbnail data is stored under property 'Exif - Thumbnail Data', extract that and set it in a dataprovider
 	 * thumbnail = image.getMetaDataObject("Exif - Thumbnail Data"); // gets thumbnail data from the image
+	 *
+	 * @return An array of metadata property names available in the image.
 	 */
 	public String[] js_getMetaDataProperties()
 	{
@@ -352,6 +368,8 @@ public class JSImage implements IScriptable, Wrapper
 	 * @sampleas js_getMetaDataProperties()
 	 *
 	 * @param property
+	 *
+	 * @return The description of the specified metadata property, or null if not found.
 	 */
 	public String js_getMetaDataDescription(String property)
 	{
@@ -370,6 +388,8 @@ public class JSImage implements IScriptable, Wrapper
 	 * @sampleas js_getMetaDataProperties()
 	 *
 	 * @param property
+	 *
+	 * @return The metadata object associated with the specified property, or null if not found.
 	 */
 	public Object js_getMetaDataObject(String property)
 	{
@@ -383,6 +403,8 @@ public class JSImage implements IScriptable, Wrapper
 	}
 
 	/**
+	 * @return The raw image data as a byte array.
+	 *
 	 * @see org.mozilla.javascript.Wrapper#unwrap()
 	 */
 	public Object unwrap()

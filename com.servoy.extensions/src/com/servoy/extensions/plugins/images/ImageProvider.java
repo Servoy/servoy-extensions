@@ -121,6 +121,8 @@ public class ImageProvider implements IScriptable, IReturnedTypesProvider
 	 * application.setStatusText('Wrote file: '+tempFile)
 	 *
 	 * @param object file/byte_array/bean/applet/form_element
+	 *
+	 * @return a JSImage object for the given file, byte array, bean, applet, or form element.
 	 */
 	public JSImage js_getImage(Object object)
 	{

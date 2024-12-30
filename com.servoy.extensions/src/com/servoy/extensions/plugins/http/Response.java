@@ -111,6 +111,8 @@ public class Response implements IScriptable, IJavaScriptType
 	 *
 	 * @sample
 	 * var status = response.getStatusCode();// compare with HTTP_STATUS constants
+	 *
+	 * @return the HTTP status code of the response. Returns 0 if an exception occurred during the request.
 	 */
 	public int js_getStatusCode()
 	{
@@ -133,6 +135,8 @@ public class Response implements IScriptable, IJavaScriptType
 	 *
 	 * @sample
 	 * var statusReasonPhrase = response.getStatusReasonPhrase();
+	 *
+	 * @return the reason phrase associated with the HTTP status code of the response. Returns `null` if an exception occurred.
 	 */
 	public String js_getStatusReasonPhrase()
 	{
@@ -152,6 +156,8 @@ public class Response implements IScriptable, IJavaScriptType
 	 *
 	 * @sample
 	 * var pageData = response.getResponseBody();
+	 *
+	 * @return the response body content as a string. Returns an empty string if an exception occurred.
 	 */
 	public String js_getResponseBody()
 	{
@@ -184,6 +190,8 @@ public class Response implements IScriptable, IJavaScriptType
 	 *
 	 * @sample
 	 * var mediaData = response.getMediaData();
+	 *
+	 * @return the response body content as a byte array, supporting gzip-ed content. Returns `null` if an exception occurred.
 	 */
 	public byte[] js_getMediaData()
 	{
@@ -209,6 +217,8 @@ public class Response implements IScriptable, IJavaScriptType
 	 * var header;
 	 *
 	 * for (header in allHeaders) application.output(header + ': ' + allHeaders[header]);
+	 *
+	 * @return a `JSMap` of all headers in the response or a specific header if `headerName` is provided. Returns `null` if an exception occurred.
 	 */
 	public JSMap js_getResponseHeaders()
 	{
@@ -221,6 +231,8 @@ public class Response implements IScriptable, IJavaScriptType
 	 * var contentLength = response.getResponseHeaders("Content-Length");
 	 *
 	 * @param headerName
+	 *
+	 * @return a `JSMap` of all headers in the response or a specific header if `headerName` is provided. Returns `null` if an exception occurred.
 	 */
 	public JSMap js_getResponseHeaders(String headerName)
 	{
@@ -268,6 +280,8 @@ public class Response implements IScriptable, IJavaScriptType
 	 *
 	 * @sample
 	 * var charset = response.getCharset();
+	 *
+	 * @return the character set of the response body. Returns `null` if an exception occurred or the character set is not defined.
 	 */
 	public String js_getCharset()
 	{

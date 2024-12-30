@@ -256,7 +256,7 @@ public class ClientManagerProvider implements IScriptable, IReturnedTypesProvide
 	/**
 	 * Returns the current client JSClientInformation object. Note this is snapshot information, client information will not get updated.
 	 *
-	 * @return
+	 * @return A JSClientInformation object containing snapshot information about the current client, or null if the information cannot be retrieved.
 	 */
 	@JSFunction
 	public JSClientInformation getClientInformation()
@@ -472,6 +472,9 @@ public class ClientManagerProvider implements IScriptable, IReturnedTypesProvide
 		}
 	}
 
+	/**
+	 * @return The server build date as a Date object, or null if the information cannot be retrieved.
+	 */
 	public Date js_getServerBuildDate()
 	{
 		try

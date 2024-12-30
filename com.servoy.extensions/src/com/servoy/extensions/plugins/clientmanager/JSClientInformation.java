@@ -61,6 +61,8 @@ public class JSClientInformation implements IScriptable
 	 * }
 	 *
 	 * @see com.servoy.j2db.scripting.info.APPLICATION_TYPES
+	 *
+	 * @return the type of application started by this client. See APPLICATION_TYPES for possible values.
 	 */
 	public int js_getApplicationType()
 	{
@@ -71,6 +73,8 @@ public class JSClientInformation implements IScriptable
 	 * The ID of this client.
 	 *
 	 * @sampleas js_getApplicationType()
+	 *
+	 * @return the unique ID of this client.
 	 */
 	public String js_getClientID()
 	{
@@ -81,6 +85,8 @@ public class JSClientInformation implements IScriptable
 	 * The time and date the user logged into the system.
 	 *
 	 * @sampleas js_getApplicationType()
+	 *
+	 * @return the date and time when the user logged into the system.
 	 */
 	public Date js_getLoginTime()
 	{
@@ -91,6 +97,8 @@ public class JSClientInformation implements IScriptable
 	 * The time and date since the user has been idle.
 	 *
 	 * @sampleas js_getApplicationType()
+	 *
+	 * @return the date and time since the user has been idle.
 	 */
 	public Date js_getIdleTime()
 	{
@@ -101,6 +109,8 @@ public class JSClientInformation implements IScriptable
 	 * The name of the solution that is currently open by the client.
 	 *
 	 * @sampleas js_getApplicationType()
+	 *
+	 * @return the name of the solution currently open by the client.
 	 */
 	public String js_getOpenSolutionName()
 	{
@@ -120,6 +130,8 @@ public class JSClientInformation implements IScriptable
 	 * The host address of this client.
 	 *
 	 * @sampleas js_getApplicationType()
+	 *
+	 * @return the IP address of this client.
 	 */
 	public String js_getHostAddress()
 	{
@@ -130,6 +142,8 @@ public class JSClientInformation implements IScriptable
 	 * The host identifier of this client.
 	 *
 	 * @sampleas js_getApplicationType()
+	 *
+	 * @return the identifier of the host where this client is running.
 	 */
 	public String js_getHostIdentifier()
 	{
@@ -140,6 +154,8 @@ public class JSClientInformation implements IScriptable
 	 * The host name of this client.
 	 *
 	 * @sampleas js_getApplicationType()
+	 *
+	 *  @return the name of the host where this client is running.
 	 */
 	public String js_getHostName()
 	{
@@ -150,6 +166,8 @@ public class JSClientInformation implements IScriptable
 	 * The name of the user who is logged in at this client.
 	 *
 	 * @sampleas js_getApplicationType()
+	 *
+	 * @return the username of the user logged in at this client.
 	 */
 	public String js_getUserName()
 	{
@@ -160,6 +178,8 @@ public class JSClientInformation implements IScriptable
 	 * The ID of the user who is logged in at this client.
 	 *
 	 * @sampleas js_getApplicationType()
+	 *
+	 * @return the unique ID of the user logged in at this client.
 	 */
 	public String js_getUserUID()
 	{
@@ -169,6 +189,8 @@ public class JSClientInformation implements IScriptable
 	/**
 	 * Gets the array of client information strings as seen on the admin page.
 	 * @return a String array with the client information
+	 *
+	 * @return an array of client information strings, as seen on the admin page.
 	 */
 	@JSFunction
 	public String[] getClientInfos()
@@ -190,6 +212,8 @@ public class JSClientInformation implements IScriptable
 	 * @return a date object or null if the client doesn't support this
 	 *
 	 * @sampleas js_getApplicationType()
+	 *
+	 * @return the date and time of the last physical access to the application. Returns `null` if unsupported by the client.
 	 */
 	public Date js_getLastAccessedTime()
 	{
@@ -202,6 +226,8 @@ public class JSClientInformation implements IScriptable
 	 * @return a string that is the status line as reported on the admin page.
 	 *
 	 * @sampleas js_getApplicationType()
+	 *
+	 * @return the status line reported on the admin page for an NGClient. Returns `null` for other clients.
 	 */
 	public String js_getStatusLine()
 	{

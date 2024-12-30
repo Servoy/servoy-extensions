@@ -83,6 +83,8 @@ public class UDPProvider implements IScriptable, IReturnedTypesProvider
 	 * @param method_to_call_when_packet_received_and_buffer_is_empty when the socket receives one or more packages, it calls this method once.
 	 * The method will no longer be called even if new packages are received - until a call to {@link UDPProvider#js_getReceivedPacket()} returns null. So you should
 	 * consume all available packets before you expect this method to be called again.
+	 *
+	 * @return true if the UDP socket was successfully started; otherwise, false.
 	 */
 	public boolean js_startSocket(int port_number, Object method_to_call_when_packet_received_and_buffer_is_empty)
 	{
@@ -133,6 +135,8 @@ public class UDPProvider implements IScriptable, IReturnedTypesProvider
 	 * packet.writeInt(12348293)//writes 4 bytes
 	 * packet.writeShort(14823)//writes 2 bytes
 	 * packet.writeByte(123)//writes 1 byte
+	 *
+	 * @return a new, empty JSPacket instance for creating and sending UDP packets.
 	 */
 	public JSPacket js_createNewPacket()
 	{
@@ -149,6 +153,8 @@ public class UDPProvider implements IScriptable, IReturnedTypesProvider
 	 *
 	 * @param destIpOrHostname the ip of the destination or the hostname
 	 * @param packet the JSPacket to send
+	 *
+	 * @return true if the packet was successfully sent; otherwise, false.
 	 */
 	public boolean js_sendPacket(String destIpOrHostname, JSPacket packet)
 	{
@@ -166,6 +172,8 @@ public class UDPProvider implements IScriptable, IReturnedTypesProvider
 	 * @param destIpOrHostname the ip of the destination or the hostname
 	 * @param packet the JSPacket to send
 	 * @param port the port on which to send the packet
+	 *
+	 * @return true if the packet was successfully sent to the specified port; otherwise, false.
 	 */
 	public boolean js_sendPacket(String destIpOrHostname, JSPacket packet, int port)
 	{
@@ -199,6 +207,8 @@ public class UDPProvider implements IScriptable, IReturnedTypesProvider
 	 * plugins.udp.testPacket(packet)
 	 *
 	 * @param packet
+	 *
+	 * @return true if the test packet was successfully added to the receive buffer; otherwise, false.
 	 */
 	public boolean js_testPacket(JSPacket packet)
 	{
@@ -228,6 +238,8 @@ public class UDPProvider implements IScriptable, IReturnedTypesProvider
 	 * 	var text = packet.readUTF()
 	 * 	var count = packet.readInt()
 	 * }
+	 *
+	 * @return the next JSPacket from the receive buffer, or null if the buffer is empty.
 	 */
 	public JSPacket js_getReceivedPacket()
 	{

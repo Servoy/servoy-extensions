@@ -153,6 +153,8 @@ public class HeadlessClientProvider implements IScriptable, IReturnedTypesProvid
 	 * @param username
 	 * @param password
 	 * @param solutionOpenMethodArgs
+	 *
+	 * @return A new JSClient instance for the specified solution, or null if the client could not be created.
 	 */
 	public JSClient js_createClient(String solutionName, String username, String password, Object[] solutionOpenMethodArgs)
 	{
@@ -185,6 +187,8 @@ public class HeadlessClientProvider implements IScriptable, IReturnedTypesProvid
 	 * }
 	 *
 	 * @param clientID
+	 *
+	 * @return The JSClient corresponding to the given client ID if it exists and is valid, or null otherwise.
 	 */
 	public JSClient js_getClient(String clientID)
 	{

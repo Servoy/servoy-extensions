@@ -79,6 +79,8 @@ public class JSPacket implements IScriptable
 	 * 		break;
 	 * 	}
 	 * }
+	 *
+	 * @return The zero-based index indicating the current read/write position in the packet's byte array.
 	 */
 	public int js_getIndex()
 	{
@@ -105,6 +107,8 @@ public class JSPacket implements IScriptable
 	 * 		break;
 	 * 	}
 	 * }
+	 *
+	 * @return The hostname or IP address from which this packet was sent.
 	 */
 	public String js_getHost()
 	{
@@ -129,6 +133,8 @@ public class JSPacket implements IScriptable
 	 * 		break;
 	 * 	}
 	 * }
+	 *
+	 * @return A copy of the packet's payload data as a byte array.
 	 */
 	public byte[] js_getByteArray()
 	{
@@ -139,6 +145,8 @@ public class JSPacket implements IScriptable
 	 * Returns the length of the packet in bytes.
 	 *
 	 * @sampleas js_getHost()
+	 *
+	 * @return The total number of bytes contained in the packet's payload.
 	 */
 	public int js_getLength()
 	{
@@ -149,6 +157,8 @@ public class JSPacket implements IScriptable
 	 * Returns the port where the packet originated from.
 	 *
 	 * @sampleas js_getHost()
+	 *
+	 * @return The port number associated with the sender of this packet.
 	 */
 	public int js_getPort()
 	{
@@ -159,6 +169,8 @@ public class JSPacket implements IScriptable
 	 * Reads an 8 bits byte value from the packet, starting from the current index. Advances the index with one position.
 	 *
 	 * @sampleas js_getIndex()
+	 *
+	 * @return A single byte from the current position in the packet, represented as an integer.
 	 */
 	public int js_readByte()
 	{
@@ -169,6 +181,8 @@ public class JSPacket implements IScriptable
 	 * Reads a 32 bits int value from the packet, starting from the current index. Advances the index with 4 positions.
 	 *
 	 * @sampleas js_getIndex()
+	 *
+	 * @return A 32-bit integer extracted from the current position in the packet.
 	 */
 	public int js_readInt()
 	{
@@ -179,6 +193,8 @@ public class JSPacket implements IScriptable
 	 * Reads a 32 bits short value from the packet, starting from the current index. Advances the index with 2 positions.
 	 *
 	 * @sampleas js_getIndex()
+	 *
+	 * @return A 16-bit short value extracted from the current position in the packet.
 	 */
 	public int js_readShort()
 	{
@@ -190,6 +206,8 @@ public class JSPacket implements IScriptable
 	 * @sampleas js_readUTF()
 	 *
 	 * @param length
+	 *
+	 * @return A string decoded from the specified number of UTF-8 encoded bytes in the packet.
 	 */
 	public String js_readUTF(int length)
 	{
@@ -200,6 +218,8 @@ public class JSPacket implements IScriptable
 	 * Reads a UTF-8 string from the packet, starting from the current index. If an argument is specified, then it represents the length (in UTF-8 encoded bytes, not characters) of the string to read. If no argument is specified, then first a 32 bits (4 byte) int is read from the packet and that will be the byte length of the string. Advances the index with a number of positions that depends on the length of the read string.
 	 *
 	 * @sampleas js_getHost()
+	 *
+	 * @return A string decoded from the packet, with its length determined by the first four bytes.
 	 */
 	public String js_readUTF()
 	{
@@ -278,6 +298,8 @@ public class JSPacket implements IScriptable
 	 * @sampleas js_writeByte(int)
 	 *
 	 * @param string
+	 *
+	 * @return The total number of bytes written to the packet for the UTF-8 encoded string.
 	 */
 	public int js_writeUTF(String string)
 	{

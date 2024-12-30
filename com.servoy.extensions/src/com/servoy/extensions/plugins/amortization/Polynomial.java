@@ -158,6 +158,9 @@ public class Polynomial implements IScriptable
 	 * @param startValue
 	 * @param error
 	 * @param iterations
+	 *
+	 * @return The root value after the specified number of iterations or as soon as the error condition is satisfied.
+	 *         Returns Double.NaN if the derivative was zero during the computation.
 	 */
 	public double js_findRoot(double startValue, double error, int iterations)
 	{
@@ -168,6 +171,8 @@ public class Polynomial implements IScriptable
 	 * Returns a polynomial that holds the derivative of this polynomial.
 	 *
 	 * @sampleas js_findRoot(double, double, int)
+	 *
+	 * @return A polynomial representing the derivative of this polynomial.
 	 */
 	public Polynomial js_getDerivative()
 	{
@@ -180,6 +185,8 @@ public class Polynomial implements IScriptable
 	 * @sampleas js_findRoot(double, double, int)
 	 *
 	 * @param x
+	 *
+	 * @return The value of the derivative of this polynomial at the specified point.
 	 */
 	public double js_getDerivativeValue(double x)
 	{
@@ -192,6 +199,8 @@ public class Polynomial implements IScriptable
 	 * @sampleas js_findRoot(double, double, int)
 	 *
 	 * @param x
+	 *
+	 * @return The value of this polynomial at the specified point.
 	 */
 	public double js_getValue(double x)
 	{

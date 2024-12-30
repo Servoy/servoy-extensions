@@ -61,6 +61,11 @@ public class OAuthResponseJSON extends OAuthResponseText implements IJavaScriptT
 		super(response);
 	}
 
+	/**
+	 * @return A JSON object representation of the response body.
+	 * If the response body is a JSON array, it is wrapped in an object with the key "array".
+	 * Returns null if the response body is empty or cannot be parsed as JSON.
+	 */
 	@JSFunction
 	public JSONObject getAsJSON()
 	{

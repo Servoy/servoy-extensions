@@ -90,6 +90,8 @@ public class HttpProvider implements IReturnedTypesProvider, IScriptable
 	 * var pageData = plugins.http.getPageData('http://www.cnn.com');
 	 *
 	 * @param url
+	 *
+	 * @return The content of the page at the specified URL as a string.
 	 */
 	public String js_getPageData(String url)
 	{
@@ -249,6 +251,8 @@ public class HttpProvider implements IReturnedTypesProvider, IScriptable
 	 * var image_byte_array = plugins.http.getMediaData('http://www.cnn.com/cnn.gif');
 	 *
 	 * @param url
+	 *
+	 * @return The media content from the specified URL as a byte array.
 	 */
 	public byte[] js_getMediaData(String url)
 	{
@@ -280,6 +284,8 @@ public class HttpProvider implements IReturnedTypesProvider, IScriptable
 	 *
 	 * @sample
 	 * var client = plugins.http.createNewHttpClient();
+	 *
+	 * @return A new HttpClient instance for making multiple HTTP requests within the same session.
 	 */
 	public HttpClient js_createNewHttpClient()
 	{
@@ -297,6 +303,8 @@ public class HttpProvider implements IReturnedTypesProvider, IScriptable
 	 * @param config httpclient config
 	 * @sample
 	 * var client = plugins.http.createNewHttpClient(config);
+	 *
+	 * @return A new HttpClient instance configured with the specified HttpClientConfig.
 	 */
 	public HttpClient js_createNewHttpClient(HttpClientConfig config)
 	{
@@ -310,6 +318,8 @@ public class HttpProvider implements IReturnedTypesProvider, IScriptable
 	 *
 	 * @sample
 	 * var config = plugins.http.createNewHttpClientConfig();
+	 *
+	 * @return A new HttpClientConfig instance for customizing HTTP client behavior.
 	 */
 	public HttpClientConfig js_createNewHttpClientConfig()
 	{
