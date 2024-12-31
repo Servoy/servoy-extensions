@@ -255,6 +255,8 @@ public class AmortizationCalculation implements IScriptable, IConstantsObject
 	 *
 	 * @param newPeriod
 	 * @param date
+	 *
+	 * @return the total number of pages printed during the meta print job.
 	 */
 	public boolean js_addCompoundPeriodChange(int newPeriod, Date date)
 	{
@@ -272,6 +274,8 @@ public class AmortizationCalculation implements IScriptable, IConstantsObject
 	 * @param period
 	 * @param number
 	 * @param startday
+	 *
+	 * @return true if the loan event was added successfully, false otherwise.
 	 */
 	public boolean js_addLoan(double amount, Date firstDate, Date lastDate, int period, int number, int startday)
 	{
@@ -287,6 +291,8 @@ public class AmortizationCalculation implements IScriptable, IConstantsObject
 	 * @param lastDate
 	 * @param period
 	 * @param number
+	 *
+	 * @return true if the loan event was added successfully, false otherwise.
 	 */
 	public boolean js_addLoan(double amount, Date firstDate, Date lastDate, int period, int number)
 	{
@@ -301,6 +307,8 @@ public class AmortizationCalculation implements IScriptable, IConstantsObject
 	 * @param firstDate
 	 * @param lastDate
 	 * @param period
+	 *
+	 * @return true if the loan event was added successfully, false otherwise.
 	 */
 	public boolean js_addLoan(double amount, Date firstDate, Date lastDate, int period)
 	{
@@ -313,6 +321,8 @@ public class AmortizationCalculation implements IScriptable, IConstantsObject
 	 *
 	 * @param amount
 	 * @param date
+	 *
+	 * @return true if the loan event was added successfully, false otherwise.
 	 */
 	public boolean js_addLoan(double amount, Date date)
 	{
@@ -330,6 +340,8 @@ public class AmortizationCalculation implements IScriptable, IConstantsObject
 	 * @param period
 	 * @param number
 	 * @param startday
+	 *
+	 * @return true if the payment event was added successfully, false otherwise.
 	 */
 	public boolean js_addPayment(double amount, Date firstDate, Date lastDate, int period, int number, int startday)
 	{
@@ -345,6 +357,8 @@ public class AmortizationCalculation implements IScriptable, IConstantsObject
 	 * @param lastDate
 	 * @param period
 	 * @param number
+	 *
+	 * @return true if the payment event was added successfully, false otherwise.
 	 */
 	public boolean js_addPayment(double amount, Date firstDate, Date lastDate, int period, int number)
 	{
@@ -359,6 +373,8 @@ public class AmortizationCalculation implements IScriptable, IConstantsObject
 	 * @param firstDate
 	 * @param lastDate
 	 * @param period
+	 *
+	 * @return true if the payment event was added successfully, false otherwise.
 	 */
 	public boolean js_addPayment(double amount, Date firstDate, Date lastDate, int period)
 	{
@@ -371,6 +387,8 @@ public class AmortizationCalculation implements IScriptable, IConstantsObject
 	 *
 	 * @param amount
 	 * @param date
+	 *
+	 * @return true if the payment event was added successfully, false otherwise.
 	 */
 	public boolean js_addPayment(double amount, Date date)
 	{
@@ -384,6 +402,8 @@ public class AmortizationCalculation implements IScriptable, IConstantsObject
 	 *
 	 * @param newRate
 	 * @param date
+	 *
+	 * @return true if the rate change was added successfully, false otherwise.
 	 */
 	public boolean js_addRateChange(double newRate, Date date)
 	{
@@ -395,6 +415,8 @@ public class AmortizationCalculation implements IScriptable, IConstantsObject
 	 *
 	 * @sample
 	 * plugins.amortization.calculateAmortizationSchedule();
+	 *
+	 * @return true if the amortization schedule was calculated successfully, false otherwise.
 	 */
 	public boolean js_calculateAmortizationSchedule()
 	{
@@ -406,6 +428,8 @@ public class AmortizationCalculation implements IScriptable, IConstantsObject
 	 *
 	 * @sample
 	 * plugins.amortization.getAmortizationSchedule();
+	 *
+	 * @return the amortization schedule as a JSDataSet.
 	 */
 	@JSFunction
 	public IDataSet getAmortizationSchedule()
@@ -435,6 +459,8 @@ public class AmortizationCalculation implements IScriptable, IConstantsObject
 	 * // not converge for some reason.
 	 * var r = c.getUnknown();
 	 * var e = c.getError();
+	 *
+	 * @return the error value resulting from solving for the unknown.
 	 */
 	public double js_getError()
 	{
@@ -446,6 +472,8 @@ public class AmortizationCalculation implements IScriptable, IConstantsObject
 	 *
 	 * @sample
 	 * plugins.amortization.getEvents();
+	 *
+	 * @return all amortization events such as rate changes, loans, payments, and compounding period changes as a JSDataSet.
 	 */
 	@JSFunction
 	public IDataSet getEvents()
@@ -458,6 +486,8 @@ public class AmortizationCalculation implements IScriptable, IConstantsObject
 	 *
 	 * @sample
 	 * var rb = plugins.amortization.getRestBalance();
+	 *
+	 * @return the remaining balance after the amortization schedule.
 	 */
 	public double js_getRestBalance()
 	{
@@ -469,6 +499,8 @@ public class AmortizationCalculation implements IScriptable, IConstantsObject
 	 *
 	 * @sample
 	 * plugins.amortization.getUnknown();
+	 *
+	 * @return the value of the unknown parameter solved during amortization.
 	 */
 	public double js_getUnknown()
 	{
@@ -482,6 +514,8 @@ public class AmortizationCalculation implements IScriptable, IConstantsObject
 	 * var v_period = plugins.amortization.isValidPeriod(12);
 	 *
 	 * @param period
+	 *
+	 * @return true if the specified period is valid, false otherwise.
 	 */
 	public boolean js_isValidPeriod(int period)
 	{
@@ -496,6 +530,8 @@ public class AmortizationCalculation implements IScriptable, IConstantsObject
 	 * var rm = plugins.amortization.roundMoney(34.349384);
 	 *
 	 * @param amount
+	 *
+	 * @return the amount rounded to the nearest cent.
 	 */
 	public double js_roundMoney(double amount)
 	{
@@ -507,6 +543,8 @@ public class AmortizationCalculation implements IScriptable, IConstantsObject
 	 *
 	 * @sample
 	 * plugins.amortization.solveForUnknown();
+	 *
+	 * @return true if the unknown value was successfully solved, false otherwise.
 	 */
 	public boolean js_solveForUnknown()
 	{

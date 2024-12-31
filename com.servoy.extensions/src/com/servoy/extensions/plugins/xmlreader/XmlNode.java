@@ -64,6 +64,8 @@ public class XmlNode implements IScriptable
 	 * Return the name of the XML node element.
 	 *
 	 * @sampleas js_getChildNodes()
+	 *
+	 * @return the name of the XML node element.
 	 */
 	public String js_getName()
 	{
@@ -74,6 +76,8 @@ public class XmlNode implements IScriptable
 	 * Return the type of the XML node element.
 	 *
 	 * @sampleas js_getChildNodes()
+	 *
+	 * @return the type of the XML node element, which can be "TEXT", "ELEMENT", or "UNKNOWN".
 	 */
 	public String js_getType()
 	{
@@ -101,6 +105,8 @@ public class XmlNode implements IScriptable
 	 * Return the text-value of the XML node element.
 	 *
 	 * @sampleas js_getChildNodes()
+	 *
+	 * @return the text value of the XML node element, or null if the node has no text content.
 	 */
 	public String js_getTextValue()
 	{
@@ -122,6 +128,8 @@ public class XmlNode implements IScriptable
 	 * @sampleas js_getAttributeNames()
 	 *
 	 * @param attributeName
+	 *
+	 * @return the value of the specified attribute, or null if the attribute does not exist.
 	 */
 	public String js_getAttributeValue(String attributeName)
 	{
@@ -139,6 +147,8 @@ public class XmlNode implements IScriptable
 	 * application.output(attributes[1])
 	 * val1 = rootNode.getAttributeValue('attr1');
 	 * application.output(val1)
+	 *
+	 * @return an array of attribute names for the current XML node, or an empty array if the node has no attributes.
 	 */
 	public String[] js_getAttributeNames()
 	{
@@ -172,6 +182,8 @@ public class XmlNode implements IScriptable
 	 * application.output(subChilds[0].getName())
 	 * application.output(subChilds[0].getTextValue())
 	 * application.output(subChilds[0].getType())
+	 *
+	 * @return an array of XmlNode objects representing the child nodes of the current XML node, or an empty array if there are no child nodes.
 	 */
 	public XmlNode[] js_getChildNodes()
 	{

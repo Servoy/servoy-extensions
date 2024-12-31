@@ -256,6 +256,8 @@ public class SchedulerProvider implements IScriptable
 	 *
 	 * @sample
 	 * plugins.scheduler.getLastRunJobName();
+	 *
+	 * @return the name of the last job that was run by the scheduler.
 	 */
 	public String js_getLastRunJobName()
 	{
@@ -272,6 +274,8 @@ public class SchedulerProvider implements IScriptable
 	 *
 	 * @sample
 	 * plugins.scheduler.getCurrentJobNames()
+	 *
+	 * @return an array of job names currently scheduled for the client.
 	 */
 	public String[] js_getCurrentJobNames()
 	{
@@ -434,6 +438,8 @@ public class SchedulerProvider implements IScriptable
 	 * plugins.scheduler.removeJob('myjob');
 	 *
 	 * @param jobname
+	 *
+	 * @return true if the job was successfully removed; false otherwise.
 	 */
 	public boolean js_removeJob(String jobname)
 	{

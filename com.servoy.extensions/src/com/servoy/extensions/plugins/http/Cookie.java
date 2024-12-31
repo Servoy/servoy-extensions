@@ -61,6 +61,8 @@ public class Cookie implements IScriptable
 	 * var name = cookie.getName();
 	 *
 	 * @param
+	 *
+	 * @return the name of the cookie, or an empty string if the cookie is null.
 	 */
 	public String js_getName()
 	{
@@ -76,6 +78,8 @@ public class Cookie implements IScriptable
 	 * var value = cookie.getValue();
 	 *
 	 * @param
+	 *
+	 * @return the value of the cookie, or an empty string if the cookie is null.
 	 */
 	public String js_getValue()
 	{
@@ -91,6 +95,8 @@ public class Cookie implements IScriptable
 	 * var domain = cookie.getDomain();
 	 *
 	 * @param
+	 *
+	 * @return the value of the cookie, or an empty string if the cookie is null.
 	 */
 	public String js_getDomain()
 	{
@@ -106,6 +112,8 @@ public class Cookie implements IScriptable
 	 * var path = cookie.getPath();
 	 *
 	 * @param
+	 *
+	 * @return the path of the cookie, or an empty string if the cookie is null.
 	 */
 	public String js_getPath()
 	{
@@ -121,6 +129,8 @@ public class Cookie implements IScriptable
 	 * var path = cookie.getSecure();
 	 *
 	 * @param
+	 *
+	 * @return true if the cookie is marked as secure, false otherwise or if the cookie is null.
 	 */
 	public boolean js_getSecure()
 	{

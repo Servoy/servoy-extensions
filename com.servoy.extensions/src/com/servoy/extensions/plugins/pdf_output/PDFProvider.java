@@ -91,6 +91,8 @@ public class PDFProvider implements IScriptable
 	 * @sample
 	 * //to print current record without printdialog to pdf file in temp dir.
 	 * controller.print(true,false,plugins.pdf_output.getPDFPrinter());
+	 *
+	 * @return a PrinterJob object that can be used in print calls, or the last started meta print job if no filename is specified.
 	 */
 	@ServoyClientSupport(ng = false, wc = true, sc = true)
 	public PrinterJob js_getPDFPrinter()
@@ -106,6 +108,8 @@ public class PDFProvider implements IScriptable
 	 * controller.print(true,false,plugins.pdf_output.getPDFPrinter('c:/temp/out.pdf'));
 	 *
 	 * @param filename the file name
+	 *
+	 * @return a PrinterJob object that generates a PDF into the specified file, or the last started meta print job if no filename is specified.
 	 */
 	@SuppressWarnings("nls")
 	@ServoyClientSupport(ng = false, wc = true, sc = true)
@@ -140,6 +144,8 @@ public class PDFProvider implements IScriptable
 	 * Used for printing multiple things into the same PDF document. Starts a meta print job and all print calls made before ending the meta print job will be done into the same PDF document. The PDF document is stored in memory and can be retrieved when ending the meta print job and can be saved, for example, into a dataprovider.
 	 *
 	 * @sampleas js_endMetaPrintJob()
+	 *
+	 * @return true if the meta print job was successfully started, otherwise false.
 	 */
 	@ServoyClientSupport(ng = false, wc = true, sc = true)
 	public boolean js_startMetaPrintJob()
@@ -153,6 +159,8 @@ public class PDFProvider implements IScriptable
 	 * @sampleas js_endMetaPrintJob()
 	 *
 	 * @param filename the file name
+	 *
+	 * @return true if the meta print job was successfully started, otherwise false.
 	 */
 	@SuppressWarnings("nls")
 	@ServoyClientSupport(ng = false, wc = true, sc = true)
@@ -217,6 +225,8 @@ public class PDFProvider implements IScriptable
 	 * }
 	 * application.output('total printed pages: ' + plugins.pdf_output.getTotalPagesPrinted());
 	 * mediaDataProvider = plugins.pdf_output.endMetaPrintJob()
+	 *
+	 * @return the byte array content of the generated PDF document or null if no meta print job was active.
 	 */
 	@ServoyClientSupport(ng = false, wc = true, sc = true)
 	public byte[] js_endMetaPrintJob()
@@ -246,6 +256,8 @@ public class PDFProvider implements IScriptable
 	 * plugins.pdf_output.insertFontDirectory('/Library/Fonts');
 	 *
 	 * @param path the path to use
+	 *
+	 * @return the number of fonts successfully added from the specified directory, or -1 if no meta print job is active.
 	 */
 	@ServoyClientSupport(ng = false, wc = true, sc = true)
 	public int js_insertFontDirectory(String path)
@@ -266,6 +278,8 @@ public class PDFProvider implements IScriptable
 	 *
 	 * @param pdf_docs_bytearrays  the array of documents to combine
 	 * @param pdf_docs_passwords an array of passwords to use
+	 *
+	 * @return the combined PDF document as a byte array, or null if the input array is empty or invalid.
 	 */
 	@ServoyClientSupport(ng = true, wc = true, sc = true)
 	public byte[] js_combineProtectedPDFDocuments(Object[] pdf_docs_bytearrays, Object[] pdf_docs_passwords)
@@ -349,6 +363,8 @@ public class PDFProvider implements IScriptable
 	 * pdf_blob_column = combinePDFDocuments(new Array(pdf_blob1,pdf_blob2,pdf_blob3));
 	 *
 	 * @param pdf_docs_bytearrays the array of documents to combine
+	 *
+	 * @return the combined PDF document as a byte array, or null if the input array is empty or invalid.
 	 */
 	@ServoyClientSupport(ng = true, wc = true, sc = true)
 	public byte[] js_combinePDFDocuments(Object[] pdf_docs_bytearrays)
@@ -375,6 +391,9 @@ public class PDFProvider implements IScriptable
 	 * @param pdf_password the password to use
 	 * @param field_values the field values to use. If partialFlattening is true, only these fields will be flattened.
 	 * @param partialFlattening if true, only flatten the fields set as values, the rest remain unchanged
+	 *
+	 * @return the flattened PDF document as a byte array, or null in case of an error.
+	 * If partialFlattening is true, only the specified fields are flattened, while others remain interactive.
 	 */
 	@ServoyClientSupport(ng = true, wc = true, sc = true)
 	public byte[] js_convertProtectedPDFFormToPDFDocument(byte[] pdf_form, String pdf_password, Object field_values, boolean partialFlattening)
@@ -489,6 +508,8 @@ public class PDFProvider implements IScriptable
 	 * @param pdf_form the PDF Form to convert
 	 * @param pdf_password the password to use
 	 * @param field_values the field values to use
+	 *
+	 * @return the flattened PDF document as a byte array, or null in case of an error.
 	 */
 	@ServoyClientSupport(ng = true, wc = true, sc = true)
 	public byte[] js_convertProtectedPDFFormToPDFDocument(byte[] pdf_form, String pdf_password, Object field_values)
@@ -513,6 +534,8 @@ public class PDFProvider implements IScriptable
 	 *
 	 * @param pdf_form the PDF Form to convert
 	 * @param field_values the values to use
+	 *
+	 * @return the flattened PDF document as a byte array, or null in case of an error.
 	 */
 	@ServoyClientSupport(ng = true, wc = true, sc = true)
 	public byte[] js_convertPDFFormToPDFDocument(byte[] pdf_form, Object field_values)
@@ -538,6 +561,8 @@ public class PDFProvider implements IScriptable
 	 * @param pdf_form the PDF Form to convert
 	 * @param field_values the values to use. If partialFlattening is true, only these fields will be flattened.
 	 * @param partialFlattening if true, only flatten the fields set as values, the rest remain unchanged
+	 *
+	 * @return the flattened PDF document as a byte array, or null in case of an error.
 	 */
 	@ServoyClientSupport(ng = true, wc = true, sc = true)
 	public byte[] js_convertPDFFormToPDFDocument(byte[] pdf_form, Object field_values, boolean partialFlattening)
@@ -549,6 +574,8 @@ public class PDFProvider implements IScriptable
 	 * Returns the number of pages printed by the last print call done in the context of a meta print job.
 	 *
 	 * @sampleas js_endMetaPrintJob()
+	 *
+	 * @return the number of pages printed by the last print call in the context of a meta print job.
 	 */
 	@ServoyClientSupport(ng = false, wc = true, sc = true)
 	public int js_getPagesPrinted()
@@ -564,6 +591,8 @@ public class PDFProvider implements IScriptable
 	 * Returns the total number of pages printed in the context of a meta print job. Call this method before ending the meta print job.
 	 *
 	 * @sampleas js_endMetaPrintJob()
+	 *
+	 * @return the total number of pages printed during the meta print job.
 	 */
 	@ServoyClientSupport(ng = false, wc = true, sc = true)
 	public int js_getTotalPagesPrinted()

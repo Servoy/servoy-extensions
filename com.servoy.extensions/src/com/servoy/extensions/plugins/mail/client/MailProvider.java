@@ -140,6 +140,8 @@ public class MailProvider implements IReturnedTypesProvider, IScriptable, IJavaS
 	 * @param username
 	 * @param password
 	 * @param leaveMsgsOnServer
+	 *
+	 * @return an array of MailMessage objects representing received mail, or null if an error occurred.
 	 */
 	public MailMessage[] js_receiveMail(String username, String password, Boolean leaveMsgsOnServer)
 	{
@@ -170,6 +172,8 @@ public class MailProvider implements IReturnedTypesProvider, IScriptable, IJavaS
 	 * @param password
 	 * @param leaveMsgsOnServer
 	 * @param receiveMode
+	 *
+	 * @return an array of MailMessage objects representing received mail, or null if an error occurred.
 	 */
 	public MailMessage[] js_receiveMail(String username, String password, Boolean leaveMsgsOnServer, Number receiveMode)
 	{
@@ -202,6 +206,8 @@ public class MailProvider implements IReturnedTypesProvider, IScriptable, IJavaS
 	 * @param leaveMsgsOnServer
 	 * @param receiveMode
 	 * @param onlyReceiveMsgWithSentDate
+	 *
+	 * @return an array of MailMessage objects representing received mail, or null if an error occurred.
 	 */
 	public MailMessage[] js_receiveMail(String username, String password, Boolean leaveMsgsOnServer, Number receiveMode, Date onlyReceiveMsgWithSentDate)
 	{
@@ -249,6 +255,8 @@ public class MailProvider implements IReturnedTypesProvider, IScriptable, IJavaS
 	 * @param receiveMode
 	 * @param onlyReceiveMsgWithSentDate
 	 * @param pop3Host
+	 *
+	 * @return an array of MailMessage objects representing received mail, or null if an error occurred.
 	 */
 	public MailMessage[] js_receiveMail(String username, String password, Boolean leaveMsgsOnServer, Number receiveMode, Date onlyReceiveMsgWithSentDate,
 		String pop3Host)
@@ -294,6 +302,8 @@ public class MailProvider implements IReturnedTypesProvider, IScriptable, IJavaS
 	 * @param receiveMode
 	 * @param onlyReceiveMsgWithSentDate
 	 * @param properties
+	 *
+	 * @return an array of MailMessage objects representing received mail, or null if an error occurred.
 	 */
 	public MailMessage[] js_receiveMail(String username, String password, Boolean leaveMsgsOnServer, Number receiveMode, Date onlyReceiveMsgWithSentDate,
 		String[] properties)
@@ -341,6 +351,8 @@ public class MailProvider implements IReturnedTypesProvider, IScriptable, IJavaS
 	 * application.output(plainArray[0]) //will return 'from_me@example.com'
 	 *
 	 * @param addressesString
+	 *
+	 * @return an array of plain email addresses extracted from the input string, or an empty array if no valid addresses are found.
 	 */
 	public String[] js_getPlainMailAddresses(String addresses)
 	{
@@ -364,6 +376,8 @@ public class MailProvider implements IReturnedTypesProvider, IScriptable, IJavaS
 	 * plugins.mail.isValidEmailAddress("me@example.com");
 	 *
 	 * @param email
+	 *
+	 * @return true if the given email address is valid, false otherwise.
 	 */
 	public boolean js_isValidEmailAddress(String email)
 	{
@@ -397,6 +411,8 @@ public class MailProvider implements IReturnedTypesProvider, IScriptable, IJavaS
 	 * }
 	 *
 	 * @param binaryblob/string
+	 *
+	 * @return a MailMessage object created from the provided binary or string data, or null if an error occurred.
 	 */
 	public MailMessage js_getMailMessage(Object data)
 	{
@@ -445,6 +461,8 @@ public class MailProvider implements IReturnedTypesProvider, IScriptable, IJavaS
 	 *
 	 * @param filename
 	 * @param binarydata
+	 *
+	 * @return an Attachment object created with the specified filename and binary data, or null if the inputs are invalid.
 	 */
 	public Attachment js_createBinaryAttachment(String filename, byte[] binarydata)
 	{
@@ -467,6 +485,8 @@ public class MailProvider implements IReturnedTypesProvider, IScriptable, IJavaS
 	 * @param filename
 	 * @param binarydata
 	 * @param mimeType
+	 *
+	 * @return an Attachment object created with the specified filename, binary data, and MIME type, or null if the inputs are invalid.
 	 */
 	public Attachment js_createBinaryAttachment(String filename, byte[] binarydata, String mimeType)
 	{
@@ -487,6 +507,8 @@ public class MailProvider implements IReturnedTypesProvider, IScriptable, IJavaS
 	 *
 	 * @param filename
 	 * @param textdata
+	 *
+	 * @return an Attachment object created with the specified filename and text data, using the default MIME type of ‘text/plain’, or null if the inputs are invalid.
 	 */
 	public Attachment js_createTextAttachment(String filename, String textdata)
 	{
@@ -508,6 +530,8 @@ public class MailProvider implements IReturnedTypesProvider, IScriptable, IJavaS
 	 * @param filename
 	 * @param textdata
 	 * @param mimeType
+	 *
+	 * @return an Attachment object created with the specified filename, text data, and MIME type, or null if the inputs are invalid.
 	 */
 	public Attachment js_createTextAttachment(String filename, String textdata, String mimeType)
 	{
@@ -531,6 +555,8 @@ public class MailProvider implements IReturnedTypesProvider, IScriptable, IJavaS
 	 * @param from A string containing an address and optional reply addresses, separated by commas.
 	 * @param subject The subject of the mail
 	 * @param msgText The message text
+	 *
+	 * @return true if the email is sent successfully, false otherwise.
 	 */
 	public boolean js_sendMail(String to, String from, String subject, String msgText)
 	{
@@ -554,6 +580,8 @@ public class MailProvider implements IReturnedTypesProvider, IScriptable, IJavaS
 	 * @param subject The subject of the mail
 	 * @param msgText The message text
 	 * @param cc One or more addresses separated by a comma
+	 *
+	 * 	@return true if the email is sent, including to recipients in the “cc” field, or false in case of failure.
 	 */
 	public boolean js_sendMail(String to, String from, String subject, String msgText, String cc)
 	{
@@ -579,6 +607,8 @@ public class MailProvider implements IReturnedTypesProvider, IScriptable, IJavaS
 	 * @param msgText The message text
 	 * @param cc One or more addresses separated by a comma
 	 * @param bcc One or more addresses separated by a comma
+	 *
+	 * @return true if the email is sent successfully, covering both “cc” and “bcc” recipients, or false if an error occurs.
 	 */
 	public boolean js_sendMail(String to, String from, String subject, String msgText, String cc, String bcc)
 	{
@@ -606,6 +636,8 @@ public class MailProvider implements IReturnedTypesProvider, IScriptable, IJavaS
 	 * @param cc One or more addresses separated by a comma
 	 * @param bcc One or more addresses separated by a comma
 	 * @param attachments The attachments
+	 *
+	 * @return true if the email, along with the specified attachments, is sent successfully, or false otherwise.
 	 */
 	public boolean js_sendMail(String to, String from, String subject, String msgText, String cc, String bcc, Attachment[] attachments)
 	{
@@ -639,6 +671,8 @@ public class MailProvider implements IReturnedTypesProvider, IScriptable, IJavaS
 	 * @param bcc One or more addresses separated by a comma
 	 * @param attachments The attachments
 	 * @param overrideProperties An array of properties
+	 *
+	 * @return true if the email is dispatched with the specified attachments and overridden properties, or false if sending fails.
 	 */
 	public boolean js_sendMail(String to, String from, String subject, String msgText, String cc, String bcc, Attachment[] attachments,
 		String[] overrideProperties)
@@ -669,6 +703,8 @@ public class MailProvider implements IReturnedTypesProvider, IScriptable, IJavaS
 	 * @param bcc One or more addresses separated by a comma
 	 * @param attachments The attachments
 	 * @param smtpHost The smtp host
+	 *
+	 * @return true if the email is dispatched with the specified attachments and overridden properties, or false if sending fails.
 	 */
 	public boolean js_sendMail(String to, String from, String subject, String msgText, String cc, String bcc, Attachment[] attachments, String smtpHost)
 	{
@@ -695,6 +731,8 @@ public class MailProvider implements IReturnedTypesProvider, IScriptable, IJavaS
 	 * @param cc One or more addresses separated by a comma
 	 * @param bcc One or more addresses separated by a comma
 	 * @param attachment A single attachment
+	 *
+	 * @return true if the email containing the single specified attachment is sent successfully, or false otherwise.
 	 */
 	public boolean js_sendMail(String to, String from, String subject, String msgText, String cc, String bcc, Attachment attachment)
 	{
@@ -726,6 +764,8 @@ public class MailProvider implements IReturnedTypesProvider, IScriptable, IJavaS
 	 * @param bcc One or more addresses separated by a comma
 	 * @param attachment A single attachment
 	 * @param overrideProperties An array of properties
+	 *
+	 * @return true if the email containing the single specified attachment is sent successfully, or false otherwise.
 	 */
 	public boolean js_sendMail(String to, String from, String subject, String msgText, String cc, String bcc, Attachment attachment,
 		String[] overrideProperties)
@@ -755,6 +795,8 @@ public class MailProvider implements IReturnedTypesProvider, IScriptable, IJavaS
 	 * @param bcc One or more addresses separated by a comma
 	 * @param attachment A single attachment
 	 * @param smtpHost The smtp host
+	 *
+	 * @return true if the email containing the single specified attachment is sent successfully, or false otherwise.
 	 */
 	public boolean js_sendMail(String to, String from, String subject, String msgText, String cc, String bcc, Attachment attachment, String smtpHost)
 	{
@@ -777,6 +819,8 @@ public class MailProvider implements IReturnedTypesProvider, IScriptable, IJavaS
 	 * @param from A string containing an address and optional reply addresses, separated by commas.
 	 * @param subject The subject of the bulk mail
 	 * @param msgText The message text
+	 *
+	 * @return true if the bulk email is successfully sent to all specified recipients, or false if an error occurs.
 	 */
 	public boolean js_sendBulkMail(String to, String from, String subject, String msgText)
 	{
@@ -800,6 +844,8 @@ public class MailProvider implements IReturnedTypesProvider, IScriptable, IJavaS
 	 * @param subject The subject of the bulk mail
 	 * @param msgText The message text
 	 * @param cc One or more addresses separated by a comma
+	 *
+	 * @return true if the bulk email, including “cc” recipients, is sent successfully, or false otherwise.
 	 */
 	public boolean js_sendBulkMail(String to, String from, String subject, String msgText, String cc)
 	{
@@ -825,6 +871,8 @@ public class MailProvider implements IReturnedTypesProvider, IScriptable, IJavaS
 	 * @param msgText The message text
 	 * @param cc One or more addresses separated by a comma
 	 * @param bcc One or more addresses separated by a comma
+	 *
+	 * @return true if the bulk email is delivered successfully to all specified recipients, including “cc” and “bcc”, or false in case of failure.
 	 */
 	public boolean js_sendBulkMail(String to, String from, String subject, String msgText, String cc, String bcc)
 	{
@@ -852,6 +900,8 @@ public class MailProvider implements IReturnedTypesProvider, IScriptable, IJavaS
 	 * @param cc One or more addresses separated by a comma
 	 * @param bcc One or more addresses separated by a comma
 	 * @param attachments The attachments
+	 *
+	 * @return true if the bulk email with the specified attachments is sent without issues, or false otherwise.
 	 */
 	public boolean js_sendBulkMail(String to, String from, String subject, String msgText, String cc, String bcc, Attachment[] attachments)
 	{
@@ -951,6 +1001,8 @@ public class MailProvider implements IReturnedTypesProvider, IScriptable, IJavaS
 	 * @param bcc One or more addresses separated by a comma
 	 * @param attachments The attachments
 	 * @param smtpHost The smtp host
+	 *
+	 * @return true if the bulk email with the specified attachments is sent without issues, or false otherwise.
 	 */
 	public boolean js_sendBulkMail(String to, String from, String subject, String msgText, String cc, String bcc, Attachment[] attachments, String smtpHost)
 	{
@@ -977,6 +1029,8 @@ public class MailProvider implements IReturnedTypesProvider, IScriptable, IJavaS
 	 * @param cc One or more addresses separated by a comma
 	 * @param bcc One or more addresses separated by a comma
 	 * @param attachment A single attachment
+	 *
+	 * @return true if the bulk email with the specified attachment is sent without issues, or false otherwise.
 	 */
 	public boolean js_sendBulkMail(String to, String from, String subject, String msgText, String cc, String bcc, Attachment attachment)
 	{
@@ -1008,6 +1062,8 @@ public class MailProvider implements IReturnedTypesProvider, IScriptable, IJavaS
 	 * @param bcc One or more addresses separated by a comma
 	 * @param attachment A single attachment
 	 * @param overrideProperties An array of properties
+	 *
+	 * @return true if the bulk email with the specified attachment is sent without issues, or false otherwise.
 	 */
 	public boolean js_sendBulkMail(String to, String from, String subject, String msgText, String cc, String bcc, Attachment attachment,
 		String[] overrideProperties)
@@ -1037,6 +1093,8 @@ public class MailProvider implements IReturnedTypesProvider, IScriptable, IJavaS
 	 * @param bcc One or more addresses separated by a comma
 	 * @param attachment A single attachment
 	 * @param smtpHost The smtp host
+	 *
+	 * @return true if the bulk email with the specified attachment is sent without issues, or false otherwise.
 	 */
 	public boolean js_sendBulkMail(String to, String from, String subject, String msgText, String cc, String bcc, Attachment attachment, String smtpHost)
 	{
