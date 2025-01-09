@@ -971,6 +971,8 @@ public class MailProvider implements IReturnedTypesProvider, IScriptable, IJavaS
 	 * @param bcc One or more addresses separated by a comma
 	 * @param attachments The attachments
 	 * @param overrideProperties An array of properties
+	 *
+	 * @return true if the bulk mail was successfully sent, false otherwise.
 	 */
 	public boolean js_sendBulkMail(String to, String from, String subject, String msgText, String cc, String bcc, Attachment[] attachments,
 		String[] overrideProperties)
@@ -1223,6 +1225,8 @@ public class MailProvider implements IReturnedTypesProvider, IScriptable, IJavaS
 	 * {
 	 * 	plugins.dialogs.showWarningDialog('Alert',plugins.mail.getLastSendMailExceptionMsg(),'OK');
 	 * }
+	 *
+	 * @return The exception message from the last sendMail attempt, or null if no exception occurred.
 	 */
 	public String js_getLastSendMailExceptionMsg()
 	{

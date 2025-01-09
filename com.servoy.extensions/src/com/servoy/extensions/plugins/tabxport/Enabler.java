@@ -170,6 +170,8 @@ public class Enabler implements IReturnedTypesProvider, IScriptable
 	 * @param foundSet the foundset to export with
 	 * @param dataProviderIds the ids of the dataproviders
 	 * @param separator the separator of the data
+	 *
+	 * @return A string containing the exported data in the specified text-separated format.
 	 */
 	@ServoyClientSupport(ng = true, wc = true, sc = true)
 	public String js_textExport(IFoundSet foundSet, String[] dataProviderIds, String separator)

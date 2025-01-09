@@ -64,6 +64,8 @@ public class ClientManagerProvider implements IScriptable, IReturnedTypesProvide
 	 * 	application.output("Server is in maintenance mode.");
 	 * else
 	 * 	application.output("Server is not in maintenance mode.");
+	 *
+	 * @return true if the server is in maintenance mode, false otherwise.
 	 */
 	public boolean js_isInMaintenanceMode()
 	{
@@ -399,6 +401,8 @@ public class ClientManagerProvider implements IScriptable, IReturnedTypesProvide
 	 *
 	 *	@sample
 	 * 	var locks = plugins.clientmanager.getLocks();
+	 *
+	 * @return A dataset containing all locks on the server, with columns for datasource, acquireDate, clientId, and pkHash.
 	 */
 	public JSDataSet js_getLocks()
 	{

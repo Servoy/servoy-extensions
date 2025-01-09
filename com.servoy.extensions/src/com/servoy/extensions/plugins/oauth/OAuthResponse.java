@@ -50,18 +50,30 @@ public class OAuthResponse implements IJavaScriptType, IScriptable
 		this.response = response;
 	}
 
+	/**
+	 * @return The HTTP status code of the OAuth response.
+	 */
 	@JSFunction
 	public int getCode()
 	{
 		return response.getCode();
 	}
 
+	/**
+	 *
+	 * @param name
+	 * @return The value of the specified header, or null if the header is not present.
+	 */
 	@JSFunction
 	public String getHeader(String name)
 	{
 		return response.getHeader(name);
 	}
 
+	/**
+	 *
+	 * @return An array of all header names in the OAuth response.
+	 */
 	@JSFunction
 	public String[] getHeaders()
 	{

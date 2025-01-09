@@ -266,6 +266,8 @@ public class BaseEntityEnclosingRequest extends BaseRequest
 	 * @param parameterName
 	 * @param fileName
 	 * @param fileLocation
+	 *
+	 * @return true if the file was successfully added to the request, false otherwise.
 	 */
 	public boolean js_addFile(String parameterName, String fileName, String fileLocation)
 	{
@@ -302,6 +304,8 @@ public class BaseEntityEnclosingRequest extends BaseRequest
 	 * @param fileName
 	 * @param fileLocation
 	 * @param mimeType The mime type that must be used could be the real default ('application/octet-stream') if the files one (by name or by its first bytes) is not good.
+	 *
+	 * @return true if the file with the specified mime type was successfully added, false otherwise.
 	 */
 	public boolean js_addFile(String parameterName, String fileName, String fileLocation, String mimeType)
 	{
@@ -335,6 +339,8 @@ public class BaseEntityEnclosingRequest extends BaseRequest
 	 *
 	 * @param parameterName
 	 * @param jsFile
+	 *
+	 * @return true if the JSFile was successfully added to the request, false otherwise.
 	 */
 	public boolean js_addFile(String parameterName, Object jsFile)
 	{
@@ -366,6 +372,8 @@ public class BaseEntityEnclosingRequest extends BaseRequest
 	 * @param parameterName
 	 * @param jsFile
 	 * @param mimeType The mime type that must be used could be the real default ('application/octet-stream') if the files one (by name or by its first bytes) is not good.
+	 *
+	 * @return true if the JSFile with the specified mime type was successfully added, false otherwise.
 	 */
 	public boolean js_addFile(String parameterName, Object jsFile, String mimeType)
 	{
@@ -397,6 +405,8 @@ public class BaseEntityEnclosingRequest extends BaseRequest
 	 * @param parameterName
 	 * @param fileName
 	 * @param jsFile
+	 *
+	 * @return true if the specified file was successfully added to the request, false otherwise.
 	 */
 	public boolean js_addFile(String parameterName, String fileName, Object jsFile)
 	{
@@ -429,6 +439,8 @@ public class BaseEntityEnclosingRequest extends BaseRequest
 	 * @param fileName
 	 * @param jsFile
 	 * @param mimeType The mime type that must be used could be the real default ('application/octet-stream') if the files one (by name or by its first bytes) is not good.
+	 *
+	 * @return true if the file with the given parameters and mime type was successfully added, false otherwise.
 	 */
 	public boolean js_addFile(String parameterName, String fileName, Object jsFile, String mimeType)
 	{
@@ -451,6 +463,8 @@ public class BaseEntityEnclosingRequest extends BaseRequest
 	 *
 	 * @param name
 	 * @param value
+	 *
+	 * @return true if the parameter was successfully added, false otherwise.
 	 */
 	public boolean js_addParameter(String name, String value)
 	{
@@ -485,6 +499,8 @@ public class BaseEntityEnclosingRequest extends BaseRequest
 	 * @param name
 	 * @param value
 	 * @param mimeType
+	 *
+	 * @return true if the parameter with the specified mime type was successfully added, false otherwise.
 	 */
 	public boolean js_addParameter(String name, String value, String mimeType)
 	{

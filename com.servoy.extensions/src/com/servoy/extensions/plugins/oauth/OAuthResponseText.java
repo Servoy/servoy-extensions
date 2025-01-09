@@ -57,6 +57,10 @@ public class OAuthResponseText extends OAuthResponse implements IJavaScriptType,
 		super(response);
 	}
 
+	/**
+	 *
+	 * @return The response body as a string, or null if an error occurs while reading it.
+	 */
 	@JSFunction
 	public String getBody()
 	{

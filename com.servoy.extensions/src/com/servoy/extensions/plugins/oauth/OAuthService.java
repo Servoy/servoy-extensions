@@ -84,6 +84,10 @@ public class OAuthService implements IScriptable, IJavaScriptType
 		this.state = state;
 	}
 
+	/**
+	 *
+	 * @return The authorization URL for initiating the OAuth flow.
+	 */
 	@JSFunction
 	public String getAuthorizationURL()
 	{

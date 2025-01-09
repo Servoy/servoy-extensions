@@ -59,6 +59,8 @@ public class RestWSClientProvider implements IScriptable
 	/**
 	 *  Check whether the client is currently running a REST-WS request.
 	 *  If false, the rest-ws client-plugin features are not available.
+	 *
+	 *  @return true if the client is currently handling a REST-WS request, false otherwise.
 	 */
 	@JSFunction
 	public boolean isRunningRequest()
@@ -69,6 +71,8 @@ public class RestWSClientProvider implements IScriptable
 	/**
 	 *  Get the currently running REST-WS request.
 	 *  If the client is not currently running in REST-WS, an exception is thrown.
+	 *
+	 *  @return The currently active REST-WS request as a `WsRequest` object.
 	 */
 	@JSFunction
 	public WsRequest getRequest()
@@ -83,6 +87,8 @@ public class RestWSClientProvider implements IScriptable
 	 * @sample
 	 * var response = plugins.rest_ws.getResponse();
 	 * resp.setHeader("My-Custom-Header", "42");
+	 *
+	 * @return The response associated with the currently active REST-WS request as a `WsResponse` object.
 	 */
 	@JSFunction
 	public WsResponse getResponse()
@@ -102,6 +108,8 @@ public class RestWSClientProvider implements IScriptable
 	 *
 	 * @param name The name of the cookie
 	 * @param value The value of the cookie
+	 *
+	 * @return A `WsCookie` object representing the created HTTP cookie.
 	 */
 	@JSFunction
 	public WsCookie createCookie(String name, String value)

@@ -2113,6 +2113,8 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 * @sample
 	 * var dir = plugins.file.showDirectorySelectDialog();
 	 * application.output("you've selected folder: " + dir.getAbsolutePath());
+	 *
+	 * @return A `JSFile` object representing the selected directory, or null if no directory was selected.
 	 */
 	@ServoyClientSupport(ng = false, wc = false, sc = true)
 	public JSFile js_showDirectorySelectDialog()
