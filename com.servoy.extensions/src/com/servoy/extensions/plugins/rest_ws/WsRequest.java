@@ -82,6 +82,8 @@ public class WsRequest implements IScriptable, IJavaScriptType
 	 * var header = request.getHeader('');
 	 *
 	 * @param name The name of the header to get
+	 *
+	 * @return The value of the specified request header as a String, or null if the header is not present.
 	 */
 	@JSFunction
 	public String getHeader(String name)
@@ -354,7 +356,7 @@ public class WsRequest implements IScriptable, IJavaScriptType
 	 *
 	 * Returns well-formed IETF BCP 47 language tags representing
 	 * the locales.
-	
+
 	 * @return an array of preferred
 	 * <code>Locale</code> objects for the client
 	 */

@@ -96,6 +96,8 @@ public abstract class BaseRequest implements IScriptable, IJavaScriptType
 	 *
 	 * @param headerName
 	 * @param value
+	 *
+	 * @return A boolean indicating whether the header was successfully added to the request.
 	 */
 	public boolean js_addHeader(String headerName, String value)
 	{
@@ -130,6 +132,8 @@ public abstract class BaseRequest implements IScriptable, IJavaScriptType
 	 *
 	 * response.close()
 	 *
+	 * @return A Response object containing the result of the executed HTTP request.
+	 *
 	 */
 	public Response js_executeRequest()
 	{
@@ -142,6 +146,8 @@ public abstract class BaseRequest implements IScriptable, IJavaScriptType
 	 *
 	 * @param userName the user name
 	 * @param password the password
+	 *
+	 * @return A Response object containing the result of the HTTP request, authenticated with the provided username and password.
 	 */
 	public Response js_executeRequest(String userName, String password)
 	{
@@ -165,6 +171,8 @@ public abstract class BaseRequest implements IScriptable, IJavaScriptType
 	 * @param password the password
 	 * @param workstation The workstation the authentication request is originating from.
 	 * @param domain The domain to authenticate within.
+	 *
+	 * @return A Response object containing the result of the HTTP request, authenticated using Windows authentication with the provided credentials.
 	 */
 	public Response js_executeRequest(String userName, String password, String workstation, String domain)
 	{
@@ -184,6 +192,7 @@ public abstract class BaseRequest implements IScriptable, IJavaScriptType
 	 * the client - useful when uploading files, as some http servers would cancel the first request from the client, if too big,
 	 * as the authentication request to the client was not yet sent)
 	 * @param b
+	 *
 	 */
 	public void js_usePreemptiveAuthentication(boolean b)
 	{
