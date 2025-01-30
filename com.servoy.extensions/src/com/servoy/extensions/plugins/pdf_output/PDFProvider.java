@@ -308,12 +308,12 @@ public class PDFProvider implements IScriptable
 				reader.consolidateNamedDestinations();
 				// we retrieve the total number of pages
 				int n = reader.getNumberOfPages();
-				List bookmarks = SimpleBookmark.getBookmark(reader);
+				List<Map<String, Object>> bookmarks = SimpleBookmark.getBookmarkList(reader);
 				if (bookmarks != null)
 				{
 					if (pageOffset != 0)
 					{
-						SimpleBookmark.shiftPageNumbers(bookmarks, pageOffset, null);
+						SimpleBookmark.shiftPageNumbersInRange(bookmarks, pageOffset, null);
 					}
 					master.addAll(bookmarks);
 				}
@@ -413,7 +413,7 @@ public class PDFProvider implements IScriptable
 					form.setFields(fdf);
 					if (partialFlattening)
 					{
-						fieldNames.addAll(fdf.getFields().keySet());
+						fieldNames.addAll(fdf.getAllFields().keySet());
 					}
 				}
 				else if (field_values instanceof byte[])
@@ -422,7 +422,7 @@ public class PDFProvider implements IScriptable
 					form.setFields(fdf);
 					if (partialFlattening)
 					{
-						fieldNames.addAll(fdf.getFields().keySet());
+						fieldNames.addAll(fdf.getAllFields().keySet());
 					}
 				}
 				else if (field_values instanceof Object[])

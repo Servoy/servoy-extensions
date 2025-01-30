@@ -314,13 +314,13 @@ public class ITextTools
 	 * @throws DocumentException
 	 * @throws IOException
 	 */
-	public static byte[] addMetaData(InputStream inputStream, Map< ? , ? > metaData) throws DocumentException, IOException
+	public static byte[] addMetaData(InputStream inputStream, Map<String, String> metaData) throws DocumentException, IOException
 	{
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 		PdfStamper stamp = new PdfStamper(new PdfReader(inputStream), outputStream);
 		try
 		{
-			stamp.setMoreInfo((HashMap< ? , ? >)metaData);
+			stamp.setInfoDictionary(metaData);
 		}
 		finally
 		{
