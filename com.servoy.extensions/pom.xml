@@ -23,29 +23,33 @@
         <workspace_dir>${project.basedir}/../</workspace_dir>
         <servoy-local.url>${project.baseUri}/target/repository/</servoy-local.url>
         <scribejava.version>8.3.3</scribejava.version>
-        <amqp.version>5.22.0</amqp.version>
+        <amqp.version>5.24.0</amqp.version>
         <doc.version>1.7.0</doc.version>
-        <commons.io.version>2.17.0</commons.io.version>
-        <httpclient.version>5.3.1</httpclient.version>
+        <commons.io.version>2.18.0</commons.io.version>
+	<commons.pool.version>2.12.1</commons.pool.version>
+	<commons.text.version>1.13.0</commons.text.version>
+	<httpclient.version>5.3.1</httpclient.version>
         <httpcore.version>5.2.5</httpcore.version>
-        <pdfbox.version>3.0.3</pdfbox.version>
-        <fontbox.version>3.0.3</fontbox.version>
-        <jwt.version>4.4.0</jwt.version>
-        <fasterxml.version>2.17.2</fasterxml.version>
+        <pdfbox.version>3.0.4</pdfbox.version>
+        <fontbox.version>3.0.4</fontbox.version>
+        <jwt.version>4.5.0</jwt.version>
+        <fasterxml.version>2.18.2</fasterxml.version>
         <jwks.version>0.22.1</jwks.version>
         <metadataextractor.version>2.19.0</metadataextractor.version>
-        <bouncy.version>1.78.1</bouncy.version>
+        <bouncy.version>1.80</bouncy.version>
         <xmpcore.version>6.1.11</xmpcore.version>
         <rhino.version>1.7.15.s3</rhino.version>
         <tsaUrl>http://timestamp.digicert.com</tsaUrl>
         <jbpm.version>7.74.1.Final</jbpm.version>
         <!--  This has to be in sync with jasperreports version  -->
-        <poi.version>5.3.0</poi.version>
+        <poi.version>5.4.0</poi.version>
         <curvesapi.version>1.08</curvesapi.version>
-        <xmlbeans.version>5.2.1</xmlbeans.version>
+        <xmlbeans.version>5.3.0</xmlbeans.version>
         <!--  Poi dependencies  -->
         <math3.version>3.6.1</math3.version>
         <sparsebitset.version>1.3</sparsebitset.version>
+	<quartz.version>2.5.0</quartz.version>
+
     </properties>
     <profiles>
         <profile>
@@ -2443,7 +2447,7 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-pool2</artifactId>
-            <version>2.12.0</version>
+            <version>${commons.pool.version}</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/commons-io/commons-io -->
         <dependency>
@@ -2475,7 +2479,7 @@
         <dependency>
             <groupId>org.quartz-scheduler</groupId>
             <artifactId>quartz</artifactId>
-            <version>2.3.2</version>
+            <version>${quartz.version}</version>
         </dependency>
         <dependency>
             <groupId>com.servoy</groupId>
@@ -2639,7 +2643,7 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-text</artifactId>
-            <version>1.12.0</version>
+            <version>${commons.text.version}</version>
         </dependency>
         <dependency>
     		<groupId>org.jbpm</groupId>
