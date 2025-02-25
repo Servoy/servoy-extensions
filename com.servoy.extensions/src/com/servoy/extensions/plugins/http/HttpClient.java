@@ -30,7 +30,11 @@ import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.sql.Date;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.KeyManagerFactory;
@@ -64,10 +68,13 @@ import org.apache.hc.core5.ssl.SSLContexts;
 import org.apache.hc.core5.ssl.TrustStrategy;
 import org.apache.hc.core5.util.TimeValue;
 import org.apache.hc.core5.util.Timeout;
+import org.mozilla.javascript.NativePromise;
+import org.mozilla.javascript.annotations.JSFunction;
 
 import com.servoy.j2db.documentation.ServoyDocumented;
 import com.servoy.j2db.plugins.IClientPluginAccess;
 import com.servoy.j2db.plugins.ISmartRuntimeWindow;
+import com.servoy.j2db.scripting.Deferred;
 import com.servoy.j2db.scripting.IJavaScriptType;
 import com.servoy.j2db.scripting.IScriptable;
 import com.servoy.j2db.util.Debug;
@@ -477,6 +484,57 @@ public class HttpClient implements IScriptable, IJavaScriptType
 			cookieObjects[i] = new Cookie(cookies.get(i));
 		}
 		return cookieObjects;
+	}
+
+	/**
+	 * Execute multiple requests asynchronously.
+	 * A Promise is returned that resolves with an array of Response objects when all requests are complete in the same order as the Request objects.
+	 *
+	 * @param requests
+	 * @return
+	 */
+	@JSFunction
+	public NativePromise execute(BaseRequest[] requests)
+	{
+		Deferred deferred = new Deferred(httpPlugin.getClientPluginAccess());
+
+		httpPlugin.getClientPluginAccess().getExecutor().execute(() -> {
+			List<Future<FileOrTextHttpResponse>> responses = new ArrayList<>(requests.length);
+
+			for (BaseRequest request : requests)
+			{
+				try
+				{
+					responses.add(request.executeRequest(null, null, null, null, false, null, null, null));
+
+				}
+				catch (Exception e)
+				{
+					deferred.reject(e.getMessage());
+				}
+			}
+
+			List<Response> results = new ArrayList<>(requests.length);
+			for (int i = 0; i < responses.size(); i++)
+			{
+				try
+				{
+					FileOrTextHttpResponse baseRequest = responses.get(i).get();
+					results.add(new Response(baseRequest, requests[i].getMethod()));
+				}
+				catch (ExecutionException | InterruptedException ee)
+				{
+					results.add(new Response(ee.getMessage()));
+				}
+				catch (CancellationException ce)
+				{
+					results.add(new Response("Request was cancelled"));
+				}
+			}
+			deferred.resolve(results.toArray());
+		});
+		return deferred.getPromise();
+
 	}
 
 	/**

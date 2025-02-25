@@ -21,6 +21,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
@@ -86,6 +87,12 @@ public abstract class BaseRequest implements IScriptable, IJavaScriptType
 		this.httpPlugin = httpPlugin;
 		this.requestConfigBuilder = requestConfigBuilder;
 		this.proxyCredentialsProvider = proxyCredentialsProvider;
+	}
+
+
+	HttpUriRequestBase getMethod()
+	{
+		return method;
 	}
 
 	/**
@@ -207,6 +214,48 @@ public abstract class BaseRequest implements IScriptable, IJavaScriptType
 	private Response executeRequest(String userName, String password, String workstation, String domain, boolean windowsAuthentication,
 		FunctionDefinition successFunctionDef, FunctionDefinition errorFunctionDef, Object[] callbackArgs, boolean waitForResult) throws Exception
 	{
+		final Future<FileOrTextHttpResponse> future = executeRequest(userName, password, workstation, domain, windowsAuthentication, successFunctionDef,
+			errorFunctionDef, callbackArgs);
+		if (waitForResult)
+		{
+			try
+			{
+				FileOrTextHttpResponse response = future.get();
+				return new Response(processResponse(response), method);
+
+			}
+			catch (ExecutionException ee)
+			{
+				return new Response(ee.getMessage());
+			}
+			catch (CancellationException ce)
+			{
+				return new Response("Request was cancelled");
+			}
+			catch (Exception ex)
+			{
+				logError(ex, userName, workstation, domain);
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * @param userName
+	 * @param password
+	 * @param workstation
+	 * @param domain
+	 * @param windowsAuthentication
+	 * @param successFunctionDef
+	 * @param errorFunctionDef
+	 * @param callbackArgs
+	 * @return
+	 * @throws MalformedURLException
+	 * @throws Exception
+	 */
+	Future<FileOrTextHttpResponse> executeRequest(String userName, String password, String workstation, String domain, boolean windowsAuthentication,
+		FunctionDefinition successFunctionDef, FunctionDefinition errorFunctionDef, Object[] callbackArgs) throws MalformedURLException, Exception
+	{
 		HttpClientContext context = null;
 
 		boolean acceptEncodingAdded = false;
@@ -311,28 +360,7 @@ public abstract class BaseRequest implements IScriptable, IJavaScriptType
 				}
 
 			});
-		if (waitForResult)
-		{
-			try
-			{
-				FileOrTextHttpResponse response = future.get();
-				return new Response(processResponse(response), method);
-
-			}
-			catch (ExecutionException ee)
-			{
-				return new Response(ee.getMessage());
-			}
-			catch (CancellationException ce)
-			{
-				return new Response("Request was cancelled");
-			}
-			catch (Exception ex)
-			{
-				logError(ex, userName, workstation, domain);
-			}
-		}
-		return null;
+		return future;
 	}
 
 	private FileOrTextHttpResponse processResponse(FileOrTextHttpResponse response)
