@@ -41,8 +41,11 @@ import org.apache.hc.core5.http.HttpHost;
 import org.apache.hc.core5.http.nio.AsyncEntityProducer;
 import org.apache.hc.core5.http.nio.support.BasicRequestProducer;
 import org.mozilla.javascript.Function;
+import org.mozilla.javascript.NativePromise;
+import org.mozilla.javascript.annotations.JSFunction;
 
 import com.servoy.j2db.plugins.IClientPluginAccess;
+import com.servoy.j2db.scripting.Deferred;
 import com.servoy.j2db.scripting.FunctionDefinition;
 import com.servoy.j2db.scripting.IJavaScriptType;
 import com.servoy.j2db.scripting.IScriptable;
@@ -376,6 +379,76 @@ public abstract class BaseRequest implements IScriptable, IJavaScriptType
 	}
 
 	/**
+	 * Execute the request method asynchronous a Promise is returned which will be resolved or rejected when the request is completed or failed.
+	 *
+	 * This Response can be a response with a different status code then just 200, it could also be 500, which is still a valid response from the server.
+	 * So you need to test the Reponse.getStatusCode() for that to know if everything did go OK.
+	 * If no response is received (request errors out), the Promise is rejected with exception message as the value.
+	 *
+	 * You can use Promise.all([promise1, promise2, promise3]) to wait for multiple promises to complete.
+	 * A shortcut for this would be to use httpClient.executeRequest(requestArray) that returns 1 promise that is called when all of them are done.
+	 *
+	 * @sample
+	 * request.executeAsyncRequest().then(response => { // handle the response }).catch(errorMessage => { // handle the error });})
+	 *
+	 */
+	@JSFunction
+	public NativePromise executeAsyncRequest()
+	{
+		return executeAsyncRequest(null, null, null, null);
+	}
+
+	/**
+	 * @clonedesc executeAsyncRequest()
+	 * @sampleas executeAsyncRequest()
+	 *
+	 * @param username the user name
+	 * @param password the password
+	 */
+	@JSFunction
+	public NativePromise executeAsyncRequest(final String username, final String password)
+	{
+		return executeAsyncRequest(username, password, null, null);
+	}
+
+	/**
+	 * @clonedesc executeAsyncRequest()
+	 * @sampleas executeAsyncRequest()
+	 *
+	 * @param username the user name
+	 * @param password the password
+	 * @param workstation The workstation the authentication request is originating from.
+	 * @param domain The domain to authenticate within.
+	 */
+	@JSFunction
+	public NativePromise executeAsyncRequest(final String username, final String password, final String workstation, final String domain)
+	{
+		Deferred deferred = new Deferred(httpPlugin.getClientPluginAccess());
+
+		httpPlugin.getClientPluginAccess().getExecutor().execute(() -> {
+			try
+			{
+				Future<FileOrTextHttpResponse> future = executeRequest(username, password, workstation, domain, workstation != null, null, null, null);
+				FileOrTextHttpResponse response = future.get();
+				deferred.resolve(new Response(response, method));
+			}
+			catch (ExecutionException ee)
+			{
+				deferred.reject(new Response(ee.getMessage()));
+			}
+			catch (CancellationException ce)
+			{
+				deferred.reject((new Response("Request was cancelled")));
+			}
+			catch (Exception ex)
+			{
+				deferred.reject(new Response(ex.getMessage()));
+			}
+		});
+		return deferred.getPromise();
+	}
+
+	/**
 	 * @clonedesc js_executeAsyncRequest(Function,Function)
 	 * @sampleas js_executeAsyncRequest(Function,Function)
 	 *
@@ -384,7 +457,6 @@ public abstract class BaseRequest implements IScriptable, IJavaScriptType
 	 * @param successCallbackMethod callbackMethod to be called after response is received
 	 * @param errorCallbackMethod callbackMethod to be called if request errors out
 	 */
-
 	public void js_executeAsyncRequest(final String username, final String password, Function successCallbackMethod, Function errorCallbackMethod)
 	{
 		executeAsyncRequest(username, password, null, null, successCallbackMethod, errorCallbackMethod, false, null);
@@ -465,7 +537,6 @@ public abstract class BaseRequest implements IScriptable, IJavaScriptType
 	 * @param callbackExtraArgs extra arguments that will be passed to the callback methods; can be used to identify from which request the response arrived when
 	 * using the same callback method for multiple requests. Please use only simple JSON arguments (primitive types or array/objects of primitive types)
 	 */
-
 	public void js_executeAsyncRequest(final String username, final String password, final String workstation, final String domain,
 		Function successCallbackMethod, Function errorCallbackMethod, final Object[] callbackExtraArgs)
 	{

@@ -487,30 +487,41 @@ public class HttpClient implements IScriptable, IJavaScriptType
 	}
 
 	/**
-	 * Execute multiple requests asynchronously.
+	 * Execute multiple requests asynchronously, it assumes that all request are to the same server (it gives the same username, password, workstation and domain to all requests).
+	 *
 	 * A Promise is returned that resolves with an array of Response objects when all requests are complete in the same order as the Request objects.
+	 * Because some request can fail and others can just work, this promise will always just resolve (not reject) with response object having the message of the error or the actual normal response.
+	 *
+	 * BaseRequest[] request
 	 *
 	 * @param requests
+	 * @param username the user name
+	 * @param password the password
+	 * @param workstation The workstation the authentication request is originating from.
+	 * @param domain The domain to authenticate within.
+	 *
 	 * @return The promise object that resolves with an array of Response objects when all requests are complete in the same order as the Request objects.
 	 */
 	@JSFunction
-	public NativePromise execute(BaseRequest[] requests)
+	public NativePromise executeRequest(final BaseRequest[] requests, final String username, final String password, final String workstation,
+		final String domain)
 	{
+
 		Deferred deferred = new Deferred(httpPlugin.getClientPluginAccess());
 
 		httpPlugin.getClientPluginAccess().getExecutor().execute(() -> {
-			List<Future<FileOrTextHttpResponse>> responses = new ArrayList<>(requests.length);
+			List<Object> responses = new ArrayList<>(requests.length);
 
 			for (BaseRequest request : requests)
 			{
 				try
 				{
-					responses.add(request.executeRequest(null, null, null, null, false, null, null, null));
+					responses.add(request.executeRequest(username, password, workstation, domain, workstation != null, null, null, null));
 
 				}
 				catch (Exception e)
 				{
-					deferred.reject(e.getMessage());
+					responses.add(e);
 				}
 			}
 
@@ -519,8 +530,16 @@ public class HttpClient implements IScriptable, IJavaScriptType
 			{
 				try
 				{
-					FileOrTextHttpResponse baseRequest = responses.get(i).get();
-					results.add(new Response(baseRequest, requests[i].getMethod()));
+					Object object = responses.get(i);
+					if (object instanceof Future future)
+					{
+						FileOrTextHttpResponse baseRequest = (FileOrTextHttpResponse)future.get();
+						results.add(new Response(baseRequest, requests[i].getMethod()));
+					}
+					else if (object instanceof Exception e)
+					{
+						results.add(new Response(e.getMessage()));
+					}
 				}
 				catch (ExecutionException | InterruptedException ee)
 				{
@@ -535,6 +554,58 @@ public class HttpClient implements IScriptable, IJavaScriptType
 		});
 		return deferred.getPromise();
 
+
+	}
+
+	/**
+	 * Execute multiple requests asynchronously, it assumes that all request are to the same server (it gives the same username, password to all requests).
+	 *
+	 * A Promise is returned that resolves with an array of Response objects when all requests are complete in the same order as the Request objects.
+	 * Because some request can fail and others can just work, this promise will always just resolve (not reject) with response object having the message of the error or the actual normal response.
+	 *
+	 * @sampleas execute(BaseRequest[])
+	 *
+	 * @param requests
+	 * @param username the user name
+	 * @param password the password
+	 *
+	 * @return The promise object that resolves with an array of Response objects when all requests are complete in the same order as the Request objects.
+	 */
+	@JSFunction
+	public NativePromise executeRequest(final BaseRequest[] requests, final String username, final String password)
+	{
+		return executeRequest(requests, username, password, null, null);
+	}
+
+	/**
+	 * Execute multiple requests asynchronously.
+	 * A Promise is returned that resolves with an array of Response objects when all requests are complete in the same order as the Request objects.
+	 * Because some request can fail and others can just work, this promise will always just resolve (not reject) with response object having the message of the error or the actual normal response.
+	 *
+	 * @sample
+	 * var client = plugins.http.createNewHttpClient();
+	 * var requests = [];
+	 * requests.push(client.createGetRequest("https://www.google.com"))
+	 * requests.push(client.createGetRequest("https://servoy.com"))
+	 * var promise = client.execute(requests)
+	 * promise.then(/** @type {Array<plugins.http.Response>} *&#47;
+	 * responses => {
+	 *    for (var index = 0; index < responses.length; index++) {
+	 *      application.output(responses[index].getStatusCode())
+	 *      application.output(responses[index].getResponseBody().substring(0,100));
+	 *      application.output(responses[index].getFileUpload());
+	 *      responses[index].close();
+	 *    }
+	 * });
+	 *
+	 * @param requests
+	 *
+	 * @return The promise object that resolves with an array of Response objects when all requests are complete in the same order as the Request objects.
+	 */
+	@JSFunction
+	public NativePromise execute(BaseRequest[] requests)
+	{
+		return executeRequest(requests, null, null, null, null);
 	}
 
 	/**
