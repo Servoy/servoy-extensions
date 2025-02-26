@@ -491,7 +491,7 @@ public class HttpClient implements IScriptable, IJavaScriptType
 	 * A Promise is returned that resolves with an array of Response objects when all requests are complete in the same order as the Request objects.
 	 *
 	 * @param requests
-	 * @return
+	 * @return The promise object that resolves with an array of Response objects when all requests are complete in the same order as the Request objects.
 	 */
 	@JSFunction
 	public NativePromise execute(BaseRequest[] requests)
