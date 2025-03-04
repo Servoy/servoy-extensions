@@ -34,6 +34,8 @@ public class BroadcastInfo implements Serializable
 
 	public BroadcastInfo(IBroadcaster broadCaster, String name, String channelName)
 	{
+		if (name == null) throw new IllegalArgumentException("name cannot be null for broadcaster with channelName " + channelName); //$NON-NLS-1$
+		if (channelName == null) throw new IllegalArgumentException("channelName cannot be null for broadcaster with name " + name); //$NON-NLS-1$
 		this.broadCaster = broadCaster;
 		this.name = name;
 		this.channelName = channelName;
