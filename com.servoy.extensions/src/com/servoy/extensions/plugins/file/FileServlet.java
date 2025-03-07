@@ -72,6 +72,10 @@ public class FileServlet extends HttpServlet
 			if (file != null && file.exists() && file.isFile())
 			{
 				String contentType = AbstractFile.getContentType(file);
+				if (contentType == null)
+				{
+					contentType = req.getServletContext().getMimeType(file.getName());
+				}
 				if (contentType != null) resp.setContentType(contentType);
 				resp.setContentLengthLong(file.length());
 				String contentDisposition = req.getParameter("c");
