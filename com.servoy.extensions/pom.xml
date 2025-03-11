@@ -18,8 +18,8 @@
     <properties>
         <tycho.version>4.0.9</tycho.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
         <workspace_dir>${project.basedir}/../</workspace_dir>
         <servoy-local.url>${project.baseUri}/target/repository/</servoy-local.url>
         <scribejava.version>8.3.3</scribejava.version>
@@ -120,7 +120,7 @@
                         <configuration>
                             <toolchains>
                                 <jdk>
-                                    <id>JavaSE-17</id>
+                                    <id>JavaSE-21</id>
                                 </jdk>
                             </toolchains>
                         </configuration>
@@ -203,7 +203,7 @@
                                     <type>eclipse-feature</type>
                                 </dependency>
                             </dependencies>
-                            <executionEnvironment>JavaSE-17</executionEnvironment>
+                            <executionEnvironment>JavaSE-21</executionEnvironment>
                         </configuration>
                         <executions>
                             <execution>
