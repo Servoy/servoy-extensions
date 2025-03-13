@@ -64,18 +64,18 @@ public class UDPSocket implements IScriptable, IJavaScriptType
 
 	/**
 	 * Starts the socket to listen for incoming packets, no need to call this method if you only want to send packets.
-	 * the given function will be called when a packet is received with the JSPackage as an argument.
+	 * the given function will be called when a packet is received
 	 *
 	 * @sample
-	 * function callbackFunction(packet) {
-	 *   var string = packet.readUTF();
+	 * var socket = plugins.udp.createSocket(4321).start(callbackFunction);
+	 * function callbackFunction() {
+	 *   var string = socket.getReceivedPacket().readUTF();
 	 *   application.output(string);
 	 * }
-	 * var socket = plugins.udp.createSocket(4321).start(callbackFunction);
 	 *
 	 *
 	 *
-	 * @param packageReceivedCallback the callback function that will be called when a package is received, with the JSPacket as an argument
+	 * @param packageReceivedCallback the callback function that will be called when a package is received
 	 */
 	@JSFunction
 	public UDPSocket start(Function packageReceivedCallback)

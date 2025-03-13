@@ -81,7 +81,7 @@ public class UDPProvider implements IScriptable, IReturnedTypesProvider
 	 * Create a new UDPSocket.
 	 *
 	 * @sample
-	 * var socket = plugins.udp.createSocket(4321).start();
+	 * var socket = plugins.udp.createSocket(4321);
 	 * var packet = plugins.udp.createNewPacket()
 	 * packet.writeUTF('hello world!')
 	 * socket.sendPacket('10.0.0.1',packet, 4321)
@@ -102,7 +102,7 @@ public class UDPProvider implements IScriptable, IReturnedTypesProvider
 	 *
 	 * @sample
 	 * var address = plugins.udp.getAllInetAddresses().find(xxxx);
-	 * var socket = plugins.udp.createSocket(4321, address).start();
+	 * var socket = plugins.udp.createSocket(4321, address).start(reveive_callback|);
 	 * var packet = plugins.udp.createNewPacket()
 	 * packet.writeUTF('hello world!')
 	 * socket.sendPacket('10.0.0.1',packet, 4321)
