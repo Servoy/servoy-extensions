@@ -20,6 +20,7 @@ import java.io.UTFDataFormatException;
 import java.net.DatagramPacket;
 
 import com.servoy.j2db.documentation.ServoyDocumented;
+import com.servoy.j2db.scripting.IJavaScriptType;
 import com.servoy.j2db.scripting.IScriptable;
 import com.servoy.j2db.util.Debug;
 
@@ -38,7 +39,7 @@ import com.servoy.j2db.util.Debug;
  * for constructing or parsing complex packet structures.</p>
  */
 @ServoyDocumented(scriptingName = "JSPacket")
-public class JSPacket implements IScriptable
+public class JSPacket implements IScriptable, IJavaScriptType
 {
 	static final int MAX_PACKET_LENGTH = 64000;
 	private final DatagramPacket enclosed;

@@ -19,13 +19,17 @@ package com.servoy.extensions.plugins.udp;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.mozilla.javascript.Function;
+import org.mozilla.javascript.annotations.JSFunction;
 
 import com.servoy.j2db.documentation.ServoyDocumented;
 import com.servoy.j2db.scripting.FunctionDefinition;
@@ -74,6 +78,112 @@ public class UDPProvider implements IScriptable, IReturnedTypesProvider
 	}
 
 	/**
+	 * Create a new UDPSocket.
+	 *
+	 * @sample
+	 * var socket = plugins.udp.createSocket(4321).start();
+	 * var packet = plugins.udp.createNewPacket()
+	 * packet.writeUTF('hello world!')
+	 * socket.sendPacket('10.0.0.1',packet, 4321)
+	 * socket.close();
+	 *
+	 * @param port_number the local port that this UDP socket will bind to.
+	 *
+	 * @return a new UDPSocket instance for sending and/or receiving UDP packets.
+	 */
+	@JSFunction
+	public UDPSocket createSocket(int port_number)
+	{
+		return createSocket(port_number, null);
+	}
+
+	/**
+	 * Create a new UDPSocket that is binded to a specific local address.
+	 *
+	 * @sample
+	 * var address = plugins.udp.getAllInetAddresses().find(xxxx);
+	 * var socket = plugins.udp.createSocket(4321, address).start();
+	 * var packet = plugins.udp.createNewPacket()
+	 * packet.writeUTF('hello world!')
+	 * socket.sendPacket('10.0.0.1',packet, 4321)
+	 * socket.close();
+	 *
+	 * @param port_number the local port that this UDP socket will bind to.
+	 * @param laddr the local address that this UDP socket will bind to
+	 *
+	 * @return a new UDPSocket instance for sending and/or receiving UDP packets.
+	 */
+	@JSFunction
+	public UDPSocket createSocket(int port_number, InetAddress laddr)
+	{
+		UDPSocket udpSocket;
+		try
+		{
+			DatagramSocket socket = new DatagramSocket(port_number, laddr);
+			udpSocket = new UDPSocket(socket, plugin);
+			this.plugin.registerSocket(udpSocket);
+		}
+		catch (SocketException e)
+		{
+			throw new RuntimeException(e);
+		}
+
+		return udpSocket;
+	}
+
+	/**
+	 * Get all available network interfaces.
+	 *
+	 * @return
+	 */
+	@JSFunction
+	public InetAddress[] getAllInetAddresses()
+	{
+		ArrayList<InetAddress> addresses = new ArrayList<>();
+		try
+		{
+			Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
+
+			while (networkInterfaces.hasMoreElements())
+			{
+				NetworkInterface networkInterface = networkInterfaces.nextElement();
+				Enumeration<InetAddress> inetAddresses = networkInterface.getInetAddresses();
+
+				for (InetAddress inetAddress : Collections.list(inetAddresses))
+				{
+					addresses.add(inetAddress);
+				}
+			}
+		}
+		catch (SocketException e)
+		{
+			e.printStackTrace();
+		}
+		return addresses.toArray(new InetAddress[addresses.size()]);
+	}
+
+	/**
+	 * Returns a InetAddress for a specific (local) ip or hostname.
+	 *
+	 * @param destIpOrHostname
+	 *
+	 * @return returns the InetAddress object for the given IP address or hostname or null if not found.
+	 */
+	@JSFunction
+	public InetAddress getInetAddress(String destIpOrHostname)
+	{
+		try
+		{
+			return InetAddress.getByName(destIpOrHostname);
+		}
+		catch (UnknownHostException e)
+		{
+		}
+		return null;
+	}
+
+
+	/**
 	 * Start a UDP socket for a port.
 	 *
 	 * @sample
@@ -100,7 +210,7 @@ public class UDPProvider implements IScriptable, IReturnedTypesProvider
 				if (!(method_to_call_when_packet_received_and_buffer_is_empty instanceof Function)) throw new IllegalArgumentException("method invalid"); //$NON-NLS-1$
 
 				DatagramSocket socket = new DatagramSocket(port_number);
-				listner = new DatagramHandler(this, socket);
+				listner = new DatagramHandler(this::addPacket, socket);
 				listner.start();
 
 				functionDef = new FunctionDefinition((Function)method_to_call_when_packet_received_and_buffer_is_empty);
@@ -175,7 +285,7 @@ public class UDPProvider implements IScriptable, IReturnedTypesProvider
 	 *
 	 * @return true if the packet was successfully sent to the specified port; otherwise, false.
 	 */
-	public boolean js_sendPacket(String destIpOrHostname, JSPacket packet, int port)
+	public boolean js_sendPacket(String destIpOrHostname, JSPacket packet, @SuppressWarnings("hiding") int port)
 	{
 		if (destIpOrHostname != null && packet != null)
 		{
@@ -278,6 +388,6 @@ public class UDPProvider implements IScriptable, IReturnedTypesProvider
 
 	public Class< ? >[] getAllReturnedTypes()
 	{
-		return new Class[] { JSPacket.class };
+		return new Class[] { JSPacket.class, UDPSocket.class };
 	}
 }

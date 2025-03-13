@@ -19,19 +19,19 @@ package com.servoy.extensions.plugins.udp;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketException;
-
-import com.servoy.j2db.util.Debug;
+import java.util.function.Consumer;
 
 public class DatagramHandler extends Thread
 {
 	private boolean listen = true;
-	private UDPProvider provider;
+	private Consumer<DatagramPacket> provider;
 	private DatagramSocket socket;
 
-	DatagramHandler(UDPProvider provider, DatagramSocket socket)
+	DatagramHandler(Consumer<DatagramPacket> provider, DatagramSocket socket)
 	{
 		this.provider = provider;
 		this.socket = socket;
+		setDaemon(true);
 	}
 
 	@Override
@@ -43,12 +43,16 @@ public class DatagramHandler extends Thread
 			{
 				DatagramPacket dp = new DatagramPacket(new byte[JSPacket.MAX_PACKET_LENGTH], JSPacket.MAX_PACKET_LENGTH);
 				socket.receive(dp);
-				provider.addPacket(dp);
+				provider.accept(dp);
 			}
 			catch (Throwable e)
 			{
+				if (socket != null && socket.isClosed())
+				{
+					listen = false;
+				}
 				// only log the exception if it wasn't caused by an intentional close of the socket by setListen(false)... "SocketException: socket closed"
-				if (listen || !(e instanceof SocketException)) Debug.error(e);
+				if (listen || !(e instanceof SocketException)) UDPSocket.LOG.error("Error in UDPSocket when reading/listening for packages", e); //$NON-NLS-1$
 			}
 		}
 	}
@@ -62,7 +66,7 @@ public class DatagramHandler extends Thread
 		}
 		catch (Throwable e)
 		{
-			Debug.error(e);
+			UDPSocket.LOG.error("Error when calling close on the UDPSocket", e); //$NON-NLS-1$
 		}
 		socket = null;
 		provider = null;
@@ -77,7 +81,7 @@ public class DatagramHandler extends Thread
 		}
 		catch (Throwable e)
 		{
-			Debug.error(e);
+			UDPSocket.LOG.error("Error in UDPSocket when writing a package to the socket", e); //$NON-NLS-1$
 		}
 		return false;
 	}

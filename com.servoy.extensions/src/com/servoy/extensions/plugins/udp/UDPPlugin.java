@@ -18,6 +18,8 @@ package com.servoy.extensions.plugins.udp;
 
 import java.beans.PropertyChangeEvent;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 import javax.swing.Icon;
@@ -37,6 +39,7 @@ public class UDPPlugin implements IClientPlugin, IIconProvider
 	private IClientPluginAccess access;
 	private UDPProvider impl;
 	private URL iconUrl;
+	private final List<UDPSocket> sockets = new ArrayList<>();
 
 	/*
 	 * @see IPlugin#load()
@@ -58,6 +61,8 @@ public class UDPPlugin implements IClientPlugin, IIconProvider
 	 */
 	public void unload() throws PluginException
 	{
+		sockets.forEach(UDPSocket::internalClose);
+		sockets.clear();
 		access = null;
 		impl = null;
 	}
@@ -134,5 +139,21 @@ public class UDPPlugin implements IClientPlugin, IIconProvider
 	public URL getIconUrl()
 	{
 		return this.getClass().getResource("images/udp.png"); //$NON-NLS-1$
+	}
+
+	/**
+	 * @param udpSocket
+	 */
+	public void registerSocket(UDPSocket udpSocket)
+	{
+		sockets.add(udpSocket);
+	}
+
+	/**
+	 * @param udpSocket
+	 */
+	public void removeSocket(UDPSocket udpSocket)
+	{
+		sockets.remove(udpSocket);
 	}
 }
