@@ -612,8 +612,7 @@ public class HttpClient implements IScriptable, IJavaScriptType
 	 * Create a new post request ( Origin server should accept/process the submitted data.)
 	 * If this url is a https ssl encrypted url which certificates are not in the java certificate store.
 	 * (Like a self signed certificate or a none existing root certificate)
-	 * Then for a smart client a dialog will be given, to give the user the ability to accept this certificate for the next time.
-	 * For a Web or Headless client the system administrator does have to add that certificate (chain) to the java install on the server.
+	 * The system administrator does have to add that certificate (chain) to the java install on the server.
 	 * See https://wiki.servoy.com/display/tutorials/Import+a+%28Root%29+certificate+in+the+java+cacerts+file
 	 *
 	 * @sample
@@ -638,8 +637,7 @@ public class HttpClient implements IScriptable, IJavaScriptType
 	 * Creates a new get request (retrieves whatever information is stored on specified url).
 	 * If this url is a https ssl encrypted url which certificates are not in the java certificate store.
 	 * (Like a self signed certificate or a none existing root certificate)
-	 * Then for a smart client a dialog will be given, to give the user the ability to accept this certificate for the next time.
-	 * For a Web or Headless client the system administrator does have to add that certificate (chain) to the java install on the server.
+	 * The system administrator does have to add that certificate (chain) to the java install on the server.
 	 * See https://wiki.servoy.com/display/tutorials/Import+a+%28Root%29+certificate+in+the+java+cacerts+file
 	 *
 	 * @sample

@@ -82,8 +82,7 @@ public class HttpProvider implements IReturnedTypesProvider, IScriptable
 
 	/**
 	 * Get all page html in a variable, if this url is an https url that uses certificates unknown to Java
-	 * then you have to use the HttpClient so that smart client users will get the unknown certificate dialog that they then can accept
-	 * or you must make sure that those server certificates are stored in the cacerts of the java vm that is used (this is required for a web or headless client)
+	 * you must make sure that those server certificates are stored in the cacerts of the java vm that is used.
 	 *
 	 * @sample
 	 * // get data using a default connection
@@ -244,8 +243,7 @@ public class HttpProvider implements IReturnedTypesProvider, IScriptable
 	/**
 	 * Get media (binary data) such as images in a variable. It also supports gzip-ed content.
 	 * If this url is an https url that uses certificates unknown to Java
-	 * then you have to use the HttpClient so that smart client users will get the unknown certificate dialog that they then can accept
-	 * or you must make sure that those server certificates are stored in the cacerts of the java vm that is used (this is required for a web or headless client)
+	 * then you must make sure that those server certificates are stored in the cacerts of the java vm that is used
 	 *
 	 * @sample
 	 * var image_byte_array = plugins.http.getMediaData('http://www.cnn.com/cnn.gif');

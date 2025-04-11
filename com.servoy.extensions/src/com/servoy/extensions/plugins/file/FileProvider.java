@@ -1614,9 +1614,7 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	/**
 	 * Writes the given file to disk.
 	 *
-	 * If "file" is a JSFile or you are running in Smart Client, it writes data into a (local) binary file.
-	 *
-	 * If you are running in Web Client and "file" is a String (like 'mypdffile.pdf' to hint the browser what it is) the user will get
+	 * If "file" is a String (like 'mypdffile.pdf' to hint the browser what it is) the user will get
 	 * prompted by the browser to save the file (sent using "Content-disposition: attachment" HTTP header). If it is a JSFile instance
 	 * in this case it will be saved as a file on the server.
 	 *
@@ -1718,8 +1716,7 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	/**
 	 * Opens the given local file.
 	 *
-	 * Smart Client: launches the default OS associated application to open an existing local file.
-	 * Web Client: the (server local) file will open inside the browser - if supported (sent using "Content-disposition: inline" HTTP header).
+	 * The (server local) file will open inside the browser - if supported (sent using "Content-disposition: inline" HTTP header).
 	 *
 	 * @param file the local file to open. The file should exist and be accessible.
 	 * @return success status of the open operation
@@ -1769,10 +1766,9 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	/**
 	 * Opens the given data as a file.
 	 *
-	 * Smart Client: writes the data to a temporary file, then launches the default OS associated application to open it.
-	 * Web Client: the data will open as a file inside the browser - if supported (sent using "Content-disposition: inline" HTTP header).
+	 * The data will open as a file inside the browser - if supported (sent using "Content-disposition: inline" HTTP header).
 	 *
-	 * @param fileName the name of the file that should open with the given data. Can be null (but in Smart Client null - so no extension - will probably make open fail).
+	 * @param fileName the name of the file that should open with the given data. Can be null.
 	 * @param data the file's binary content.
 	 * @param mimeType can be left null, and is used for webclient only. Specify one of any valid mime types:
 	 * https://developer.mozilla.org/en-US/docs/Properly_Configuring_Server_MIME_Types
@@ -1801,7 +1797,7 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	/**
 	 * @clonedesc {@link #js_openFile(String, byte[], String)}
 	 *
-	 * @param fileName the name of the file that should open with the given data. Can be null (but in Smart Client null - so no extension - will probably make open fail).
+	 * @param fileName the name of the file that should open with the given data. Can be null.
 	 * @param data the file's binary content.
 	 * @param mimeType can be left null, and is used for webclient only. Specify one of any valid mime types:
 	 * https://developer.mozilla.org/en-US/docs/Properly_Configuring_Server_MIME_Types
@@ -2023,6 +2019,7 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 *
 	 * @return a JSFile instance representing the saved file, or null if no file was saved.
 	 */
+	@Deprecated
 	@ServoyClientSupport(mc = false, wc = false, sc = true, ng = false)
 	public JSFile js_showFileSaveDialog()
 	{
@@ -2037,6 +2034,7 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 *
 	 * @return a JSFile instance representing the saved file, or null if no file was saved.
 	 */
+	@Deprecated
 	@ServoyClientSupport(mc = false, wc = false, sc = true, ng = false)
 	public JSFile js_showFileSaveDialog(JSFile fileNameDir)
 	{
@@ -2051,6 +2049,7 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 *
 	 * @return a JSFile instance representing the saved file, or null if no file was saved.
 	 */
+	@Deprecated
 	@ServoyClientSupport(mc = false, wc = false, sc = true, ng = false)
 	public JSFile js_showFileSaveDialog(String fileNameDir)
 	{
@@ -2065,6 +2064,7 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 *
 	 * @return a JSFile instance representing the saved file, or null if no file was saved.
 	 */
+	@Deprecated
 	@ServoyClientSupport(mc = false, wc = false, sc = true, ng = false)
 	public JSFile js_showFileSaveDialog(JSFile fileNameDir, String title)
 	{
@@ -2079,6 +2079,7 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 *
 	 * @return a JSFile instance representing the saved file, or null if no file was saved.
 	 */
+	@Deprecated
 	@ServoyClientSupport(mc = false, wc = false, sc = true, ng = false)
 	public JSFile js_showFileSaveDialog(String fileNameDir, String title)
 	{
