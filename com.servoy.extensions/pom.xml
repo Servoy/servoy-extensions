@@ -120,7 +120,7 @@
                         <configuration>
                             <toolchains>
                                 <jdk>
-                                    <id>JavaSE-17</id>
+                                    <id>JavaSE-21</id>
                                 </jdk>
                             </toolchains>
                         </configuration>
