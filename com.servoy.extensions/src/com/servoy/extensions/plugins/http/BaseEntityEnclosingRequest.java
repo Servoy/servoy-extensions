@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.hc.client5.http.classic.methods.HttpUriRequestBase;
+import org.apache.hc.client5.http.config.RequestConfig;
 import org.apache.hc.client5.http.config.RequestConfig.Builder;
 import org.apache.hc.client5.http.impl.async.CloseableHttpAsyncClient;
 import org.apache.hc.client5.http.impl.auth.BasicCredentialsProvider;
@@ -34,7 +35,10 @@ import org.apache.hc.core5.http.message.BasicNameValuePair;
 import org.apache.hc.core5.http.nio.AsyncEntityProducer;
 import org.apache.hc.core5.http.nio.entity.AsyncEntityProducers;
 import org.apache.hc.core5.http.nio.entity.BasicAsyncEntityProducer;
+import org.apache.hc.core5.net.URIBuilder;
 import org.apache.hc.core5.net.WWWFormCodec;
+import org.apache.hc.core5.util.Timeout;
+import org.mozilla.javascript.annotations.JSFunction;
 
 import com.servoy.extensions.plugins.file.JSFile;
 import com.servoy.j2db.util.Debug;
@@ -68,6 +72,97 @@ public class BaseEntityEnclosingRequest extends BaseRequest
 	protected final void clearFiles()
 	{
 		files = new ArrayList<FileInfo>();
+	}
+
+	/**
+	 * Get the raw body content of the request.
+	 *
+	 * @return The body content, or null if none.
+	 */
+	@JSFunction
+	public String getHttpBody()
+	{
+		return bodyContent;
+	}
+
+	/**
+	 * Get form parameters of the request.
+	 *
+	 * @return A map of parameter names to values.
+	 */
+	@JSFunction
+	public Map<String, String> getParameters()
+	{
+		Map<String, String> simpleParams = new HashMap<>();
+		if (params != null)
+		{
+			for (Map.Entry<NameValuePair, String> e : params.entrySet())
+			{
+				simpleParams.put(e.getKey().getName(), e.getKey().getValue());
+			}
+		}
+		return simpleParams;
+	}
+
+	/**
+	 * Get the content type of the request body.
+	 *
+	 * @return The MIME type of the body.
+	 */
+	@JSFunction
+	public String getContentType()
+	{
+		return bodyMimeType;
+	}
+
+	/**
+	 * Get query parameters from the request URL.
+	 *
+	 * @return A map of parameter names to arrays of values.
+	 */
+	@JSFunction
+	public Map<String, String[]> getQueryParameters()
+	{
+		Map<String, List<String>> temp = new HashMap<>();
+		try
+		{
+			URIBuilder builder = new URIBuilder(this.url);
+			List<NameValuePair> pairs = builder.getQueryParams();
+			for (NameValuePair p : pairs)
+			{
+				temp.computeIfAbsent(p.getName(), k -> new ArrayList<>()).add(p.getValue());
+			}
+		}
+		catch (Exception ignored)
+		{
+			// ignore parse errors
+		}
+		Map<String, String[]> result = new HashMap<>();
+		temp.forEach((key, list) -> result.put(key, list.toArray(new String[0])));
+		return result;
+	}
+
+	/**
+	 * Get the Apache RequestConfig for this request.
+	 *
+	 * @return The built RequestConfig.
+	 */
+	@JSFunction
+	public RequestConfig getRequestConfig()
+	{
+		return requestConfigBuilder.build();
+	}
+
+	/**
+	 * Get the configured response timeout in milliseconds.
+	 *
+	 * @return Timeout in ms, or –1 if none.
+	 */
+	@JSFunction
+	public int getTimeout()
+	{
+		Timeout t = requestConfigBuilder.build().getResponseTimeout();
+		return (t != null ? (int)t.toMilliseconds() : -1);
 	}
 
 	/**

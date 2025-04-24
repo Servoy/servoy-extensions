@@ -41,6 +41,8 @@ import org.apache.hc.core5.http.HttpHost;
 import org.apache.hc.core5.http.nio.AsyncEntityProducer;
 import org.apache.hc.core5.http.nio.support.BasicRequestProducer;
 import org.mozilla.javascript.Function;
+import org.mozilla.javascript.NativeArray;
+import org.mozilla.javascript.NativeObject;
 import org.mozilla.javascript.NativePromise;
 import org.mozilla.javascript.annotations.JSFunction;
 
@@ -65,7 +67,7 @@ public abstract class BaseRequest implements IScriptable, IJavaScriptType
 	protected Map<String, String[]> headers;
 	private HttpPlugin httpPlugin;
 	protected boolean usePreemptiveAuthentication = false;
-	private Builder requestConfigBuilder;
+	protected Builder requestConfigBuilder;
 	private BasicCredentialsProvider proxyCredentialsProvider;
 
 	public BaseRequest()
@@ -83,6 +85,52 @@ public abstract class BaseRequest implements IScriptable, IJavaScriptType
 		this.httpPlugin = httpPlugin;
 		this.requestConfigBuilder = requestConfigBuilder;
 		this.proxyCredentialsProvider = proxyCredentialsProvider;
+	}
+
+	/**
+	 * Get the HTTP method of the request.
+	 *
+	 * @return The HTTP method (e.g., "GET", "POST").
+	 */
+	@JSFunction
+	public String getHttpMethod()
+	{
+		return method.getMethod();
+	}
+
+	/**
+	 * Get the URL of the request.
+	 *
+	 * @return The request URL.
+	 */
+	@JSFunction
+	public String getUrl()
+	{
+		return url;
+	}
+
+	/**
+	 * Get the headers set on the request.
+	 *
+	 * @return An array of objects with "name" and "value" properties.
+	 */
+	@JSFunction
+	public NativeArray getHeaders()
+	{
+		NativeArray headerArray = new NativeArray(0);
+		int idx = 0;
+		for (Map.Entry<String, String[]> entry : headers.entrySet())
+		{
+			String name = entry.getKey();
+			for (String value : entry.getValue())
+			{
+				NativeObject obj = new NativeObject();
+				obj.put("name", obj, name);
+				obj.put("value", obj, value);
+				headerArray.put(idx++, headerArray, obj);
+			}
+		}
+		return headerArray;
 	}
 
 
