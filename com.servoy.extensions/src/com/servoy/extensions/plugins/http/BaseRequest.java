@@ -32,6 +32,7 @@ import org.apache.hc.client5.http.auth.Credentials;
 import org.apache.hc.client5.http.auth.NTCredentials;
 import org.apache.hc.client5.http.auth.UsernamePasswordCredentials;
 import org.apache.hc.client5.http.classic.methods.HttpUriRequestBase;
+import org.apache.hc.client5.http.config.RequestConfig;
 import org.apache.hc.client5.http.config.RequestConfig.Builder;
 import org.apache.hc.client5.http.impl.async.CloseableHttpAsyncClient;
 import org.apache.hc.client5.http.impl.auth.BasicCredentialsProvider;
@@ -44,6 +45,7 @@ import org.apache.hc.core5.http.NameValuePair;
 import org.apache.hc.core5.http.nio.AsyncEntityProducer;
 import org.apache.hc.core5.http.nio.support.BasicRequestProducer;
 import org.apache.hc.core5.net.URIBuilder;
+import org.apache.hc.core5.util.Timeout;
 import org.mozilla.javascript.Function;
 import org.mozilla.javascript.NativeArray;
 import org.mozilla.javascript.NativeObject;
@@ -71,7 +73,7 @@ public abstract class BaseRequest implements IScriptable, IJavaScriptType
 	protected Map<String, String[]> headers;
 	private HttpPlugin httpPlugin;
 	protected boolean usePreemptiveAuthentication = false;
-	protected Builder requestConfigBuilder;
+	private Builder requestConfigBuilder;
 	private BasicCredentialsProvider proxyCredentialsProvider;
 
 	public BaseRequest()
@@ -158,6 +160,27 @@ public abstract class BaseRequest implements IScriptable, IJavaScriptType
 		Map<String, String[]> result = new HashMap<>();
 		temp.forEach((key, list) -> result.put(key, list.toArray(new String[0])));
 		return result;
+	}
+
+	/**
+	 * Get the configured response timeout in milliseconds.
+	 *
+	 * @return Timeout in ms, or –1 if none.
+	 */
+	public int js_getTimeout()
+	{
+		Timeout t = requestConfigBuilder.build().getResponseTimeout();
+		return (t != null ? (int)t.toMilliseconds() : -1);
+	}
+
+	/**
+	 * Get the Apache RequestConfig for this request.
+	 *
+	 * @return The built RequestConfig.
+	 */
+	public RequestConfig js_getRequestConfig()
+	{
+		return requestConfigBuilder.build();
 	}
 
 

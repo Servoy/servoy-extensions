@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.hc.client5.http.classic.methods.HttpUriRequestBase;
-import org.apache.hc.client5.http.config.RequestConfig;
 import org.apache.hc.client5.http.config.RequestConfig.Builder;
 import org.apache.hc.client5.http.impl.async.CloseableHttpAsyncClient;
 import org.apache.hc.client5.http.impl.auth.BasicCredentialsProvider;
@@ -36,7 +35,6 @@ import org.apache.hc.core5.http.nio.AsyncEntityProducer;
 import org.apache.hc.core5.http.nio.entity.AsyncEntityProducers;
 import org.apache.hc.core5.http.nio.entity.BasicAsyncEntityProducer;
 import org.apache.hc.core5.net.WWWFormCodec;
-import org.apache.hc.core5.util.Timeout;
 
 import com.servoy.extensions.plugins.file.JSFile;
 import com.servoy.j2db.util.Debug;
@@ -108,27 +106,6 @@ public class BaseEntityEnclosingRequest extends BaseRequest
 	public String js_getContentType()
 	{
 		return bodyMimeType;
-	}
-
-	/**
-	 * Get the Apache RequestConfig for this request.
-	 *
-	 * @return The built RequestConfig.
-	 */
-	public RequestConfig js_getRequestConfig()
-	{
-		return requestConfigBuilder.build();
-	}
-
-	/**
-	 * Get the configured response timeout in milliseconds.
-	 *
-	 * @return Timeout in ms, or –1 if none.
-	 */
-	public int js_getTimeout()
-	{
-		Timeout t = requestConfigBuilder.build().getResponseTimeout();
-		return (t != null ? (int)t.toMilliseconds() : -1);
 	}
 
 	/**
