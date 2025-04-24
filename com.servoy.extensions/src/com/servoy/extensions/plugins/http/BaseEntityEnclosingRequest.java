@@ -35,10 +35,8 @@ import org.apache.hc.core5.http.message.BasicNameValuePair;
 import org.apache.hc.core5.http.nio.AsyncEntityProducer;
 import org.apache.hc.core5.http.nio.entity.AsyncEntityProducers;
 import org.apache.hc.core5.http.nio.entity.BasicAsyncEntityProducer;
-import org.apache.hc.core5.net.URIBuilder;
 import org.apache.hc.core5.net.WWWFormCodec;
 import org.apache.hc.core5.util.Timeout;
-import org.mozilla.javascript.annotations.JSFunction;
 
 import com.servoy.extensions.plugins.file.JSFile;
 import com.servoy.j2db.util.Debug;
@@ -79,8 +77,7 @@ public class BaseEntityEnclosingRequest extends BaseRequest
 	 *
 	 * @return The body content, or null if none.
 	 */
-	@JSFunction
-	public String getHttpBody()
+	public String js_getHttpBody()
 	{
 		return bodyContent;
 	}
@@ -90,8 +87,7 @@ public class BaseEntityEnclosingRequest extends BaseRequest
 	 *
 	 * @return A map of parameter names to values.
 	 */
-	@JSFunction
-	public Map<String, String> getParameters()
+	public Map<String, String> js_getParameters()
 	{
 		Map<String, String> simpleParams = new HashMap<>();
 		if (params != null)
@@ -109,37 +105,9 @@ public class BaseEntityEnclosingRequest extends BaseRequest
 	 *
 	 * @return The MIME type of the body.
 	 */
-	@JSFunction
-	public String getContentType()
+	public String js_getContentType()
 	{
 		return bodyMimeType;
-	}
-
-	/**
-	 * Get query parameters from the request URL.
-	 *
-	 * @return A map of parameter names to arrays of values.
-	 */
-	@JSFunction
-	public Map<String, String[]> getQueryParameters()
-	{
-		Map<String, List<String>> temp = new HashMap<>();
-		try
-		{
-			URIBuilder builder = new URIBuilder(this.url);
-			List<NameValuePair> pairs = builder.getQueryParams();
-			for (NameValuePair p : pairs)
-			{
-				temp.computeIfAbsent(p.getName(), k -> new ArrayList<>()).add(p.getValue());
-			}
-		}
-		catch (Exception ignored)
-		{
-			// ignore parse errors
-		}
-		Map<String, String[]> result = new HashMap<>();
-		temp.forEach((key, list) -> result.put(key, list.toArray(new String[0])));
-		return result;
 	}
 
 	/**
@@ -147,8 +115,7 @@ public class BaseEntityEnclosingRequest extends BaseRequest
 	 *
 	 * @return The built RequestConfig.
 	 */
-	@JSFunction
-	public RequestConfig getRequestConfig()
+	public RequestConfig js_getRequestConfig()
 	{
 		return requestConfigBuilder.build();
 	}
@@ -158,8 +125,7 @@ public class BaseEntityEnclosingRequest extends BaseRequest
 	 *
 	 * @return Timeout in ms, or –1 if none.
 	 */
-	@JSFunction
-	public int getTimeout()
+	public int js_getTimeout()
 	{
 		Timeout t = requestConfigBuilder.build().getResponseTimeout();
 		return (t != null ? (int)t.toMilliseconds() : -1);

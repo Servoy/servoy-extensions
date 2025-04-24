@@ -19,7 +19,9 @@ package com.servoy.extensions.plugins.http;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
@@ -38,8 +40,10 @@ import org.apache.hc.client5.http.impl.auth.CredentialsProviderBuilder;
 import org.apache.hc.client5.http.protocol.HttpClientContext;
 import org.apache.hc.core5.concurrent.FutureCallback;
 import org.apache.hc.core5.http.HttpHost;
+import org.apache.hc.core5.http.NameValuePair;
 import org.apache.hc.core5.http.nio.AsyncEntityProducer;
 import org.apache.hc.core5.http.nio.support.BasicRequestProducer;
+import org.apache.hc.core5.net.URIBuilder;
 import org.mozilla.javascript.Function;
 import org.mozilla.javascript.NativeArray;
 import org.mozilla.javascript.NativeObject;
@@ -92,8 +96,7 @@ public abstract class BaseRequest implements IScriptable, IJavaScriptType
 	 *
 	 * @return The HTTP method (e.g., "GET", "POST").
 	 */
-	@JSFunction
-	public String getHttpMethod()
+	public String js_getHttpMethod()
 	{
 		return method.getMethod();
 	}
@@ -103,8 +106,7 @@ public abstract class BaseRequest implements IScriptable, IJavaScriptType
 	 *
 	 * @return The request URL.
 	 */
-	@JSFunction
-	public String getUrl()
+	public String js_getUrl()
 	{
 		return url;
 	}
@@ -114,8 +116,7 @@ public abstract class BaseRequest implements IScriptable, IJavaScriptType
 	 *
 	 * @return An array of objects with "name" and "value" properties.
 	 */
-	@JSFunction
-	public NativeArray getHeaders()
+	public NativeArray js_getHeaders()
 	{
 		NativeArray headerArray = new NativeArray(0);
 		int idx = 0;
@@ -133,6 +134,32 @@ public abstract class BaseRequest implements IScriptable, IJavaScriptType
 		return headerArray;
 	}
 
+	/**
+	 * Get query parameters from the request URL.
+	 *
+	 * @return A map of parameter names to arrays of values.
+	 */
+	public Map<String, String[]> js_getQueryParameters()
+	{
+		Map<String, List<String>> temp = new HashMap<>();
+		try
+		{
+			URIBuilder builder = new URIBuilder(this.url);
+			List<NameValuePair> pairs = builder.getQueryParams();
+			for (NameValuePair p : pairs)
+			{
+				temp.computeIfAbsent(p.getName(), k -> new ArrayList<>()).add(p.getValue());
+			}
+		}
+		catch (Exception ignored)
+		{
+			// ignore parse errors
+		}
+		Map<String, String[]> result = new HashMap<>();
+		temp.forEach((key, list) -> result.put(key, list.toArray(new String[0])));
+		return result;
+	}
+
 
 	HttpUriRequestBase getMethod()
 	{
@@ -140,7 +167,7 @@ public abstract class BaseRequest implements IScriptable, IJavaScriptType
 	}
 
 	/**
-	 * Add a header to the request.
+	 * Add a header to the request. ###Test string 1.###
 	 *
 	 * @sample
 	 * method.addHeader('Content-type','text/xml; charset=ISO-8859-1')
