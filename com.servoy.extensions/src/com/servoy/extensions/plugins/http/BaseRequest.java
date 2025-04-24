@@ -167,7 +167,7 @@ public abstract class BaseRequest implements IScriptable, IJavaScriptType
 	}
 
 	/**
-	 * Add a header to the request. ###Test string 1.###
+	 * Add a header to the request.
 	 *
 	 * @sample
 	 * method.addHeader('Content-type','text/xml; charset=ISO-8859-1')
