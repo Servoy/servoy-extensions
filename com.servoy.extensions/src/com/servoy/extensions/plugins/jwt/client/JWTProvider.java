@@ -30,6 +30,7 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.auth0.jwt.interfaces.Verification;
 import com.servoy.base.scripting.annotations.ServoyClientSupport;
 import com.servoy.extensions.plugins.jwt.IJWTService;
 import com.servoy.j2db.documentation.ServoyDocumented;
@@ -164,6 +165,26 @@ public class JWTProvider implements IScriptable, IReturnedTypesProvider
 	@JSFunction
 	public Object verify(String token, Algorithm algorithm)
 	{
+		return verify(token, algorithm, 0);
+	}
+
+
+	/**
+	 * Verify a JSON Web Token with a specific algorithm.
+	 * The token could be external or created with the {@link #builder()} method.
+	 *
+	 * This will only verify and return the payload that was given if the token could be verified with the provided algorithm.
+	 * Will also return null if the token passed its expire date.
+	 *
+	 * @param token a JSON Web Token
+	 * @param algorithm an algorithm used to verify the signature
+	 * @param acceptNotBefore a specific leeway window in seconds in which the Not Before ("nbf") Claim will still be valid.
+	 * 			Not Before Date is always verified when the value is present
+	 * @return the payload or null if the token can't be verified
+	 */
+	@JSFunction
+	public Object verify(String token, Algorithm algorithm, int acceptNotBefore)
+	{
 		Algorithm alg = algorithm;
 		if (alg != null)
 		{
@@ -181,7 +202,13 @@ public class JWTProvider implements IScriptable, IReturnedTypesProvider
 				com.auth0.jwt.algorithms.Algorithm algo = alg.build();
 				if (algo != null)
 				{
-					JWTVerifier jwtVerifier = JWT.require(algo)
+
+					Verification verifier = JWT.require(algo);
+					if (acceptNotBefore > 0)
+					{
+						verifier.acceptNotBefore(acceptNotBefore);
+					}
+					JWTVerifier jwtVerifier = verifier
 						.build();
 					DecodedJWT jwt = jwtVerifier.verify(token);
 					String payload = new String(Utils.decodeBASE64(jwt.getPayload()));
