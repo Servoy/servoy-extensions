@@ -16,6 +16,10 @@
  */
 package com.servoy.extensions.plugins.rawSQL;
 
+import com.servoy.j2db.scripting.Deferred;
+import org.mozilla.javascript.NativePromise;
+import org.mozilla.javascript.annotations.JSFunction;
+
 import java.util.Collection;
 
 import com.servoy.j2db.dataprocessing.IDataSet;
@@ -462,6 +466,34 @@ public class RawSQLProvider implements IScriptable
 			Debug.error(ex);
 			return false;
 		}
+	}
+
+	/**
+	 * Execute any SQL asynchronously. Returns a Promise that resolves with
+	 * the Boolean result of the SQL execution, or rejects with an error message.
+	 */
+	@JSFunction
+	public NativePromise executeAsyncSQL(String serverName, String sql) {
+	    return executeAsyncSQL(serverName, sql, (Object[])null);
+	}
+
+	/**
+	 * Execute any SQL asynchronously with arguments. Returns a Promise that resolves
+	 * with the Boolean result of the SQL execution, or rejects with an error message.
+	 */
+	@JSFunction
+	public NativePromise executeAsyncSQL(String serverName, String sql, Object[] sql_args) {
+	    Deferred deferred = new Deferred(plugin.getClientPluginAccess());
+	    plugin.getClientPluginAccess().getExecutor().execute(() -> {
+	        try {
+	            boolean result = js_executeSQL(serverName, sql, sql_args);
+	            deferred.resolve(result);
+	        } catch (Exception e) {
+	            String msg = e.getMessage() != null ? e.getMessage() : e.toString();
+	            deferred.reject(msg);
+	        }
+	    });
+	    return deferred.getPromise();
 	}
 
 	private ServerMapping getServerMapping(String serverName) throws ServoyException
