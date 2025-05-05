@@ -499,6 +499,50 @@ public class RawSQLProvider implements IScriptable
 		return deferred.getPromise();
 	}
 
+	/**
+	 * Execute a stored procedure asynchronously with in/out parameter types.
+	 * Returns a Promise that resolves with the JSDataSet result, or rejects with an error message.
+	 */
+	public NativePromise js_executeAsyncStoredProcedure(String serverName, String procDecl, Object[] args, int[] inOutTypes, int maxRows)
+	{
+		Deferred deferred = new Deferred(plugin.getClientPluginAccess());
+		plugin.getClientPluginAccess().getExecutor().execute(() -> {
+			try
+			{
+				JSDataSet result = js_executeStoredProcedure(serverName, procDecl, args, inOutTypes, maxRows);
+				deferred.resolve(result);
+			}
+			catch (Exception e)
+			{
+				String msg = e.getMessage() != null ? e.getMessage() : e.toString();
+				deferred.reject(msg);
+			}
+		});
+		return deferred.getPromise();
+	}
+
+	/**
+	 * Execute a stored procedure asynchronously without explicit in/out types.
+	 * Returns a Promise that resolves with the JSDataSet[] result array, or rejects with an error message.
+	 */
+	public NativePromise js_executeAsyncStoredProcedure(String serverName, String procDecl, Object[] args, int maxRows)
+	{
+		Deferred deferred = new Deferred(plugin.getClientPluginAccess());
+		plugin.getClientPluginAccess().getExecutor().execute(() -> {
+			try
+			{
+				JSDataSet[] results = js_executeStoredProcedure(serverName, procDecl, args, maxRows);
+				deferred.resolve(results);
+			}
+			catch (Exception e)
+			{
+				String msg = e.getMessage() != null ? e.getMessage() : e.toString();
+				deferred.reject(msg);
+			}
+		});
+		return deferred.getPromise();
+	}
+
 	private ServerMapping getServerMapping(String serverName) throws ServoyException
 	{
 		// This will always return a collection of at least 1 server name.
