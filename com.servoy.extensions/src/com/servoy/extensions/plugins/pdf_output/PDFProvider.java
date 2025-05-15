@@ -67,7 +67,7 @@ import com.servoy.j2db.util.FileChooserUtils;
  * manipulations.</p>
  *
  * <p>For further details on working with PDF files using this plugin, refer to the
- * <a href="../../../../guides/develop/programming-guide/working-with-files/pdf.md">
+ * <a href="https://docs.servoy.com/guides/develop/programming-guide/working-with-files/pdf">
  * PDF Output Plugin Guide</a>.</p>
  *
  * @author jblok

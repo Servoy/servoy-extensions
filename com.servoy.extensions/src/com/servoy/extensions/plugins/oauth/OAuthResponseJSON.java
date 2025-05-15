@@ -45,9 +45,9 @@ import com.servoy.j2db.scripting.IScriptable;
  * all headers in an array format.</p>
  *
  * <p>For more information about authentication using the OAuth service, refer to the
- * <a href="../../../../guides/develop/security/authentication.md#oauth-provider">
+ * <a href="https://docs.servoy.com/guides/develop/security/authentication#oauth-provider">
  * OAuth Provider</a> from the
- * <a href="../../../../guides/develop/security/authentication.md">
+ * <a href="https://docs.servoy.com/guides/develop/security/authentication">
  * Authentication</a> section of this documentation.</p>
  *
  * @author emera

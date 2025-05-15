@@ -48,7 +48,7 @@ import com.servoy.j2db.scripting.IScriptable;
  * facilitate inspecting headers in the response.</p>
  *
  * <p>For overall REST-WS operations, refer to the
- * <a href="../../../../guides/develop/programming-guide/creating-rest-apis.md">Creating REST API</a> section.</p>
+ * <a href="https://docs.servoy.com/guides/develop/programming-guide/creating-rest-apis">Creating REST API</a> section.</p>
  *
  * @author rgansevles
  *

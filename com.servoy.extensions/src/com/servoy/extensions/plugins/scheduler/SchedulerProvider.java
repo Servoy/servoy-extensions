@@ -62,7 +62,7 @@ import com.servoy.j2db.util.Debug;
  * simplifies job management by enabling the deletion of specific tasks.</p>
  *
  * <p>For more information, refer to the
- * <a href="../../../../guides/develop/programming-guide/automation-and-scheduling/scheduler-api.md">
+ * <a href="https://docs.servoy.com/guides/develop/programming-guide/automation-and-scheduling/scheduler-api">
  * Scheduler API</a> section of the documentation.</p>
  *
  * @author jcompagner

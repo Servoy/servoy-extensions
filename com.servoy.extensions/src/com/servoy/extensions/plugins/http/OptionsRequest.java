@@ -43,8 +43,8 @@ import com.servoy.j2db.documentation.ServoyDocumented;
  * interaction and streamlined HTTP request handling.</p>
  *
  * <p>For an overview of the HTTP client functionality and configuration options, refer
- * to the <a href="./README.md">HTTP Client</a> and
- * <a href="./httpclientconfig.md">HTTP Client Config</a> documentation.</p>
+ * to the <a href="https://docs.servoy.com/reference/servoyextensions/server-plugins/http">HTTP Client</a> and
+ * <a href="https://docs.servoy.com/reference/servoyextensions/server-plugins/http/httpclientconfig">HTTP Client Config</a> documentation.</p>
  *
  * @author pbakker
  */

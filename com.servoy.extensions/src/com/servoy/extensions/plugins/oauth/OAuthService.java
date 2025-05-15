@@ -58,9 +58,9 @@ import com.servoy.j2db.util.Utils;
  * <p>The <code>OAuthService</code> integrates seamlessly with OAuth flows, enabling
  * developers to work efficiently with access and refresh tokens, authorization URLs,
  * and custom request configurations. For additional details about the
- * <a href="../../../../guides/develop/security/authentication.md#oauth-provider">
+ * <a href="https://docs.servoy.com/guides/develop/security/authentication#oauth-provider">
  * OAuth authentication</a>, refer to the
- * <a href="../../../../guides/develop/security/authentication.md">
+ * <a href="https://docs.servoy.com/guides/develop/security/authentication">
  * Authentication</a> section of this documentation.</p>
  *
  * @author emera

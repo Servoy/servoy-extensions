@@ -39,7 +39,7 @@ import com.servoy.j2db.documentation.ServoyDocumented;
  * initial request, optimizing performance for specific scenarios.</p>
  *
  * <p>For broader context on HTTP operations, refer to the
- * <a href="./README.md">Http plugin</a> documentation.</p>
+ * <a href="https://docs.servoy.com/reference/servoyextensions/server-plugins/http">Http plugin</a> documentation.</p>
  *
  * @author pbakker
  */

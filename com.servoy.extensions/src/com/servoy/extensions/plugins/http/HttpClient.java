@@ -92,7 +92,7 @@ import com.servoy.j2db.util.Utils;
  * for different use cases.</p>
  *
  * <p>For configuration details, see the
- * <a href="./httpclientconfig.md">Http client configuration</a> section.</p>
+ * <a href="https://docs.servoy.com/reference/servoyextensions/server-plugins/http/httpclientconfig">Http client configuration</a> section.</p>
  */
 @ServoyDocumented
 public class HttpClient implements IScriptable, IJavaScriptType

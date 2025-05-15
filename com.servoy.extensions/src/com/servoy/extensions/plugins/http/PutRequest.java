@@ -41,7 +41,7 @@ import com.servoy.j2db.documentation.ServoyDocumented;
  *
  * <p>The class also provides methods to set body content, specify charsets, and directly assign files for
  * PUT operations. A sample for creating a <code>PutRequest</code> instance can be found here:
- * <a href="./httpclient.md#createputrequesturl">createPutRequest</a>.</p>
+ * <a href="https://docs.servoy.com/reference/servoyextensions/server-plugins/http/httpclient#createputrequesturl">createPutRequest</a>.</p>
  *
  * @author pbakker
  *

@@ -40,7 +40,7 @@ import com.servoy.j2db.documentation.ServoyDocumented;
  * in the request header for scenarios requiring immediate authorization.</p>
  *
  * <p>For further details, refer to the
- * <a href="../../../../guides/develop/programming-guide/creating-rest-apis.md#supporting-get-requests">
+ * <a href="https://docs.servoy.com/guides/develop/programming-guide/creating-rest-apis#supporting-get-requests">
  * Supporting GET Requests</a> section.</p>
  *
  * @author pbakker

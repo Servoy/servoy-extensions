@@ -44,8 +44,8 @@ import com.servoy.j2db.scripting.IJavaScriptType;
  *
  * <p>These methods facilitate comprehensive handling of email messages, including
  * parsing, processing, and saving data like attachments and content. References to
- * <a href="../../../servoycore/dev-api/js-lib/date.md">Date</a> and
- * <a href="../../../servoycore/dev-api/js-lib/string.md">String</a> types in the
+ * <a href="https://docs.servoy.com/reference/servoycore/dev-api/js-lib/date">Date</a> and
+ * <a href="https://docs.servoy.com/reference/servoycore/dev-api/js-lib/string">String</a> types in the
  * methods ensure consistent data handling.</p>
  *
  * @author jblok

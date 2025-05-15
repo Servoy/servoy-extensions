@@ -70,7 +70,7 @@ import com.servoy.j2db.util.Utils;
  * in scripting environments.</p>
  *
  * <p>For more details, please refer to the
- * <a href="../../../../guides/develop/programming-guide/working-with-files/images.md">
+ * <a href="https://docs.servoy.com/guides/develop/programming-guide/working-with-files/images">
  * Images plugin</a> section of this documentation.</p>
  *
  * @author jcompagner

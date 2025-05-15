@@ -44,7 +44,7 @@ import com.servoy.j2db.documentation.ServoyDocumented;
  * as <code>multipart/form-data</code> when needed, even for single-file uploads.</p>
  *
  * <p>A sample creating a <code>PatchRequest</code> can be found here:
- * <a href="./httpclient.md#createpatchrequesturl">createPatchRequest</a>.</p>
+ * <a href="https://docs.servoy.com/reference/servoyextensions/server-plugins/http/httpclient#createpatchrequesturl">createPatchRequest</a>.</p>
  *
  * @author lvostinar
  */

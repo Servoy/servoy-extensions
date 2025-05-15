@@ -40,7 +40,7 @@ import com.servoy.j2db.documentation.ServoyDocumented;
  * are useful for optimizing uploads to servers requiring immediate authentication.</p>
  *
  * <p>A sample for creating a <code>PostRequest</code> instance can be found here:
- * <a href="./httpclient.md#createpostrequesturl">createPostRequest</a>.</p>
+ * <a href="https://docs.servoy.com/reference/servoyextensions/server-plugins/http/httpclient#createpostrequesturl">createPostRequest</a>.</p>
  *
  * @author jblok
  */

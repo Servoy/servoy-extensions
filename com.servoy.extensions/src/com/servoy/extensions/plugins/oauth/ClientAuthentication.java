@@ -35,7 +35,7 @@ import com.servoy.j2db.scripting.IConstantsObject;
  * </ul>
  *
  * <p>For more information, refer to the
- * <a href="../../../../guides/develop/security/oauth.md">ClientAuthentication OAuth guide</a>.</p>
+ * <a href="https://docs.servoy.com/guides/develop/security/oauth">ClientAuthentication OAuth guide</a>.</p>
  *
  * @author emera
  */

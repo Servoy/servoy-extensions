@@ -59,9 +59,9 @@ import com.servoy.j2db.solutionmodel.ISolutionModel;
  * be used to obtain tokens and access protected resources.</p>
  *
  * <p>For additional details about OAuth authentication, refer to the
- * <a href="../../../../guides/develop/security/authentication.md#oauth-provider">
+ * <a href="https://docs.servoy.com/guides/develop/security/authentication#oauth-provider">
  * OAuth provider</a> in the
- * <a href="../../../../guides/develop/security/authentication.md">
+ * <a href="https://docs.servoy.com/guides/develop/security/authentication">
  * Authentication</a> section of this documentation.</p>
  *
  * @author emera
