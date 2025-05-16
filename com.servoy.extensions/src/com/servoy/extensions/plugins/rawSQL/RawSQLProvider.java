@@ -468,8 +468,34 @@ public class RawSQLProvider implements IScriptable
 	}
 
 	/**
-	 * Execute any SQL asynchronously. Returns a Promise that resolves with
-	 * the Boolean result of the SQL execution, or rejects with an error message.
+	 * Execute any SQL asynchronously.
+	 * Returns a <a href="https://docs.servoy.com/reference/servoycore/dev-api/js-lib/promise">Promise</a> object
+	 * that resolves to a <a href="https://docs.servoy.com/reference/servoycore/dev-api/js-lib/boolean">Boolean</a>
+	 * indicating whether the SQL executed successfully, or rejects with an error message if it fails.
+	 *
+	 * <p>Example using the <em>example_data.employees</em> datasource:</p>
+	 * <pre><code>
+	 * plugins.rawSQL.executeAsyncSQL(
+	 *   "example_data",
+	 *   "UPDATE employees SET lastname = ? WHERE employeeid = ?",
+	 *   ["DE", 100]
+	 * )
+	 * .then(function(success) {
+	 *   if (success) {
+	 *       application.output("Lastname updated successfully");
+	 *   } else {
+	 *       application.output("Update returned false: " + plugins.rawSQL.getException().getMessage());
+	 *   }
+	 * })
+	 * .catch(function(errMsg) {
+	 *   application.output("Async SQL failed: " + errMsg);
+	 * });
+	 * </code></pre>
+	 *
+	 * @param serverName the logical DB server name (e.g. <code>example_data</code>)
+	 * @param sql the SQL statement to execute
+	 *
+	 * @return a <a href="https://docs.servoy.com/reference/servoycore/dev-api/js-lib/promise">Promise</a> resolving to <code>true</code> on success or <code>false</code> on a non-exceptional failure
 	 */
 	public NativePromise js_executeAsyncSQL(String serverName, String sql)
 	{
@@ -477,8 +503,34 @@ public class RawSQLProvider implements IScriptable
 	}
 
 	/**
-	 * Execute any SQL asynchronously with arguments. Returns a Promise that resolves
-	 * with the Boolean result of the SQL execution, or rejects with an error message.
+	 * Execute any SQL asynchronously with prepared statement parameters.
+	 * Returns a <a href="https://docs.servoy.com/reference/servoycore/dev-api/js-lib/promise">Promise</a> object
+	 * that resolves to a <a href="https://docs.servoy.com/reference/servoycore/dev-api/js-lib/boolean">Boolean</a>
+	 * indicating success, or rejects with an error message if an exception occurs.
+	 *
+	 * <p>Example inserting a new employee:</p>
+	 * <pre><code>
+	 * plugins.rawSQL.executeAsyncSQL(
+	 *	     "example_data",
+	 *	     "UPDATE employees SET lastname = ?, firstname = ? WHERE employeeid = ?",
+	 *	     ["Smith", "Jane", 1]
+	 *	 )
+	 *	 .then(function(success) {
+	 *	     if (success) {
+	 *	         application.output("Employee updated successfully");
+	 *	     } else {
+	 *	         application.output("Update returned false: " + plugins.rawSQL.getException().getMessage());
+	 *	     }
+	 *	 })
+	 *	 .catch(function(errMsg) {
+	 *	     application.output("Async SQL failed: " + errMsg);
+	 *	 });
+	 * </code></pre>
+	 *
+	 * @param serverName the logical DB server name (e.g. <code>example_data</code>)
+	 * @param sql the SQL statement with placeholders
+	 * @param sql_args the array of parameter values
+	 * @return a <a href="https://docs.servoy.com/reference/servoycore/dev-api/js-lib/promise">Promise</a> resolving to <code>true</code> on success or <code>false</code> on a non-exceptional failure
 	 */
 	@SuppressWarnings("boxing")
 	public NativePromise js_executeAsyncSQL(String serverName, String sql, Object[] sql_args)
@@ -500,8 +552,34 @@ public class RawSQLProvider implements IScriptable
 	}
 
 	/**
-	 * Execute a stored procedure asynchronously with in/out parameter types.
-	 * Returns a Promise that resolves with the JSDataSet result, or rejects with an error message.
+	 * Execute a stored procedure asynchronously with specified parameter directions and types.
+	 * Returns a <a href="https://docs.servoy.com/reference/servoycore/dev-api/js-lib/promise">Promise</a> object
+	 * that resolves to a <code>JSDataSet</code> containing the result set, or rejects with an error message on failure.
+	 *
+	 * <p>Example calculating age from birth year:</p>
+	 * <pre><code>
+	 * plugins.rawSQL.executeAsyncStoredProcedure(
+	 *    "example_data",
+	 *    "call increase(?)",
+	 *    [2],
+	 *    100
+	 * )
+	 * .then(function(datasets) {
+	 *    var ds = datasets[0];
+	 *    application.output(ds);
+	 * })
+	 * .catch(function(error) {
+	 *    application.output("Async stored procedure failed: " + error);
+	 * });
+	 * </code></pre>
+	 *
+	 * @param serverName the logical DB server name (e.g. <code>example_data</code>)
+	 * @param procDecl the JDBC stored procedure call string
+	 * @param args the array of input/output parameter values
+	 * @param inOutTypes the SQL Types for input/output parameters
+	 * @param maxRows the maximum number of rows to fetch from a SELECT inside the procedure
+	 *
+	 * @return a <a href="https://docs.servoy.com/reference/servoycore/dev-api/js-lib/promise">Promise</a> resolving to a <code>JSDataSet</code> on success
 	 */
 	public NativePromise js_executeAsyncStoredProcedure(String serverName, String procDecl, Object[] args, int[] inOutTypes, int maxRows)
 	{
@@ -522,8 +600,33 @@ public class RawSQLProvider implements IScriptable
 	}
 
 	/**
-	 * Execute a stored procedure asynchronously without explicit in/out types.
-	 * Returns a Promise that resolves with the JSDataSet[] result array, or rejects with an error message.
+	 * Execute a stored procedure asynchronously without explicit direction types. Returns a <a href="https://docs.servoy.com/reference/servoycore/dev-api/js-lib/promise">Promise</a> object
+	 * that resolves to an array of <code>JSDataSet</code> containing all result sets, or rejects with an error message on failure.
+	 *
+	 * <p>Example listing employees in a department:</p>
+	 * <pre><code>
+	 * plugins.rawSQL.executeAsyncStoredProcedure(
+	 *    "example_data",
+	 *    "call increase(?)",
+	 *    [2],
+	 *    [0]
+	 *    100
+	 * )
+	 * .then(function(datasets) {
+	 *    var ds = datasets[0];
+	 *    application.output(ds);
+	 * })
+	 * .catch(function(error) {
+	 *    application.output("Async stored procedure failed: " + error);
+	 * });
+	 * </code></pre>
+	 *
+	 * @param serverName the logical DB server name (e.g. <code>example_data</code>)
+	 * @param procDecl the JDBC stored procedure declaration
+	 * @param args the array of procedure arguments
+	 * @param maxRows the maximum number of rows to retrieve for a SELECT inside the procedure
+	 *
+	 * @return a <a href="https://docs.servoy.com/reference/servoycore/dev-api/js-lib/promise">Promise</a> resolving to an array of <code>JSDataSet</code> on success
 	 */
 	public NativePromise js_executeAsyncStoredProcedure(String serverName, String procDecl, Object[] args, int maxRows)
 	{
