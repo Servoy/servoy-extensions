@@ -120,6 +120,19 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 */
 	static final int CHUNK_BUFFER_SIZE = 64 * 1024;
 
+	/**
+	 * Maximum upload file size in MB (0 means no limit)
+	 * @since Servoy 2024.03
+	 */
+	private static int maxUploadFileSize = 0;
+
+	/**
+	 * Maximum allowed upload file size in MB (system limitation)
+	 * This is a reasonable upper limit that should work on most systems
+	 * @since Servoy 2024.03
+	 */
+	private static final int MAX_SYSTEM_UPLOAD_SIZE = 2048; // 2GB
+
 	public FileProvider(FilePlugin plugin)
 	{
 		this.plugin = plugin;
@@ -550,16 +563,25 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 
 		if (filter instanceof String)
 		{
-			filterA = new String[] { (String)filter };
+			// Add maxUploadFileSize as the last element in the filter array
+			filterA = new String[] { (String)filter, "maxUploadFileSize=" + maxUploadFileSize };
 		}
 		else if (filter instanceof Object[])
 		{
 			Object[] array = (Object[])filter;
-			filterA = new String[array.length];
+			// Create a new array with one extra element for maxUploadFileSize
+			filterA = new String[array.length + 1];
 			for (int i = 0; i < array.length; i++)
 			{
 				filterA[i] = array[i].toString();
 			}
+			// Add maxUploadFileSize as the last element
+			filterA[array.length] = "maxUploadFileSize=" + maxUploadFileSize;
+		}
+		else
+		{
+			// If no filter is provided, create one with just the maxUploadFileSize
+			filterA = new String[] { "maxUploadFileSize=" + maxUploadFileSize };
 		}
 
 		IClientPluginAccess access = plugin.getClientPluginAccess();
@@ -3066,6 +3088,64 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 			Debug.error(ex);
 		}
 		return null;
+	}
+
+	/**
+	 * Sets the maximum allowed file size for uploads in MB.
+	 * A value of 0 means no size limit.
+	 *
+	 * @sample
+	 * // set maximum file size to 10MB
+	 * plugins.file.setMaxUploadFileSize(10);
+	 *
+	 * // remove size limit
+	 * plugins.file.setMaxUploadFileSize(0);
+	 *
+	 * @param size the maximum file size in MB (0 means no limit)
+	 */
+	public void js_setMaxUploadFileSize(int size)
+	{
+		if (size < 0)
+		{
+			Debug.error("Invalid file size specified. Maximum file size must be 0 or greater."); //$NON-NLS-1$
+			return;
+		}
+
+		if (size > MAX_SYSTEM_UPLOAD_SIZE)
+		{
+			Debug.error("Maximum file size exceeds system limit. Maximum allowed is " + MAX_SYSTEM_UPLOAD_SIZE + "MB."); //$NON-NLS-1$ //$NON-NLS-2$
+			return;
+		}
+
+		maxUploadFileSize = size;
+	}
+
+	/**
+	 * Returns the maximum allowed file size for uploads in MB.
+	 * A value of 0 means no size limit.
+	 *
+	 * @sample
+	 * // get the current maximum file size
+	 * var maxSize = plugins.file.getMaxUploadFileSize();
+	 * application.output("Maximum file size: " + maxSize + " MB");
+	 *
+	 * @return the maximum file size in MB (0 means no limit)
+	 */
+	public int js_getMaxUploadFileSize()
+	{
+		return maxUploadFileSize;
+	}
+
+	/**
+	 * Resets the maximum allowed file size for uploads to 0 (no limit).
+	 *
+	 * @sample
+	 * // reset the maximum file size to no limit
+	 * plugins.file.resetMaxUploadFileSize();
+	 */
+	public void js_resetMaxUploadFileSize()
+	{
+		maxUploadFileSize = 0;
 	}
 
 	/**
