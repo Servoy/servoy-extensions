@@ -595,6 +595,13 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 			}
 		}
 
+		//Testing
+		System.out.println("filterA:");
+		for (String s : filterA)
+		{
+			System.out.println(s);
+		}
+
 		IClientPluginAccess access = plugin.getClientPluginAccess();
 		if (fd != null)
 		{
