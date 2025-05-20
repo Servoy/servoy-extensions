@@ -122,14 +122,13 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 
 	/**
 	 * Maximum upload file size in MB (0 means no limit)
-	 * @since Servoy 2024.03
+	 * @since Servoy 2025.6
 	 */
 	private static int maxUploadFileSize = 0;
 
 	/**
 	 * Maximum allowed upload file size in MB (system limitation)
-	 * This is a reasonable upper limit that should work on most systems
-	 * @since Servoy 2024.03
+	 * @since Servoy 2025.6
 	 */
 	private static final int MAX_SYSTEM_UPLOAD_SIZE = 2048; // 2GB
 
@@ -3103,6 +3102,7 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 *
 	 * @param size the maximum file size in MB (0 means no limit)
 	 */
+	@ServoyClientSupport(ng = true, wc = true, sc = true)
 	public void js_setMaxUploadFileSize(int size)
 	{
 		if (size < 0)
@@ -3131,6 +3131,7 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 *
 	 * @return the maximum file size in MB (0 means no limit)
 	 */
+	@ServoyClientSupport(ng = true, wc = true, sc = true)
 	public int js_getMaxUploadFileSize()
 	{
 		return maxUploadFileSize;
@@ -3143,6 +3144,7 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 * // reset the maximum file size to no limit
 	 * plugins.file.resetMaxUploadFileSize();
 	 */
+	@ServoyClientSupport(ng = true, wc = true, sc = true)
 	public void js_resetMaxUploadFileSize()
 	{
 		maxUploadFileSize = 0;
