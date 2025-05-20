@@ -560,27 +560,39 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 		FunctionDefinition fd = callbackfunction != null ? new FunctionDefinition(callbackfunction) : null;
 		String[] filterA = null;
 
-		if (filter instanceof String)
+		if (filter == null)
 		{
-			// Add maxUploadFileSize as the last element in the filter array
-			filterA = new String[] { (String)filter, "maxUploadFileSize=" + maxUploadSize };
+			if (maxUploadSize > 0)
+			{
+				filterA = new String[] { "maxUploadFileSize=" + maxUploadSize };
+			}
+		}
+		else if (filter instanceof String)
+		{
+			if (maxUploadSize > 0)
+			{
+				filterA = new String[] { (String)filter, "maxUploadFileSize=" + maxUploadSize };
+			}
+			else
+			{
+				filterA = new String[] { (String)filter };
+			}
+
 		}
 		else if (filter instanceof Object[])
 		{
 			Object[] array = (Object[])filter;
-			// Create a new array with one extra element for maxUploadFileSize
-			filterA = new String[array.length + 1];
+			int lenArray = maxUploadSize > 0 ? array.length + 1 : array.length;
+			filterA = new String[lenArray];
+
 			for (int i = 0; i < array.length; i++)
 			{
 				filterA[i] = array[i].toString();
 			}
-			// Add maxUploadFileSize as the last element
-			filterA[array.length] = "maxUploadFileSize=" + maxUploadSize;
-		}
-		else
-		{
-			// If no filter is provided, create one with just the maxUploadFileSize
-			filterA = new String[] { "maxUploadFileSize=" + maxUploadSize };
+			if (maxUploadSize > 0)
+			{
+				filterA[lenArray - 1] = "maxUploadFileSize=" + maxUploadSize;
+			}
 		}
 
 		IClientPluginAccess access = plugin.getClientPluginAccess();
@@ -3122,7 +3134,7 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	}
 
 	/**
-	 * Test - Returns the maximum allowed file size for uploads in MB.
+	 * Returns the maximum allowed file size for uploads in MB.
 	 * A value of 0 means no size limit.
 	 *
 	 * @sample
