@@ -124,7 +124,7 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 * Maximum upload file size in MB (0 means no limit)
 	 * @since Servoy 2025.6
 	 */
-	private static int maxUploadFileSize = 0;
+	private static int maxUploadSize = 0;
 
 	/**
 	 * Maximum allowed upload file size in MB (system limitation)
@@ -563,7 +563,7 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 		if (filter instanceof String)
 		{
 			// Add maxUploadFileSize as the last element in the filter array
-			filterA = new String[] { (String)filter, "maxUploadFileSize=" + maxUploadFileSize };
+			filterA = new String[] { (String)filter, "maxUploadFileSize=" + maxUploadSize };
 		}
 		else if (filter instanceof Object[])
 		{
@@ -575,12 +575,12 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 				filterA[i] = array[i].toString();
 			}
 			// Add maxUploadFileSize as the last element
-			filterA[array.length] = "maxUploadFileSize=" + maxUploadFileSize;
+			filterA[array.length] = "maxUploadFileSize=" + maxUploadSize;
 		}
 		else
 		{
 			// If no filter is provided, create one with just the maxUploadFileSize
-			filterA = new String[] { "maxUploadFileSize=" + maxUploadFileSize };
+			filterA = new String[] { "maxUploadFileSize=" + maxUploadSize };
 		}
 
 		IClientPluginAccess access = plugin.getClientPluginAccess();
@@ -3102,8 +3102,9 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 *
 	 * @param size the maximum file size in MB (0 means no limit)
 	 */
+	@JSFunction
 	@ServoyClientSupport(ng = true, wc = true, sc = true)
-	public void js_setMaxUploadFileSize(int size)
+	public void setMaxUploadFileSize(int size)
 	{
 		if (size < 0)
 		{
@@ -3117,11 +3118,11 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 			return;
 		}
 
-		maxUploadFileSize = size;
+		maxUploadSize = size;
 	}
 
 	/**
-	 * Returns the maximum allowed file size for uploads in MB.
+	 * Test - Returns the maximum allowed file size for uploads in MB.
 	 * A value of 0 means no size limit.
 	 *
 	 * @sample
@@ -3131,10 +3132,11 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 *
 	 * @return the maximum file size in MB (0 means no limit)
 	 */
+	@JSFunction
 	@ServoyClientSupport(ng = true, wc = true, sc = true)
-	public int js_getMaxUploadFileSize()
+	public int getMaxUploadFileSize()
 	{
-		return maxUploadFileSize;
+		return maxUploadSize;
 	}
 
 	/**
@@ -3144,10 +3146,11 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 * // reset the maximum file size to no limit
 	 * plugins.file.resetMaxUploadFileSize();
 	 */
+	@JSFunction
 	@ServoyClientSupport(ng = true, wc = true, sc = true)
-	public void js_resetMaxUploadFileSize()
+	public void resetMaxUploadFileSize()
 	{
-		maxUploadFileSize = 0;
+		maxUploadSize = 0;
 	}
 
 	/**
