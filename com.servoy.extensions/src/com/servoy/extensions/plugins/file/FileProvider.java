@@ -564,7 +564,7 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 		{
 			if (maxUploadSize > 0)
 			{
-				filterA = new String[] { "maxUploadFileSize=" + maxUploadSize };
+				filterA = new String[] { "Max size(MB)", "maxUploadFileSize=" + maxUploadSize };
 			}
 		}
 		else if (filter instanceof String)
@@ -593,13 +593,6 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 			{
 				filterA[lenArray - 1] = "maxUploadFileSize=" + maxUploadSize;
 			}
-		}
-
-		//Testing
-		System.out.println("filterA:");
-		for (String s : filterA)
-		{
-			System.out.println(s);
 		}
 
 		IClientPluginAccess access = plugin.getClientPluginAccess();
