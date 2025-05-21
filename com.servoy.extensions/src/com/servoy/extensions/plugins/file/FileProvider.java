@@ -3107,12 +3107,12 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	}
 
 	/**
-	 * Sets the maximum allowed file size for uploads in MB.
+	 * Sets the maximum allowed file size for uploads in KB.
 	 * Defaults to servoy.webclient.maxuploadsize parameter from Admin page
 	 *
 	 * @sample
-	 * // set maximum file size to 10MB
-	 * plugins.file.setMaxUploadFileSize(10);
+	 * // set maximum file size to 10 MB
+	 * plugins.file.setMaxUploadFileSize(10240);
 	 *
 	 * // remove size limit
 	 * plugins.file.setMaxUploadFileSize(0);
@@ -3145,7 +3145,7 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 * @sample
 	 * // get the current maximum file size
 	 * var maxSize = plugins.file.getMaxUploadFileSize();
-	 * application.output("Maximum file size: " + maxSize + " MB");
+	 * application.output("Maximum file size: " + maxSize + " KB");
 	 *
 	 * @return the maximum file size in KB
 	 */
