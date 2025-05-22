@@ -176,6 +176,21 @@ public class BaseEntityEnclosingRequest extends BaseRequest
 		{
 			entityProducer = new MultiPartEntityProducer();
 
+			// add the parameters
+			if (params != null)
+			{
+				for (NameValuePair nvp : params.keySet())
+				{
+					String mimeType = params.get(nvp);
+					((MultiPartEntityProducer)entityProducer)
+						.addProducer(
+							new BasicAsyncEntityProducer(nvp.getValue().getBytes(),
+								ContentType.create(mimeType != null ? mimeType : "text/plain", Charset.forName(charset))),
+							nvp.getName(), null, mimeType != null);
+					// For usual String parameters
+				}
+			}
+
 			// For File parameters
 			for (FileInfo info : files)
 			{
@@ -208,21 +223,6 @@ public class BaseEntityEnclosingRequest extends BaseRequest
 				else
 				{
 					Debug.error("could not add file to post request unknown type: " + info);
-				}
-			}
-
-			// add the parameters
-			if (params != null)
-			{
-				for (NameValuePair nvp : params.keySet())
-				{
-					String mimeType = params.get(nvp);
-					((MultiPartEntityProducer)entityProducer)
-						.addProducer(
-							new BasicAsyncEntityProducer(nvp.getValue().getBytes(),
-								ContentType.create(mimeType != null ? mimeType : "text/plain", Charset.forName(charset))),
-							nvp.getName(), null, mimeType != null);
-					// For usual String parameters
 				}
 			}
 
