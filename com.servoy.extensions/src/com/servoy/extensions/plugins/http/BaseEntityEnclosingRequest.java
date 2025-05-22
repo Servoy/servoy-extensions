@@ -210,6 +210,7 @@ public class BaseEntityEnclosingRequest extends BaseRequest
 					Debug.error("could not add file to post request unknown type: " + info);
 				}
 			}
+
 			// add the parameters
 			if (params != null)
 			{
@@ -224,6 +225,7 @@ public class BaseEntityEnclosingRequest extends BaseRequest
 					// For usual String parameters
 				}
 			}
+
 		}
 
 		// entity may have been set already, see PutRequest.js_setFile
