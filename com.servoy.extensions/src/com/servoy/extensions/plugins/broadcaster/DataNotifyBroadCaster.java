@@ -31,6 +31,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.UUID;
@@ -189,6 +190,13 @@ public class DataNotifyBroadCaster implements IServerPlugin
 			String exchangeName = app.getSettings().getProperty("amqpbroadcaster.exchange", EXCHANGE_NAME);
 			String routingKey = app.getSettings().getProperty("amqpbroadcaster.routingkey", ROUTING_KEY);
 
+			String dbServersRaw = app.getSettings().getProperty("amqpbroadcaster.dbservers", "");
+			final List<String> dbServers;
+			if (dbServersRaw.trim().isEmpty())
+				dbServers = new ArrayList<>();
+			else
+				dbServers = Arrays.asList(dbServersRaw.split(","));
+
 			try
 			{
 				final IDataNotifyService dataNotifyService = app.getDataNotifyService();
@@ -243,6 +251,8 @@ public class DataNotifyBroadCaster implements IServerPlugin
 								NotifyData nd = (NotifyData)readObject;
 								if (!ORIGIN_SERVER_UUID.equals(nd.originServerUUID))
 								{
+									if (!dbServers.isEmpty() && !dbServers.contains(nd.server_name))
+										return;
 									if (nd.dataSource != null)
 									{
 										dataNotifyService.flushCachedDatabaseData(nd.dataSource, nd.broadcastFilters);
@@ -348,6 +358,7 @@ public class DataNotifyBroadCaster implements IServerPlugin
 			"When set this will enabled TLS communication over the given protocol like TLSv1.2 or TLSv1.3. WARNING: Without a keystore this will not verify the certificates only enable tls communication");
 		req.put("amqpbroadcaster.hostnameverification",
 			"When set to true this will enable the hostname verification for the TLS conncetions (TLS must be enabled) (default false)");
+		req.put("amqpbroadcaster.dbservers", "Set the comma-delimited list of database servers that will support databroadcasting (default value is all servers)");
 		return req;
 	}
 
