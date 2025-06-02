@@ -30,11 +30,7 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.UUID;
+import java.util.*;
 
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
@@ -195,7 +191,7 @@ public class DataNotifyBroadCaster implements IServerPlugin
 			if (dbServersRaw.trim().isEmpty())
 				dbServers = new ArrayList<>();
 			else
-				dbServers = Arrays.asList(dbServersRaw.split(","));
+				dbServers = Arrays.stream(dbServersRaw.split(",")).map(String::trim).toList();
 
 			try
 			{
