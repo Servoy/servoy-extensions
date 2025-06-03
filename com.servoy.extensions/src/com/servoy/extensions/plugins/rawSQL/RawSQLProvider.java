@@ -475,7 +475,7 @@ public class RawSQLProvider implements IScriptable
 	 *
 	 * <p>Example using the <em>example_data.employees</em> datasource:</p>
 	 * <pre><code>
-	 * plugins.rawSQL.executeAsyncSQL(
+	 * plugins.rawSQL.executeSQLAsync(
 	 *   "example_data",
 	 *   "UPDATE employees SET lastname = ? WHERE employeeid = ?",
 	 *   ["DE", 100]
@@ -497,9 +497,9 @@ public class RawSQLProvider implements IScriptable
 	 *
 	 * @return a <a href="https://docs.servoy.com/reference/servoycore/dev-api/js-lib/promise">Promise</a> resolving to <code>true</code> on success or <code>false</code> on a non-exceptional failure
 	 */
-	public NativePromise js_executeAsyncSQL(String serverName, String sql)
+	public NativePromise js_executeSQLAsync(String serverName, String sql)
 	{
-		return js_executeAsyncSQL(serverName, sql, (Object[])null);
+		return js_executeSQLAsync(serverName, sql, (Object[])null);
 	}
 
 	/**
@@ -510,7 +510,7 @@ public class RawSQLProvider implements IScriptable
 	 *
 	 * <p>Example inserting a new employee:</p>
 	 * <pre><code>
-	 * plugins.rawSQL.executeAsyncSQL(
+	 * plugins.rawSQL.executeSQLAsync(
 	 *	     "example_data",
 	 *	     "UPDATE employees SET lastname = ?, firstname = ? WHERE employeeid = ?",
 	 *	     ["Smith", "Jane", 1]
@@ -533,7 +533,7 @@ public class RawSQLProvider implements IScriptable
 	 * @return a <a href="https://docs.servoy.com/reference/servoycore/dev-api/js-lib/promise">Promise</a> resolving to <code>true</code> on success or <code>false</code> on a non-exceptional failure
 	 */
 	@SuppressWarnings("boxing")
-	public NativePromise js_executeAsyncSQL(String serverName, String sql, Object[] sql_args)
+	public NativePromise js_executeSQLAsync(String serverName, String sql, Object[] sql_args)
 	{
 		Deferred deferred = new Deferred(plugin.getClientPluginAccess());
 		plugin.getClientPluginAccess().getExecutor().execute(() -> {
@@ -558,7 +558,7 @@ public class RawSQLProvider implements IScriptable
 	 *
 	 * <p>Example calculating age from birth year:</p>
 	 * <pre><code>
-	 * plugins.rawSQL.executeAsyncStoredProcedure(
+	 * plugins.rawSQL.executeStoredProcedureAsync(
 	 *    "example_data",
 	 *    "call increase(?)",
 	 *    [2],
@@ -581,7 +581,7 @@ public class RawSQLProvider implements IScriptable
 	 *
 	 * @return a <a href="https://docs.servoy.com/reference/servoycore/dev-api/js-lib/promise">Promise</a> resolving to a <code>JSDataSet</code> on success
 	 */
-	public NativePromise js_executeAsyncStoredProcedure(String serverName, String procDecl, Object[] args, int[] inOutTypes, int maxRows)
+	public NativePromise js_executeStoredProcedureAsync(String serverName, String procDecl, Object[] args, int[] inOutTypes, int maxRows)
 	{
 		Deferred deferred = new Deferred(plugin.getClientPluginAccess());
 		plugin.getClientPluginAccess().getExecutor().execute(() -> {
@@ -605,7 +605,7 @@ public class RawSQLProvider implements IScriptable
 	 *
 	 * <p>Example listing employees in a department:</p>
 	 * <pre><code>
-	 * plugins.rawSQL.executeAsyncStoredProcedure(
+	 * plugins.rawSQL.executeStoredProcedureAsync(
 	 *    "example_data",
 	 *    "call increase(?)",
 	 *    [2],
@@ -628,7 +628,7 @@ public class RawSQLProvider implements IScriptable
 	 *
 	 * @return a <a href="https://docs.servoy.com/reference/servoycore/dev-api/js-lib/promise">Promise</a> resolving to an array of <code>JSDataSet</code> on success
 	 */
-	public NativePromise js_executeAsyncStoredProcedure(String serverName, String procDecl, Object[] args, int maxRows)
+	public NativePromise js_executeStoredProcedureAsync(String serverName, String procDecl, Object[] args, int maxRows)
 	{
 		Deferred deferred = new Deferred(plugin.getClientPluginAccess());
 		plugin.getClientPluginAccess().getExecutor().execute(() -> {
