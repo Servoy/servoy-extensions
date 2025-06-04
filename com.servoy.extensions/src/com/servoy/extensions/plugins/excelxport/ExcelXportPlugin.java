@@ -150,7 +150,7 @@ public class ExcelXportPlugin implements IClientPlugin, ActionListener, IIconPro
 
 	public IScriptable getScriptObject()
 	{
-		if (en == null) return new Enabler();//return dummy
+		if (en == null) return new Enabler(); // this is for developer (en == null means it's not initialized)
 		return en;
 	}
 
@@ -182,7 +182,7 @@ public class ExcelXportPlugin implements IClientPlugin, ActionListener, IIconPro
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see com.servoy.j2db.plugins.IIconProvider#getIconUrl()
 	 */
 	@Override
