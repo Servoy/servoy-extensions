@@ -98,7 +98,7 @@ import com.servoy.j2db.util.Utils;
  *
  * @author jcompagner
  */
-@ServoyDocumented(publicName = "datanotifybroadcaster", scriptingName = "plugins.datanotifybroadcaster")
+@ServoyDocumented(publicName = "datanotifybroadcaster")
 @SuppressWarnings("nls")
 public class DataNotifyBroadCaster implements IServerPlugin
 {
