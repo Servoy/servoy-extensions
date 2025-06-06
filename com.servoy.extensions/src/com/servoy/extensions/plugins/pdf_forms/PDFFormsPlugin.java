@@ -16,16 +16,22 @@
  */
 package com.servoy.extensions.plugins.pdf_forms;
 
+import java.beans.PropertyChangeEvent;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import javax.swing.Icon;
+
 import com.servoy.extensions.plugins.pdf_forms.servlets.PDFServlet;
 import com.servoy.j2db.documentation.ServoyDocumented;
+import com.servoy.j2db.plugins.IClientPlugin;
+import com.servoy.j2db.plugins.IClientPluginAccess;
 import com.servoy.j2db.plugins.IServerAccess;
 import com.servoy.j2db.plugins.IServerPlugin;
 import com.servoy.j2db.plugins.PluginException;
 import com.servoy.j2db.preference.PreferencePanel;
+import com.servoy.j2db.scripting.IScriptable;
 
 /**
  * <p>The <code>PDFFormsPlugin</code> is a server plugin designed to handle PDF forms in the Servoy
@@ -53,8 +59,8 @@ import com.servoy.j2db.preference.PreferencePanel;
  *
  * @author jblok
  */
-@ServoyDocumented
-public class PDFFormsPlugin implements IServerPlugin
+@ServoyDocumented(publicName = "pdf_forms", scriptingName = "plugins.pdf_forms")
+public class PDFFormsPlugin implements IServerPlugin, IClientPlugin
 {
 	public void initialize(IServerAccess app) throws PluginException
 	{
@@ -87,5 +93,65 @@ public class PDFFormsPlugin implements IServerPlugin
 		Properties props = new Properties();
 		props.put(DISPLAY_NAME, "PDF Forms Plugin"); //$NON-NLS-1$
 		return props;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
+	 */
+	@Override
+	public void propertyChange(PropertyChangeEvent evt)
+	{
+		// TODO Auto-generated method stub
+
+	}
+
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see com.servoy.j2db.scripting.IScriptableProvider#getScriptObject()
+	 */
+	@Override
+	public IScriptable getScriptObject()
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see com.servoy.j2db.plugins.IClientPlugin#initialize(com.servoy.j2db.plugins.IClientPluginAccess)
+	 */
+	@Override
+	public void initialize(IClientPluginAccess app) throws PluginException
+	{
+		// TODO Auto-generated method stub
+
+	}
+
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see com.servoy.j2db.plugins.IClientPlugin#getName()
+	 */
+	@Override
+	public String getName()
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see com.servoy.j2db.plugins.IClientPlugin#getImage()
+	 */
+	@Override
+	public Icon getImage()
+	{
+		// TODO Auto-generated method stub
+		return null;
 	}
 }
