@@ -3121,7 +3121,7 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 * plugins.file.setMaxUploadFileSize(0);
 	 *
 	 * @param size the maximum file size in KB;
-	 * 		-1 will set value of the'servoy.webclient.maxuploadsize' setting from the Admin page (if any) or zero (no limit);
+	 * 		-1 default - will set value of the'servoy.webclient.maxuploadsize' setting from the Admin page (if any) or zero (no limit);
 	 * 		0 no limit
 	 * 		> 0 max file size for upload (kb)
 	 */
