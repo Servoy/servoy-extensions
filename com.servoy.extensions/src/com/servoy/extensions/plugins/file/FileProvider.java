@@ -563,9 +563,11 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 		FunctionDefinition fd = callbackfunction != null ? new FunctionDefinition(callbackfunction) : null;
 		String[] filterA = null;
 
-		Settings settings = Settings.getInstance();
-		long maxUpload = Utils.getAsLong(settings.getProperty("servoy.webclient.maxuploadsize", "0"), false);
-		long uploadSize = maxUploadSize > 0 ? maxUploadSize : maxUpload;
+		if (maxUploadSize < 0)
+		{
+			String maxUploadSizeStr = Settings.getInstance().getProperty("servoy.webclient.maxuploadsize", "0");
+			maxUploadSize = Utils.getAsLong(maxUploadSizeStr, false);
+		}
 		if (filter == null)
 		{
 			if (maxUploadSize > 0)
@@ -588,7 +590,7 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 		else if (filter instanceof Object[])
 		{
 			Object[] array = (Object[])filter;
-			int lenArray = uploadSize > 0 ? array.length + 1 : array.length;
+			int lenArray = maxUploadSize > 0 ? array.length + 1 : array.length;
 			filterA = new String[lenArray];
 
 			for (int i = 0; i < array.length; i++)
