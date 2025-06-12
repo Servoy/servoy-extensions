@@ -122,12 +122,6 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 */
 	static final int CHUNK_BUFFER_SIZE = 64 * 1024;
 
-	/**
-	 * Maximum upload file size in KB
-	 * @since Servoy 2025.6
-	 */
-	private static long maxUploadSize = -1;
-
 	public FileProvider(FilePlugin plugin)
 	{
 		this.plugin = plugin;
@@ -556,8 +550,10 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 		FunctionDefinition fd = callbackfunction != null ? new FunctionDefinition(callbackfunction) : null;
 		String[] filterA = null;
 
-		access.getRuntimeProperties().remove("servoy.runtime.maxuploadfilesize"); // always clean it up
-		if (maxUploadSize < 0)
+		//get value as in setMaxUploadFileSize
+		Long maxUpload = (Long)access.getRuntimeProperties().remove("servoy.runtime.maxuploadfilesize"); // always clean it up
+		long maxUploadSize = maxUpload != null ? maxUpload.longValue() : -1;
+		if (maxUploadSize < 0) // -1 use whatever is set to the page admin (0 - unlimit is there is no value)
 		{
 			String maxUploadSizeStr = Settings.getInstance().getProperty("servoy.webclient.maxuploadsize", "0");
 			maxUploadSize = Utils.getAsLong(maxUploadSizeStr, false);
@@ -597,9 +593,9 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 			}
 		}
 
-		if (maxUploadSize > 0)
+		if (maxUpload != null && maxUpload.longValue() > 0)//if there is a value overriding the default (0 - unlimited, > 0 - whatever value it is)
 		{
-			access.getRuntimeProperties().put("servoy.runtime.maxuploadfilesize", Long.valueOf(maxUploadSize));
+			access.getRuntimeProperties().put("servoy.runtime.maxuploadfilesize", maxUpload); //restore to be accessible on the MediaResourceServlet
 		}
 
 
@@ -3128,14 +3124,7 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	@ServoyClientSupport(ng = true, wc = true, sc = true)
 	public void setMaxUploadFileSize(long size)
 	{
-		if (size == -1)
-		{
-			Settings settings = Settings.getInstance();
-			maxUploadSize = Utils.getAsLong(settings.getProperty("servoy.webclient.maxuploadsize", "0"), false);
-			return;
-		}
-		maxUploadSize = size;
-
+		plugin.getClientPluginAccess().getRuntimeProperties().put("servoy.runtime.maxuploadfilesize", Long.valueOf(size));
 	}
 
 	/**
@@ -3153,8 +3142,9 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	@ServoyClientSupport(ng = true, wc = true, sc = true)
 	public long getMaxUploadFileSize()
 	{
-
-		return maxUploadSize;
+		@SuppressWarnings("boxing")
+		Long retVal = (Long)plugin.getClientPluginAccess().getRuntimeProperties().getOrDefault("servoy.runtime.maxuploadfilesize", Long.valueOf(-1)); //$NON-NLS-1$
+		return retVal.longValue();
 	}
 
 	/**
