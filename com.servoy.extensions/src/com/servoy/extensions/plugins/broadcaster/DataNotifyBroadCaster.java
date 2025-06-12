@@ -17,7 +17,6 @@
 
 package com.servoy.extensions.plugins.broadcaster;
 
-import java.beans.PropertyChangeEvent;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -38,7 +37,6 @@ import java.util.UUID;
 
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
-import javax.swing.Icon;
 
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
@@ -51,13 +49,10 @@ import com.rabbitmq.client.Recoverable;
 import com.rabbitmq.client.RecoverableConnection;
 import com.rabbitmq.client.RecoveryListener;
 import com.servoy.j2db.documentation.ServoyDocumented;
-import com.servoy.j2db.plugins.IClientPlugin;
-import com.servoy.j2db.plugins.IClientPluginAccess;
 import com.servoy.j2db.plugins.IDataNotifyService;
 import com.servoy.j2db.plugins.IServerAccess;
 import com.servoy.j2db.plugins.IServerPlugin;
 import com.servoy.j2db.plugins.PluginException;
-import com.servoy.j2db.scripting.IScriptable;
 import com.servoy.j2db.util.Debug;
 import com.servoy.j2db.util.Utils;
 
@@ -82,9 +77,9 @@ import com.servoy.j2db.util.Utils;
  *
  * @author jcompagner
  */
-@ServoyDocumented(publicName = "datanotifybroadcaster", scriptingName = "plugins.datanotifybroadcaster")
+@ServoyDocumented(publicName = "datanotifybroadcaster")
 @SuppressWarnings("nls")
-public class DataNotifyBroadCaster implements IServerPlugin, IClientPlugin
+public class DataNotifyBroadCaster implements IServerPlugin
 {
 	private static final String EXCHANGE_NAME = "databroadcast";
 	private static final String ROUTING_KEY = "";
@@ -406,65 +401,5 @@ public class DataNotifyBroadCaster implements IServerPlugin, IClientPlugin
 			}
 		};
 		channel.basicConsume(queueName, consumer);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
-	 */
-	@Override
-	public void propertyChange(PropertyChangeEvent evt)
-	{
-		// TODO Auto-generated method stub
-
-	}
-
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see com.servoy.j2db.scripting.IScriptableProvider#getScriptObject()
-	 */
-	@Override
-	public IScriptable getScriptObject()
-	{
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see com.servoy.j2db.plugins.IClientPlugin#initialize(com.servoy.j2db.plugins.IClientPluginAccess)
-	 */
-	@Override
-	public void initialize(IClientPluginAccess app) throws PluginException
-	{
-		// TODO Auto-generated method stub
-
-	}
-
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see com.servoy.j2db.plugins.IClientPlugin#getName()
-	 */
-	@Override
-	public String getName()
-	{
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see com.servoy.j2db.plugins.IClientPlugin#getImage()
-	 */
-	@Override
-	public Icon getImage()
-	{
-		// TODO Auto-generated method stub
-		return null;
 	}
 }
