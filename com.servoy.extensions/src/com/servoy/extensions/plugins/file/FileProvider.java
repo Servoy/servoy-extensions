@@ -551,12 +551,11 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 		String[] filterA = null;
 
 		//get value as in setMaxUploadFileSize
-		Long maxUpload = (Long)access.getRuntimeProperties().remove("servoy.runtime.maxuploadfilesize"); // always clean it up
-		long maxUploadSize = maxUpload != null ? maxUpload.longValue() : -1;
-		if (maxUploadSize < 0) // -1 use whatever is set to the page admin (0 - unlimit is there is no value)
+		Long maxUpload = (Long)access.getRuntimeProperties().get("servoy.runtime.maxuploadfilesize"); // always clean it up //$NON-NLS-1$
+		long maxUploadSize = maxUpload != null ? maxUpload.longValue() : 0;
+		if (maxUploadSize == 0)
 		{
-			String maxUploadSizeStr = Settings.getInstance().getProperty("servoy.webclient.maxuploadsize", "0");
-			maxUploadSize = Utils.getAsLong(maxUploadSizeStr, false);
+			maxUploadSize = Utils.getAsLong(Settings.getInstance().getProperty("servoy.webclient.maxuploadsize", "0"), false);
 		}
 		if (filter == null)
 		{
@@ -592,12 +591,6 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 				filterA[lenArray - 1] = "maxUploadFileSize=" + maxUploadSize;
 			}
 		}
-
-		if (maxUpload != null && maxUpload.longValue() > 0)//if there is a value overriding the default
-		{
-			access.getRuntimeProperties().put("servoy.runtime.maxuploadfilesize", maxUpload); //restore to be accessible on the MediaResourceServlet
-		}
-
 
 		if (fd != null)
 		{
@@ -3106,25 +3099,26 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 
 	/**
 	 * Sets the maximum allowed file size for uploads in KB.
-	 * Defaults to servoy.webclient.maxuploadsize parameter from Admin page
+	 * Defaults to servoy.webclient.maxuploadsize parameter from Admin page if the value is set to 0;
+	 *
+	 * This sets the maximum file size uploads for the file plugin showFileOpenDialog but also for the file upload component.
 	 *
 	 * @sample
 	 * // set maximum file size to 10 MB
-	 * plugins.file.setMaxUploadFileSize(10240);
+	 * plugins.file.setMaxUploadFileSize(10000);
 	 *
-	 * // remove size limit
+	 * // remove size limit, fallback to the admin page property
 	 * plugins.file.setMaxUploadFileSize(0);
 	 *
 	 * @param size the maximum file size in KB;
-	 * 		-1 default - will set value of the'servoy.webclient.maxuploadsize' setting from the Admin page (if any) or zero (no limit);
-	 * 		0 no limit
-	 * 		> 0 max file size for upload (kb)
+	 * 		0 tis will use the default size from the admin page (servoy.webclient.maxuploadsize)
+	 * 		> 0 max file size for upload (kb) overwriting the admin page value.
 	 */
 	@JSFunction
 	@ServoyClientSupport(ng = true, wc = true, sc = true)
 	public void setMaxUploadFileSize(long size)
 	{
-		plugin.getClientPluginAccess().getRuntimeProperties().put("servoy.runtime.maxuploadfilesize", Long.valueOf(size));
+		plugin.getClientPluginAccess().getRuntimeProperties().put("servoy.runtime.maxuploadfilesize", Long.valueOf(size)); //$NON-NLS-1$
 	}
 
 	/**
