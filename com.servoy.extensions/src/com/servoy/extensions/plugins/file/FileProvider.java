@@ -593,7 +593,7 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 			}
 		}
 
-		if (maxUpload != null && maxUpload.longValue() > 0)//if there is a value overriding the default (0 - unlimited, > 0 - whatever value it is)
+		if (maxUpload != null && maxUpload.longValue() > 0)//if there is a value overriding the default
 		{
 			access.getRuntimeProperties().put("servoy.runtime.maxuploadfilesize", maxUpload); //restore to be accessible on the MediaResourceServlet
 		}
