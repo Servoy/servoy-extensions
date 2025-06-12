@@ -97,13 +97,6 @@ import com.servoy.j2db.util.Utils;
  * for downloads or inline viewing. Temporary file handling via <code>trackFileForDeletion</code>
  * automates cleanup processes upon solution closure, contributing to resource efficiency.</p>
  *
- *
- * <p><b>Configuration Properties:</b></p>
- *
- * <ul>
- * <li><code>servoy.FileServerService.defaultFolder</code>: Set the default folder path (absolute path on the server) to save files sent by clients (will default to user.home/.servoy/uploads/UUID/)</li>
- * </ul>
- *
  * @author jcompagner
  * @author Servoy Stuff
  */

@@ -49,14 +49,6 @@ import com.servoy.j2db.scripting.IScriptable;
  * <code>load()</code> and <code>unload()</code> for resource management, and
  * <code>getProperties()</code> for exposing its configuration details.</p>
  *
- *
- * <p><b>Configuration Properties:</b></p>
- *
- * <ul>
- * <li><code>pdf_forms_plugin_template_location</code>: The url to retrieve the pdf templates(using file name from database)</li>
- * <li><code>pdf_forms_plugin_servername</code>: The name of the server to locate the required pdf_form_values,pdf_templates,pdf_actions SQL tabels</li>
- * </ul>
- *
  * @author jblok
  */
 @ServoyDocumented(publicName = "pdf_forms", scriptingName = "plugins.pdf_forms")

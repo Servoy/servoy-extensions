@@ -80,27 +80,6 @@ import com.servoy.j2db.util.Utils;
  * security settings, and timeout values. The plugin automatically creates the necessary AMQP
  * exchanges and queues during initialization.</p>
  *
- *
- * <p><b>Configuration Properties:</b></p>
- *
- * <ul>
- * <li><code>amqpbroadcaster.hostname</code>: Set the hostname of the AMQP (RabbitMQ) server where to connect to (this is mandatory field)</li>
- * <li><code>amqpbroadcaster.username</code>: Set the username of the AMQP (RabbitMQ) server where to connect to (default value is guest)</li>
- * <li><code>amqpbroadcaster.password</code>: Set the password of the AMQP (RabbitMQ) server where to connect to (default value is guest)</li>
- * <li><code>amqpbroadcaster.virtualhost</code>: Set the virtual host of the AMQP (RabbitMQ) server where to connect to (default value is / )</li>
- * <li><code>amqpbroadcaster.port</code>: Set the port of the AMQP (RabbitMQ) server where to connect to (default value is 5671 for SSL connection and 5672 for default connection)</li>
- * <li><code>amqpbroadcaster.exchange</code>: Set the exchange through which the databroadcast notifications are send (default value is databroadcast)</li>
- * <li><code>amqpbroadcaster.routingkey</code>: Set the key for routing the databroadcast notifications (default to empty string)</li>
- * <li><code>amqpbroadcaster.connectiontimeout</code>: Set the connection timeout of the AMQP (RabbitMQ) connection (default value 60000 - 60 seconds)</li>
- * <li><code>amqpbroadcaster.handshaketimeout</code>: Set the handshake timeout of the AMQP (RabbitMQ) connection (default value 10000 - 10 seconds)</li>
- * <li><code>amqpbroadcaster.shutdowntimeout</code>: Set the shutdown timeout of the AMQP (RabbitMQ) connection (default value 10000 - 10 seconds)</li>
- * <li><code>amqpbroadcaster.rpctimeout</code>: Set the rpc continuation timeout of the AMQP (RabbitMQ) channel (default value 10 minutes)</li>
- * <li><code>amqpbroadcaster.keystore.path</code>: The path on the system that points to a the keystore to enable TLS communication, a .JKS file will use the JKS keystore format, else it will use PKCS12 format</li>
- * <li><code>amqpbroadcaster.keystore.password</code>: The password to access/read the keystore and key of the amqpbroadcaster.keystore.path</li>
- * <li><code>amqpbroadcaster.tlsprotocols</code>: When set this will enabled TLS communication over the given protocol like TLSv1.2 or TLSv1.3. WARNING: Without a keystore this will not verify the certificates only enable tls communication</li>
- * <li><code>amqpbroadcaster.hostnameverification</code>: When set to true this will enable the hostname verification for the TLS conncetions (TLS must be enabled) (default false)</li>
- * </ul>
- *
  * @author jcompagner
  */
 @ServoyDocumented(publicName = "datanotifybroadcaster", scriptingName = "plugins.datanotifybroadcaster")

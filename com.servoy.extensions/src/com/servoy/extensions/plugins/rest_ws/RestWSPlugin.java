@@ -55,21 +55,6 @@ import com.servoy.j2db.util.serialize.JSONSerializerWrapper;
  * fail, or grow, with block as the default).</p>
  *
  * @see RestWSServlet
- * 
- *
- * <p><b>Configuration Properties:</b></p>
- *
- * <ul>
- * <li><code>rest_ws_use_jsupload_for_binary_data</code>: Convert binary uploads (multipart or pure byte uploads) to a JSUpload that is cached on disk if they are bigger then a threshold (servoy.ng_web_client.tempfile.threshold property), default 'true'</li>
- * <li><code>rest_ws_plugin_client_pool_exhausted_action</code>: The following values are supported for this setting:
-block (default): requests will wait untill a client becomes available, when running in developer this value will be used
-fail: the request will fail. The API will generate a SERVICE_UNAVAILABLE response (HTTP 503)
-grow: allows the pool to  grow, by starting additional clients. The number of clients per solution may become higher than defined by setting 'rest_ws_plugin_client_pool_size', but will shrink back to that value when clients in the pool become idle.</li>
- * <li><code>rest_ws_plugin_authorized_groups</code>: Only authenticated users in the listed groups (comma-separated) have access, when left empty unauthorised access is allowed</li>
- * <li><code>rest_ws_send_user_properties_headers</code>: This is a global setting to specify if the user properties are generated as header values on the REST responses. It can also be set in the rest ws plugin ws_* methods. Default is true.</li>
- * <li><code>rest_ws_plugin_client_pool_size</code>: Max number of clients per solution used (this defines the number of concurrent requests and licences used per solution), default = 5. The same value is used for maximum number of idle clients. In case of rest_ws_plugin_client_pool_exhausted_action=grow, the number of clients may become higher. When running in developer this setting is ignored, pool size will always be 1</li>
- * <li><code>rest_ws_plugin_client_max_grow_pool_size</code>: This value is only used when rest_ws_plugin_client_pool_exhausted_action=grow, and it defines the total number of clients to which the pool grows, after this value the pool will block. By default is not defined.</li>
- * </ul>
  *
  * @author rgansevles
  */

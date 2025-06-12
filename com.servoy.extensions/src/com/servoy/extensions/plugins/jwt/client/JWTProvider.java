@@ -58,13 +58,6 @@ import com.servoy.j2db.util.Utils;
  * <code>JWK(url)</code> method. These features collectively enable robust and secure
  * token-based authentication systems.</p>
  *
- *
- * <p><b>Configuration Properties:</b></p>
- *
- * <ul>
- * <li><code>jwt.secret.password</code>: Shared secret, used to sign and verify the JWT tokens. Should be the same on all servers that want to sign or verify the same tokens.</li>
- * </ul>
- *
  * @author emera
  */
 @ServoyDocumented(publicName = JWTPlugin.PLUGIN_NAME, scriptingName = "plugins." + JWTPlugin.PLUGIN_NAME)

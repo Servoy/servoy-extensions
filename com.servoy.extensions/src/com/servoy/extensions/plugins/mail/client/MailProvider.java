@@ -46,28 +46,6 @@ import com.servoy.j2db.util.Utils;
  * providing flexibility for diverse email content. Utility methods like email address validation
  * and plain address extraction are also available.</p>
  *
- *
- * <p><b>Configuration Properties:</b></p>
- *
- * <ul>
- * <li><code>mail.server.allowUnauthenticatedRMIAccess</code>: Allow mailserver access for unauthenticated smart (rmi) client (true/false), defaults to false</li>
- * <li><code>mail.pop3.host</code>: The name of POP3 server to recieve mails from</li>
- * <li><code>mail.pop3.apop.enable</code>: Whether or not to use APOP for authentication (true/false), defaults to false.</li>
- * <li><code>mail.smtp.host</code>: The name of SMTP server to deliver the mails to</li>
- * <li><code>mail.smtp.port</code>: The port of SMTP server to deliver the mails to</li>
- * <li><code>mail.from</code>: Default 'from' address if none is specified</li>
- * <li><code>mail.smtp.auth</code>: Use authentication (true/false), defaults to false.</li>
- * <li><code>mail.smtp.username</code>: Specify username if using authentication</li>
- * <li><code>mail.smtp.password</code>: Specify password if using authentication</li>
- * <li><code>mail.smtp.connectiontimeout</code>: Socket connection timeout value in milliseconds. Default is infinite timeout.</li>
- * <li><code>mail.smtp.timeout</code>: Socket I/O timeout value in milliseconds. Default is infinite timeout.</li>
- * <li><code>mail.smtp.ssl.enable</code>: Use SSL (true/false), defaults to false .</li>
- * <li><code>mail.smtp.starttls.enable</code>: Use START/TLS (true/false), defaults to false .</li>
- * <li><code>mail.mime.charset</code>: Specify the name of the charset to use for mail encoding (leave emtpy for system default), see http://java.sun.com/j2se/1.4.2/docs/api/java/nio/charset/Charset.html forinfo which charset names are usable</li>
- * <li><code>mail.development.override.address</code>: Specify an email address to which all email will be send instead of the specified To, Cc and Bcc addresses.
-The specified to, Cc and Bcc addresses will be added to the Subject.</li>
- * </ul>
- *
  * @author jblok
  */
 @ServoyDocumented(publicName = MailPlugin.PLUGIN_NAME, scriptingName = "plugins." + MailPlugin.PLUGIN_NAME)
