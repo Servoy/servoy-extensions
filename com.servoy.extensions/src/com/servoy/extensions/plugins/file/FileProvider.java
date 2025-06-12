@@ -3124,6 +3124,7 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	/**
 	 * Returns the maximum allowed file size for uploads in KB.
 	 * Defaults to servoy.webclient.maxuploadsize parameter from Admin page
+	 * If this return 0 then this means there is no maximum set.
 	 *
 	 * @sample
 	 * // get the current maximum file size
@@ -3132,13 +3133,15 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 *
 	 * @return the maximum file size in KB
 	 */
+	@SuppressWarnings("nls")
 	@JSFunction
 	@ServoyClientSupport(ng = true, wc = true, sc = true)
 	public long getMaxUploadFileSize()
 	{
-		@SuppressWarnings("boxing")
-		Long retVal = (Long)plugin.getClientPluginAccess().getRuntimeProperties().getOrDefault("servoy.runtime.maxuploadfilesize", Long.valueOf(-1)); //$NON-NLS-1$
-		return retVal.longValue();
+		Object runtimeSize = plugin.getClientPluginAccess().getRuntimeProperties().get("servoy.runtime.maxuploadfilesize");
+		if (runtimeSize instanceof Long retVal) return retVal.longValue();
+		long retVal = Utils.getAsLong(Settings.getInstance().getProperty("servoy.webclient.maxuploadsize", "0"));
+		return retVal;
 	}
 
 	/**
