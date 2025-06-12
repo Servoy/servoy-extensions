@@ -122,18 +122,6 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 */
 	static final int CHUNK_BUFFER_SIZE = 64 * 1024;
 
-	/**
-	 * Maximum upload file size in KB
-	 * @since Servoy 2025.6
-	 */
-	private static long maxUploadSize = 0;
-
-	/**
-	 * Maximum allowed upload file size in KB (system limitation)
-	 * @since Servoy 2025.6
-	 */
-	private static final int MAX_SYSTEM_UPLOAD_SIZE = 2048 * 1024; // 2GB
-
 	public FileProvider(FilePlugin plugin)
 	{
 		this.plugin = plugin;
@@ -557,26 +545,31 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 			default :
 				selection = JFileChooser.FILES_ONLY;
 		}
-
+		IClientPluginAccess access = plugin.getClientPluginAccess();
 		File file = startDirectory != null ? getFileFromArg(startDirectory, true) : null;
 		FunctionDefinition fd = callbackfunction != null ? new FunctionDefinition(callbackfunction) : null;
 		String[] filterA = null;
 
-		Settings settings = Settings.getInstance();
-		long maxUpload = Utils.getAsLong(settings.getProperty("servoy.webclient.maxuploadsize", "0"), false);
-		long uploadSize = maxUploadSize > 0 ? maxUploadSize : maxUpload;
+		//get value as in setMaxUploadFileSize
+		Long maxUpload = (Long)access.getRuntimeProperties().remove("servoy.runtime.maxuploadfilesize"); // always clean it up
+		long maxUploadSize = maxUpload != null ? maxUpload.longValue() : -1;
+		if (maxUploadSize < 0) // -1 use whatever is set to the page admin (0 - unlimit is there is no value)
+		{
+			String maxUploadSizeStr = Settings.getInstance().getProperty("servoy.webclient.maxuploadsize", "0");
+			maxUploadSize = Utils.getAsLong(maxUploadSizeStr, false);
+		}
 		if (filter == null)
 		{
-			if (uploadSize > 0)
+			if (maxUploadSize > 0)
 			{
 				filterA = new String[] { "Max size(KB)", "maxUploadFileSize=" + maxUploadSize };
 			}
 		}
 		else if (filter instanceof String)
 		{
-			if (uploadSize > 0)
+			if (maxUploadSize > 0)
 			{
-				filterA = new String[] { (String)filter, "maxUploadFileSize=" + uploadSize };
+				filterA = new String[] { (String)filter, "maxUploadFileSize=" + maxUploadSize };
 			}
 			else
 			{
@@ -587,20 +580,25 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 		else if (filter instanceof Object[])
 		{
 			Object[] array = (Object[])filter;
-			int lenArray = uploadSize > 0 ? array.length + 1 : array.length;
+			int lenArray = maxUploadSize > 0 ? array.length + 1 : array.length;
 			filterA = new String[lenArray];
 
 			for (int i = 0; i < array.length; i++)
 			{
 				filterA[i] = array[i].toString();
 			}
-			if (uploadSize > 0)
+			if (maxUploadSize > 0)
 			{
-				filterA[lenArray - 1] = "maxUploadFileSize=" + uploadSize;
+				filterA[lenArray - 1] = "maxUploadFileSize=" + maxUploadSize;
 			}
 		}
 
-		IClientPluginAccess access = plugin.getClientPluginAccess();
+		if (maxUpload != null && maxUpload.longValue() > 0)//if there is a value overriding the default
+		{
+			access.getRuntimeProperties().put("servoy.runtime.maxuploadfilesize", maxUpload); //restore to be accessible on the MediaResourceServlet
+		}
+
+
 		if (fd != null)
 		{
 			final FunctionDefinition functionDef = fd;
@@ -3117,25 +3115,16 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 * // remove size limit
 	 * plugins.file.setMaxUploadFileSize(0);
 	 *
-	 * @param size the maximum file size in KB
+	 * @param size the maximum file size in KB;
+	 * 		-1 default - will set value of the'servoy.webclient.maxuploadsize' setting from the Admin page (if any) or zero (no limit);
+	 * 		0 no limit
+	 * 		> 0 max file size for upload (kb)
 	 */
 	@JSFunction
 	@ServoyClientSupport(ng = true, wc = true, sc = true)
 	public void setMaxUploadFileSize(long size)
 	{
-		if (size < 0)
-		{
-			Debug.error("Invalid file size specified. Maximum file size must be 0 or greater."); //$NON-NLS-1$
-			return;
-		}
-
-		if (size > MAX_SYSTEM_UPLOAD_SIZE)
-		{
-			Debug.error("Maximum file size exceeds system limit. Maximum allowed is " + MAX_SYSTEM_UPLOAD_SIZE + "KB."); //$NON-NLS-1$ //$NON-NLS-2$
-			return;
-		}
-
-		maxUploadSize = size;
+		plugin.getClientPluginAccess().getRuntimeProperties().put("servoy.runtime.maxuploadfilesize", Long.valueOf(size));
 	}
 
 	/**
@@ -3153,25 +3142,9 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	@ServoyClientSupport(ng = true, wc = true, sc = true)
 	public long getMaxUploadFileSize()
 	{
-		Settings settings = Settings.getInstance();
-		long maxUpload = Utils.getAsLong(settings.getProperty("servoy.webclient.maxuploadsize", "0"), false);
-		long uploadSize = maxUploadSize > 0 ? maxUploadSize : maxUpload;
-
-		return uploadSize;
-	}
-
-	/**
-	 * Resets the maximum allowed file size for uploads to 0 (no limit).
-	 *
-	 * @sample
-	 * // reset the maximum file size to no limit
-	 * plugins.file.resetMaxUploadFileSize();
-	 */
-	@JSFunction
-	@ServoyClientSupport(ng = true, wc = true, sc = true)
-	public void resetMaxUploadFileSize()
-	{
-		maxUploadSize = 0;
+		@SuppressWarnings("boxing")
+		Long retVal = (Long)plugin.getClientPluginAccess().getRuntimeProperties().getOrDefault("servoy.runtime.maxuploadfilesize", Long.valueOf(-1)); //$NON-NLS-1$
+		return retVal.longValue();
 	}
 
 	/**
