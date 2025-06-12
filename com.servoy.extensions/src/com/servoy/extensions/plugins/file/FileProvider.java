@@ -556,6 +556,7 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 		FunctionDefinition fd = callbackfunction != null ? new FunctionDefinition(callbackfunction) : null;
 		String[] filterA = null;
 
+		plugin.getClientPluginAccess().getRuntimeProperties().remove("servoy.runtime.maxuploadfilesize"); // always clean it up
 		if (maxUploadSize < 0)
 		{
 			String maxUploadSizeStr = Settings.getInstance().getProperty("servoy.webclient.maxuploadsize", "0");
@@ -594,6 +595,11 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 			{
 				filterA[lenArray - 1] = "maxUploadFileSize=" + maxUploadSize;
 			}
+		}
+
+		if (maxUploadSize > 0)
+		{
+			plugin.getClientPluginAccess().getRuntimeProperties().put("servoy.runtime.maxuploadfilesize", Long.toString(maxUploadSize));
 		}
 
 		IClientPluginAccess access = plugin.getClientPluginAccess();
@@ -3122,16 +3128,11 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	@ServoyClientSupport(ng = true, wc = true, sc = true)
 	public void setMaxUploadFileSize(long size)
 	{
-		plugin.getClientPluginAccess().getRuntimeProperties().remove("servoy.runtime.maxuploadfilesize"); // always clean it up
 		if (size == -1)
 		{
 			Settings settings = Settings.getInstance();
 			maxUploadSize = Utils.getAsLong(settings.getProperty("servoy.webclient.maxuploadsize", "0"), false);
 			return;
-		}
-		if (size > 0)
-		{
-			plugin.getClientPluginAccess().getRuntimeProperties().put("servoy.runtime.maxuploadfilesize", Long.toString(size));
 		}
 		maxUploadSize = size;
 
