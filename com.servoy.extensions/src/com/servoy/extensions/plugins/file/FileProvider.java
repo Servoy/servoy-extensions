@@ -551,12 +551,12 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 			default :
 				selection = JFileChooser.FILES_ONLY;
 		}
-
+		IClientPluginAccess access = plugin.getClientPluginAccess();
 		File file = startDirectory != null ? getFileFromArg(startDirectory, true) : null;
 		FunctionDefinition fd = callbackfunction != null ? new FunctionDefinition(callbackfunction) : null;
 		String[] filterA = null;
 
-		plugin.getClientPluginAccess().getRuntimeProperties().remove("servoy.runtime.maxuploadfilesize"); // always clean it up
+		access.getRuntimeProperties().remove("servoy.runtime.maxuploadfilesize"); // always clean it up
 		if (maxUploadSize < 0)
 		{
 			String maxUploadSizeStr = Settings.getInstance().getProperty("servoy.webclient.maxuploadsize", "0");
@@ -599,10 +599,10 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 
 		if (maxUploadSize > 0)
 		{
-			plugin.getClientPluginAccess().getRuntimeProperties().put("servoy.runtime.maxuploadfilesize", Long.toString(maxUploadSize));
+			access.getRuntimeProperties().put("servoy.runtime.maxuploadfilesize", Long.valueOf(maxUploadSize));
 		}
 
-		IClientPluginAccess access = plugin.getClientPluginAccess();
+
 		if (fd != null)
 		{
 			final FunctionDefinition functionDef = fd;
