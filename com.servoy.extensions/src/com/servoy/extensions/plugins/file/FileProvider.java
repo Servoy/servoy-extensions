@@ -3122,15 +3122,19 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	@ServoyClientSupport(ng = true, wc = true, sc = true)
 	public void setMaxUploadFileSize(long size)
 	{
+		plugin.getClientPluginAccess().getRuntimeProperties().remove("servoy.runtime.maxuploadfilesize"); // always clean it up
 		if (size == -1)
 		{
 			Settings settings = Settings.getInstance();
 			maxUploadSize = Utils.getAsLong(settings.getProperty("servoy.webclient.maxuploadsize", "0"), false);
-			plugin.getClientPluginAccess().getRuntimeProperties().put("servoy.runtime.maxuploadfilesize", Long.toString(maxUploadSize));
 			return;
 		}
+		if (size > 0)
+		{
+			plugin.getClientPluginAccess().getRuntimeProperties().put("servoy.runtime.maxuploadfilesize", Long.toString(size));
+		}
 		maxUploadSize = size;
-		plugin.getClientPluginAccess().getRuntimeProperties().put("servoy.runtime.maxuploadfilesize", Long.toString(maxUploadSize));
+
 	}
 
 	/**
