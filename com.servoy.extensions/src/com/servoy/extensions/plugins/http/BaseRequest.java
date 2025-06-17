@@ -47,8 +47,6 @@ import org.apache.hc.core5.http.nio.support.BasicRequestProducer;
 import org.apache.hc.core5.net.URIBuilder;
 import org.apache.hc.core5.util.Timeout;
 import org.mozilla.javascript.Function;
-import org.mozilla.javascript.NativeArray;
-import org.mozilla.javascript.NativeObject;
 import org.mozilla.javascript.NativePromise;
 import org.mozilla.javascript.annotations.JSFunction;
 
@@ -57,6 +55,7 @@ import com.servoy.j2db.scripting.Deferred;
 import com.servoy.j2db.scripting.FunctionDefinition;
 import com.servoy.j2db.scripting.IJavaScriptType;
 import com.servoy.j2db.scripting.IScriptable;
+import com.servoy.j2db.scripting.JSMap;
 import com.servoy.j2db.util.Debug;
 import com.servoy.j2db.util.Utils;
 
@@ -114,26 +113,15 @@ public abstract class BaseRequest implements IScriptable, IJavaScriptType
 	}
 
 	/**
-	 * Get the headers set on the request.
+	 * This returns a Object with header names as keys and arrays of values as values.
 	 *
-	 * @return An array of objects with "name" and "value" properties.
+	 * @return An Object with "name" > "value"
 	 */
-	public NativeArray js_getHeaders()
+	public Map<String, String[]> js_getHeaders()
 	{
-		NativeArray headerArray = new NativeArray(0);
-		int idx = 0;
-		for (Map.Entry<String, String[]> entry : headers.entrySet())
-		{
-			String name = entry.getKey();
-			for (String value : entry.getValue())
-			{
-				NativeObject obj = new NativeObject();
-				obj.put("name", obj, name);
-				obj.put("value", obj, value);
-				headerArray.put(idx++, headerArray, obj);
-			}
-		}
-		return headerArray;
+		JSMap<String, String[]> map = new JSMap<>();
+		map.putAll(headers);
+		return map;
 	}
 
 	/**
@@ -157,7 +145,7 @@ public abstract class BaseRequest implements IScriptable, IJavaScriptType
 		{
 			// ignore parse errors
 		}
-		Map<String, String[]> result = new HashMap<>();
+		Map<String, String[]> result = new JSMap<>();
 		temp.forEach((key, list) -> result.put(key, list.toArray(new String[0])));
 		return result;
 	}
