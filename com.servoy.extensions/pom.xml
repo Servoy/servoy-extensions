@@ -24,7 +24,7 @@
         <servoy-local.url>${project.baseUri}/target/repository/</servoy-local.url>
         <scribejava.version>8.3.3</scribejava.version>
         <amqp.version>5.25.0</amqp.version>
-        <doc.version>1.7.0</doc.version>
+        <doc.version>1.8.0</doc.version>
         <commons.io.version>2.19.0</commons.io.version>
     	<commons.pool.version>2.12.1</commons.pool.version>
 	    <commons.text.version>1.13.1</commons.text.version>
