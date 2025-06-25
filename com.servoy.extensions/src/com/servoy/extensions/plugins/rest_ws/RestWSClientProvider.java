@@ -16,12 +16,12 @@
  */
 package com.servoy.extensions.plugins.rest_ws;
 
-import javax.servlet.http.Cookie;
-
 import org.mozilla.javascript.annotations.JSFunction;
 
 import com.servoy.j2db.documentation.ServoyDocumented;
 import com.servoy.j2db.scripting.IScriptable;
+
+import jakarta.servlet.http.Cookie;
 
 /**
  * <p>The <code>rest_ws</code> client represents a REST-WS client instance, valid only

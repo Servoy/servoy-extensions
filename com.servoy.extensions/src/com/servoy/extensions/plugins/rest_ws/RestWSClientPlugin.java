@@ -21,12 +21,10 @@ import java.net.URL;
 import java.util.List;
 import java.util.Properties;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
-import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload2.core.DiskFileItem;
 
 import com.servoy.j2db.plugins.IClientPlugin;
 import com.servoy.j2db.plugins.IClientPluginAccess;
@@ -34,6 +32,9 @@ import com.servoy.j2db.plugins.IIconProvider;
 import com.servoy.j2db.plugins.PluginException;
 import com.servoy.j2db.preference.PreferencePanel;
 import com.servoy.j2db.scripting.IScriptable;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * Plugin for accessing the request and response during a REST-WS call.
@@ -48,7 +49,7 @@ public class RestWSClientPlugin implements IClientPlugin, IIconProvider
 
 	private HttpServletRequest request;
 	private HttpServletResponse response;
-	private List<FileItem> contents;
+	private List<DiskFileItem> contents;
 	private Boolean sendUserPropertiesHeaders = null;
 
 
@@ -109,7 +110,7 @@ public class RestWSClientPlugin implements IClientPlugin, IIconProvider
 	/*
 	 * Set/clear request, response and contents, called from server-plugin
 	 */
-	public void setRequestResponseContents(HttpServletRequest request, HttpServletResponse response, List<FileItem> contents)
+	public void setRequestResponseContents(HttpServletRequest request, HttpServletResponse response, List<DiskFileItem> contents)
 	{
 		this.request = request;
 		this.response = response;
@@ -126,7 +127,7 @@ public class RestWSClientPlugin implements IClientPlugin, IIconProvider
 		return response;
 	}
 
-	public List<FileItem> getContents()
+	public List<DiskFileItem> getContents()
 	{
 		return contents;
 	}

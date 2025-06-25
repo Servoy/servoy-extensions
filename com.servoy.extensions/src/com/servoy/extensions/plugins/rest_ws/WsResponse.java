@@ -20,8 +20,6 @@ package com.servoy.extensions.plugins.rest_ws;
 import java.io.IOException;
 import java.util.Locale;
 
-import javax.servlet.http.HttpServletResponse;
-
 import org.mozilla.javascript.annotations.JSFunction;
 import org.mozilla.javascript.annotations.JSGetter;
 import org.mozilla.javascript.annotations.JSSetter;
@@ -29,6 +27,8 @@ import org.mozilla.javascript.annotations.JSSetter;
 import com.servoy.j2db.documentation.ServoyDocumented;
 import com.servoy.j2db.scripting.IJavaScriptType;
 import com.servoy.j2db.scripting.IScriptable;
+
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * <p>The <code>WsResponse</code> object represents a REST-WS response and is only valid while handling a

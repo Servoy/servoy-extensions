@@ -27,10 +27,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-
-import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload2.core.DiskFileItem;
 import org.mozilla.javascript.annotations.JSFunction;
 import org.mozilla.javascript.annotations.JSGetter;
 import org.mozilla.javascript.annotations.JSSetter;
@@ -39,6 +36,9 @@ import com.servoy.j2db.documentation.ServoyDocumented;
 import com.servoy.j2db.scripting.IJavaScriptType;
 import com.servoy.j2db.scripting.IScriptable;
 import com.servoy.j2db.scripting.JSMap;
+
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * <p><code>WsRequest</code> represents an HTTP request in a REST-WS environment, offering
@@ -356,7 +356,7 @@ public class WsRequest implements IScriptable, IJavaScriptType
 	 *
 	 * Returns well-formed IETF BCP 47 language tags representing
 	 * the locales.
-
+	
 	 * @return an array of preferred
 	 * <code>Locale</code> objects for the client
 	 */
@@ -400,7 +400,7 @@ public class WsRequest implements IScriptable, IJavaScriptType
 	@JSFunction
 	public String getRealPath(String path)
 	{
-		return getRequest().getRealPath(path);
+		return null;
 	}
 
 	/**
@@ -488,7 +488,7 @@ public class WsRequest implements IScriptable, IJavaScriptType
 	@JSFunction
 	public WsContents[] getContents()
 	{
-		List<FileItem> contents = plugin.getContents();
+		List<DiskFileItem> contents = plugin.getContents();
 		if (contents == null || contents.isEmpty())
 		{
 			return NO_CONTENTS;

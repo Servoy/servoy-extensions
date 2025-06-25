@@ -17,8 +17,6 @@
 
 package com.servoy.extensions.plugins.rest_ws;
 
-import javax.servlet.http.Cookie;
-
 import org.mozilla.javascript.annotations.JSGetter;
 import org.mozilla.javascript.annotations.JSSetter;
 
@@ -26,6 +24,8 @@ import com.servoy.j2db.documentation.ServoyDocumented;
 import com.servoy.j2db.scripting.IJavaScriptType;
 import com.servoy.j2db.scripting.IScriptable;
 import com.servoy.j2db.scripting.annotations.JSReadonlyProperty;
+
+import jakarta.servlet.http.Cookie;
 
 /**
  * <p>An HTTP cookie representation provides methods to manage and manipulate various attributes

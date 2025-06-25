@@ -17,14 +17,17 @@
 
 package com.servoy.extensions.plugins.rest_ws;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 
-import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload2.core.DiskFileItem;
 import org.mozilla.javascript.annotations.JSGetter;
 
 import com.servoy.j2db.documentation.ServoyDocumented;
 import com.servoy.j2db.scripting.IJavaScriptType;
 import com.servoy.j2db.scripting.IScriptable;
+import com.servoy.j2db.util.Debug;
 
 /**
  * <p>The <code>WsContents</code> class represents the contents or parts of an HTTP request. It
@@ -45,12 +48,12 @@ import com.servoy.j2db.scripting.IScriptable;
 @ServoyDocumented(scriptingName = "WsContents")
 public class WsContents implements IScriptable, IJavaScriptType
 {
-	private final FileItem fileItem;
+	private final DiskFileItem fileItem;
 
 	/**
 	 * @param fileItem
 	 */
-	public WsContents(FileItem fileItem)
+	public WsContents(DiskFileItem fileItem)
 	{
 		if (fileItem == null) throw new NullPointerException("fileItem");
 		this.fileItem = fileItem;
@@ -98,7 +101,15 @@ public class WsContents implements IScriptable, IJavaScriptType
 	@JSGetter
 	public byte[] getBytes()
 	{
-		return fileItem.get();
+		try
+		{
+			return fileItem.get();
+		}
+		catch (IOException e)
+		{
+			Debug.error(e);
+		}
+		return null;
 	}
 
 	/**
@@ -141,9 +152,9 @@ public class WsContents implements IScriptable, IJavaScriptType
 	 * }
 	 */
 	@JSGetter
-	public String getString(String encoding) throws UnsupportedEncodingException
+	public String getString(String encoding) throws UnsupportedEncodingException, IOException
 	{
-		return fileItem.getString(encoding);
+		return fileItem.getString(Charset.forName(encoding, null));
 	}
 
 	@Override

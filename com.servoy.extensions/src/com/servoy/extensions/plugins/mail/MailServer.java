@@ -30,24 +30,6 @@ import java.util.Properties;
 import java.util.StringTokenizer;
 import java.util.stream.Stream;
 
-import javax.activation.DataHandler;
-import javax.mail.FetchProfile;
-import javax.mail.Flags;
-import javax.mail.Folder;
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.Part;
-import javax.mail.PasswordAuthentication;
-import javax.mail.Session;
-import javax.mail.Store;
-import javax.mail.Transport;
-import javax.mail.internet.AddressException;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeBodyPart;
-import javax.mail.internet.MimeMessage;
-import javax.mail.internet.MimeMultipart;
-import javax.mail.internet.MimeUtility;
-
 import com.servoy.base.util.ITagResolver;
 import com.servoy.extensions.plugins.mail.client.Attachment;
 import com.servoy.extensions.plugins.mail.client.MailMessage;
@@ -58,6 +40,24 @@ import com.servoy.j2db.preference.PreferencePanel;
 import com.servoy.j2db.util.Debug;
 import com.servoy.j2db.util.Text;
 import com.servoy.j2db.util.UUID;
+
+import jakarta.activation.DataHandler;
+import jakarta.mail.FetchProfile;
+import jakarta.mail.Flags;
+import jakarta.mail.Folder;
+import jakarta.mail.Message;
+import jakarta.mail.MessagingException;
+import jakarta.mail.Part;
+import jakarta.mail.PasswordAuthentication;
+import jakarta.mail.Session;
+import jakarta.mail.Store;
+import jakarta.mail.Transport;
+import jakarta.mail.internet.AddressException;
+import jakarta.mail.internet.InternetAddress;
+import jakarta.mail.internet.MimeBodyPart;
+import jakarta.mail.internet.MimeMessage;
+import jakarta.mail.internet.MimeMultipart;
+import jakarta.mail.internet.MimeUtility;
 
 /**
  * Server mail component
@@ -151,7 +151,7 @@ public class MailServer implements IMailService, IServerPlugin
 		ClassLoader saveCl = Thread.currentThread().getContextClassLoader();
 		try
 		{
-			Thread.currentThread().setContextClassLoader(javax.mail.Session.class.getClassLoader());
+			Thread.currentThread().setContextClassLoader(jakarta.mail.Session.class.getClassLoader());
 
 			MimeMessage message = createMessage(to, from, subject, rawMsgText, cc, bcc, attachments, overrideProperties);
 			message.setHeader("Precedence", "bulk");
@@ -176,7 +176,7 @@ public class MailServer implements IMailService, IServerPlugin
 		ClassLoader saveCl = Thread.currentThread().getContextClassLoader();
 		try
 		{
-			Thread.currentThread().setContextClassLoader(javax.mail.Session.class.getClassLoader());
+			Thread.currentThread().setContextClassLoader(jakarta.mail.Session.class.getClassLoader());
 
 			MimeMessage message = createMessage(to, from, subject, rawMsgText, cc, bcc, attachments, overrideProperties);
 			Transport.send(message);
@@ -424,7 +424,7 @@ public class MailServer implements IMailService, IServerPlugin
 		ClassLoader saveCl = Thread.currentThread().getContextClassLoader();
 		try
 		{
-			Thread.currentThread().setContextClassLoader(javax.mail.Session.class.getClassLoader());
+			Thread.currentThread().setContextClassLoader(jakarta.mail.Session.class.getClassLoader());
 			// Create empty properties
 			// -- Get hold of the default session --
 			Properties properties = overrideProperties(settings, overrideProperties);
@@ -501,7 +501,7 @@ public class MailServer implements IMailService, IServerPlugin
 		return new PreferencePanel[] { new MailPreferencePanel(application) };
 	}
 
-	private class SMTPAuthenticator extends javax.mail.Authenticator
+	private class SMTPAuthenticator extends jakarta.mail.Authenticator
 	{
 		private final Properties properties;
 
@@ -527,7 +527,7 @@ public class MailServer implements IMailService, IServerPlugin
 		ClassLoader saveCl = Thread.currentThread().getContextClassLoader();
 		try
 		{
-			Thread.currentThread().setContextClassLoader(javax.mail.Session.class.getClassLoader());
+			Thread.currentThread().setContextClassLoader(jakarta.mail.Session.class.getClassLoader());
 			try
 			{
 				ByteArrayInputStream is = new ByteArrayInputStream(data);

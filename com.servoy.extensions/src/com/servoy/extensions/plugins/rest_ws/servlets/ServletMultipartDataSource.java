@@ -22,7 +22,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.SequenceInputStream;
 
-import javax.activation.DataSource;
+import jakarta.activation.DataSource;
 
 public class ServletMultipartDataSource implements DataSource
 {

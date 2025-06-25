@@ -21,10 +21,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import javax.activation.DataSource;
-import javax.activation.MimetypesFileTypeMap;
-
 import com.servoy.extensions.plugins.mail.client.Attachment;
+
+import jakarta.activation.DataSource;
+import jakarta.activation.MimetypesFileTypeMap;
 
 /**
  * Separate class because we do not have DataSource class on client

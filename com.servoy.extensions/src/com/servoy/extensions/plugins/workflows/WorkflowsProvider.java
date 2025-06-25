@@ -17,22 +17,6 @@
 
 package com.servoy.extensions.plugins.workflows;
 
-import java.util.List;
-
-import org.kie.server.api.marshalling.MarshallingFormat;
-import org.kie.server.api.model.instance.TaskSummary;
-import org.kie.server.client.KieServicesClient;
-import org.kie.server.client.KieServicesConfiguration;
-import org.kie.server.client.KieServicesFactory;
-import org.kie.server.client.ProcessServicesClient;
-import org.kie.server.client.QueryServicesClient;
-import org.kie.server.client.RuleServicesClient;
-import org.kie.server.client.SolverServicesClient;
-import org.kie.server.client.UIServicesClient;
-import org.kie.server.client.UserTaskServicesClient;
-import org.kie.server.client.admin.UserTaskAdminServicesClient;
-import org.mozilla.javascript.annotations.JSFunction;
-
 import com.servoy.j2db.documentation.ServoyDocumented;
 import com.servoy.j2db.scripting.IReturnedTypesProvider;
 import com.servoy.j2db.scripting.IScriptable;
@@ -64,46 +48,47 @@ public class WorkflowsProvider implements IScriptable, IReturnedTypesProvider
 		plugin = workflowPlugin;
 	}
 
-	@JSFunction
-	public KieServicesClient createClient(String deploymentUrl, String user, String password)
-	{
-		return getServicesClient(deploymentUrl, user, password);
-	}
-
-
-	@JSFunction
-	public JSServicesClient createServicesClient(String deploymentUrl, String user, String password)
-	{
-		KieServicesClient client = getServicesClient(deploymentUrl, user, password);
-		return new JSServicesClient(client);
-	}
-
-	private KieServicesClient getServicesClient(String deploymentUrl, String user, String password)
-	{
-		KieServicesConfiguration config = KieServicesFactory.newRestConfiguration(
-			deploymentUrl, user, password);
-		config.setMarshallingFormat(MarshallingFormat.JSON);
-		KieServicesClient client = KieServicesFactory.newKieServicesClient(config);
-		return client;
-	}
-
-	@JSFunction
-	public List<TaskSummary> getAllUserTasks(String deploymentUrl, String user, String password)
-	{
-		return getAllUserTasks(deploymentUrl, user, password, 0, 10);
-	}
-
-	@JSFunction
-	public List<TaskSummary> getAllUserTasks(String deploymentUrl, String user, String password, int page, int pageSize)
-	{
-		KieServicesClient client = getServicesClient(deploymentUrl, user, password);
-		UserTaskServicesClient taskClient = client.getServicesClient(UserTaskServicesClient.class);
-		return taskClient.findTasks(user, Integer.valueOf(page), Integer.valueOf(pageSize));
-	}
-
+//	@JSFunction
+//	public KieServicesClient createClient(String deploymentUrl, String user, String password)
+//	{
+//		return getServicesClient(deploymentUrl, user, password);
+//	}
+//
+//
+//	@JSFunction
+//	public JSServicesClient createServicesClient(String deploymentUrl, String user, String password)
+//	{
+//		KieServicesClient client = getServicesClient(deploymentUrl, user, password);
+//		return new JSServicesClient(client);
+//	}
+//
+//	private KieServicesClient getServicesClient(String deploymentUrl, String user, String password)
+//	{
+//		KieServicesConfiguration config = KieServicesFactory.newRestConfiguration(
+//			deploymentUrl, user, password);
+//		config.setMarshallingFormat(MarshallingFormat.JSON);
+//		KieServicesClient client = KieServicesFactory.newKieServicesClient(config);
+//		return client;
+//	}
+//
+//	@JSFunction
+//	public List<TaskSummary> getAllUserTasks(String deploymentUrl, String user, String password)
+//	{
+//		return getAllUserTasks(deploymentUrl, user, password, 0, 10);
+//	}
+//
+//	@JSFunction
+//	public List<TaskSummary> getAllUserTasks(String deploymentUrl, String user, String password, int page, int pageSize)
+//	{
+//		KieServicesClient client = getServicesClient(deploymentUrl, user, password);
+//		UserTaskServicesClient taskClient = client.getServicesClient(UserTaskServicesClient.class);
+//		return taskClient.findTasks(user, Integer.valueOf(page), Integer.valueOf(pageSize));
+//	}
+//
 	public Class< ? >[] getAllReturnedTypes()
 	{
-		return new Class[] { JSServicesClient.class, KieServicesClient.class, TaskSummary.class, UserTaskServicesClient.class, ProcessServicesClient.class, QueryServicesClient.class, RuleServicesClient.class, SolverServicesClient.class, UIServicesClient.class, UserTaskAdminServicesClient.class };
+		return null;
+//		return new Class[] { JSServicesClient.class, KieServicesClient.class, TaskSummary.class, UserTaskServicesClient.class, ProcessServicesClient.class, QueryServicesClient.class, RuleServicesClient.class, SolverServicesClient.class, UIServicesClient.class, UserTaskAdminServicesClient.class };
 	}
 }
 

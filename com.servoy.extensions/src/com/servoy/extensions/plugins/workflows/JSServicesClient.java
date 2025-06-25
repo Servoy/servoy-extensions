@@ -17,68 +17,58 @@
 
 package com.servoy.extensions.plugins.workflows;
 
-import org.kie.server.client.KieServicesClient;
-import org.kie.server.client.ProcessServicesClient;
-import org.kie.server.client.QueryServicesClient;
-import org.kie.server.client.RuleServicesClient;
-import org.kie.server.client.SolverServicesClient;
-import org.kie.server.client.UIServicesClient;
-import org.kie.server.client.UserTaskServicesClient;
-import org.kie.server.client.admin.UserTaskAdminServicesClient;
-import org.mozilla.javascript.annotations.JSFunction;
-
 import com.servoy.j2db.scripting.IJavaScriptType;
 import com.servoy.j2db.scripting.IScriptable;
 
 public class JSServicesClient implements IJavaScriptType, IScriptable
 {
 
-	private final KieServicesClient client;
-
-	public JSServicesClient(KieServicesClient client)
-	{
-		this.client = client;
-	}
-
-	@JSFunction
-	public ProcessServicesClient getProcessServicesClient()
-	{
-		return client.getServicesClient(ProcessServicesClient.class);
-	}
-
-	@JSFunction
-	public UserTaskServicesClient getUserTaskServicesClient()
-	{
-		return client.getServicesClient(UserTaskServicesClient.class);
-	}
-
-	@JSFunction
-	public QueryServicesClient getQueryServicesClient()
-	{
-		return client.getServicesClient(QueryServicesClient.class);
-	}
-
-	@JSFunction
-	public RuleServicesClient getRuleServicesClient()
-	{
-		return client.getServicesClient(RuleServicesClient.class);
-	}
-
-	@JSFunction
-	public SolverServicesClient getSolverServicesClient()
-	{
-		return client.getServicesClient(SolverServicesClient.class);
-	}
-
-	@JSFunction
-	public UIServicesClient getUIServicesClient()
-	{
-		return client.getServicesClient(UIServicesClient.class);
-	}
-
-	@JSFunction
-	public UserTaskAdminServicesClient getUserTaskAdminServicesClient()
-	{
-		return client.getServicesClient(UserTaskAdminServicesClient.class);
-	}
+//	private final KieServicesClient client;
+//
+//	public JSServicesClient(KieServicesClient client)
+//	{
+//		this.client = client;
+//	}
+//
+//	@JSFunction
+//	public ProcessServicesClient getProcessServicesClient()
+//	{
+//		return client.getServicesClient(ProcessServicesClient.class);
+//	}
+//
+//	@JSFunction
+//	public UserTaskServicesClient getUserTaskServicesClient()
+//	{
+//		return client.getServicesClient(UserTaskServicesClient.class);
+//	}
+//
+//	@JSFunction
+//	public QueryServicesClient getQueryServicesClient()
+//	{
+//		return client.getServicesClient(QueryServicesClient.class);
+//	}
+//
+//	@JSFunction
+//	public RuleServicesClient getRuleServicesClient()
+//	{
+//		return client.getServicesClient(RuleServicesClient.class);
+//	}
+//
+//	@JSFunction
+//	public SolverServicesClient getSolverServicesClient()
+//	{
+//		return client.getServicesClient(SolverServicesClient.class);
+//	}
+//
+//	@JSFunction
+//	public UIServicesClient getUIServicesClient()
+//	{
+//		return client.getServicesClient(UIServicesClient.class);
+//	}
+//
+//	@JSFunction
+//	public UserTaskAdminServicesClient getUserTaskAdminServicesClient()
+//	{
+//		return client.getServicesClient(UserTaskAdminServicesClient.class);
+//	}
 }

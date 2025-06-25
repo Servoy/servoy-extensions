@@ -21,8 +21,6 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Properties;
 
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.commons.pool2.BaseKeyedPooledObjectFactory;
 import org.apache.commons.pool2.KeyedObjectPool;
 import org.apache.commons.pool2.PooledObject;
@@ -46,6 +44,8 @@ import com.servoy.j2db.server.shared.IHeadlessClient;
 import com.servoy.j2db.util.Debug;
 import com.servoy.j2db.util.Utils;
 import com.servoy.j2db.util.serialize.JSONSerializerWrapper;
+
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * <p>A server plugin designed to facilitate RESTful web services integration.</p>

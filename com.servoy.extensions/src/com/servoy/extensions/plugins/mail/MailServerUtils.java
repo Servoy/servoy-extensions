@@ -25,19 +25,19 @@ import java.nio.charset.Charset;
 import java.util.Enumeration;
 import java.util.StringTokenizer;
 
-import javax.mail.Address;
-import javax.mail.BodyPart;
-import javax.mail.Header;
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.Multipart;
-import javax.mail.Part;
-import javax.mail.internet.MimeUtility;
-
 import com.servoy.extensions.plugins.mail.client.Attachment;
 import com.servoy.extensions.plugins.mail.client.MailMessage;
 import com.servoy.j2db.util.Debug;
 import com.servoy.j2db.util.Utils;
+
+import jakarta.mail.Address;
+import jakarta.mail.BodyPart;
+import jakarta.mail.Header;
+import jakarta.mail.Message;
+import jakarta.mail.MessagingException;
+import jakarta.mail.Multipart;
+import jakarta.mail.Part;
+import jakarta.mail.internet.MimeUtility;
 
 /**
  * @author jblok

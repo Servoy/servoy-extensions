@@ -41,18 +41,12 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpServletResponseWrapper;
-
-import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.FileUploadException;
-import org.apache.commons.fileupload.disk.DiskFileItemFactory;
-import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.commons.fileupload2.core.DiskFileItem;
+import org.apache.commons.fileupload2.core.DiskFileItemFactory;
+import org.apache.commons.fileupload2.core.FileItem;
+import org.apache.commons.fileupload2.core.FileUploadException;
+import org.apache.commons.fileupload2.jakarta.servlet6.JakartaServletDiskFileUpload;
+import org.apache.commons.fileupload2.jakarta.servlet6.JakartaServletFileUpload;
 import org.apache.commons.io.FileCleaningTracker;
 import org.apache.commons.io.IOUtils;
 import org.apache.hc.core5.http.NameValuePair;
@@ -89,6 +83,14 @@ import com.servoy.j2db.util.MimeTypes;
 import com.servoy.j2db.util.Pair;
 import com.servoy.j2db.util.ServoyException;
 import com.servoy.j2db.util.Utils;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponseWrapper;
 
 /**
  * Servlet for mapping RESTfull Web Service request to Servoy methods.
@@ -184,8 +186,8 @@ public class RestWSServlet extends HttpServlet
 		}
 		int tempFileThreshold = Utils.getAsInteger(plugin.getServerAccess().getSettings().getProperty("servoy.ng_web_client.tempfile.threshold", "50"), false) *
 			1000;
-		diskFileItemFactory = new DiskFileItemFactory(tempFileThreshold, fileUploadDir);
-		diskFileItemFactory.setFileCleaningTracker(fileCleaningTracker);
+		diskFileItemFactory = DiskFileItemFactory.builder().setBufferSize(tempFileThreshold).setPath(uploadDir).setFileCleaningTracker(fileCleaningTracker)
+			.get();
 	}
 
 	@Override
@@ -417,7 +419,7 @@ public class RestWSServlet extends HttpServlet
 		boolean reloadSolution = plugin.shouldReloadSolutionAfterRequest();
 		try
 		{
-			Pair<List<FileItem>, ContentType> contents = getContents(request);
+			Pair<List<DiskFileItem>, ContentType> contents = getContents(request);
 			if (contents == null)
 			{
 				sendError(response, HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
@@ -459,7 +461,7 @@ public class RestWSServlet extends HttpServlet
 		boolean reloadSolution = plugin.shouldReloadSolutionAfterRequest();
 		try
 		{
-			Pair<List<FileItem>, ContentType> contents = getContents(request);
+			Pair<List<DiskFileItem>, ContentType> contents = getContents(request);
 			if (contents == null)
 			{
 				sendError(response, HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
@@ -503,13 +505,14 @@ public class RestWSServlet extends HttpServlet
 		}
 	}
 
-	private void doPatch(HttpServletRequest request, HttpServletResponse response) throws IOException
+	@Override
+	protected void doPatch(HttpServletRequest request, HttpServletResponse response) throws IOException
 	{
 		Pair<IHeadlessClient, String> client = null;
 		boolean reloadSolution = plugin.shouldReloadSolutionAfterRequest();
 		try
 		{
-			Pair<List<FileItem>, ContentType> contents = getContents(request);
+			Pair<List<DiskFileItem>, ContentType> contents = getContents(request);
 			if (contents == null)
 			{
 				sendError(response, HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
@@ -698,7 +701,7 @@ public class RestWSServlet extends HttpServlet
 	 * @return
 	 * @throws Exception
 	 */
-	private Object wsService(String wsMethod, Object[] fixedArgs, List<FileItem> contents, HttpServletRequest request, HttpServletResponse response,
+	private Object wsService(String wsMethod, Object[] fixedArgs, List<DiskFileItem> contents, HttpServletRequest request, HttpServletResponse response,
 		IHeadlessClient client)
 		throws Exception
 	{
@@ -994,7 +997,7 @@ public class RestWSServlet extends HttpServlet
 		throw new NotAuthorizedException("User not authorized");
 	}
 
-	private FileItem getBody(HttpServletRequest request) throws IOException
+	private DiskFileItem getBody(HttpServletRequest request) throws IOException
 	{
 		return createFileItem(request.getInputStream(), request.getContentType());
 	}
@@ -1005,9 +1008,10 @@ public class RestWSServlet extends HttpServlet
 	 * @return
 	 * @throws IOException
 	 */
-	private FileItem createFileItem(InputStream inputStream, String contentType) throws IOException
+	private DiskFileItem createFileItem(InputStream inputStream, String contentType) throws IOException
 	{
-		FileItem fileItem = diskFileItemFactory.createItem(null, contentType, false, "restws_" + UUID.randomUUID().toString().replace("-", "_"));
+		DiskFileItem fileItem = diskFileItemFactory.fileItemBuilder().setContentType(contentType)
+			.setFileName("restws_" + UUID.randomUUID().toString().replace("-", "_")).get();
 		IOUtils.copy(inputStream, fileItem.getOutputStream());
 		return fileItem;
 	}
@@ -1051,7 +1055,7 @@ public class RestWSServlet extends HttpServlet
 		return ContentType.OTHER;
 	}
 
-	private ContentType getRequestContentType(HttpServletRequest request, String header, FileItem body, ContentType defaultContentType)
+	private ContentType getRequestContentType(HttpServletRequest request, String header, DiskFileItem body, ContentType defaultContentType)
 	{
 		String contentTypeHeaderValue = request.getHeader(header);
 		ContentType contentType = getContentType(contentTypeHeaderValue);
@@ -1216,7 +1220,7 @@ public class RestWSServlet extends HttpServlet
 		}
 	}
 
-	private Object decodeContent(ContentType contentType, List<FileItem> contents, HttpServletRequest request) throws Exception
+	private Object decodeContent(ContentType contentType, List<DiskFileItem> contents, HttpServletRequest request) throws Exception
 	{
 		if (contentType == ContentType.MULTIPART)
 		{
@@ -1228,7 +1232,7 @@ public class RestWSServlet extends HttpServlet
 			return null;
 		}
 
-		FileItem body = contents.get(0);
+		DiskFileItem body = contents.get(0);
 		String charset = getHeaderKey(request.getHeader("Content-Type"), "charset", CHARSET_DEFAULT);
 
 		return decode(contentType, body, charset);
@@ -1240,10 +1244,11 @@ public class RestWSServlet extends HttpServlet
 	 * @param charset
 	 * @return
 	 * @throws UnmarshallException
-	 * @throws UnsupportedEncodingException
+	 * @throws IOException
 	 */
-	private Object decode(ContentType contentType, FileItem body, String charset) throws UnmarshallException, UnsupportedEncodingException
+	private Object decode(ContentType contentType, DiskFileItem body, String ch) throws UnmarshallException, IOException
 	{
+		Charset charset = Charset.forName(ch);
 		switch (contentType)
 		{
 			case JSON :
@@ -1272,14 +1277,14 @@ public class RestWSServlet extends HttpServlet
 		throw new IllegalStateException();
 	}
 
-	private Pair<List<FileItem>, ContentType> getContents(HttpServletRequest request) throws FileUploadException, IOException
+	private Pair<List<DiskFileItem>, ContentType> getContents(HttpServletRequest request) throws FileUploadException, IOException
 	{
-		if (ServletFileUpload.isMultipartContent(request))
+		if (JakartaServletFileUpload.isMultipartContent(request))
 		{
 			return new Pair<>(getFileItemsMultipartRequest(request), ContentType.MULTIPART);
 		}
 
-		FileItem body = getBody(request);
+		DiskFileItem body = getBody(request);
 		if (body.getSize() == 0)
 		{
 			return new Pair<>(emptyList(), ContentType.OTHER);
@@ -1293,16 +1298,16 @@ public class RestWSServlet extends HttpServlet
 		return new Pair<>(asList(body), contentType);
 	}
 
-	private List<FileItem> getFileItemsMultipartRequest(HttpServletRequest request) throws FileUploadException
+	private List<DiskFileItem> getFileItemsMultipartRequest(HttpServletRequest request) throws FileUploadException
 	{
-		ServletFileUpload upload = new ServletFileUpload(diskFileItemFactory);
-		upload.setHeaderEncoding("UTF-8");
+		JakartaServletDiskFileUpload upload = new JakartaServletDiskFileUpload(diskFileItemFactory);
+		upload.setHeaderCharset(Charset.forName("UTF-8", null));
 		long maxUpload = Utils.getAsLong(plugin.getServerAccess().getSettings().getProperty("servoy.webclient.maxuploadsize", "0"), false);
 		if (maxUpload > 0) upload.setFileSizeMax(maxUpload * 1000);
 		return upload.parseRequest(request);
 	}
 
-	private Object[] getMultipartContent(List<FileItem> contents, String requestCharset) throws UnsupportedEncodingException, UnmarshallException
+	private Object[] getMultipartContent(List<DiskFileItem> contents, String requestCharset) throws UnmarshallException, IOException
 	{
 		Map<String, String> formFields = new JSMap<>();
 
@@ -1313,7 +1318,7 @@ public class RestWSServlet extends HttpServlet
 			useJSUploadWithFormFields = !contents.stream().allMatch(FileItem::isFormField);
 			if (useJSUploadWithFormFields)
 			{
-				for (FileItem item : contents)
+				for (DiskFileItem item : contents)
 				{
 					if (item.isFormField())
 					{
@@ -1322,7 +1327,7 @@ public class RestWSServlet extends HttpServlet
 						{
 							try
 							{
-								formFields.put(item.getFieldName(), item.getString(charset));
+								formFields.put(item.getFieldName(), item.getString(Charset.forName(charset, null)));
 							}
 							catch (UnsupportedEncodingException e)
 							{
@@ -1339,7 +1344,7 @@ public class RestWSServlet extends HttpServlet
 		}
 
 		List<JSMap<String, Object>> parts = new ArrayList<>();
-		for (FileItem item : contents)
+		for (DiskFileItem item : contents)
 		{
 			if (!item.isFormField() || !useJSUploadWithFormFields)
 			{
