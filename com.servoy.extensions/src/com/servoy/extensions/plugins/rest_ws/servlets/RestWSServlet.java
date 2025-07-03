@@ -43,6 +43,7 @@ import java.util.stream.Stream;
 
 import org.apache.commons.fileupload2.core.DiskFileItem;
 import org.apache.commons.fileupload2.core.DiskFileItemFactory;
+import org.apache.commons.fileupload2.core.DiskFileItemFactory.Builder;
 import org.apache.commons.fileupload2.core.FileItem;
 import org.apache.commons.fileupload2.core.FileUploadException;
 import org.apache.commons.fileupload2.jakarta.servlet6.JakartaServletDiskFileUpload;
@@ -186,8 +187,12 @@ public class RestWSServlet extends HttpServlet
 		}
 		int tempFileThreshold = Utils.getAsInteger(plugin.getServerAccess().getSettings().getProperty("servoy.ng_web_client.tempfile.threshold", "50"), false) *
 			1000;
-		diskFileItemFactory = DiskFileItemFactory.builder().setBufferSize(tempFileThreshold).setPath(uploadDir).setFileCleaningTracker(fileCleaningTracker)
-			.get();
+		Builder builder = DiskFileItemFactory.builder().setBufferSize(tempFileThreshold).setFileCleaningTracker(fileCleaningTracker);
+		if (fileUploadDir != null)
+		{
+			builder.setPath(fileUploadDir.toPath());
+		}
+		diskFileItemFactory = builder.get();
 	}
 
 	@Override
