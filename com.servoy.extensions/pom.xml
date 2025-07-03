@@ -28,7 +28,7 @@
         <commons.io.version>2.19.0</commons.io.version>
     	<commons.pool.version>2.12.1</commons.pool.version>
 	    <commons.text.version>1.13.1</commons.text.version>
-    	<httpclient.version>5.5</httpclient.version>
+    	<httpclient.version>5.4.4</httpclient.version>
         <httpcore.version>5.3.4</httpcore.version>
         <pdfbox.version>3.0.5</pdfbox.version>
         <fontbox.version>3.0.5</fontbox.version>
