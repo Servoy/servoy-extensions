@@ -114,6 +114,8 @@ public class FileOrBinAsyncEntityConsumer extends AbstractBinDataConsumer implem
 				pos.flush();
 				try
 				{
+					// this is needed to really let the pis give back a -1 to the gzip input.
+					pos.close();
 					// now join on the thread so we wait until it really have written everything.
 					unzipThread.join();
 				}
