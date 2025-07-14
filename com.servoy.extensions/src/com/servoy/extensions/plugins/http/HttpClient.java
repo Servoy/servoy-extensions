@@ -46,6 +46,7 @@ import javax.net.ssl.TrustManagerFactory;
 import org.apache.hc.client5.http.ConnectionKeepAliveStrategy;
 import org.apache.hc.client5.http.config.RequestConfig;
 import org.apache.hc.client5.http.config.RequestConfig.Builder;
+import org.apache.hc.client5.http.config.TlsConfig;
 import org.apache.hc.client5.http.cookie.BasicCookieStore;
 import org.apache.hc.client5.http.cookie.CookieStore;
 import org.apache.hc.client5.http.impl.DefaultConnectionKeepAliveStrategy;
@@ -159,6 +160,14 @@ public class HttpClient implements IScriptable, IJavaScriptType
 			int maxConnPerRoute = config != null && config.maxConnectionsPerRoute >= 0 ? config.maxConnectionsPerRoute : 5;
 			connectionManagerBuilder.setMaxConnPerRoute(maxConnPerRoute);
 			connectionManagerBuilder.setTlsStrategy(tlsFactory.build());
+
+			if (config != null && config.forceHttp1)
+			{
+				// the line below (builder.setVersionPolicy(HttpVersionPolicy.FORCE_HTTP_1);) is deprecated and doesn't work anymore always
+				// this should fix this. but for now both are set.
+				connectionManagerBuilder.setDefaultTlsConfig(TlsConfig.custom().setVersionPolicy(HttpVersionPolicy.FORCE_HTTP_1).build());
+			}
+
 			builder.setConnectionManager(connectionManagerBuilder.build());
 		}
 		catch (Exception ex)
