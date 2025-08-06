@@ -134,7 +134,7 @@ public class UDPProvider implements IScriptable, IReturnedTypesProvider
 	/**
 	 * Get all available network interfaces.
 	 *
-	 * @return
+	 * @return An array of all available IP addresses from the system's network interfaces.
 	 */
 	@JSFunction
 	public InetAddress[] getAllInetAddresses()
@@ -165,9 +165,9 @@ public class UDPProvider implements IScriptable, IReturnedTypesProvider
 	/**
 	 * Returns a InetAddress for a specific (local) ip or hostname.
 	 *
-	 * @param destIpOrHostname
+	 * @param {String} destIpOrHostname The IP address or hostname to resolve into an InetAddress.
 	 *
-	 * @return returns the InetAddress object for the given IP address or hostname or null if not found.
+	 * @return The InetAddress object for the given IP address or hostname, or null if the address could not be resolved.
 	 */
 	@JSFunction
 	public InetAddress getInetAddress(String destIpOrHostname)

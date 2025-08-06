@@ -74,6 +74,8 @@ public class UDPSocket implements IScriptable, IJavaScriptType
 	 * }
 	 *
 	 * @param packageReceivedCallback the callback function that will be called when a package is received, it will get as a parameter UPPSocket instance itself.
+	 *
+	 * @return The UDPSocket instance, allowing method chaining after starting the listener.
 	 */
 	@JSFunction
 	public UDPSocket start(Function packageReceivedCallback)
