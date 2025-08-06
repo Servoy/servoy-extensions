@@ -23,20 +23,20 @@
         <workspace_dir>${project.basedir}/../</workspace_dir>
         <servoy-local.url>${project.baseUri}/target/repository/</servoy-local.url>
         <scribejava.version>8.3.3</scribejava.version>
-        <amqp.version>5.25.0</amqp.version>
+        <amqp.version>5.26.0</amqp.version>
         <doc.version>1.7.0</doc.version>
-        <commons.io.version>2.19.0</commons.io.version>
+        <commons.io.version>2.20.0</commons.io.version>
 	<commons.pool.version>2.12.1</commons.pool.version>
-	<commons.text.version>1.13.1</commons.text.version>
-	<httpclient.version>5.4.4</httpclient.version>
+	<commons.text.version>1.14.0</commons.text.version>
+	<httpclient.version>5.5</httpclient.version>
         <httpcore.version>5.3.4</httpcore.version>
         <pdfbox.version>3.0.5</pdfbox.version>
         <fontbox.version>3.0.5</fontbox.version>
         <jwt.version>4.5.0</jwt.version>
-        <fasterxml.version>2.19.0</fasterxml.version>
-        <jwks.version>0.22.1</jwks.version>
+        <fasterxml.version>2.19.2</fasterxml.version>
+        <jwks.version>0.22.2</jwks.version>
         <metadataextractor.version>2.19.0</metadataextractor.version>
-        <bouncy.version>1.80</bouncy.version>
+        <bouncy.version>1.81</bouncy.version>
         <xmpcore.version>6.1.11</xmpcore.version>
         <rhino.version>1.8.0.s5</rhino.version>
         <tsaUrl>http://timestamp.digicert.com</tsaUrl>
@@ -2494,7 +2494,7 @@
         <dependency>
             <groupId>com.fazecast</groupId>
             <artifactId>jSerialComm</artifactId>
-            <version>2.11.0</version>
+            <version>2.11.2</version>
         </dependency>
         <dependency>
             <groupId>com.github.scribejava</groupId>
