@@ -110,6 +110,7 @@ public class SQLProcessor implements ISQLService, IServerPlugin
 				{
 					ps = connection.createStatement();
 					long t1 = System.currentTimeMillis();
+					long sqlStatementId = application.addTrackStatement(clientId, server, sql, t1, ps);
 					Long perfUuid = application.addPerformanceTiming(server, sql, 0 - t1, clientId);
 					try
 					{
@@ -118,6 +119,7 @@ public class SQLProcessor implements ISQLService, IServerPlugin
 					finally
 					{
 						application.endPerformanceTiming(server, perfUuid, clientId);
+						application.removeTrackStatement(sqlStatementId);
 					}
 				}
 				else
