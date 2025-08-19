@@ -30,6 +30,7 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -244,7 +245,23 @@ public class DataNotifyBroadCaster implements IServerPlugin
 				channel.exchangeDeclare(exchangeName, "fanout");
 				dataNotifyService.registerDataNotifyListener(new DataNotifyListener(ORIGIN_SERVER_UUID, channel, connection, exchangeName, routingKey));
 
-				String queueName = channel.queueDeclare().getQueue();
+				String queuetype = app.getSettings().getProperty("amqpbroadcaster.queuetype", null);
+				String singleActiveConsumer = app.getSettings().getProperty("amqpbroadcaster.singleactiveconsumer", null);
+				Map<String, Object> args = null;
+				if (queuetype != null || singleActiveConsumer != null)
+				{
+					args = new HashMap<>();
+					if (queuetype != null)
+					{
+						args.put("x-queue-type", queuetype);
+					}
+					if (singleActiveConsumer != null)
+					{
+						args.put("x-single-active-consumer", Boolean.valueOf(singleActiveConsumer));
+					}
+				}
+
+				String queueName = args != null ? channel.queueDeclare("", false, true, true, args).getQueue() : channel.queueDeclare().getQueue();
 				channel.queueBind(queueName, exchangeName, routingKey);
 
 				Consumer consumer = new DefaultConsumer(channel)
@@ -368,6 +385,10 @@ public class DataNotifyBroadCaster implements IServerPlugin
 			"When set this will enabled TLS communication over the given protocol like TLSv1.2 or TLSv1.3. WARNING: Without a keystore this will not verify the certificates only enable tls communication");
 		req.put("amqpbroadcaster.hostnameverification",
 			"When set to true this will enable the hostname verification for the TLS conncetions (TLS must be enabled) (default false)");
+		req.put("amqpbroadcaster.queuetype",
+			"What type of queue algorithm will be used, quorum or classic (default classic)");
+		req.put("amqpbroadcaster.singleactiveconsumer",
+			"Single active consumer allows to have only one consumer at a time consuming from a queue and to fail over to another registered consumer in case the active one is cancelled or dies. (default false)");
 		return req;
 	}
 
