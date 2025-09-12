@@ -151,7 +151,7 @@ public class MailServer implements IMailService, IServerPlugin
 		ClassLoader saveCl = Thread.currentThread().getContextClassLoader();
 		try
 		{
-			Thread.currentThread().setContextClassLoader(jakarta.mail.Session.class.getClassLoader());
+			Thread.currentThread().setContextClassLoader(MailServer.class.getClassLoader());
 
 			MimeMessage message = createMessage(to, from, subject, rawMsgText, cc, bcc, attachments, overrideProperties);
 			message.setHeader("Precedence", "bulk");
@@ -176,7 +176,7 @@ public class MailServer implements IMailService, IServerPlugin
 		ClassLoader saveCl = Thread.currentThread().getContextClassLoader();
 		try
 		{
-			Thread.currentThread().setContextClassLoader(jakarta.mail.Session.class.getClassLoader());
+			Thread.currentThread().setContextClassLoader(MailServer.class.getClassLoader());
 
 			MimeMessage message = createMessage(to, from, subject, rawMsgText, cc, bcc, attachments, overrideProperties);
 			Transport.send(message);
@@ -424,7 +424,7 @@ public class MailServer implements IMailService, IServerPlugin
 		ClassLoader saveCl = Thread.currentThread().getContextClassLoader();
 		try
 		{
-			Thread.currentThread().setContextClassLoader(jakarta.mail.Session.class.getClassLoader());
+			Thread.currentThread().setContextClassLoader(MailServer.class.getClassLoader());
 			// Create empty properties
 			// -- Get hold of the default session --
 			Properties properties = overrideProperties(settings, overrideProperties);
@@ -527,7 +527,7 @@ public class MailServer implements IMailService, IServerPlugin
 		ClassLoader saveCl = Thread.currentThread().getContextClassLoader();
 		try
 		{
-			Thread.currentThread().setContextClassLoader(jakarta.mail.Session.class.getClassLoader());
+			Thread.currentThread().setContextClassLoader(MailServer.class.getClassLoader());
 			try
 			{
 				ByteArrayInputStream is = new ByteArrayInputStream(data);
