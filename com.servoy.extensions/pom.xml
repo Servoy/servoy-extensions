@@ -43,6 +43,7 @@
         <jbpm.version>7.74.1.Final</jbpm.version>
         <!--  This has to be in sync with jasperreports version  -->
         <poi.version>5.4.1</poi.version>
+        <openpdf.version>1.3.32</openpdf.version>
         <curvesapi.version>1.08</curvesapi.version>
         <xmlbeans.version>5.3.0</xmlbeans.version>
         <!--  Poi dependencies  -->
@@ -368,13 +369,6 @@
                                     </copy>
                                     <makejar srcdir="mail"
                                         includes=",META-INF/services/com.servoy.j2db.plugins.IPlugin" />
-                                    <!--  <makejar srcdir="openid" /> 
-                                    <copy overwrite="true"
-                                        todir="${project.build.directory}/plugins_beans/plugins/openid">
-                                        <fileset file="${project.basedir}/lib/openid4java.jar" />
-                                        <fileset file="${project.basedir}/lib/guice-2.0.jar" />
-                                    </copy>
-                                    -->
                                     <makejar srcdir="oauth" />
                                     <makejar srcdir="pdf_forms" />
                                     <copy overwrite="true"
@@ -388,10 +382,6 @@
                                         <fileset
                                             file="${project.basedir}/resources/pdf_output/pdf_output.jar.jnlp" />
                                     </copy>
-                                    <copy overwrite="true"
-                                        todir="${project.build.directory}/plugins_beans/plugins/pdf_output">
-                                        <fileset file="${project.basedir}/lib/openpdf.jar" />
-                                    </copy>
                                     <makejar srcdir="rawSQL" />
                                     <makejar srcdir="rest_ws" />
                                     <makejar srcdir="scheduler"
@@ -400,10 +390,6 @@
                                         todir="${project.build.directory}/plugins_beans/plugins/">
                                         <fileset
                                             file="${project.basedir}/resources/scheduler/scheduler.jar.jnlp" />
-                                    </copy>
-                                    <copy overwrite="true"
-                                        todir="${project.build.directory}/plugins_beans/plugins/scheduler">
-                                        <fileset file="${project.basedir}/lib/quartz.jar" />
                                     </copy>
                                     <makejar srcdir="serialize" />
                                     <copy overwrite="true"
@@ -433,12 +419,6 @@
                                         </patternset>
                                     </unzip>
                                     -->
-                                    <unzip src="${project.basedir}/lib/quartz.jar"
-                                        dest="${project.build.directory}/classes">
-                                        <patternset>
-                                            <exclude name="META-INF/**" />
-                                        </patternset>
-                                    </unzip>
                                 </parallel>
                             </target>
                         </configuration>
@@ -650,7 +630,22 @@
                                     <outputDirectory>${project.build.directory}/plugins_beans/plugins/mail</outputDirectory>
                                     <destFileName>angus-activation.jar</destFileName>
                                 </artifactItem>
-
+                                <artifactItem>
+                                    <groupId>org.quartz-scheduler</groupId>
+                                    <artifactId>quartz</artifactId>
+                                    <version>${quartz.version}</version>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>${project.build.directory}/plugins_beans/plugins/scheduler</outputDirectory>
+                                    <destFileName>quartz.jar</destFileName>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>com.github.librepdf</groupId>
+                                    <artifactId>openpdf</artifactId>
+                                    <version>${openpdf.version}</version>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>${project.build.directory}/plugins_beans/plugins/pdf_output</outputDirectory>
+                                    <destFileName>openpdf.jar</destFileName>
+                                </artifactItem>
                                 <!--artifactItem>
                                    	<groupId>org.jbpm</groupId>
     								<artifactId>jbpm-kie-services</artifactId>
@@ -2616,7 +2611,7 @@
         <dependency>
             <groupId>com.github.librepdf</groupId>
             <artifactId>openpdf</artifactId>
-            <version>1.3.32</version>
+            <version>${openpdf.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.poi</groupId>
