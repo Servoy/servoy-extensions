@@ -616,6 +616,12 @@ public class JSFile implements IScriptable, IJavaScriptType, IFile
 
 	}
 
+	@Override
+	public String getName()
+	{
+		return file.getName();
+	}
+
 	/**
 	 * @return
 	 */
