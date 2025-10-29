@@ -46,8 +46,8 @@ import com.servoy.j2db.scripting.IScriptable;
 import com.servoy.j2db.util.Debug;
 
 /**
- * <p>The <code>scheduler</code> plugin enables the creation and management of background jobs in headless
- * clients. It supports both cron-based schedules and custom intervals, allowing for versatile task automation.</p>
+ * <p>The <code>scheduler</code> plugin enables the creation and management of background jobs; it is meant for usage in headless
+ * clients, but it does work for other clients as well. It supports both cron-based schedules and custom intervals, allowing for versatile task automation.</p>
  *
  * <p>The <code>addCronJob</code> method schedules tasks using cron expressions, with options for specifying
  * start and end dates, and passing arguments. This method is ideal for periodic tasks such as running jobs
