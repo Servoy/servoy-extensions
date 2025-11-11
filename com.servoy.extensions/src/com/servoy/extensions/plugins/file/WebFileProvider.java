@@ -67,15 +67,15 @@ public class WebFileProvider extends FileProvider
 	{
 		if (data == null) return false;
 		File file = getFileFromArg(f, false);
-		if (file == null || f == null)
+		IClientPluginAccess access = plugin.getClientPluginAccess();
+		if ((file == null || f == null) && access instanceof IAllWebClientPluginAccess webAccess)
 		{
 			String name = "file.bin";
 			if (f instanceof JSFile) name = ((JSFile)f).js_getName();
 			else if (f != null) name = f.toString();
-			IClientPluginAccess access = plugin.getClientPluginAccess();
 			String type = (mimeType == null) ? MimeTypes.getContentType(data, name) : mimeType.trim();
-			String url = ((IAllWebClientPluginAccess)access).serveResource(name, data, type);
-			((IAllWebClientPluginAccess)access).showURL(url, "_self", null, 0, false);
+			String url = webAccess.serveResource(name, data, type);
+			webAccess.showURL(url, "_self", null, 0, false);
 			return true;
 		}
 		else
@@ -88,11 +88,15 @@ public class WebFileProvider extends FileProvider
 	public boolean js_openFile(JSFile file, String webClientTarget, String webClientTargetOptions)
 	{
 		IClientPluginAccess access = plugin.getClientPluginAccess();
-		String fileName = file.js_getName();
-		byte[] data = file.jsFunction_getBytes();
-		String url = ((IAllWebClientPluginAccess)access).serveResource(fileName, data, MimeTypes.getContentType(data, fileName), "inline"); //$NON-NLS-1$
-		((IAllWebClientPluginAccess)access).showURL(url, webClientTarget != null ? webClientTarget : "_blank", webClientTargetOptions, 0, true); //$NON-NLS-1$
-		return true;
+		if (access instanceof IAllWebClientPluginAccess webAccess)
+		{
+			String fileName = file.js_getName();
+			byte[] data = file.jsFunction_getBytes();
+			String url = webAccess.serveResource(fileName, data, MimeTypes.getContentType(data, fileName), "inline"); //$NON-NLS-1$
+			webAccess.showURL(url, webClientTarget != null ? webClientTarget : "_blank", webClientTargetOptions, 0, true); //$NON-NLS-1$
+			return true;
+		}
+		return super.js_openFile(file, webClientTarget, webClientTargetOptions);
 	}
 
 	@Override
@@ -101,10 +105,14 @@ public class WebFileProvider extends FileProvider
 		String name = (fileName == null ? "file.bin" : fileName); //$NON-NLS-1$
 
 		IClientPluginAccess access = plugin.getClientPluginAccess();
-		String type = (mimeType == null) ? MimeTypes.getContentType(data, name) : mimeType.trim();
-		String url = ((IAllWebClientPluginAccess)access).serveResource(name, data, type, "inline"); //$NON-NLS-1$
-		((IAllWebClientPluginAccess)access).showURL(url, webClientTarget != null ? webClientTarget : "_blank", webClientTargetOptions, 0, true); //$NON-NLS-1$
-		return true;
+		if (access instanceof IAllWebClientPluginAccess webAccess)
+		{
+			String type = (mimeType == null) ? MimeTypes.getContentType(data, name) : mimeType.trim();
+			String url = webAccess.serveResource(name, data, type, "inline"); //$NON-NLS-1$
+			webAccess.showURL(url, webClientTarget != null ? webClientTarget : "_blank", webClientTargetOptions, 0, true); //$NON-NLS-1$
+			return true;
+		}
+		return super.js_openFile(fileName, data, mimeType, webClientTarget, webClientTargetOptions);
 	}
 
 	@Override
@@ -176,7 +184,8 @@ public class WebFileProvider extends FileProvider
 	protected boolean writeTXT(Object f, String data, String encoding, String contentType)
 	{
 		File file = getFileFromArg(f, false);
-		if (file == null || f == null)
+		IClientPluginAccess access = plugin.getClientPluginAccess();
+		if ((file == null || f == null) && access instanceof IAllWebClientPluginAccess webAccess)
 		{
 			ByteArrayOutputStream baos = new ByteArrayOutputStream(data.length());
 			try
@@ -189,9 +198,8 @@ public class WebFileProvider extends FileProvider
 						mimeType += "; charset=\"" + encoding + "\"";
 					}
 					String name = f == null ? "file.txt" : f instanceof JSFile ? ((JSFile)f).js_getName() : f.toString();
-					IClientPluginAccess access = plugin.getClientPluginAccess();
-					String url = ((IAllWebClientPluginAccess)access).serveResource(name, baos.toByteArray(), mimeType);
-					((IAllWebClientPluginAccess)access).showURL(url, "_self", null, 0, false);
+					String url = webAccess.serveResource(name, baos.toByteArray(), mimeType);
+					webAccess.showURL(url, "_self", null, 0, false);
 					return true;
 				}
 			}
