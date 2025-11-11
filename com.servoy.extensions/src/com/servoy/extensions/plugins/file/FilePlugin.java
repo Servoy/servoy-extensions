@@ -76,7 +76,8 @@ public class FilePlugin implements IClientPlugin, IIconProvider
 		if (fileProvider == null)
 		{
 			if (access != null &&
-				(access.getApplicationType() == IClientPluginAccess.WEB_CLIENT || access.getApplicationType() == IClientPluginAccess.NG_CLIENT))
+				(access.getApplicationType() == IClientPluginAccess.WEB_CLIENT || access.getApplicationType() == IClientPluginAccess.NG_CLIENT ||
+					access.getApplicationType() == IClientPluginAccess.HEADLESS_CLIENT))
 			{
 				fileProvider = new WebFileProvider(this);
 			}
@@ -125,7 +126,7 @@ public class FilePlugin implements IClientPlugin, IIconProvider
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see com.servoy.j2db.plugins.IIconProvider#getIconUrl()
 	 */
 	@Override
