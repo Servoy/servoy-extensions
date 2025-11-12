@@ -80,7 +80,7 @@ public class WebFileProvider extends FileProvider
 		}
 		else
 		{
-			return super.writeFile(file, data, mimeType);
+			return super.writeFile(f, data, mimeType);
 		}
 	}
 
