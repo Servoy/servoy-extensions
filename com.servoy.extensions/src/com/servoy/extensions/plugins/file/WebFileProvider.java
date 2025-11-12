@@ -25,6 +25,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import org.apache.commons.io.ByteOrderMark;
+import org.apache.commons.io.input.BOMInputStream;
 import org.mozilla.javascript.Function;
 
 import com.servoy.j2db.plugins.IAllWebClientPluginAccess;
@@ -134,6 +136,14 @@ public class WebFileProvider extends FileProvider
 		{
 			try
 			{
+				if (charsetname != null && charsetname.contains("UTF")) //$NON-NLS-1$
+				{
+					BOMInputStream bomIn = new BOMInputStream(((JSFile)file).getInputStream(), false,
+						ByteOrderMark.UTF_8,
+						ByteOrderMark.UTF_16LE, ByteOrderMark.UTF_16BE,
+						ByteOrderMark.UTF_32LE, ByteOrderMark.UTF_32BE);
+					return readTXTFile(charsetname, bomIn);
+				}
 				InputStream is = ((JSFile)file).getInputStream();
 				if (is != null)
 				{
