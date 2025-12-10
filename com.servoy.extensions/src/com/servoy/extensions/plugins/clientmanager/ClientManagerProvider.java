@@ -119,7 +119,7 @@ public class ClientManagerProvider implements IScriptable, IReturnedTypesProvide
 	 *
 	 * @param name The nickname for this user on this channel
 	 * @param channelName The channel name where should be listened to (and send messages to)
-	 * @param callback The callback when for incomming messages
+	 * @param callback {(nickName:String,message:String,channelName:String)=>void} The callback when for incomming messages
 	 * @return BroadCaster
 	 */
 	public Broadcaster js_getOrCreateBroadcaster(String name, String channelName, Function callback)
@@ -178,7 +178,7 @@ public class ClientManagerProvider implements IScriptable, IReturnedTypesProvide
 	 *
 	 * @param name The nickname for this user on this channel
 	 * @param channelName The channel name where should be listened to (and send messages to)
-	 * @param callback The callback when for incomming messages
+	 * @param callback {(nickName:String,message:String,channelName:String)=>void} The callback when for incomming messages
 	 * @return BroadCaster
 	 */
 	public Broadcaster js_createBroadcaster(String name, String channelName, Function callback)

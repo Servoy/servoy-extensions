@@ -255,7 +255,7 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 * @clonedesc js_showFileOpenDialog()
 	 * @sampleas js_showFileOpenDialog()
 	 *
-	 * @param callbackfunction A function that takes the (JSFile) array of the selected files as first argument
+	 * @param callbackfunction {(fileArray:Array<JsFile>)=>void} A function that takes the (JSFile) array of the selected files as first argument
 	 *
 	 * @return a JSFile or an array of JSFiles selected by the user, or null if no file was selected.
 	 */
