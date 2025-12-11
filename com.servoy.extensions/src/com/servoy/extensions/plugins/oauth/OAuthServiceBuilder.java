@@ -102,7 +102,7 @@ public class OAuthServiceBuilder implements IScriptable, IJavaScriptType
 	/**
 	 * Configure the service with a callback function to be executed when the service is ready to use.
 	 * After the access token is returned by the server, this callback function is executed.
-	 * @param callback a function in a scope or form
+	 * @param callback {(result:boolean,auth_outcome:String)=>void} a function in a scope or form
 	 * @param timeout max number of seconds in which the callback method should be executed (with success or error message)
 	 * 			Please note that the timeout should be enough for the user to login and accept permissions.
 	 * @return the service builder for method chaining
