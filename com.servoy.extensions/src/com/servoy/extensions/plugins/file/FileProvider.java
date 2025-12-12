@@ -255,7 +255,7 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 * @clonedesc js_showFileOpenDialog()
 	 * @sampleas js_showFileOpenDialog()
 	 *
-	 * @param callbackfunction {(files:Array<JSFile>)=>void} A function that takes the (JSFile) array of the selected files as first argument
+	 * @param callbackfunction {(files:Array<plugins.file.JSFile>)=>void} A function that takes the (JSFile) array of the selected files as first argument
 	 *
 	 * @return a JSFile or an array of JSFiles selected by the user, or null if no file was selected.
 	 */
@@ -283,7 +283,7 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 * @sampleas js_showFileOpenDialog()
 	 *
 	 * @param selectionMode 0=both,1=Files,2=Dirs
-	 * @param callbackfunction {(files:Array<JSFile>)=>void} A function that takes the (JSFile) array of the selected files as first argument
+	 * @param callbackfunction {(files:Array<plugins.file.JSFile>)=>void} A function that takes the (JSFile) array of the selected files as first argument
 	 *
 	 * @return a JSFile or an array of JSFiles selected by the user, or null if no file was selected.
 	 */
@@ -328,7 +328,7 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 *
 	 * @param selectionMode 0=both,1=Files,2=Dirs
 	 * @param startDirectory JSFile instance of default folder,null=default/previous
-	 * @param callbackfunction {(files:Array<JSFile>)=>void} A function that takes the (JSFile) array of the selected files as first argument
+	 * @param callbackfunction {(files:Array<plugins.file.JSFile>)=>void} A function that takes the (JSFile) array of the selected files as first argument
 	 *
 	 * @return a JSFile or an array of JSFiles selected by the user, or null if no file was selected.
 	 */
@@ -344,7 +344,7 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 *
 	 * @param selectionMode 0=both,1=Files,2=Dirs
 	 * @param startDirectory Path to default folder,null=default/previous
-	 * @param callbackfunction {(files:Array<JSFile>)=>void} A function that takes the (JSFile) array of the selected files as first argument
+	 * @param callbackfunction {(files:Array<plugins.file.JSFile>)=>void} A function that takes the (JSFile) array of the selected files as first argument
 	 *
 	 * @return a JSFile or an array of JSFiles selected by the user, or null if no file was selected.
 	 */
@@ -391,7 +391,7 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 * @param selectionMode 0=both,1=Files,2=Dirs
 	 * @param startDirectory JSFile instance of default folder,null=default/previous
 	 * @param multiselect true/false
-	 * @param callbackfunction {(files:Array<JSFile>)=>void} A function that takes the (JSFile) array of the selected files as first argument
+	 * @param callbackfunction {(files:Array<plugins.file.JSFile>)=>void} A function that takes the (JSFile) array of the selected files as first argument
 	 *
 	 * @return a JSFile or an array of JSFiles selected by the user, or null if no file was selected.
 	 */
@@ -408,7 +408,7 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 * @param selectionMode 0=both,1=Files,2=Dirs
 	 * @param startDirectory Path to default folder,null=default/previous
 	 * @param multiselect true/false
-	 * @param callbackfunction {(files:Array<JSFile>)=>void} A function that takes the (JSFile) array of the selected files as first argument
+	 * @param callbackfunction {(files:Array<plugins.file.JSFile>)=>void} A function that takes the (JSFile) array of the selected files as first argument
 	 *
 	 * @return a JSFile or an array of JSFiles selected by the user, or null if no file was selected.
 	 */
@@ -459,7 +459,7 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 * @param startDirectory JSFile instance of default folder,null=default/previous
 	 * @param multiselect true/false
 	 * @param filter A filter or array of filters on the folder files.
-	 * @param callbackfunction {(files:Array<JSFile>)=>void} A function that takes the (JSFile) array of the selected files as first argument
+	 * @param callbackfunction {(files:Array<plugins.file.JSFile>)=>void} A function that takes the (JSFile) array of the selected files as first argument
 	 *
 	 * @return a JSFile or an array of JSFiles selected by the user, or null if no file was selected.
 	 */
@@ -477,7 +477,7 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 * @param startDirectory Path to default folder,null=default/previous
 	 * @param multiselect true/false
 	 * @param filter A filter or array of filters on the folder files.
-	 * @param callbackfunction {(files:Array<JSFile>)=>void} A function that takes the (JSFile) array of the selected files as first argument
+	 * @param callbackfunction {(files:Array<plugins.file.JSFile>)=>void} A function that takes the (JSFile) array of the selected files as first argument
 	 *
 	 * @return a JSFile or an array of JSFiles selected by the user, or null if no file was selected.
 	 */
@@ -495,7 +495,7 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 * @param startDirectory JSFile instance of default folder, null=default/previous
 	 * @param multiselect true/false
 	 * @param filter A filter or array of filters on the folder files.
-	 * @param callbackfunction {(files:Array<JSFile>)=>void} A function that takes the (JSFile) array of the selected files as first argument
+	 * @param callbackfunction {(files:Array<plugins.file.JSFile>)=>void} A function that takes the (JSFile) array of the selected files as first argument
 	 * @param title The tile of the dialog
 	 *
 	 * @return a JSFile or an array of JSFiles selected by the user, or null if no file was selected.
@@ -515,7 +515,7 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 * @param startDirectory Path to default folder, null=default/previous
 	 * @param multiselect true/false
 	 * @param filter A filter or array of filters on the folder files.
-	 * @param callbackfunction {(files:Array<JSFile>)=>void} A function that takes the (JSFile) array of the selected files as first argument
+	 * @param callbackfunction {(files:Array<plugins.file.JSFile>)=>void} A function that takes the (JSFile) array of the selected files as first argument
 	 * @param title The tile of the dialog
 	 *
 	 * @return a JSFile or an array of JSFiles selected by the user, or null if no file was selected.
