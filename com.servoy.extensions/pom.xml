@@ -7,7 +7,7 @@
     </prerequisites>
     <groupId>com.servoy</groupId>
     <artifactId>com.servoy.extensions</artifactId>
-    <version>2025.12.0.4120_rc</version>
+    <version>2025.12.0.4121_rc2</version>
     <repositories>
         <repository>
             <id>developer_repo</id>
@@ -309,7 +309,7 @@
                                         <retry retrycount="3" retrydelay="1000">
                                             <signjar keystore="${jarsigner.keystore}"
                                                 jar="${project.build.directory}/plugins_beans/@{type}/@{jarname}.jar"
-                                                alias="ServoyClient" storepass="${jarsigner.storepass}"
+                                                alias="${jarsigner.alias}" storepass="${jarsigner.storepass}"
                                                 tsaurl="${tsaUrl}"
                                                 sigalg="SHA256withRSA" digestalg="SHA-256" />
                                         </retry>
@@ -2301,87 +2301,87 @@
                                 <parallel>
                                     <signjar keystore="${jarsigner.keystore}"
                                         jar="${project.build.directory}/plugins_beans/plugins/pdf_output/fontbox.jar"
-                                        alias="ServoyClient" storepass="${jarsigner.storepass}"
+                                        alias="${jarsigner.alias}" storepass="${jarsigner.storepass}"
                                         tsaurl="${tsaUrl}"
                                         sigalg="SHA256withRSA" digestalg="SHA-256" />
                                     <signjar keystore="${jarsigner.keystore}"
                                         jar="${project.build.directory}/plugins_beans/plugins/pdf_output/pdfbox.jar"
-                                        alias="ServoyClient" storepass="${jarsigner.storepass}"
+                                    alias="${jarsigner.alias}" storepass="${jarsigner.storepass}"
                                         tsaurl="${tsaUrl}"
                                         sigalg="SHA256withRSA" digestalg="SHA-256" />
                                     <signjar keystore="${jarsigner.keystore}"
                                         jar="${project.build.directory}/plugins_beans/plugins/pdf_output/pdfbox-io.jar"
-                                        alias="ServoyClient" storepass="${jarsigner.storepass}"
+                                        alias="${jarsigner.alias}" storepass="${jarsigner.storepass}"
                                         tsaurl="${tsaUrl}"
                                         sigalg="SHA256withRSA" digestalg="SHA-256" />
                                     <signjar keystore="${jarsigner.keystore}"
                                         jar="${project.build.directory}/plugins_beans/plugins/pdf_output/bcprov.jar"
-                                        alias="ServoyClient" storepass="${jarsigner.storepass}"
+                                        alias="${jarsigner.alias}" storepass="${jarsigner.storepass}"
                                         tsaurl="${tsaUrl}"
                                         sigalg="SHA256withRSA" digestalg="SHA-256" />
                                     <signjar keystore="${jarsigner.keystore}"
                                         jar="${project.build.directory}/plugins_beans/plugins/pdf_output/bcmail.jar"
-                                        alias="ServoyClient" storepass="${jarsigner.storepass}"
+                                        alias="${jarsigner.alias}" storepass="${jarsigner.storepass}"
                                         tsaurl="${tsaUrl}"
                                         sigalg="SHA256withRSA" digestalg="SHA-256" />
                                     <!--signjar keystore="${jarsigner.keystore}"
                                         jar="${project.build.directory}/plugins_beans/plugins/jackson/jackson-jaxb-annotations.jar"
-                                        alias="ServoyClient" storepass="${jarsigner.storepass}"
+                                        alias="${jarsigner.alias}" storepass="${jarsigner.storepass}"
                                         tsaurl="${tsaUrl}"
                                         sigalg="SHA256withRSA" digestalg="SHA-256" />
                                     <signjar keystore="${jarsigner.keystore}"
                                         jar="${project.build.directory}/plugins_beans/plugins/jackson/jackson-datatype-jsr310.jar"
-                                        alias="ServoyClient" storepass="${jarsigner.storepass}"
+                                        alias="${jarsigner.alias}" storepass="${jarsigner.storepass}"
                                         tsaurl="${tsaUrl}"
                                         sigalg="SHA256withRSA" digestalg="SHA-256" />
                                     <signjar keystore="${jarsigner.keystore}"
                                         jar="${project.build.directory}/plugins_beans/plugins/jackson/jaxb-api.jar"
-                                        alias="ServoyClient" storepass="${jarsigner.storepass}"
+                                        alias="${jarsigner.alias}" storepass="${jarsigner.storepass}"
                                         tsaurl="${tsaUrl}"
                                         sigalg="SHA256withRSA" digestalg="SHA-256" /-->
                                     <signjar keystore="${jarsigner.keystore}"
                                         jar="${project.build.directory}/plugins_beans/plugins/http/httpclient5.jar"
-                                        alias="ServoyClient" storepass="${jarsigner.storepass}"
+                                        alias="${jarsigner.alias}" storepass="${jarsigner.storepass}"
                                         tsaurl="${tsaUrl}"
                                         sigalg="SHA256withRSA" digestalg="SHA-256" />
                                     <signjar keystore="${jarsigner.keystore}"
                                         jar="${project.build.directory}/plugins_beans/plugins/http/httpcore5.jar"
-                                        alias="ServoyClient" storepass="${jarsigner.storepass}"
+                                        alias="${jarsigner.alias}" storepass="${jarsigner.storepass}"
                                         tsaurl="${tsaUrl}"
                                         sigalg="SHA256withRSA" digestalg="SHA-256" />
                                     <signjar keystore="${jarsigner.keystore}"
                                         jar="${project.build.directory}/plugins_beans/plugins/http/httpcore5-h2.jar"
-                                        alias="ServoyClient" storepass="${jarsigner.storepass}"
+                                        alias="${jarsigner.alias}" storepass="${jarsigner.storepass}"
                                         tsaurl="${tsaUrl}"
                                         sigalg="SHA256withRSA" digestalg="SHA-256" />
                                     <signjar keystore="${jarsigner.keystore}"
                                         jar="${project.build.directory}/plugins_beans/plugins/images/metadataextractor.jar"
-                                        alias="ServoyClient" storepass="${jarsigner.storepass}"
+                                        alias="${jarsigner.alias}" storepass="${jarsigner.storepass}"
                                         tsaurl="${tsaUrl}"
                                         sigalg="SHA256withRSA" digestalg="SHA-256" />
                                     <signjar keystore="${jarsigner.keystore}"
                                         jar="${project.build.directory}/plugins_beans/plugins/images/xmpcore.jar"
-                                        alias="ServoyClient" storepass="${jarsigner.storepass}"
+                                        alias="${jarsigner.alias}" storepass="${jarsigner.storepass}"
                                         tsaurl="${tsaUrl}"
                                         sigalg="SHA256withRSA" digestalg="SHA-256" />
                                     <signjar keystore="${jarsigner.keystore}"
                                         jar="${project.build.directory}/plugins_beans/plugins/jakarta-poi/jakarta-poi.jar"
-                                        alias="ServoyClient" storepass="${jarsigner.storepass}"
+                                        alias="${jarsigner.alias}" storepass="${jarsigner.storepass}"
                                         tsaurl="${tsaUrl}"
                                         sigalg="SHA256withRSA" digestalg="SHA-256" />
                                     <signjar keystore="${jarsigner.keystore}"
                                         jar="${project.build.directory}/plugins_beans/plugins/jakarta-poi/poi-ooxml.jar"
-                                        alias="ServoyClient" storepass="${jarsigner.storepass}"
+                                        alias="${jarsigner.alias}" storepass="${jarsigner.storepass}"
                                         tsaurl="${tsaUrl}"
                                         sigalg="SHA256withRSA" digestalg="SHA-256" />
                                     <signjar keystore="${jarsigner.keystore}"
                                         jar="${project.build.directory}/plugins_beans/plugins/jakarta-poi/commons-math3.jar"
-                                        alias="ServoyClient" storepass="${jarsigner.storepass}"
+                                        alias="${jarsigner.alias}" storepass="${jarsigner.storepass}"
                                         tsaurl="${tsaUrl}"
                                         sigalg="SHA256withRSA" digestalg="SHA-256" />
                                     <signjar keystore="${jarsigner.keystore}"
                                         jar="${project.build.directory}/plugins_beans/plugins/jakarta-poi/SparseBitSet.jar"
-                                        alias="ServoyClient" storepass="${jarsigner.storepass}"
+                                        alias="${jarsigner.alias}" storepass="${jarsigner.storepass}"
                                         tsaurl="${tsaUrl}"
                                         sigalg="SHA256withRSA" digestalg="SHA-256" />     
                                 </parallel>
