@@ -2306,7 +2306,7 @@
                                         sigalg="SHA256withRSA" digestalg="SHA-256" />
                                     <signjar keystore="${jarsigner.keystore}"
                                         jar="${project.build.directory}/plugins_beans/plugins/pdf_output/pdfbox.jar"
-                                    alias="${jarsigner.alias}" storepass="${jarsigner.storepass}"
+                                        alias="${jarsigner.alias}" storepass="${jarsigner.storepass}"
                                         tsaurl="${tsaUrl}"
                                         sigalg="SHA256withRSA" digestalg="SHA-256" />
                                     <signjar keystore="${jarsigner.keystore}"
