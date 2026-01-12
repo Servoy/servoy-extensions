@@ -16,6 +16,7 @@
  */
 package com.servoy.extensions.plugins.converters;
 
+import java.sql.Types;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -108,6 +109,7 @@ public class GlobalMethodConverter implements ITypedColumnConverter, IUIConverte
 				if (value.equals("NUMBER")) return IColumnTypes.NUMBER; //$NON-NLS-1$
 				if (value.equals("DATETIME")) return IColumnTypes.DATETIME; //$NON-NLS-1$
 				if (value.equals("MEDIA")) return IColumnTypes.MEDIA; //$NON-NLS-1$
+				if (value.equals("ARRAY")) return Types.ARRAY; //$NON-NLS-1$
 			}
 		}
 		return Integer.MAX_VALUE;
@@ -115,7 +117,7 @@ public class GlobalMethodConverter implements ITypedColumnConverter, IUIConverte
 
 	public int[] getSupportedColumnTypes()
 	{
-		return new int[] { IColumnTypes.DATETIME, IColumnTypes.INTEGER, IColumnTypes.MEDIA, IColumnTypes.NUMBER, IColumnTypes.TEXT };
+		return new int[] { IColumnTypes.DATETIME, IColumnTypes.INTEGER, IColumnTypes.MEDIA, IColumnTypes.NUMBER, IColumnTypes.TEXT, Types.ARRAY };
 	}
 
 	public int[] getSupportedDataproviderTypes()
@@ -138,13 +140,14 @@ public class GlobalMethodConverter implements ITypedColumnConverter, IUIConverte
 		}
 		if (TYPE_NAME_PROPERTY.equals(property))
 		{
-			String[] choices = new String[] {//
-			"<as is>", //$NON-NLS-1$
-			"TEXT", //$NON-NLS-1$
-			"INTEGER", //$NON-NLS-1$
-			"NUMBER", //$NON-NLS-1$
-			"DATETIME", //$NON-NLS-1$
-			"MEDIA" //$NON-NLS-1$
+			String[] choices = new String[] { //
+				"<as is>", //$NON-NLS-1$
+				"TEXT", //$NON-NLS-1$
+				"INTEGER", //$NON-NLS-1$
+				"NUMBER", //$NON-NLS-1$
+				"DATETIME", //$NON-NLS-1$
+				"MEDIA", //$NON-NLS-1$
+				"ARRAY" //$NON-NLS-1$
 			};
 			return new PropertyDescriptor("The converted object type", IPropertyDescriptor.NUMBER, choices); //$NON-NLS-1$
 		}
@@ -169,10 +172,12 @@ public class GlobalMethodConverter implements ITypedColumnConverter, IUIConverte
 				"Called for performing a conversion between a displayed value and a database value.",
 				ArgumentType.Object,
 				"the database value.",
-				new IMethodArgument[] { methodTemplatesFactory.createMethodArgument("displayedValue", ArgumentType.Object, "The displayed value."), methodTemplatesFactory.createMethodArgument(
-					"dbType", ArgumentType.String, "The type of the database column. Can be one of \"" + Column.getDisplayTypeString(IColumnTypes.TEXT) +
-						"\", \"" + Column.getDisplayTypeString(IColumnTypes.INTEGER) + "\", \"" + Column.getDisplayTypeString(IColumnTypes.NUMBER) + "\", \"" +
-						Column.getDisplayTypeString(IColumnTypes.DATETIME) + "\" or \"" + Column.getDisplayTypeString(IColumnTypes.MEDIA) + "\".") },
+				new IMethodArgument[] { methodTemplatesFactory.createMethodArgument("displayedValue", ArgumentType.Object,
+					"The displayed value."), methodTemplatesFactory.createMethodArgument(
+						"dbType", ArgumentType.String, "The type of the database column. Can be one of \"" + Column.getDisplayTypeString(IColumnTypes.TEXT) +
+							"\", \"" + Column.getDisplayTypeString(IColumnTypes.INTEGER) + "\", \"" + Column.getDisplayTypeString(IColumnTypes.NUMBER) +
+							"\", \"" +
+							Column.getDisplayTypeString(IColumnTypes.DATETIME) + "\" or \"" + Column.getDisplayTypeString(IColumnTypes.MEDIA) + "\".") },
 				"// return the original value without conversion\n" + "return displayedValue;", true));
 
 		methodTemplates.put(
@@ -182,10 +187,12 @@ public class GlobalMethodConverter implements ITypedColumnConverter, IUIConverte
 				"Called for performing a conversion between a database value and a displayed value.",
 				ArgumentType.Object,
 				"the displayed value.",
-				new IMethodArgument[] { methodTemplatesFactory.createMethodArgument("databaseValue", ArgumentType.Object, "The database value."), methodTemplatesFactory.createMethodArgument(
-					"dbType", ArgumentType.String, "The type of the database column. Can be one of \"" + Column.getDisplayTypeString(IColumnTypes.TEXT) +
-						"\", \"" + Column.getDisplayTypeString(IColumnTypes.INTEGER) + "\", \"" + Column.getDisplayTypeString(IColumnTypes.NUMBER) + "\", \"" +
-						Column.getDisplayTypeString(IColumnTypes.DATETIME) + "\" or \"" + Column.getDisplayTypeString(IColumnTypes.MEDIA) + "\".") },
+				new IMethodArgument[] { methodTemplatesFactory.createMethodArgument("databaseValue", ArgumentType.Object,
+					"The database value."), methodTemplatesFactory.createMethodArgument(
+						"dbType", ArgumentType.String, "The type of the database column. Can be one of \"" + Column.getDisplayTypeString(IColumnTypes.TEXT) +
+							"\", \"" + Column.getDisplayTypeString(IColumnTypes.INTEGER) + "\", \"" + Column.getDisplayTypeString(IColumnTypes.NUMBER) +
+							"\", \"" +
+							Column.getDisplayTypeString(IColumnTypes.DATETIME) + "\" or \"" + Column.getDisplayTypeString(IColumnTypes.MEDIA) + "\".") },
 				"// return the original value without conversion\n" + "return databaseValue;", true));
 
 		return methodTemplates;
