@@ -509,7 +509,7 @@ public class HttpClient implements IScriptable, IJavaScriptType
 	 * @param workstation The workstation the authentication request is originating from.
 	 * @param domain The domain to authenticate within.
 	 *
-	 * @return The promise object that resolves with an array of Response objects when all requests are complete in the same order as the Request objects.
+	 * @return {Promise} The promise object that resolves with an array of Response objects when all requests are complete in the same order as the Request objects.
 	 */
 	@JSFunction
 	public NativePromise executeRequest(final BaseRequest[] requests, final String username, final String password, final String workstation,
@@ -578,7 +578,7 @@ public class HttpClient implements IScriptable, IJavaScriptType
 	 * @param username the user name
 	 * @param password the password
 	 *
-	 * @return The promise object that resolves with an array of Response objects when all requests are complete in the same order as the Request objects.
+	 * @return {Promise} The promise object that resolves with an array of Response objects when all requests are complete in the same order as the Request objects.
 	 */
 	@JSFunction
 	public NativePromise executeRequest(final BaseRequest[] requests, final String username, final String password)
@@ -609,7 +609,7 @@ public class HttpClient implements IScriptable, IJavaScriptType
 	 *
 	 * @param requests
 	 *
-	 * @return The promise object that resolves with an array of Response objects when all requests are complete in the same order as the Request objects.
+	 * @return {Promise} The promise object that resolves with an array of Response objects when all requests are complete in the same order as the Request objects.
 	 */
 	@JSFunction
 	public NativePromise execute(BaseRequest[] requests)
