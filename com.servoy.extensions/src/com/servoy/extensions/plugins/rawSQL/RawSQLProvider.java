@@ -151,7 +151,7 @@ public class RawSQLProvider implements IScriptable
 		{
 			ServerMapping serverMapping = getServerMapping(serverName);
 			return getSQLService().executeSQL(plugin.getClientPluginAccess().getClientID(), serverMapping.remoteServername, sql, sql_args,
-				serverMapping.transactionID);
+				serverMapping.transactionID, 0);
 		}
 		catch (Exception ex)
 		{
@@ -212,12 +212,29 @@ public class RawSQLProvider implements IScriptable
 	 */
 	public boolean js_executeSQL(String serverName, String sql, Object[] sql_args)
 	{
+		return js_executeSQL(serverName, sql, sql_args, 0);
+	}
+
+	/**
+	 * @clonedesc js_executeSQL(String,String,String)
+	 *
+	 * @sampleas js_executeSQL(String,String,String)
+	 *
+	 * @param serverName the name of the server
+	 * @param sql the sql query to execute
+	 * @param sql_args the arguments for the query
+	 * @param queryTimeout number of seconds the jdbc driver will wait for a sql statement to execute. Default value is 0 (no timeout).
+	 *
+	 * @return True if the SQL execution was successful; false otherwise.
+	 */
+	public boolean js_executeSQL(String serverName, String sql, Object[] sql_args, int queryTimeout)
+	{
 		exception = null;
 		try
 		{
 			ServerMapping serverMapping = getServerMapping(serverName);
 			return getSQLService().executeSQL(plugin.getClientPluginAccess().getClientID(), serverMapping.remoteServername, sql, sql_args,
-				serverMapping.transactionID);
+				serverMapping.transactionID, queryTimeout);
 		}
 		catch (Exception ex)
 		{
@@ -532,14 +549,52 @@ public class RawSQLProvider implements IScriptable
 	 * @param sql_args the array of parameter values
 	 * @return a <a href="https://docs.servoy.com/reference/servoycore/dev-api/js-lib/promise">Promise</a> resolving to <code>true</code> on success or <code>false</code> on a non-exceptional failure
 	 */
-	@SuppressWarnings("boxing")
 	public NativePromise js_executeSQLAsync(String serverName, String sql, Object[] sql_args)
+	{
+		return js_executeSQLAsync(serverName, sql, sql_args, 0);
+	}
+
+	/**
+	 * Execute any SQL asynchronously with prepared statement parameters.
+	 * Returns a <a href="https://docs.servoy.com/reference/servoycore/dev-api/js-lib/promise">Promise</a> object
+	 * that resolves to a <a href="https://docs.servoy.com/reference/servoycore/dev-api/js-lib/boolean">Boolean</a>
+	 * indicating success, or rejects with an error message if an exception occurs.
+	 *
+	 * <p>Example inserting a new employee:</p>
+	 * <pre><code>
+	 * plugins.rawSQL.executeSQLAsync(
+	 *	     "example_data",
+	 *	     "UPDATE employees SET lastname = ?, firstname = ? WHERE employeeid = ?",
+	 *	     ["Smith", "Jane", 1],
+	 *	     30
+	 *	 )
+	 *	 .then(function(success) {
+	 *	     if (success) {
+	 *	         application.output("Employee updated successfully");
+	 *	     } else {
+	 *	         application.output("Update returned false: " + plugins.rawSQL.getException().getMessage());
+	 *	     }
+	 *	 })
+	 *	 .catch(function(errMsg) {
+	 *	     application.output("Async SQL failed: " + errMsg);
+	 *	 });
+	 * </code></pre>
+	 *
+	 * @param serverName the logical DB server name (e.g. <code>example_data</code>)
+	 * @param sql the SQL statement with placeholders
+	 * @param sql_args the array of parameter values
+	 * @param queryTimeout number of seconds the jdbc driver will wait for a sql statement to execute. Default value is 0 (no timeout).
+	 *
+	 * @return a <a href="https://docs.servoy.com/reference/servoycore/dev-api/js-lib/promise">Promise</a> resolving to <code>true</code> on success or <code>false</code> on a non-exceptional failure
+	 */
+	@SuppressWarnings("boxing")
+	public NativePromise js_executeSQLAsync(String serverName, String sql, Object[] sql_args, int queryTimeout)
 	{
 		Deferred deferred = new Deferred(plugin.getClientPluginAccess());
 		plugin.getClientPluginAccess().getExecutor().execute(() -> {
 			try
 			{
-				boolean result = js_executeSQL(serverName, sql, sql_args);
+				boolean result = js_executeSQL(serverName, sql, sql_args, queryTimeout);
 				deferred.resolve(result);
 			}
 			catch (Exception e)

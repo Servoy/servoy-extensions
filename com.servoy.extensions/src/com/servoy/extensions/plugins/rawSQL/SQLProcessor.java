@@ -95,7 +95,7 @@ public class SQLProcessor implements ISQLService, IServerPlugin
 		return req;
 	}
 
-	public boolean executeSQL(String clientId, String server, String sql, Object[] questiondata, String tid)
+	public boolean executeSQL(String clientId, String server, String sql, Object[] questiondata, String tid, int queryTimeout)
 	{
 		if (!checkAccess(clientId)) return false;
 
@@ -134,6 +134,7 @@ public class SQLProcessor implements ISQLService, IServerPlugin
 						}
 						((PreparedStatement)ps).setObject(i + 1, data);
 					}
+					if (queryTimeout > 0) ps.setQueryTimeout(queryTimeout);
 					long t1 = System.currentTimeMillis();
 					Long perfUuid = application.addPerformanceTiming(server, sql, 0 - t1, clientId);
 					try

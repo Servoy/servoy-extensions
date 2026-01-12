@@ -24,7 +24,8 @@ import com.servoy.j2db.persistence.RepositoryException;
 
 public interface ISQLService extends Remote
 {
-	public boolean executeSQL(String clientId, String server, String sql, Object[] sql_args, String server_transaction_id) throws RemoteException;
+	public boolean executeSQL(String clientId, String server, String sql, Object[] sql_args, String server_transaction_id, int queryTimeout)
+		throws RemoteException;
 
 	public IDataSet executeStoredProcedure(String clientId, String serverName, String transaction_id, String procedureDeclaration, Object[] args,
 		int[] inOutType, int startRow, int maxNumberOfRowsToRetrieve) throws RepositoryException, RemoteException;
