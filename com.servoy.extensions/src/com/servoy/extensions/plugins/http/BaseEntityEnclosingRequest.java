@@ -178,7 +178,7 @@ public class BaseEntityEnclosingRequest extends BaseRequest
 			}
 			else
 			{
-				entityProducer = AsyncEntityProducers.create("");
+				entityProducer = AsyncEntityProducers.create("", (ContentType)null);
 			}
 		}
 		else if (files.size() == 1 && (params == null || params.size() == 0) && !forceMultipart)
