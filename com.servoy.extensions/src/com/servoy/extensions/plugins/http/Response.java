@@ -218,7 +218,7 @@ public class Response implements IScriptable, IJavaScriptType
 	 *
 	 * for (header in allHeaders) application.output(header + ': ' + allHeaders[header]);
 	 *
-	 * @return a `JSMap` of all headers in the response or a specific header if `headerName` is provided. Returns `null` if an exception occurred.
+	 * @return {Map<String,Array<String>>} a `JSMap` of all headers in the response or a specific header if `headerName` is provided. Returns `null` if an exception occurred.
 	 */
 	public JSMap js_getResponseHeaders()
 	{
@@ -232,7 +232,7 @@ public class Response implements IScriptable, IJavaScriptType
 	 *
 	 * @param headerName
 	 *
-	 * @return a `JSMap` of all headers in the response or a specific header if `headerName` is provided. Returns `null` if an exception occurred.
+	 * @return {Map<String,Array<String>>} a `JSMap` of all headers in the response or a specific header if `headerName` is provided. Returns `null` if an exception occurred.
 	 */
 	public JSMap js_getResponseHeaders(String headerName)
 	{
