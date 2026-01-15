@@ -477,7 +477,7 @@ public abstract class BaseRequest implements IScriptable, IJavaScriptType
 	 * @sample
 	 * request.executeAsyncRequest().then(response => { // handle the response }).catch(errorMessage => { // handle the error });})
 	 *
-	 * @return {Promise} A Promise that resolves with a Response object upon request completion or rejects with an error message if the request fails.
+	 * @return {Promise<plugins.http.Response>} A Promise that resolves with a Response object upon request completion or rejects with an error message if the request fails.
 	 *
 	 */
 	@JSFunction
@@ -493,7 +493,7 @@ public abstract class BaseRequest implements IScriptable, IJavaScriptType
 	 * @param {String} username The user name used for authentication.
 	 * @param {String} password The password used for authentication.
 	 *
-	 * @return {Promise} A Promise that resolves with a Response object upon request completion or rejects with an error message if the request fails.
+	 * @return {Promise<plugins.http.Response>} A Promise that resolves with a Response object upon request completion or rejects with an error message if the request fails.
 	 */
 	@JSFunction
 	public NativePromise executeAsyncRequest(final String username, final String password)
@@ -510,7 +510,7 @@ public abstract class BaseRequest implements IScriptable, IJavaScriptType
 	 * @param {String} workstation The workstation the authentication request originates from.
 	 * @param {String} domain The domain to authenticate within.
 	 *
-	 * @return {Promise} A Promise that resolves with a Response object upon request completion or rejects with an error message if the request fails.
+	 * @return {Promise<plugins.http.Response>} A Promise that resolves with a Response object upon request completion or rejects with an error message if the request fails.
 	 */
 	@JSFunction
 	public NativePromise executeAsyncRequest(final String username, final String password, final String workstation, final String domain)
