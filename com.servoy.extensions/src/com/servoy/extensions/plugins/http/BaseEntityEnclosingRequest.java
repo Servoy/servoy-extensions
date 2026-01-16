@@ -83,7 +83,7 @@ public class BaseEntityEnclosingRequest extends BaseRequest
 	/**
 	 * Get form parameters of the request.
 	 *
-	 * @return A map of parameter names to values.
+	 * @return {Map<String, String>} A map of parameter names to values.
 	 */
 	public Map<String, String> js_getParameters()
 	{
