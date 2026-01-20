@@ -115,7 +115,7 @@ public abstract class BaseRequest implements IScriptable, IJavaScriptType
 	/**
 	 * This returns a Object with header names as keys and arrays of values as values.
 	 *
-	 * @return {Map<String,Array<String>>} An Object with "name" > "value"
+	 * @return {Object<String,Array<String>>} An Object with "name" > "value"
 	 */
 	public Map<String, String[]> js_getHeaders()
 	{
@@ -125,10 +125,10 @@ public abstract class BaseRequest implements IScriptable, IJavaScriptType
 	}
 
 	/**
-	 * Get query parameters from the request URL.
-	 *
-	 * @return {Map<String,Array<String>>} A map of parameter names to arrays of values.
-	 */
+	  * Get query parameters from the request URL.
+	  *
+	  * @return {Object<String,Array<String>>} A map of parameter names to arrays of values.
+	  */
 	public Map<String, String[]> js_getQueryParameters()
 	{
 		Map<String, List<String>> temp = new HashMap<>();
