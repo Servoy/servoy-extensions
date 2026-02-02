@@ -109,6 +109,7 @@ public class SQLProcessor implements ISQLService, IServerPlugin
 				if (questiondata == null || questiondata.length == 0)
 				{
 					ps = connection.createStatement();
+					if (queryTimeout > 0) ps.setQueryTimeout(queryTimeout);
 					long t1 = System.currentTimeMillis();
 					long sqlStatementId = application.addTrackStatement(clientId, server, sql, t1, ps);
 					Long perfUuid = application.addPerformanceTiming(server, sql, 0 - t1, clientId);
