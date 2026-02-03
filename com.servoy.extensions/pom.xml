@@ -7,7 +7,7 @@
     </prerequisites>
     <groupId>com.servoy</groupId>
     <artifactId>com.servoy.extensions</artifactId>
-    <version>2024.3.9.qualifier</version>
+    <version>2024.3.9-SNAPSHOT</version>
     <repositories>
         <repository>
             <id>developer_repo</id>
