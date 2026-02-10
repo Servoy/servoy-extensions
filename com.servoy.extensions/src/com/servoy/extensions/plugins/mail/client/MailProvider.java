@@ -22,7 +22,11 @@ import java.util.Date;
 import java.util.List;
 import java.util.StringTokenizer;
 
+import org.mozilla.javascript.annotations.JSFunction;
+
 import com.servoy.extensions.plugins.mail.IMailService;
+import com.servoy.extensions.plugins.mail.MessageBuilder;
+import com.servoy.extensions.plugins.mail.SMTPService;
 import com.servoy.j2db.documentation.ServoyDocumented;
 import com.servoy.j2db.plugins.IClientPluginAccess;
 import com.servoy.j2db.scripting.IJavaScriptType;
@@ -1256,8 +1260,83 @@ public class MailProvider implements IReturnedTypesProvider, IScriptable, IJavaS
 		return null;
 	}
 
+	/**
+	 * Creates a new SMTP service builder.
+	 * <p>
+	 * The returned {@link SMTPService} can be configured with SMTP properties,
+	 * authentication options (including OAuth 2.0), and sender information before
+	 * sending email messages.
+	 *
+	 * @sample
+	 * // Build OAuth service
+	 *  var oauthBuilder = plugins.oauth.serviceBuilder(clientId)
+	 *     .clientSecret(secret)
+	 *     .refreshToken(refreshToken)
+	 *     .defaultScope("https://mail.google.com/")
+	 *     .additionalParameters({ "access_type": "offline" });
+	 *
+	 * var oauthService = oauthBuilder.build(plugins.oauth.OAuthProviders.GOOGLE);
+	 *
+	 * // Create SMTP service using OAuth
+	 * var smtpBuilder = plugins.mail.createSMTPService()
+	 *     .withProperties(properties)
+	 *     .withOAuthService(oauthService)
+	 *     .withFrom(from);
+	 *
+	 * // Send simple mail
+	 * var ok = smtpBuilder.sendMail(
+	 *     to,
+	 *     "Test from the Servoy mail plugin and oauth",
+	 *     "If you read this, Gmail + Servoy are friends."
+	 * );
+	 *
+	 * application.output("Mail sent: " + ok);
+	 *
+	 * // Send mail using message builder
+	 * var msgBuilder = plugins.mail.newMessage()
+	 *     .withTo(to)
+	 *     .withSubject("Test message builder")
+	 *     .withRawMsgText("If you read this, Gmail + Servoy are friends.");
+	 *
+	 * ok = smtpBuilder.sendMail(msgBuilder);
+	 * application.output("Mail sent with builder: " + ok);
+	 *
+	 * @return a new SMTPService instance, or {@code null} if the mail service is not available
+	 */
+	@JSFunction
+	public SMTPService createSMTPService()
+	{
+		createMailService();
+		if (mailService != null)
+		{
+			return new SMTPService(this);
+		}
+		return null;
+	}
+
+	/**
+	 * Creates a new {@link MessageBuilder} for constructing an email message.
+	 * <p>
+	 * The message builder allows configuring recipients, subject, message body,
+	 * and attachments, and can be sent using an {@link SMTPService}.
+	 *
+	 * @sampleas createSMTPService()
+	 *
+	 * @return a new MessageBuilder instance, or {@code null} if the mail service is not available
+	 */
+	@JSFunction
+	public MessageBuilder newMessage()
+	{
+		createMailService();
+		if (mailService != null)
+		{
+			return new MessageBuilder();
+		}
+		return null;
+	}
+
 	public Class< ? >[] getAllReturnedTypes()
 	{
-		return new Class[] { MailMessage.class, Attachment.class };
+		return new Class[] { MailMessage.class, Attachment.class, SMTPService.class, MessageBuilder.class };
 	}
 }

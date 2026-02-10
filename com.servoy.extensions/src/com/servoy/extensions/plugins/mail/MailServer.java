@@ -30,6 +30,8 @@ import java.util.Properties;
 import java.util.StringTokenizer;
 import java.util.stream.Stream;
 
+import org.eclipse.angus.mail.auth.OAuth2SaslClientFactory;
+
 import com.servoy.base.util.ITagResolver;
 import com.servoy.extensions.plugins.mail.client.Attachment;
 import com.servoy.extensions.plugins.mail.client.MailMessage;
@@ -197,6 +199,11 @@ public class MailServer implements IMailService, IServerPlugin
 	{
 		// create a new Session object
 		Properties properties = overrideProperties(settings, overrideProperties);
+
+		if (properties.getProperty("mail.smtp.auth.mechanisms", "").toUpperCase().contains("XOAUTH2"))
+		{
+			OAuth2SaslClientFactory.init(); // XOAUTH2 support
+		}
 		Session session = Session.getInstance(properties, new SMTPAuthenticator(properties));
 
 		String encoding = properties.getProperty("mail.mime.encoding");
