@@ -319,8 +319,6 @@
                                 <delete dir="${project.build.directory}/plugins_beans" />
                                 <mkdir
                                     dir="${project.build.directory}/plugins_beans/plugins" />
-                                <mkdir
-                                    dir="${project.build.directory}/plugins_beans/beans" />
                                 <copy overwrite="true"
                                     todir="${project.build.directory}/classes/META-INF/services/">
                                     <fileset
