@@ -1,10 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-
 Bundle-Name: Servoy Mail plugin
 Bundle-SymbolicName: servoy.plugin.mail
 Bundle-Version: 1.0.0
-
 Automatic-Module-Name: servoy.plugin.mail
-
 Require-Bundle: servoy.plugin.oauth
