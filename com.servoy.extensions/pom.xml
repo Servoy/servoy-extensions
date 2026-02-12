@@ -365,10 +365,11 @@
                                         <fileset
                                             file="${project.basedir}/resources/jwt/jwt.jar.jnlp" />
                                     </copy>
-                                     <makejar srcdir="oauth" />
-                                    <makejar srcdir="mail" 
-                                    	manifest="${project.basedir}/resources/mail/MANIFEST.MF"
-                                        includes=",META-INF/services/com.servoy.j2db.plugins.IPlugin" />
+                                    <makejar srcdir="mail"
+										manifest="${project.basedir}/resources/mail/MANIFEST.MF"
+										includes=",META-INF/services/com.servoy.j2db.plugins.IPlugin" />
+									<makejar srcdir="oauth"
+										manifest="${project.basedir}/resources/oauth/MANIFEST.MF" />
                                     <makejar srcdir="pdf_forms" />
                                     <copy overwrite="true"
                                         todir="${project.build.directory}/plugins_beans/plugins/adobe_pdf_forms">

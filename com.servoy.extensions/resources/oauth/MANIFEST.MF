@@ -1,0 +1,8 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+
+Bundle-Name: Servoy OAuth plugin
+Bundle-SymbolicName: servoy.plugin.oauth
+Bundle-Version: 1.0.0
+
+Automatic-Module-Name: servoy.plugin.oauth
