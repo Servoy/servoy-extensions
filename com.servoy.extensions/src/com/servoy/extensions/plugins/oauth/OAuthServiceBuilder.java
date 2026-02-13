@@ -85,6 +85,7 @@ public class OAuthServiceBuilder implements IScriptable, IJavaScriptType
 	private boolean withPKCE = false;
 	private String refreshToken;
 	private String _scope;
+	private boolean withClientCredentials;
 
 	private static final String GET_CODE_METHOD = "getSvyOAuthCode";
 	private static final String SVY_AUTH_CODE_VAR = "svy_authCode";
@@ -318,6 +319,26 @@ public class OAuthServiceBuilder implements IScriptable, IJavaScriptType
 		return this;
 	}
 
+	/**
+	 * Configures the service to use client credentials flow. This is a flow that does not require user interaction
+	 *  and is used for machine to machine communication.
+	 *
+	 *  @sample
+	 *  var service = plugins.oauth.serviceBuilder(clientId)
+	 *          .clientSecret(clientSecret)
+	 *          .withClientCredentials()
+	 *          .tenant(tenant) //optional, only for some providers like Microsoft AD
+	 *          .defaultScope("https://graph.microsoft.com/.default")
+	 *          .build(plugins.oauth.OAuthProviders.MICROSOFT_AD); //or build(customApi)
+	 *
+	 * @return the service builder for method chaining
+	 */
+	@JSFunction
+	public OAuthServiceBuilder withClientCredentials()
+	{
+		this.withClientCredentials = true;
+		return this;
+	}
 
 	/**
 	 * Get the authorization url. This is for DEBUGGING PURPOSES ONLY.
@@ -393,6 +414,14 @@ public class OAuthServiceBuilder implements IScriptable, IJavaScriptType
 					OAuthService.log.debug("Could not refresh the token, need to go through the login process.");
 				}
 			}
+		}
+
+		if (withClientCredentials)
+		{
+			OAuthService service = new OAuthService(builder.build(api), _state);
+			service.setAccessTokenClientCredentialsGrant();
+			if (_callback != null) executeCallback(service, null);
+			return service;
 		}
 
 		boolean generateGlobalMethods = _deeplink == null || provider.getPluginAccess().getSolutionModel().getGlobalMethod(GLOBALS_SCOPE, _deeplink) == null;

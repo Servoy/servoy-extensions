@@ -565,4 +565,21 @@ public class OAuthService implements IScriptable, IJavaScriptType
 		}
 
 	}
+
+	public void setAccessTokenClientCredentialsGrant() throws Exception
+	{
+		try
+		{
+			this.accessToken = service.getAccessTokenClientCredentialsGrant();
+			if (accessToken != null && accessToken.getExpiresIn() != null)
+			{
+				this.accessTokenExpire = System.currentTimeMillis() + accessToken.getExpiresIn().longValue() * 1000;
+			}
+		}
+		catch (IOException | InterruptedException | ExecutionException e)
+		{
+			log.error("Could not set the client credentials access token.", e);
+			throw new Exception("Could not set the client credentials access token. See the log for more details");
+		}
+	}
 }
