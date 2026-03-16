@@ -25,6 +25,7 @@
         <scribejava.version>8.3.3</scribejava.version>
         <SerialComm.version>2.11.4</SerialComm.version>
         <amqp.version>5.29.0</amqp.version>
+        <io.netty>4.2.10.Final</io.netty>
         <doc.version>1.8.0</doc.version>
         <commons.io.version>2.21.0</commons.io.version>
     	<commons.pool.version>2.13.1</commons.pool.version>
@@ -51,12 +52,12 @@
         <!--  Poi dependencies  -->
         <math3.version>3.6.1</math3.version>
         <sparsebitset.version>1.3</sparsebitset.version>
-	<quartz.version>2.5.2</quartz.version>
+        <quartz.version>2.5.2</quartz.version>
         <angus-mail.version>2.0.5</angus-mail.version>
         <angus-activation.version>2.0.3</angus-activation.version>
         <jakarta-activation.version>2.1.4</jakarta-activation.version>
         <jakarta-mail.version>2.1.5</jakarta-mail.version>
-
+        
     </properties>
     <profiles>
         <profile>
@@ -449,6 +450,31 @@
                                     <overWrite>true</overWrite>
                                     <outputDirectory>${project.build.directory}/plugins_beans/plugins/broadcaster</outputDirectory>
                                     <destFileName>amqp-client.jar</destFileName>
+                                </artifactItem>
+                                
+                                <artifactItem>
+                                    <groupId>io.netty</groupId>
+                                    <artifactId>netty-codec</artifactId>
+                                    <version>${io.netty}</version>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>${project.build.directory}/plugins_beans/plugins/broadcaster</outputDirectory>
+                                    <destFileName>netty-codec.jar</destFileName>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>io.netty</groupId>
+                                    <artifactId>netty-transport</artifactId>
+                                    <version>${io.netty}</version>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>${project.build.directory}/plugins_beans/plugins/broadcaster</outputDirectory>
+                                    <destFileName>netty-transport.jar</destFileName>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>io.netty</groupId>
+                                    <artifactId>netty-handler</artifactId>
+                                    <version>${io.netty}</version>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>${project.build.directory}/plugins_beans/plugins/broadcaster</outputDirectory>
+                                    <destFileName>netty-handler.jar</destFileName>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.apache.pdfbox</groupId>
@@ -2491,6 +2517,7 @@
             <artifactId>amqp-client</artifactId>
             <version>${amqp.version}</version>
         </dependency>
+
         <dependency>
             <groupId>org.openid4java</groupId>
             <artifactId>openid4java</artifactId>
