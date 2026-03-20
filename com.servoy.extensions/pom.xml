@@ -136,7 +136,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-dependency-plugin</artifactId>
-                        <version>3.8.0</version>
+                        <version>3.10.0</version>
                         <executions>
                             <execution>
                                 <id>unpack</id>
@@ -433,8 +433,23 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
-                <version>3.8.0</version>
+                <version>3.10.0</version>
                 <executions>
+                   <execution>
+                        <id>copy-rabbitmq-only</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/plugins_beans/plugins/broadcaster</outputDirectory>
+                            <overWriteReleases>false</overWriteReleases>
+                            <overWriteSnapshots>false</overWriteSnapshots>
+                            <overWriteIfNewer>true</overWriteIfNewer>
+                            <includeScope>runtime</includeScope>
+                            <includeGroupIds>com.rabbitmq,io.netty</includeGroupIds> 
+                        </configuration>
+                    </execution>
                     <execution>
                         <id>copy_libs</id>
                         <phase>prepare-package</phase>
@@ -443,14 +458,6 @@
                         </goals>
                         <configuration>
                             <artifactItems>
-                                <artifactItem>
-                                    <groupId>com.rabbitmq</groupId>
-                                    <artifactId>amqp-client</artifactId>
-                                    <version>${amqp.version}</version>
-                                    <overWrite>true</overWrite>
-                                    <outputDirectory>${project.build.directory}/plugins_beans/plugins/broadcaster</outputDirectory>
-                                    <destFileName>amqp-client.jar</destFileName>
-                                </artifactItem>
                                 
                                 <artifactItem>
                                     <groupId>io.netty</groupId>
