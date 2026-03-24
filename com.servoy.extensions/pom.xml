@@ -36,7 +36,7 @@
         <fontbox.version>3.0.7</fontbox.version>
         <jwt.version>4.5.1</jwt.version>
         <jwks.version>0.23.0</jwks.version>
-        <jackson.version>2.21.1</jackson.version>
+        <jackson.version>2.21.2</jackson.version>
         <jackson-annotations.version>2.21</jackson-annotations.version>
         <metadataextractor.version>2.19.0</metadataextractor.version>
         <bouncy.version>1.83</bouncy.version>
