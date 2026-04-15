@@ -37,7 +37,7 @@ import com.servoy.j2db.scripting.IScriptable;
 /**
  * @author emera
  */
-@ServoyClientSupport(ng = true, wc = false, sc = false)
+@ServoyClientSupport(ng = true, wc = true, sc = false)
 public class OAuthPlugin implements IClientPlugin, IIconProvider, IServerPlugin
 {
 	public static final String PLUGIN_NAME = "oauth"; //$NON-NLS-1$

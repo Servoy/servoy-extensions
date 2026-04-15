@@ -47,7 +47,7 @@ import com.servoy.j2db.solutionmodel.ISolutionModel;
  * @author emera
  */
 @ServoyDocumented(scriptingName = "OAuthServiceBuilder")
-@ServoyClientSupport(ng = true, wc = false, sc = false)
+@ServoyClientSupport(ng = true, wc = true, sc = false)
 public class OAuthServiceBuilder implements IScriptable, IJavaScriptType
 {
 	private Function _callback;
@@ -474,7 +474,11 @@ public class OAuthServiceBuilder implements IScriptable, IJavaScriptType
 					}
 					fd.executeAsync(provider.getPluginAccess(),
 						new Object[] { errorMessage != null ? Boolean.FALSE : Boolean.TRUE, errorMessage != null ? errorMessage : service });
-					((INGClientPluginAccess)provider.getPluginAccess()).clearUrlState();
+
+					if (provider.getPluginAccess() instanceof INGClientPluginAccess pluginAccess)
+					{
+						pluginAccess.clearUrlState();
+					}
 				}
 				catch (InterruptedException e)
 				{

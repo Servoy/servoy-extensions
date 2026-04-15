@@ -26,7 +26,7 @@ import com.servoy.j2db.scripting.IConstantsObject;
  * @author emera
  */
 @ServoyDocumented(scriptingName = "OAuthProviders")
-@ServoyClientSupport(ng = true, wc = false, sc = false)
+@ServoyClientSupport(ng = true, wc = true, sc = false)
 public class OAuthProviders implements IConstantsObject
 {
 	//scribe-java

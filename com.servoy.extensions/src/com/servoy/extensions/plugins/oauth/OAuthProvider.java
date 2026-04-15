@@ -26,6 +26,7 @@ import com.github.scribejava.core.builder.ServiceBuilder;
 import com.github.scribejava.core.builder.api.DefaultApi20;
 import com.servoy.base.scripting.annotations.ServoyClientSupport;
 import com.servoy.extensions.plugins.oauth.apis.OktaApi;
+import com.servoy.j2db.IApplication;
 import com.servoy.j2db.documentation.ServoyDocumented;
 import com.servoy.j2db.plugins.IClientPluginAccess;
 import com.servoy.j2db.scripting.IReturnedTypesProvider;
@@ -34,7 +35,7 @@ import com.servoy.j2db.scripting.IScriptable;
 /**
  * @author emera
  */
-@ServoyClientSupport(ng = true, wc = false, sc = false)
+@ServoyClientSupport(ng = true, wc = true, sc = false)
 @ServoyDocumented(publicName = OAuthPlugin.PLUGIN_NAME, scriptingName = "plugins." + OAuthPlugin.PLUGIN_NAME)
 public class OAuthProvider implements IScriptable, IReturnedTypesProvider
 {
@@ -144,9 +145,22 @@ public class OAuthProvider implements IScriptable, IReturnedTypesProvider
 			}
 			redirectURL.append("servoy-service/oauth/");
 		}
-		String path = getPluginAccess().getRuntimeProperties().containsKey("NG2") && (Boolean)getPluginAccess().getRuntimeProperties().get("NG2")
-			? SOLUTION_PATH
-			: SOLUTIONS_PATH;
+		String path = null;
+
+		if (getPluginAccess().getApplicationType() == IApplication.WEB_CLIENT)
+		{
+			path = "servoy-webclient/solutions/solution/";
+		}
+		else if (getPluginAccess().getApplicationType() == IApplication.NG_CLIENT)
+		{
+			path = getPluginAccess().getRuntimeProperties().containsKey("NG2") && (Boolean)getPluginAccess().getRuntimeProperties().get("NG2")
+				? SOLUTION_PATH
+				: SOLUTIONS_PATH;
+		}
+		else
+		{
+			throw new IllegalStateException("Unsupported application type for OAuth plugin: " + getPluginAccess().getApplicationType());
+		}
 		redirectURL.append(!redirectURL.toString().endsWith("/") ? "/" + path : path);
 		redirectURL.append(getPluginAccess().getMainSolutionName() + "/m/" + callbackmethod);
 		return redirectURL.toString();

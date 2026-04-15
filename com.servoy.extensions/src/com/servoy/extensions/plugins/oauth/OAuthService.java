@@ -44,7 +44,7 @@ import com.servoy.j2db.scripting.IScriptable;
  * @author emera
  */
 @ServoyDocumented(scriptingName = "OAuthService")
-@ServoyClientSupport(ng = true, wc = false, sc = false)
+@ServoyClientSupport(ng = true, wc = true, sc = false)
 public class OAuthService implements IScriptable, IJavaScriptType
 {
 	public static final Logger log = LoggerFactory.getLogger("plugin.oauth");
