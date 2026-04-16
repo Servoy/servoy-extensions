@@ -26,6 +26,7 @@ import com.github.scribejava.core.builder.ServiceBuilder;
 import com.github.scribejava.core.builder.api.DefaultApi20;
 import com.servoy.base.scripting.annotations.ServoyClientSupport;
 import com.servoy.extensions.plugins.oauth.apis.OktaApi;
+import com.servoy.j2db.IApplication;
 import com.servoy.j2db.documentation.ServoyDocumented;
 import com.servoy.j2db.plugins.IClientPluginAccess;
 import com.servoy.j2db.scripting.IReturnedTypesProvider;
@@ -170,9 +171,18 @@ public class OAuthProvider implements IScriptable, IReturnedTypesProvider
 			}
 			redirectURL.append("servoy-service/oauth/");
 		}
-		String path = getPluginAccess().getRuntimeProperties().containsKey("NG2") && (Boolean)getPluginAccess().getRuntimeProperties().get("NG2")
-			? SOLUTION_PATH
-			: SOLUTIONS_PATH;
+		String path = null;
+
+		if (getPluginAccess().getApplicationType() == IApplication.NG_CLIENT)
+		{
+			path = getPluginAccess().getRuntimeProperties().containsKey("NG2") && (Boolean)getPluginAccess().getRuntimeProperties().get("NG2")
+				? SOLUTION_PATH
+				: SOLUTIONS_PATH;
+		}
+		else
+		{
+			throw new IllegalStateException("Unsupported application type for OAuth plugin: " + getPluginAccess().getApplicationType());
+		}
 		redirectURL.append(!redirectURL.toString().endsWith("/") ? "/" + path : path);
 		redirectURL.append(getPluginAccess().getMainSolutionName() + "/m/" + callbackmethod);
 		return redirectURL.toString();
