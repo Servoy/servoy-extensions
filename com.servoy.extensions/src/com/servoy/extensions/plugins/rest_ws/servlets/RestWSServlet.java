@@ -23,7 +23,6 @@ import static java.util.Collections.emptyMap;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
@@ -1021,6 +1020,50 @@ public class RestWSServlet extends HttpServlet
 		return fileItem;
 	}
 
+	/**
+	 * This replaces the deprecated getString(Charset) method.
+	 *
+	 * @param item the file item
+	 * @param charset the charset to use
+	 * @return the string content, never null (returns empty string for empty items)
+	 * @throws IOException if an I/O error occurs
+	 */
+	private String getFileItemString(FileItem< ? > item, Charset charset) throws IOException
+	{
+		try (InputStream in = item.getInputStream())
+		{
+			byte[] bytes = in.readAllBytes();
+			return bytes.length > 0 ? new String(bytes, charset) : "";
+		}
+	}
+
+	/**
+	 * This replaces the deprecated getString() method.
+	 *
+	 * @param item the file item
+	 * @return the string content, never null (returns empty string for empty items)
+	 * @throws IOException if an I/O error occurs
+	 */
+	private String getFileItemString(FileItem< ? > item) throws IOException
+	{
+		return getFileItemString(item, Charset.forName("UTF-8"));
+	}
+
+	/**
+	 * This replaces the deprecated get() method.
+	 *
+	 * @param item the file item
+	 * @return the byte array content, never null (returns empty array for empty items)
+	 * @throws IOException if an I/O error occurs
+	 */
+	private byte[] getFileItemBytes(FileItem< ? > item) throws IOException
+	{
+		try (InputStream in = item.getInputStream())
+		{
+			return in.readAllBytes();
+		}
+	}
+
 	private ContentType getContentType(String headerValue)
 	{
 		if (headerValue != null)
@@ -1257,22 +1300,22 @@ public class RestWSServlet extends HttpServlet
 		switch (contentType)
 		{
 			case JSON :
-				return plugin.getJSONSerializer().fromJSON(body.getString(charset));
+				return plugin.getJSONSerializer().fromJSON(getFileItemString(body, charset));
 
 			case XML :
-				return plugin.getJSONSerializer().fromJSON(XML.toJSONObject(body.getString(charset)));
+				return plugin.getJSONSerializer().fromJSON(XML.toJSONObject(getFileItemString(body, charset)));
 
 			case FORMPOST :
-				return parseQueryString(body.getString(charset));
+				return parseQueryString(getFileItemString(body, charset));
 
 			case BINARY :
-				return plugin.useJSUploadForBinaryData() ? new JSUpload(body, emptyMap()) : body.get();
+				return plugin.useJSUploadForBinaryData() ? new JSUpload(body, emptyMap()) : getFileItemBytes(body);
 
 			case TEXT :
-				return body.getString(charset);
+				return getFileItemString(body, charset);
 
 			case OTHER :
-				return plugin.useJSUploadForBinaryData() ? new JSUpload(body, emptyMap()) : body.get();
+				return plugin.useJSUploadForBinaryData() ? new JSUpload(body, emptyMap()) : getFileItemBytes(body);
 
 			default :
 				break;
@@ -1308,7 +1351,7 @@ public class RestWSServlet extends HttpServlet
 		JakartaServletDiskFileUpload upload = new JakartaServletDiskFileUpload(diskFileItemFactory);
 		upload.setHeaderCharset(Charset.forName("UTF-8", null));
 		long maxUpload = Utils.getAsLong(plugin.getServerAccess().getSettings().getProperty("servoy.webclient.maxuploadsize", "0"), false);
-		if (maxUpload > 0) upload.setFileSizeMax(maxUpload * 1000);
+		if (maxUpload > 0) upload.setMaxFileSize(maxUpload * 1000);
 		return upload.parseRequest(request);
 	}
 
@@ -1330,18 +1373,11 @@ public class RestWSServlet extends HttpServlet
 						String charset = getHeaderKey(item.getContentType(), "charset", requestCharset);
 						if (charset != null)
 						{
-							try
-							{
-								formFields.put(item.getFieldName(), item.getString(Charset.forName(charset, null)));
-							}
-							catch (UnsupportedEncodingException e)
-							{
-								formFields.put(item.getFieldName(), item.getString());
-							}
+							formFields.put(item.getFieldName(), getFileItemString(item, Charset.forName(charset, null)));
 						}
 						else
 						{
-							formFields.put(item.getFieldName(), item.getString());
+							formFields.put(item.getFieldName(), getFileItemString(item));
 						}
 					}
 				}
