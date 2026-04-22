@@ -186,7 +186,7 @@ public class RestWSServlet extends HttpServlet
 		}
 		int tempFileThreshold = Utils.getAsInteger(plugin.getServerAccess().getSettings().getProperty("servoy.ng_web_client.tempfile.threshold", "50"), false) *
 			1000;
-		Builder builder = DiskFileItemFactory.builder().setBufferSize(tempFileThreshold).setFileCleaningTracker(fileCleaningTracker);
+		Builder builder = DiskFileItemFactory.builder().setThreshold(tempFileThreshold).setFileCleaningTracker(fileCleaningTracker);
 		if (fileUploadDir != null)
 		{
 			builder.setPath(fileUploadDir.toPath());
