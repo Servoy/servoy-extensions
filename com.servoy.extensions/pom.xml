@@ -39,7 +39,7 @@
         <jackson.version>2.21.2</jackson.version>
         <jackson-annotations.version>2.21</jackson-annotations.version>
         <metadataextractor.version>2.19.0</metadataextractor.version>
-        <bouncy.version>1.83</bouncy.version>
+        <bouncy.version>1.84</bouncy.version>
         <xmpcore.version>6.1.11</xmpcore.version>
         <rhino.version>1.9.1.s1</rhino.version>
         <tsaUrl>http://timestamp.digicert.com</tsaUrl>
