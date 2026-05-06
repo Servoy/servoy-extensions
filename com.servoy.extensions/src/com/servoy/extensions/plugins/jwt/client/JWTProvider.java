@@ -177,6 +177,10 @@ public class JWTProvider implements IScriptable, IReturnedTypesProvider
 						log.error("Cannot verify the token with jwks '" + alg.jwks_url + "' because the key id is not present in the token header.");
 					}
 					alg = alg.kid(decoded.getKeyId());
+					if (alg.getAlgorithm() == null)
+					{
+						alg.setAlgorithm(decoded.getAlgorithm());
+					}
 				}
 				com.auth0.jwt.algorithms.Algorithm algo = alg.build();
 				if (algo != null)

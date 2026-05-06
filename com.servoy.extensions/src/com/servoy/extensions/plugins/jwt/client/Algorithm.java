@@ -193,8 +193,13 @@ public class Algorithm implements IScriptable, IJavaScriptType
 	 */
 	private boolean validateAlgorithm() throws MalformedURLException, JwkException
 	{
-		if (alg != null)
+		if (jwks_url == null)
 		{
+			if (alg == null)
+			{
+				JWTProvider.log.error("Algorithm must be specified when not using JWKS.");
+				return false;
+			}
 			if (alg.startsWith("HS"))
 			{
 				if (pwd == null)
@@ -214,13 +219,32 @@ public class Algorithm implements IScriptable, IJavaScriptType
 				return false;
 			}
 		}
-		else if (jwks_url != null)
+		else
 		{
 			final JwkProvider jwkStore = new UrlJwkProvider(new URL(jwks_url));
 			if (keyId != null)
 			{
 				jwk = jwkStore.get(keyId);
-				alg = jwk.getAlgorithm();
+				if (jwk == null)
+				{
+					JWTProvider.log.error("JWK error: No key found for the specified key id.");
+					return false;
+				}
+				else if (jwk.getAlgorithm() != null)
+				{
+					alg = jwk.getAlgorithm();
+				}
+
+				if (alg == null)
+				{
+					JWTProvider.log.error("JWK error: Algorithm was not specified in the JWK and no algorithm was set for the algorithm builder.");
+					return false;
+				}
+				else if (!alg.startsWith("RS") && !alg.startsWith("ES"))
+				{
+					JWTProvider.log.error("JWK error: The JWT plugin only supports RSA and EC keys from JWKS.");
+					return false;
+				}
 			}
 			else
 			{
@@ -415,5 +439,15 @@ public class Algorithm implements IScriptable, IJavaScriptType
 			}
 		};
 		return keyProvider;
+	}
+
+	String getAlgorithm()
+	{
+		return alg;
+	}
+
+	void setAlgorithm(String algorithm)
+	{
+		alg = algorithm;
 	}
 }
