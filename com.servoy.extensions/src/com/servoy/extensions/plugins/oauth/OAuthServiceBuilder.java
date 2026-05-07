@@ -404,6 +404,17 @@ public class OAuthServiceBuilder implements IScriptable, IJavaScriptType
 										OAuthService.log.debug("Received code in " + (System.currentTimeMillis() - redirectToAuthUrlTime) / 1000 +
 											"s since the beginning of the request.");
 
+									if (_state != null)
+									{
+										String returnedState = (String)result.get("state", result);
+										if (!_state.equals(returnedState))
+										{
+											errorMessage = "Invalid state returned by the server. Possible CSRF attack.";
+											OAuthService.log.error(errorMessage);
+											return;
+										}
+									}
+
 									if (result.has("code", result))
 									{
 										//authorization code flow
