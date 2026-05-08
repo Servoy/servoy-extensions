@@ -494,6 +494,7 @@ public class OAuthServiceBuilder implements IScriptable, IJavaScriptType
 										{
 											errorMessage = "Invalid state returned by the server. Possible CSRF attack.";
 											OAuthService.log.error(errorMessage);
+											executeCallback(service, errorMessage);
 											return;
 										}
 									}
