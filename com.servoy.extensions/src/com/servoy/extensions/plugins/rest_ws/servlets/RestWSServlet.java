@@ -1488,8 +1488,16 @@ public class RestWSServlet extends HttpServlet
 		if (resultContentType != null)
 		{
 			// content type was set using rest_ws client plugin
-			String content = getContent(response, result, false, getContentType(resultContentType));
-			bytes = content.getBytes(charset);
+			ContentType contentType = getContentType(resultContentType);
+			if (contentType == ContentType.BINARY && result instanceof byte[] b)
+			{
+				bytes = b;
+			}
+			else
+			{
+				String content = getContent(response, result, false, contentType);
+				bytes = content.getBytes(charset);
+			}
 		}
 		else if (result instanceof byte[])
 		{
