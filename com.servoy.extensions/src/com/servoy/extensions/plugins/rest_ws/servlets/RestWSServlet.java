@@ -23,6 +23,7 @@ import static java.util.Collections.emptyMap;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.Writer;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
@@ -1016,7 +1017,12 @@ public class RestWSServlet extends HttpServlet
 	{
 		DiskFileItem fileItem = diskFileItemFactory.fileItemBuilder().setContentType(contentType)
 			.setFileName("restws_" + UUID.randomUUID().toString().replace("-", "_")).get();
-		IOUtils.copy(inputStream, fileItem.getOutputStream());
+
+		try (OutputStream outputStream = fileItem.getOutputStream())
+		{
+			IOUtils.copy(inputStream, outputStream);
+		}
+
 		return fileItem;
 	}
 
