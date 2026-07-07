@@ -39,6 +39,7 @@ import com.servoy.j2db.plugins.IServerPlugin;
 import com.servoy.j2db.plugins.PluginException;
 import com.servoy.j2db.preference.PreferencePanel;
 import com.servoy.j2db.server.headlessclient.HeadlessClientFactory;
+import com.servoy.j2db.server.headlessclient.SessionClient;
 import com.servoy.j2db.server.shared.ApplicationServerRegistry;
 import com.servoy.j2db.server.shared.IHeadlessClient;
 import com.servoy.j2db.util.Debug;
@@ -378,6 +379,10 @@ public class RestWSPlugin implements IServerPlugin, IPreShutdownListener
 	{
 		if (reloadSolution)
 		{
+			if (client instanceof SessionClient sessionClient)
+			{
+				sessionClient.discardWaitingInvocations();
+			}
 			application.getExecutor().execute(new Runnable()
 			{
 				@Override
