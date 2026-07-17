@@ -29,7 +29,7 @@
         <servoy-local.url>${project.baseUri}/target/repository/</servoy-local.url>
         <scribejava.version>8.3.3</scribejava.version>
         <SerialComm.version>2.11.4</SerialComm.version>
-        <amqp.version>5.29.0</amqp.version>
+        <amqp.version>5.32.0</amqp.version>
         <io.netty>4.2.10.Final</io.netty>
         <doc.version>1.8.0</doc.version>
         <commons.io.version>2.21.0</commons.io.version>
@@ -287,130 +287,89 @@
                         <configuration>
                             <target>
                                 <macrodef name="makejar">
-                                    <attribute name="srcdir" />
-                                    <attribute name="jarname" default="@{srcdir}" />
-                                    <attribute name="includes" default="" />
-                                    <attribute name="manifest"
-                                        default="${project.basedir}/resources/MANIFEST.MF" />
-                                    <attribute name="type" default="plugins" />
+                                    <attribute name="srcdir"/>
+                                    <attribute name="jarname" default="@{srcdir}"/>
+                                    <attribute name="includes" default=""/>
+                                    <attribute name="manifest" default="${project.basedir}/resources/MANIFEST.MF"/>
+                                    <attribute name="type" default="plugins"/>
                                     <sequential>
                                         <copy todir="${project.build.directory}/tmp_@{type}_@{jarname}">
-                                            <fileset dir="${project.build.directory}/classes"
-                                                includes="com/servoy/extensions//@{type}/@{srcdir}/** @{includes}"
-                                                excludes="**/servoy-extension.html,**/servoy-extension.warnings.txt," />
+                                            <fileset dir="${project.build.directory}/classes" includes="com/servoy/extensions//@{type}/@{srcdir}/** @{includes}" excludes="**/servoy-extension.html,**/servoy-extension.warnings.txt,"/>
                                         </copy>
-                                        <copy overwrite="true" failonerror="false" file="${project.basedir}/resources/@{jarname}/com.servoy.j2db.plugins.IPlugin"
-                                            todir="${project.build.directory}/tmp_@{type}_@{jarname}/META-INF/services/"></copy>
-                                        <jar
-                                            destfile="${project.build.directory}/plugins_beans/@{type}/@{jarname}.jar"
-                                            basedir="${project.build.directory}/tmp_@{type}_@{jarname}"
-                                            manifest="@{manifest}" filesetmanifest="merge"
-                                        >
+                                        <copy overwrite="true" failonerror="false" file="${project.basedir}/resources/@{jarname}/com.servoy.j2db.plugins.IPlugin" todir="${project.build.directory}/tmp_@{type}_@{jarname}/META-INF/services/"/>
+                                        <jar destfile="${project.build.directory}/plugins_beans/@{type}/@{jarname}.jar" basedir="${project.build.directory}/tmp_@{type}_@{jarname}" manifest="@{manifest}" filesetmanifest="merge">
                                             <manifest>
-                                                <attribute name="Codebase" value="*" />
-                                                <attribute name="Application-Name"
-                                                    value="@{jarname}" />
-                                                <attribute
-                                                    name="Application-Library-Allowable-Codebase" value="*" />
-                                                <attribute name="Permissions"
-                                                    value="all-permissions" />
+                                                <attribute name="Codebase" value="*"/>
+                                                <attribute name="Application-Name" value="@{jarname}"/>
+                                                <attribute name="Application-Library-Allowable-Codebase" value="*"/>
+                                                <attribute name="Permissions" value="all-permissions"/>
                                             </manifest>
                                         </jar>
                                         <retry retrycount="3" retrydelay="1000">
-                                            <signjar keystore="${jarsigner.keystore}"
-                                                jar="${project.build.directory}/plugins_beans/@{type}/@{jarname}.jar"
-                                                alias="${jarsigner.alias}" storepass="${jarsigner.storepass}"
-                                                tsaurl="${tsaUrl}"
-                                                sigalg="SHA256withRSA" digestalg="SHA-256" />
+                                            <signjar keystore="${jarsigner.keystore}" jar="${project.build.directory}/plugins_beans/@{type}/@{jarname}.jar" alias="${jarsigner.alias}" storepass="${jarsigner.storepass}" tsaurl="${tsaUrl}" sigalg="SHA256withRSA" digestalg="SHA-256"/>
                                         </retry>
-                                        <delete quiet="true" dir="${project.build.directory}/tmp_@{type}_@{jarname}" />
+                                        <delete quiet="true" dir="${project.build.directory}/tmp_@{type}_@{jarname}"/>
                                     </sequential>
                                 </macrodef>
-                                <delete dir="${project.build.directory}/plugins_beans" />
-                                <mkdir
-                                    dir="${project.build.directory}/plugins_beans/plugins" />
-                                <copy overwrite="true"
-                                    todir="${project.build.directory}/classes/META-INF/services/">
-                                    <fileset
-                                        file="${project.basedir}/resources/mail/com.servoy.j2db.plugins.IPlugin" />
+                                <delete dir="${project.build.directory}/plugins_beans"/>
+                                <mkdir dir="${project.build.directory}/plugins_beans/plugins"/>
+                                <copy overwrite="true" todir="${project.build.directory}/classes/META-INF/services/">
+                                    <fileset file="${project.basedir}/resources/mail/com.servoy.j2db.plugins.IPlugin"/>
                                 </copy>
-                                <copy overwrite="true"
-                                    todir="${project.build.directory}/classes/META-INF/services/">
-                                    <fileset
-                                        file="${project.basedir}/resources/pdf_output/javax.print.StreamPrintServiceFactory" />
+                                <copy overwrite="true" todir="${project.build.directory}/classes/META-INF/services/">
+                                    <fileset file="${project.basedir}/resources/pdf_output/javax.print.StreamPrintServiceFactory"/>
                                 </copy>
                                 <parallel>
                                     <!--									<makejar srcdir="agent" /> -->
-                                    <makejar srcdir="amortization" />
+                                    <makejar srcdir="amortization"/>
                                     <!--makejar srcdir="workflows" manifest="${project.basedir}/resources/workflows/MANIFEST.MF" /-->
-                                    <makejar srcdir="broadcaster" />
-                                    <makejar srcdir="clientmanager" />
-                                    <makejar srcdir="converters" />
-                                    <makejar srcdir="validators"
-                                        jarname="default_validators" />
+                                    <makejar srcdir="broadcaster"/>
+                                    <makejar srcdir="clientmanager"/>
+                                    <makejar srcdir="converters"/>
+                                    <makejar srcdir="validators" jarname="default_validators"/>
                                     <!-- <makejar srcdir="dialog" /> -->
-                                    <makejar srcdir="excelxport" />
-                                    <copy overwrite="true"
-                                        todir="${project.build.directory}/plugins_beans/plugins/">
-                                        <fileset
-                                            file="${project.basedir}/resources/excelxport/excelxport.jar.jnlp" />
+                                    <makejar srcdir="excelxport"/>
+                                    <copy overwrite="true" todir="${project.build.directory}/plugins_beans/plugins/">
+                                        <fileset file="${project.basedir}/resources/excelxport/excelxport.jar.jnlp"/>
                                     </copy>
-                                    <makejar srcdir="file" />
-                                    <makejar srcdir="headlessclient" />
-                                    <makejar srcdir="http" />
-                                    <copy overwrite="true"
-                                        todir="${project.build.directory}/plugins_beans/plugins/">
-                                        <fileset
-                                            file="${project.basedir}/resources/http/http.jar.jnlp" />
+                                    <makejar srcdir="file"/>
+                                    <makejar srcdir="headlessclient"/>
+                                    <makejar srcdir="http"/>
+                                    <copy overwrite="true" todir="${project.build.directory}/plugins_beans/plugins/">
+                                        <fileset file="${project.basedir}/resources/http/http.jar.jnlp"/>
                                     </copy>
-                                    <makejar srcdir="images" />
-                                    <copy overwrite="true"
-                                        todir="${project.build.directory}/plugins_beans/plugins/">
-                                        <fileset
-                                            file="${project.basedir}/resources/images/images.jar.jnlp" />
+                                    <makejar srcdir="images"/>
+                                    <copy overwrite="true" todir="${project.build.directory}/plugins_beans/plugins/">
+                                        <fileset file="${project.basedir}/resources/images/images.jar.jnlp"/>
                                     </copy>
-                                    <makejar srcdir="jwt" />
-                                    <copy overwrite="true"
-                                        todir="${project.build.directory}/plugins_beans/plugins/">
-                                        <fileset
-                                            file="${project.basedir}/resources/jwt/jwt.jar.jnlp" />
+                                    <makejar srcdir="jwt"/>
+                                    <copy overwrite="true" todir="${project.build.directory}/plugins_beans/plugins/">
+                                        <fileset file="${project.basedir}/resources/jwt/jwt.jar.jnlp"/>
                                     </copy>
-                                    <makejar srcdir="mail"
-										manifest="${project.basedir}/resources/mail/MANIFEST.MF"
-										includes=",META-INF/services/com.servoy.j2db.plugins.IPlugin" />
-									<makejar srcdir="oauth"
-										manifest="${project.basedir}/resources/oauth/MANIFEST.MF" />
-                                    <makejar srcdir="pdf_forms" />
-                                    <copy overwrite="true"
-                                        todir="${project.build.directory}/plugins_beans/plugins/adobe_pdf_forms">
-                                        <fileset file="${project.basedir}/lib/jFdfTk.jar" />
+                                    <makejar srcdir="mail" manifest="${project.basedir}/resources/mail/MANIFEST.MF" includes=",META-INF/services/com.servoy.j2db.plugins.IPlugin"/>
+									<makejar srcdir="oauth" manifest="${project.basedir}/resources/oauth/MANIFEST.MF"/>
+                                    <makejar srcdir="pdf_forms"/>
+                                    <copy overwrite="true" todir="${project.build.directory}/plugins_beans/plugins/adobe_pdf_forms">
+                                        <fileset file="${project.basedir}/lib/jFdfTk.jar"/>
                                     </copy>
-                                    <makejar srcdir="pdf_output"
-                                        includes=",META-INF/services/javax.print.StreamPrintServiceFactory" />
-                                    <copy overwrite="true"
-                                        todir="${project.build.directory}/plugins_beans/plugins/">
-                                        <fileset
-                                            file="${project.basedir}/resources/pdf_output/pdf_output.jar.jnlp" />
+                                    <makejar srcdir="pdf_output" includes=",META-INF/services/javax.print.StreamPrintServiceFactory"/>
+                                    <copy overwrite="true" todir="${project.build.directory}/plugins_beans/plugins/">
+                                        <fileset file="${project.basedir}/resources/pdf_output/pdf_output.jar.jnlp"/>
                                     </copy>
-                                    <makejar srcdir="rawSQL" />
-                                    <makejar srcdir="rest_ws" />
-                                    <makejar srcdir="scheduler"
-                                        includes=",quartz.properties" />
-                                    <copy overwrite="true"
-                                        todir="${project.build.directory}/plugins_beans/plugins/">
-                                        <fileset
-                                            file="${project.basedir}/resources/scheduler/scheduler.jar.jnlp" />
+                                    <makejar srcdir="rawSQL"/>
+                                    <makejar srcdir="rest_ws"/>
+                                    <makejar srcdir="scheduler" includes=",quartz.properties"/>
+                                    <copy overwrite="true" todir="${project.build.directory}/plugins_beans/plugins/">
+                                        <fileset file="${project.basedir}/resources/scheduler/scheduler.jar.jnlp"/>
                                     </copy>
-                                    <makejar srcdir="serialize" />
-                                    <copy overwrite="true"
-                                        todir="${project.build.directory}/plugins_beans/plugins/">
-                                        <fileset
-                                            file="${project.basedir}/resources/serialize/serialize.jar.jnlp" />
+                                    <makejar srcdir="serialize"/>
+                                    <copy overwrite="true" todir="${project.build.directory}/plugins_beans/plugins/">
+                                        <fileset file="${project.basedir}/resources/serialize/serialize.jar.jnlp"/>
                                     </copy>
-                                    <makejar srcdir="tabxport" />
-                                    <makejar srcdir="udp" />
+                                    <makejar srcdir="tabxport"/>
+                                    <makejar srcdir="udp"/>
                                     <!-- <makejar srcdir="window" /> -->
-                                    <makejar srcdir="xmlreader" />
+                                    <makejar srcdir="xmlreader"/>
                                     <!-- <makejar srcdir="dbtreeview"
                                         manifest="${project.basedir}/resources/dbtreeview/MANIFEST.MF"
                                         type="beans" />
@@ -2341,31 +2300,11 @@
                         <configuration>
                             <target>
                                 <parallel>
-                                    <signjar keystore="${jarsigner.keystore}"
-                                        jar="${project.build.directory}/plugins_beans/plugins/pdf_output/fontbox.jar"
-                                        alias="${jarsigner.alias}" storepass="${jarsigner.storepass}"
-                                        tsaurl="${tsaUrl}"
-                                        sigalg="SHA256withRSA" digestalg="SHA-256" />
-                                    <signjar keystore="${jarsigner.keystore}"
-                                        jar="${project.build.directory}/plugins_beans/plugins/pdf_output/pdfbox.jar"
-                                         alias="${jarsigner.alias}" storepass="${jarsigner.storepass}"
-                                        tsaurl="${tsaUrl}"
-                                        sigalg="SHA256withRSA" digestalg="SHA-256" />
-                                    <signjar keystore="${jarsigner.keystore}"
-                                        jar="${project.build.directory}/plugins_beans/plugins/pdf_output/pdfbox-io.jar"
-                                        alias="${jarsigner.alias}" storepass="${jarsigner.storepass}"
-                                        tsaurl="${tsaUrl}"
-                                        sigalg="SHA256withRSA" digestalg="SHA-256" />
-                                    <signjar keystore="${jarsigner.keystore}"
-                                        jar="${project.build.directory}/plugins_beans/plugins/pdf_output/bcprov.jar"
-                                        alias="${jarsigner.alias}" storepass="${jarsigner.storepass}"
-                                        tsaurl="${tsaUrl}"
-                                        sigalg="SHA256withRSA" digestalg="SHA-256" />
-                                    <signjar keystore="${jarsigner.keystore}"
-                                        jar="${project.build.directory}/plugins_beans/plugins/pdf_output/bcmail.jar"
-                                        alias="${jarsigner.alias}" storepass="${jarsigner.storepass}"
-                                        tsaurl="${tsaUrl}"
-                                        sigalg="SHA256withRSA" digestalg="SHA-256" />
+                                    <signjar keystore="${jarsigner.keystore}" jar="${project.build.directory}/plugins_beans/plugins/pdf_output/fontbox.jar" alias="${jarsigner.alias}" storepass="${jarsigner.storepass}" tsaurl="${tsaUrl}" sigalg="SHA256withRSA" digestalg="SHA-256"/>
+                                    <signjar keystore="${jarsigner.keystore}" jar="${project.build.directory}/plugins_beans/plugins/pdf_output/pdfbox.jar" alias="${jarsigner.alias}" storepass="${jarsigner.storepass}" tsaurl="${tsaUrl}" sigalg="SHA256withRSA" digestalg="SHA-256"/>
+                                    <signjar keystore="${jarsigner.keystore}" jar="${project.build.directory}/plugins_beans/plugins/pdf_output/pdfbox-io.jar" alias="${jarsigner.alias}" storepass="${jarsigner.storepass}" tsaurl="${tsaUrl}" sigalg="SHA256withRSA" digestalg="SHA-256"/>
+                                    <signjar keystore="${jarsigner.keystore}" jar="${project.build.directory}/plugins_beans/plugins/pdf_output/bcprov.jar" alias="${jarsigner.alias}" storepass="${jarsigner.storepass}" tsaurl="${tsaUrl}" sigalg="SHA256withRSA" digestalg="SHA-256"/>
+                                    <signjar keystore="${jarsigner.keystore}" jar="${project.build.directory}/plugins_beans/plugins/pdf_output/bcmail.jar" alias="${jarsigner.alias}" storepass="${jarsigner.storepass}" tsaurl="${tsaUrl}" sigalg="SHA256withRSA" digestalg="SHA-256"/>
                                     <!--signjar keystore="${jarsigner.keystore}"
                                         jar="${project.build.directory}/plugins_beans/plugins/jackson/jackson-jaxb-annotations.jar"
                                         alias="${jarsigner.alias}" storepass="${jarsigner.storepass}"
@@ -2381,51 +2320,15 @@
                                         alias="${jarsigner.alias}" storepass="${jarsigner.storepass}"
                                         tsaurl="${tsaUrl}"
                                         sigalg="SHA256withRSA" digestalg="SHA-256" /-->
-                                    <signjar keystore="${jarsigner.keystore}"
-                                        jar="${project.build.directory}/plugins_beans/plugins/http/httpclient5.jar"
-                                        alias="${jarsigner.alias}" storepass="${jarsigner.storepass}"
-                                        tsaurl="${tsaUrl}"
-                                        sigalg="SHA256withRSA" digestalg="SHA-256" />
-                                    <signjar keystore="${jarsigner.keystore}"
-                                        jar="${project.build.directory}/plugins_beans/plugins/http/httpcore5.jar"
-                                        alias="${jarsigner.alias}" storepass="${jarsigner.storepass}"
-                                        tsaurl="${tsaUrl}"
-                                        sigalg="SHA256withRSA" digestalg="SHA-256" />
-                                    <signjar keystore="${jarsigner.keystore}"
-                                        jar="${project.build.directory}/plugins_beans/plugins/http/httpcore5-h2.jar"
-                                        alias="${jarsigner.alias}" storepass="${jarsigner.storepass}"
-                                        tsaurl="${tsaUrl}"
-                                        sigalg="SHA256withRSA" digestalg="SHA-256" />
-                                    <signjar keystore="${jarsigner.keystore}"
-                                        jar="${project.build.directory}/plugins_beans/plugins/images/metadataextractor.jar"
-                                        alias="${jarsigner.alias}" storepass="${jarsigner.storepass}"
-                                        tsaurl="${tsaUrl}"
-                                        sigalg="SHA256withRSA" digestalg="SHA-256" />
-                                    <signjar keystore="${jarsigner.keystore}"
-                                        jar="${project.build.directory}/plugins_beans/plugins/images/xmpcore.jar"
-                                        alias="${jarsigner.alias}" storepass="${jarsigner.storepass}"
-                                        tsaurl="${tsaUrl}"
-                                        sigalg="SHA256withRSA" digestalg="SHA-256" />
-                                    <signjar keystore="${jarsigner.keystore}"
-                                        jar="${project.build.directory}/plugins_beans/plugins/jakarta-poi/jakarta-poi.jar"
-                                        alias="${jarsigner.alias}" storepass="${jarsigner.storepass}"
-                                        tsaurl="${tsaUrl}"
-                                        sigalg="SHA256withRSA" digestalg="SHA-256" />
-                                    <signjar keystore="${jarsigner.keystore}"
-                                        jar="${project.build.directory}/plugins_beans/plugins/jakarta-poi/poi-ooxml.jar"
-                                        alias="${jarsigner.alias}" storepass="${jarsigner.storepass}"
-                                        tsaurl="${tsaUrl}"
-                                        sigalg="SHA256withRSA" digestalg="SHA-256" />
-                                    <signjar keystore="${jarsigner.keystore}"
-                                        jar="${project.build.directory}/plugins_beans/plugins/jakarta-poi/commons-math3.jar"
-                                        alias="${jarsigner.alias}" storepass="${jarsigner.storepass}"
-                                        tsaurl="${tsaUrl}"
-                                        sigalg="SHA256withRSA" digestalg="SHA-256" />
-                                    <signjar keystore="${jarsigner.keystore}"
-                                        jar="${project.build.directory}/plugins_beans/plugins/jakarta-poi/SparseBitSet.jar"
-                                        alias="${jarsigner.alias}" storepass="${jarsigner.storepass}"
-                                        tsaurl="${tsaUrl}"
-                                        sigalg="SHA256withRSA" digestalg="SHA-256" />     
+                                    <signjar keystore="${jarsigner.keystore}" jar="${project.build.directory}/plugins_beans/plugins/http/httpclient5.jar" alias="${jarsigner.alias}" storepass="${jarsigner.storepass}" tsaurl="${tsaUrl}" sigalg="SHA256withRSA" digestalg="SHA-256"/>
+                                    <signjar keystore="${jarsigner.keystore}" jar="${project.build.directory}/plugins_beans/plugins/http/httpcore5.jar" alias="${jarsigner.alias}" storepass="${jarsigner.storepass}" tsaurl="${tsaUrl}" sigalg="SHA256withRSA" digestalg="SHA-256"/>
+                                    <signjar keystore="${jarsigner.keystore}" jar="${project.build.directory}/plugins_beans/plugins/http/httpcore5-h2.jar" alias="${jarsigner.alias}" storepass="${jarsigner.storepass}" tsaurl="${tsaUrl}" sigalg="SHA256withRSA" digestalg="SHA-256"/>
+                                    <signjar keystore="${jarsigner.keystore}" jar="${project.build.directory}/plugins_beans/plugins/images/metadataextractor.jar" alias="${jarsigner.alias}" storepass="${jarsigner.storepass}" tsaurl="${tsaUrl}" sigalg="SHA256withRSA" digestalg="SHA-256"/>
+                                    <signjar keystore="${jarsigner.keystore}" jar="${project.build.directory}/plugins_beans/plugins/images/xmpcore.jar" alias="${jarsigner.alias}" storepass="${jarsigner.storepass}" tsaurl="${tsaUrl}" sigalg="SHA256withRSA" digestalg="SHA-256"/>
+                                    <signjar keystore="${jarsigner.keystore}" jar="${project.build.directory}/plugins_beans/plugins/jakarta-poi/jakarta-poi.jar" alias="${jarsigner.alias}" storepass="${jarsigner.storepass}" tsaurl="${tsaUrl}" sigalg="SHA256withRSA" digestalg="SHA-256"/>
+                                    <signjar keystore="${jarsigner.keystore}" jar="${project.build.directory}/plugins_beans/plugins/jakarta-poi/poi-ooxml.jar" alias="${jarsigner.alias}" storepass="${jarsigner.storepass}" tsaurl="${tsaUrl}" sigalg="SHA256withRSA" digestalg="SHA-256"/>
+                                    <signjar keystore="${jarsigner.keystore}" jar="${project.build.directory}/plugins_beans/plugins/jakarta-poi/commons-math3.jar" alias="${jarsigner.alias}" storepass="${jarsigner.storepass}" tsaurl="${tsaUrl}" sigalg="SHA256withRSA" digestalg="SHA-256"/>
+                                    <signjar keystore="${jarsigner.keystore}" jar="${project.build.directory}/plugins_beans/plugins/jakarta-poi/SparseBitSet.jar" alias="${jarsigner.alias}" storepass="${jarsigner.storepass}" tsaurl="${tsaUrl}" sigalg="SHA256withRSA" digestalg="SHA-256"/>     
                                 </parallel>
                             </target>
                         </configuration>
