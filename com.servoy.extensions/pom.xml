@@ -29,22 +29,22 @@
         <servoy-local.url>${project.baseUri}/target/repository/</servoy-local.url>
         <scribejava.version>8.3.3</scribejava.version>
         <SerialComm.version>2.11.4</SerialComm.version>
-        <amqp.version>5.29.0</amqp.version>
+        <amqp.version>5.34.0</amqp.version>
         <io.netty>4.2.10.Final</io.netty>
         <doc.version>1.8.0</doc.version>
-        <commons.io.version>2.21.0</commons.io.version>
+        <commons.io.version>2.22.0</commons.io.version>
     	<commons.pool.version>2.13.1</commons.pool.version>
     	<commons.text.version>1.15.0</commons.text.version>
-    	<httpclient.version>5.6</httpclient.version>
-        <httpcore.version>5.4.2</httpcore.version>
-        <pdfbox.version>3.0.7</pdfbox.version>
-        <fontbox.version>3.0.7</fontbox.version>
-        <jwt.version>4.5.1</jwt.version>
-        <jwks.version>0.23.0</jwks.version>
-        <jackson.version>2.21.2</jackson.version>
-        <jackson-annotations.version>2.21</jackson-annotations.version>
-        <metadataextractor.version>2.19.0</metadataextractor.version>
-        <bouncy.version>1.83</bouncy.version>
+    	<httpclient.version>5.6.2</httpclient.version>
+        <httpcore.version>5.4.3</httpcore.version>
+        <pdfbox.version>3.0.8</pdfbox.version>
+        <fontbox.version>3.0.8</fontbox.version>
+        <jwt.version>4.6.0</jwt.version>
+        <jwks.version>0.24.1</jwks.version>
+        <jackson.version>2.22.1</jackson.version>
+        <jackson-annotations.version>2.22</jackson-annotations.version>
+        <metadataextractor.version>2.20.0</metadataextractor.version>
+        <bouncy.version>1.85</bouncy.version>
         <xmpcore.version>6.1.11</xmpcore.version>
         <rhino.version>1.8.0.s13</rhino.version>
         <tsaUrl>http://timestamp.digicert.com</tsaUrl>
