@@ -5,6 +5,9 @@ pipeline {
         quietPeriod(120)
         // Log-rotator instellingen overgenomen uit de oude XML (40 dagen bewaren, max 70 builds)
         buildDiscarder(logRotator(daysToKeepStr: '40', numToKeepStr: '70'))
+
+        // cancel all previous builds don't run at the same time'
+        disableConcurrentBuilds(abortPrevious: true)
     }
     
    triggers {
@@ -32,6 +35,23 @@ pipeline {
     }
     
     stages {
+        stage('Clear Queued Builds') {
+            steps {
+                script {
+                    // Annuleer builds die in de queue wachten op de quietPeriod timer voor EXPANCT dit specifieke pad (bijv. "lts_2026/servoy-eclipse")
+                    def currentJob = env.JOB_NAME
+                    def queue = jenkins.model.Jenkins.get().queue
+                    
+                    queue.items.each { item ->
+                        if (item.task.fullName == currentJob) {
+                            echo "Removing pending queued build for ${currentJob} (Queue ID #${item.id})..."
+                            queue.cancel(item)
+                        }
+                    }
+                }
+            }
+        }
+
         stage('Build Extensions') {
             steps {
                 configFileProvider([
