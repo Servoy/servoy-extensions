@@ -41,6 +41,7 @@ import com.servoy.j2db.util.Debug;
 public class DataNotifyListener implements IDataNotifyListener
 {
 	private final Channel channel;
+	private final Connection connection;
 	private final String originServerUUID;
 	private final List<byte[]> failedList = new ArrayList<>();
 	private final String exchangeName;
@@ -53,6 +54,7 @@ public class DataNotifyListener implements IDataNotifyListener
 	{
 		this.originServerUUID = originServerUUID;
 		this.channel = channel;
+		this.connection = connection;
 		this.exchangeName = exchangeName;
 		this.routingKey = routingKey;
 		if (connection instanceof RecoverableConnection)
@@ -120,6 +122,14 @@ public class DataNotifyListener implements IDataNotifyListener
 	 */
 	private void sendBytes(byte[] bytes, boolean testFailedList)
 	{
+		if (!connection.isOpen())
+		{
+			synchronized (failedList)
+			{
+				failedList.add(bytes);
+			}
+			return;
+		}
 		if (testFailedList && failedList.size() > 0)
 		{
 			if (!channel.isOpen())

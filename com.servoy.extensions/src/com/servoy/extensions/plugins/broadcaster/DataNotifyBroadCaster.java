@@ -35,6 +35,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
@@ -88,6 +90,8 @@ public class DataNotifyBroadCaster implements IServerPlugin
 
 	private Connection connection;
 	private Channel channel;
+	private ExecutorService sharedExecutor;
+	private ExecutorService shutdownExecutor;
 
 	private IBroadcastMessageConsumer messageConsumer;
 	private IServerAccess application;
@@ -102,12 +106,17 @@ public class DataNotifyBroadCaster implements IServerPlugin
 	{
 		try
 		{
-			if (channel != null) channel.close();
-			if (connection != null) connection.close();
+			if (channel != null && channel.isOpen()) channel.close();
+			if (connection != null && connection.isOpen()) connection.close();
 		}
 		catch (Exception e)
 		{
 			Debug.error(e);
+		}
+		finally
+		{
+			if (sharedExecutor != null) sharedExecutor.shutdownNow();
+			if (shutdownExecutor != null) shutdownExecutor.shutdownNow();
 		}
 	}
 
@@ -144,6 +153,15 @@ public class DataNotifyBroadCaster implements IServerPlugin
 			if (shutdownTimeout != null) factory.setShutdownTimeout(Utils.getAsInteger(shutdownTimeout));
 			String channelRpcTimeout = app.getSettings().getProperty("amqpbroadcaster.rpctimeout");
 			if (channelRpcTimeout != null) factory.setChannelRpcTimeout(Utils.getAsInteger(channelRpcTimeout));
+
+
+			int sharedPoolSize = Utils.getAsInteger(app.getSettings().getProperty("amqpbroadcaster.sharedexecutor.poolsize", "4"));
+			sharedExecutor = Executors.newFixedThreadPool(sharedPoolSize);
+			factory.setSharedExecutor(sharedExecutor);
+
+			int shutdownPoolSize = Utils.getAsInteger(app.getSettings().getProperty("amqpbroadcaster.shutdownexecutor.poolsize", "2"));
+			shutdownExecutor = Executors.newFixedThreadPool(shutdownPoolSize);
+			factory.setShutdownExecutor(shutdownExecutor);
 
 			String keystorePath = app.getSettings().getProperty("amqpbroadcaster.keystore.path");
 			String keystorePassword = app.getSettings().getProperty("amqpbroadcaster.keystore.password");
@@ -350,6 +368,11 @@ public class DataNotifyBroadCaster implements IServerPlugin
 				{
 					if (baos != null)
 					{
+						if (!connection.isOpen() || !channel.isOpen())
+						{
+							Debug.warn("RabbitMQ message broadcast skipped, connection or channel is not open");
+							return;
+						}
 						channel.basicPublish(exchange, routing, null, baos.toByteArray());
 					}
 				}
@@ -389,6 +412,10 @@ public class DataNotifyBroadCaster implements IServerPlugin
 			"What type of queue algorithm will be used, quorum or classic (default classic)");
 		req.put("amqpbroadcaster.singleactiveconsumer",
 			"Single active consumer allows to have only one consumer at a time consuming from a queue and to fail over to another registered consumer in case the active one is cancelled or dies. (default false)");
+		req.put("amqpbroadcaster.sharedexecutor.poolsize",
+			"Set the thread pool size for the shared executor used by the RabbitMQ client for consumer dispatch and error handling (default 4)");
+		req.put("amqpbroadcaster.shutdownexecutor.poolsize",
+			"Set the thread pool size for the shutdown executor used to process connection/channel shutdown signals (default 2)");
 		return req;
 	}
 
