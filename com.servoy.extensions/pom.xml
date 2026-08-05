@@ -31,7 +31,7 @@
         <SerialComm.version>2.11.4</SerialComm.version>
         <amqp.version>5.34.0</amqp.version>
         <io.netty>4.2.10.Final</io.netty>
-        <doc.version>1.8.0</doc.version>
+        <doc.version>1.9.0</doc.version>
         <commons.io.version>2.22.0</commons.io.version>
     	<commons.pool.version>2.13.1</commons.pool.version>
     	<commons.text.version>1.15.0</commons.text.version>
@@ -46,7 +46,7 @@
         <metadataextractor.version>2.20.0</metadataextractor.version>
         <bouncy.version>1.85</bouncy.version>
         <xmpcore.version>6.1.11</xmpcore.version>
-        <rhino.version>1.9.1.s3</rhino.version>
+        <rhino.version>1.9.1.s4</rhino.version>
         <tsaUrl>http://timestamp.digicert.com</tsaUrl>
         <jbpm.version>7.74.1.Final</jbpm.version>
         <!--  This has to be in sync with jasperreports version  -->
