@@ -73,21 +73,19 @@ pipeline {
             junit allowEmptyResults: true, testResults: '**/target/surefire-reports/*.xml'
         }
         
-        success {
-            // Trigger downstream project 'build' bij succes (verander naar 'build_pipe' indien gewenst)
-            build job: 'build', wait: false
-        }
-        
-        failure {
-            office365ConnectorSend webhookUrl: TEAMS_WEBHOOK, status: 'Failed', adaptiveCards: true
-        }
-        
-        unstable {
-            office365ConnectorSend webhookUrl: TEAMS_WEBHOOK, status: 'Unstable', adaptiveCards: true
-        }
-        
-        fixed {
-            office365ConnectorSend webhookUrl: TEAMS_WEBHOOK, status: 'Back to Normal', adaptiveCards: true
+        changed {
+            script {
+                def statusMap = [
+                    'SUCCESS' : 'Back to Normal',
+                    'FAILURE' : 'Failed',
+                    'UNSTABLE': 'Unstable',
+                    'ABORTED' : 'Aborted'
+                ]
+                
+                def statusText = statusMap.get(currentBuild.currentResult, currentBuild.currentResult)
+    
+                office365ConnectorSend webhookUrl: TEAMS_WEBHOOK, status: statusText, adaptiveCards: true
+            }
         }
     }
 }
