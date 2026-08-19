@@ -30,21 +30,22 @@
         <scribejava.version>8.3.3</scribejava.version>
         <SerialComm.version>2.11.4</SerialComm.version>
         <amqp.version>5.34.0</amqp.version>
-        <io.netty>4.2.10.Final</io.netty>
+        <io.netty>4.2.17.Final</io.netty>
         <doc.version>1.8.0</doc.version>
         <commons.io.version>2.22.0</commons.io.version>
     	<commons.pool.version>2.13.1</commons.pool.version>
     	<commons.text.version>1.15.0</commons.text.version>
-    	<httpclient.version>5.6.2</httpclient.version>
+    	<httpclient.version>5.6.4</httpclient.version>
         <httpcore.version>5.4.3</httpcore.version>
         <pdfbox.version>3.0.8</pdfbox.version>
         <fontbox.version>3.0.8</fontbox.version>
         <jwt.version>4.6.0</jwt.version>
         <jwks.version>0.24.1</jwks.version>
-        <jackson.version>2.22.1</jackson.version>
+        <jackson.version>2.22.2</jackson.version>
         <jackson-annotations.version>2.22</jackson-annotations.version>
-        <metadataextractor.version>2.20.0</metadataextractor.version>
-        <bouncy.version>1.85</bouncy.version>
+        <metadataextractor.version>2.21.0</metadataextractor.version>
+        <bcprov-jdk18on.version>1.85.2</bcprov-jdk18on.version>
+        <bcmail-jdk18on.version>1.85</bcmail-jdk18on.version>
         <xmpcore.version>6.1.11</xmpcore.version>
         <rhino.version>1.8.0.s13</rhino.version>
         <tsaUrl>http://timestamp.digicert.com</tsaUrl>
@@ -515,7 +516,7 @@
                                 <artifactItem>
                                     <groupId>org.bouncycastle</groupId>
                                     <artifactId>bcprov-jdk18on</artifactId>
-                                    <version>${bouncy.version}</version>
+                                    <version>${bcprov-jdk18on.version}</version>
                                     <overWrite>true</overWrite>
                                     <outputDirectory>${project.build.directory}/plugins_beans/plugins/pdf_output</outputDirectory>
                                     <destFileName>bcprov.jar</destFileName>
@@ -2694,12 +2695,12 @@
 	   <dependency>
         	<groupId>org.bouncycastle</groupId>
                 <artifactId>bcprov-jdk18on</artifactId>
-                <version>${bouncy.version}</version>
+                <version>${bcprov-jdk18on.version}</version>
         </dependency>
         <dependency>
                 <groupId>org.bouncycastle</groupId>
                 <artifactId>bcmail-jdk18on</artifactId>
-                <version>${bouncy.version}</version>
+                <version>${bcmail-jdk18on.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
