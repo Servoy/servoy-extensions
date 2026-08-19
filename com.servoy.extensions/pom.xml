@@ -2707,6 +2707,12 @@
             <artifactId>commons-text</artifactId>
             <version>${commons.text.version}</version>
         </dependency>
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-codec</artifactId>
+            <version>${io.netty}</version>
+            <scope>provided</scope>
+        </dependency>
         <!--
         <dependency>
     		<groupId>org.jbpm</groupId>
