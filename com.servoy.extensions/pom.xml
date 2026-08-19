@@ -35,16 +35,16 @@
         <commons.io.version>2.22.0</commons.io.version>
     	<commons.pool.version>2.13.1</commons.pool.version>
     	<commons.text.version>1.15.0</commons.text.version>
-    	<httpclient.version>5.6.2</httpclient.version>
+    	<httpclient.version>5.6.4</httpclient.version>
         <httpcore.version>5.4.3</httpcore.version>
         <pdfbox.version>3.0.8</pdfbox.version>
         <fontbox.version>3.0.8</fontbox.version>
         <jwt.version>4.6.0</jwt.version>
         <jwks.version>0.24.1</jwks.version>
-        <jackson.version>2.22.1</jackson.version>
+        <jackson.version>2.22.2</jackson.version>
         <jackson-annotations.version>2.22</jackson-annotations.version>
-        <metadataextractor.version>2.20.0</metadataextractor.version>
-        <bouncy.version>1.85</bouncy.version>
+        <metadataextractor.version>2.21.0</metadataextractor.version>
+        <bouncy.version>1.85.2</bouncy.version>
         <xmpcore.version>6.1.11</xmpcore.version>
         <rhino.version>1.9.1.s3</rhino.version>
         <tsaUrl>http://timestamp.digicert.com</tsaUrl>
