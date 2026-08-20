@@ -35,7 +35,7 @@
         <scribejava.version>8.3.3</scribejava.version>
         <SerialComm.version>2.11.4</SerialComm.version>
         <amqp.version>5.34.0</amqp.version>
-        <io.netty>4.2.10.Final</io.netty>
+        <io.netty>4.2.17.Final</io.netty>
         <doc.version>1.9.0</doc.version>
         <commons.io.version>2.22.0</commons.io.version>
     	<commons.pool.version>2.13.1</commons.pool.version>
