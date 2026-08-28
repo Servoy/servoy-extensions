@@ -453,7 +453,7 @@
                 <version>3.10.0</version>
                 <executions>
                    <execution>
-                        <id>copy-rabbitmq-only</id>
+                        <id>copy-rabbitmq</id>
                         <phase>prepare-package</phase>
                         <goals>
                             <goal>copy-dependencies</goal>
@@ -464,6 +464,7 @@
                             <overWriteSnapshots>false</overWriteSnapshots>
                             <overWriteIfNewer>true</overWriteIfNewer>
                             <includeScope>runtime</includeScope>
+                            <stripVersion>true</stripVersion>
                             <includeGroupIds>com.rabbitmq,io.netty</includeGroupIds> 
                         </configuration>
                     </execution>
@@ -475,31 +476,6 @@
                         </goals>
                         <configuration>
                             <artifactItems>
-                                
-                                <artifactItem>
-                                    <groupId>io.netty</groupId>
-                                    <artifactId>netty-codec</artifactId>
-                                    <version>${io.netty}</version>
-                                    <overWrite>true</overWrite>
-                                    <outputDirectory>${project.build.directory}/plugins_beans/plugins/broadcaster</outputDirectory>
-                                    <destFileName>netty-codec.jar</destFileName>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>io.netty</groupId>
-                                    <artifactId>netty-transport</artifactId>
-                                    <version>${io.netty}</version>
-                                    <overWrite>true</overWrite>
-                                    <outputDirectory>${project.build.directory}/plugins_beans/plugins/broadcaster</outputDirectory>
-                                    <destFileName>netty-transport.jar</destFileName>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>io.netty</groupId>
-                                    <artifactId>netty-handler</artifactId>
-                                    <version>${io.netty}</version>
-                                    <overWrite>true</overWrite>
-                                    <outputDirectory>${project.build.directory}/plugins_beans/plugins/broadcaster</outputDirectory>
-                                    <destFileName>netty-handler.jar</destFileName>
-                                </artifactItem>
                                 <artifactItem>
                                     <groupId>org.apache.pdfbox</groupId>
                                     <artifactId>pdfbox</artifactId>
