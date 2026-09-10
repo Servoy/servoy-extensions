@@ -48,7 +48,6 @@ import org.apache.commons.fileupload2.core.DiskFileItemFactory.Builder;
 import org.apache.commons.fileupload2.core.FileItem;
 import org.apache.commons.fileupload2.core.FileUploadException;
 import org.apache.commons.fileupload2.jakarta.servlet6.JakartaServletDiskFileUpload;
-import org.apache.commons.fileupload2.jakarta.servlet6.JakartaServletFileUpload;
 import org.apache.commons.io.FileCleaningTracker;
 import org.apache.commons.io.IOUtils;
 import org.apache.hc.core5.http.NameValuePair;
@@ -1286,9 +1285,34 @@ public class RestWSServlet extends HttpServlet
 		throw new IllegalStateException();
 	}
 
+	/**
+	 * Determines whether the request is a multipart/form-data (file upload) request.
+	 *
+	 * This intentionally does not delegate to
+	 * {@link org.apache.commons.fileupload2.jakarta.servlet6.JakartaServletFileUpload#isMultipartContent}
+	 * because that static method's internals differ between commons-fileupload2 milestones (e.g. M5 calls
+	 * the protected {@code isMultipartRequestMethod(String)} that does not exist in M4), which causes a
+	 * {@link NoSuchMethodError} for every POST when the plugin jar and the platform-provided
+	 * commons-fileupload2 jar are out of sync. The check below only relies on the servlet API and the
+	 * request headers, matching the multipart definition from the servlet/HTTP spec.
+	 */
+	static boolean isMultipartContent(HttpServletRequest request)
+	{
+		if (!"POST".equalsIgnoreCase(request.getMethod()))
+		{
+			return false;
+		}
+		String contentType = request.getContentType();
+		if (contentType == null)
+		{
+			return false;
+		}
+		return contentType.toLowerCase().startsWith("multipart/");
+	}
+
 	private Pair<List<DiskFileItem>, ContentType> getContents(HttpServletRequest request) throws FileUploadException, IOException
 	{
-		if (JakartaServletFileUpload.isMultipartContent(request))
+		if (isMultipartContent(request))
 		{
 			return new Pair<>(getFileItemsMultipartRequest(request), ContentType.MULTIPART);
 		}
