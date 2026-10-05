@@ -52,7 +52,7 @@
         <bcprov-jdk18on.version>1.85.2</bcprov-jdk18on.version>
         <bcmail-jdk18on.version>1.85</bcmail-jdk18on.version>
         <xmpcore.version>6.1.11</xmpcore.version>
-        <rhino.version>1.9.1.s4</rhino.version>
+        <rhino.version>1.9.1.s5</rhino.version>
         <tsaUrl>http://timestamp.digicert.com</tsaUrl>
         <jbpm.version>7.74.1.Final</jbpm.version>
         <!--  This has to be in sync with jasperreports version  -->
