@@ -52,6 +52,29 @@ public class MultiPartEntityProducer implements AsyncEntityProducer
 	final String boundary;
 	long contentLength = -2;
 
+	/**
+	 * Unwritten remainder of the current framing chunk (part header, trailing part separator or closing boundary).
+	 * httpcore5's {@link DataStreamChannel#write(ByteBuffer)} is a partial write: it can accept fewer bytes than
+	 * requested (or zero) under HTTP/2 flow control. When that happens we keep the remainder here and resume
+	 * flushing it on the next {@link #produce(DataStreamChannel)} invocation, before emitting any new bytes.
+	 */
+	private ByteBuffer pending;
+	/**
+	 * When the pending buffer is the trailing {@value #CR_LF}-separator written after a part body, the producer must
+	 * advance to the next inner producer only once that separator is fully drained.
+	 */
+	private boolean advanceAfterPending = false;
+	/**
+	 * When the pending buffer is the closing {@code --boundary-- CRLF} framing, the producer must call
+	 * {@link DataStreamChannel#endStream()} only once it is fully drained.
+	 */
+	private boolean endStreamAfterPending = false;
+	/**
+	 * When the pending buffer is a part header that back-pressured mid-flush, the resumed {@link #produce(DataStreamChannel)}
+	 * must mark the header written once the remainder drains and then continue to the body - without re-emitting the header.
+	 */
+	private boolean markHeaderAfterPending = false;
+
 	static final ByteArrayBuffer FIELD_SEP = encode(StandardCharsets.ISO_8859_1, ": ");
 	static final ByteArrayBuffer CR_LF = encode(StandardCharsets.ISO_8859_1, "\r\n");
 	static final ByteArrayBuffer TWO_HYPHENS = encode(StandardCharsets.ISO_8859_1, "--");
@@ -139,8 +162,54 @@ public class MultiPartEntityProducer implements AsyncEntityProducer
 	@Override
 	public void produce(final DataStreamChannel channel) throws IOException
 	{
+		// First drain any remainder left over from a previous, back-pressured produce() call. httpcore5's
+		// DataStreamChannel.write is a partial write, so a framing chunk may need several produce() cycles to flush.
+		if (this.pending != null)
+		{
+			if (!flushPending(channel))
+			{
+				// still back-pressured; requestOutput() was already called, wait for the next produce()
+				return;
+			}
+			// pending fully drained: run any transition that was waiting on it
+			if (this.markHeaderAfterPending)
+			{
+				// the drained pending buffer was the part header; mark it written and fall through to the body,
+				// so the header is NOT rebuilt and re-emitted below
+				this.markHeaderAfterPending = false;
+				markHeaderWritten();
+			}
+			else if (this.advanceAfterPending)
+			{
+				this.advanceAfterPending = false;
+				goToNextProducer();
+			}
+			else if (this.endStreamAfterPending)
+			{
+				this.endStreamAfterPending = false;
+				channel.endStream();
+				return;
+			}
+		}
+
 		if (getCurrentProducer() != null)
 		{
+			// make sure the part header is fully flushed before any body bytes are written
+			if (!headerIsWritten())
+			{
+				this.pending = ByteBuffer.wrap(
+					buildPartHeader(getCurrentProducer(), getCurrentProducerName(), getCurrentProducerFileName(), getCurrentProducerWriteContentType())
+						.toByteArray());
+				if (!flushPending(channel))
+				{
+					// header not fully written yet; remember that the pending buffer is the header so the resumed
+					// produce() marks it written when the remainder drains instead of re-emitting the whole header
+					this.markHeaderAfterPending = true;
+					return;
+				}
+				markHeaderWritten();
+			}
+
 			getCurrentProducer().produce(new DataStreamChannel()
 			{
 
@@ -153,21 +222,25 @@ public class MultiPartEntityProducer implements AsyncEntityProducer
 				@Override
 				public int write(final ByteBuffer src) throws IOException
 				{
-					if (!headerIsWritten())
-					{
-						MultiPartEntityProducer.this.writePartHeader(channel, getCurrentProducer(), getCurrentProducerName(), getCurrentProducerFileName(),
-							getCurrentProducerWriteContentType());
-						markHeaderWritten();
-					}
+					// body bytes: return the real count so the wrapped inner producer honours partial writes itself
 					return channel.write(src);
 				}
 
 				@Override
 				public void endStream(final List< ? extends Header> p) throws IOException
 				{
-					writeBytes(CR_LF, channel);
+					// write the trailing CR_LF separator after the part body through the pending-remainder path;
+					// only advance to the next producer once it is fully drained
+					MultiPartEntityProducer.this.pending = ByteBuffer.wrap(CR_LF.toByteArray());
 					getCurrentProducer().releaseResources();
-					goToNextProducer();
+					if (flushPending(channel))
+					{
+						goToNextProducer();
+					}
+					else
+					{
+						MultiPartEntityProducer.this.advanceAfterPending = true;
+					}
 				}
 
 				@Override
@@ -179,12 +252,47 @@ public class MultiPartEntityProducer implements AsyncEntityProducer
 		}
 		else
 		{
-			writeBytes(TWO_HYPHENS, channel);
-			writeBytes(boundaryEncoded, channel);
-			writeBytes(TWO_HYPHENS, channel);
-			writeBytes(CR_LF, channel);
-			channel.endStream();
+			// closing framing: --boundary-- CRLF as a single contiguous buffer, fully flushed before endStream()
+			final ByteArrayBuffer closing = new ByteArrayBuffer(TWO_HYPHENS.length() + boundaryEncoded.length() + TWO_HYPHENS.length() + CR_LF.length());
+			closing.append(TWO_HYPHENS.array(), 0, TWO_HYPHENS.length());
+			closing.append(boundaryEncoded.array(), 0, boundaryEncoded.length());
+			closing.append(TWO_HYPHENS.array(), 0, TWO_HYPHENS.length());
+			closing.append(CR_LF.array(), 0, CR_LF.length());
+			this.pending = ByteBuffer.wrap(closing.toByteArray());
+			if (flushPending(channel))
+			{
+				channel.endStream();
+			}
+			else
+			{
+				this.endStreamAfterPending = true;
+			}
 		}
+	}
+
+	/**
+	 * Flushes the {@link #pending} buffer, honouring httpcore5's partial-write contract. Loops while the channel keeps
+	 * accepting bytes; when it returns a zero/short write the unwritten remainder is retained in {@link #pending},
+	 * {@link DataStreamChannel#requestOutput()} is called and {@code false} is returned so the async engine re-invokes
+	 * {@link #produce(DataStreamChannel)}.
+	 *
+	 * @return {@code true} when the pending buffer has been fully written (and cleared), {@code false} when the channel
+	 *         is back-pressured and some bytes remain pending.
+	 */
+	private boolean flushPending(DataStreamChannel channel) throws IOException
+	{
+		while (this.pending.hasRemaining())
+		{
+			int written = channel.write(this.pending);
+			if (written <= 0)
+			{
+				// back-pressure: keep the remainder and ask to be produced again
+				channel.requestOutput();
+				return false;
+			}
+		}
+		this.pending = null;
+		return true;
 	}
 
 	/**
@@ -257,12 +365,6 @@ public class MultiPartEntityProducer implements AsyncEntityProducer
 		return false;
 	}
 
-	void writeBytes(
-		final ByteArrayBuffer b, DataStreamChannel channel) throws IOException
-	{
-		channel.write(ByteBuffer.wrap(b.array()));
-	}
-
 	@Override
 	public void failed(final Exception cause)
 	{
@@ -272,18 +374,37 @@ public class MultiPartEntityProducer implements AsyncEntityProducer
 	@Override
 	public void releaseResources()
 	{
+		// reset all state so a repeated send (isRepeatable() == true) starts clean
+		this.pending = null;
+		this.advanceAfterPending = false;
+		this.endStreamAfterPending = false;
+		this.markHeaderAfterPending = false;
+		this.currentIndex = 0;
+		for (InnerMultiPartAsyncProducer producer : this.producers)
+		{
+			producer.initialized = false;
+		}
 	}
 
-	private void writePartHeader(DataStreamChannel channel, AsyncEntityProducer producer, String name, String fileName, boolean writeContentType)
-		throws IOException
+	/**
+	 * Builds the full part header as a single contiguous buffer:
+	 * {@code --boundary CRLF Content-Disposition: form-data; ... CRLF [Content-Type: ... CRLF] CRLF}.
+	 * Folding the ~10 tiny writes into one buffer leaves a single partial-write seam to resume on back-pressure.
+	 * The BROWSER_COMPATIBLE policy is preserved: a Content-Type line is emitted only when
+	 * {@code writeContentType == true} and {@code producer.getContentType() != null}. Everything is ISO-8859-1 encoded.
+	 * This same method is used by {@link #initContentLength()} to measure the header, so the advertised Content-Length
+	 * cannot drift from the bytes actually written.
+	 */
+	private ByteArrayBuffer buildPartHeader(AsyncEntityProducer producer, String name, String fileName, boolean writeContentType)
 	{
-		writeBytes(TWO_HYPHENS, channel);
-		writeBytes(boundaryEncoded, channel);
-		writeBytes(CR_LF, channel);
+		final ByteArrayBuffer header = new ByteArrayBuffer(128);
+		append(header, TWO_HYPHENS);
+		append(header, boundaryEncoded);
+		append(header, CR_LF);
 
 		// write content-disposition
-		writeBytes(encode(StandardCharsets.ISO_8859_1, HttpHeaders.CONTENT_DISPOSITION), channel);
-		writeBytes(FIELD_SEP, channel);
+		append(header, encode(StandardCharsets.ISO_8859_1, HttpHeaders.CONTENT_DISPOSITION));
+		append(header, FIELD_SEP);
 		final CharArrayBuffer buf = new CharArrayBuffer(64);
 		buf.append("form-data");
 		buf.append("; ");
@@ -295,20 +416,26 @@ public class MultiPartEntityProducer implements AsyncEntityProducer
 		{
 			BasicHeaderValueFormatter.INSTANCE.formatParameters(buf, fieldParameters.toArray(new NameValuePair[0]), true);
 		}
-		writeBytes(encode(StandardCharsets.ISO_8859_1, buf.toString()), channel);
-		writeBytes(CR_LF, channel);
+		append(header, encode(StandardCharsets.ISO_8859_1, buf.toString()));
+		append(header, CR_LF);
 		// make it like HttpMultipartMode.BROWSER_COMPATIBLE, only send content-type for files
 		if (writeContentType)
 		{
 			if (producer.getContentType() != null)
 			{
-				writeBytes(encode(StandardCharsets.ISO_8859_1, HttpHeaders.CONTENT_TYPE), channel);
-				writeBytes(FIELD_SEP, channel);
-				writeBytes(encode(StandardCharsets.ISO_8859_1, producer.getContentType()), channel);
-				writeBytes(CR_LF, channel);
+				append(header, encode(StandardCharsets.ISO_8859_1, HttpHeaders.CONTENT_TYPE));
+				append(header, FIELD_SEP);
+				append(header, encode(StandardCharsets.ISO_8859_1, producer.getContentType()));
+				append(header, CR_LF);
 			}
 		}
-		writeBytes(CR_LF, channel);
+		append(header, CR_LF);
+		return header;
+	}
+
+	private static void append(ByteArrayBuffer target, ByteArrayBuffer source)
+	{
+		target.append(source.array(), 0, source.length());
 	}
 
 	private void initContentLength()
@@ -330,45 +457,8 @@ public class MultiPartEntityProducer implements AsyncEntityProducer
 			{
 				for (InnerMultiPartAsyncProducer producer : producers)
 				{
-					try
-					{
-						int[] headerLength = new int[] { 0 };
-						this.writePartHeader(new DataStreamChannel()
-						{
-
-							@Override
-							public void endStream() throws IOException
-							{
-
-							}
-
-							@Override
-							public int write(ByteBuffer src) throws IOException
-							{
-								headerLength[0] += src.remaining();
-								return 0;
-							}
-
-							@Override
-							public void requestOutput()
-							{
-
-							}
-
-							@Override
-							public void endStream(List< ? extends Header> trailers) throws IOException
-							{
-
-							}
-						}, producer.producer, producer.name, producer.fileName, producer.writeContentType);
-						totalContentLength += headerLength[0];
-
-					}
-					catch (IOException e)
-					{
-						Debug.error(e);
-					}
-
+					// measure the exact same header buffer that produce() writes so the length cannot drift
+					totalContentLength += buildPartHeader(producer.producer, producer.name, producer.fileName, producer.writeContentType).length();
 					totalContentLength += 2;//CR_LF in endstream
 				}
 				totalContentLength += 6 + this.boundary.length();
