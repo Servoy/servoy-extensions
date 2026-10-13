@@ -65,6 +65,20 @@ pipeline {
                 }
             }
         }
+
+        stage('Test Extensions') {
+            steps {
+                configFileProvider([
+                    configFile(fileId: 'master_mvn_repo', variable: 'MAVEN_SETTINGS'),
+                    configFile(fileId: 'maven_toolchain', variable: 'TOOLCHAIN')
+                ]) {
+                    // Draai de JUnit-tests uit de aparte test-module. Deze module hangt af van het
+                    // com.servoy.extensions artifact dat de vorige stage via 'install' publiceert.
+                    // Testfouten laten de build niet hard falen; de junit-publisher markeert deze als unstable.
+                    sh 'mvn -B -s "$MAVEN_SETTINGS" -t "$TOOLCHAIN" -Dmaven.test.failure.ignore=true -f com.servoy.extensions.test/pom.xml test'
+                }
+            }
+        }
     }
     
     post {

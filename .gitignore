@@ -2,3 +2,6 @@
 /servoy_base/
 /servoy_shared/
 /org.eclipse.dltk.javascript.rhino/
+
+# OpenCode local index and session artifacts (not source)
+/.opencode/
