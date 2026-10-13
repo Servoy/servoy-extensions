@@ -17,6 +17,35 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.13.0</version>
             </plugin>
+            <!--
+                The com.servoy.extensions artifact produced by the build is JAR-signed on CI.
+                Loading some classes of a package from the signed jar and others (the test's own
+                compiled classes) unsigned makes the JVM throw "signer information does not match
+                signer information of other classes in the same package" when surefire forks.
+                Unpack the plugin classes into this module's target/classes so the whole package
+                is served from unsigned .class files and no signed jar is on the test classpath.
+            -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>3.10.0</version>
+                <executions>
+                    <execution>
+                        <id>unpack-extensions-unsigned</id>
+                        <phase>process-test-classes</phase>
+                        <goals>
+                            <goal>unpack-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <includeGroupIds>com.servoy</includeGroupIds>
+                            <includeArtifactIds>com.servoy.extensions</includeArtifactIds>
+                            <outputDirectory>${project.build.outputDirectory}</outputDirectory>
+                            <excludes>META-INF/**</excludes>
+                            <overWriteSnapshots>true</overWriteSnapshots>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
@@ -34,6 +63,9 @@
             <groupId>com.servoy</groupId>
             <artifactId>com.servoy.extensions</artifactId>
             <version>${project.version}</version>
+            <!-- provided: used to compile and unpacked (unsigned) into target/classes for the test
+                 runtime; keep the signed jar itself off the surefire runtime classpath -->
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>jakarta.servlet</groupId>
