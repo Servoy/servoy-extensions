@@ -2448,6 +2448,19 @@
                         <goals>
                             <goal>sign</goal>
                         </goals>
+                        <configuration>
+                            <!-- Only sign the distributable plugins_beans jar, NOT the main
+                                 com.servoy.extensions jar. The test module (com.servoy.extensions.test)
+                                 depends on the main jar; signing it makes its classes carry signer
+                                 info, which then clashes at test runtime with the unsigned classes of
+                                 the same package on the classpath (java.lang.SecurityException:
+                                 signer information does not match ... in the same package). Tests must
+                                 run against the plain, unsigned classes. -->
+                            <processMainArtifact>false</processMainArtifact>
+                            <includeClassifiers>
+                                <includeClassifier>plugins_beans</includeClassifier>
+                            </includeClassifiers>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
