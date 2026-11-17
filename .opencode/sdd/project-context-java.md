@@ -8,12 +8,18 @@ oauth, etc.). SDD runs in Java repos here.
 
 Workspace root: `servoy-extensions/`. Relevant projects (each an Eclipse `.project`):
 
-- **`com.servoy.extensions`** — the main plugin bundle. All production plugin code lives
-  here under `src/com/servoy/extensions/plugins/<pluginname>/`. This is almost always the
-  project you edit. Eclipse project name (for the Eclipse MCP tools): `com.servoy.extensions`.
-- **`com.servoy.extensions.test`** — the test module (plain Maven, not Tycho). Tests live
-  under `src/test/java/com/servoy/extensions/plugins/<pluginname>/`, mirroring the
-  production package. Add new unit tests here, in the package matching the code under test.
+- **`com.servoy.extensions`** — the one and only module; a plain Java/Maven project (NOT a
+  PDE/OSGi plugin: no MANIFEST/build.properties; jar assembly + signing are done in the pom).
+  Production plugin code lives under `src/com/servoy/extensions/plugins/<pluginname>/`.
+  Eclipse project name (for the Eclipse MCP tools): `com.servoy.extensions`.
+  **Unit tests live in this same module**, in a separate `test/` source folder
+  (`<testSourceDirectory>test</testSourceDirectory>`), under
+  `test/com/servoy/extensions/plugins/<pluginname>/` — the **same package** as the code under
+  test, so they get package-private access with no inter-module dependency. (They briefly lived
+  in a separate `com.servoy.extensions.test` module in early 2026.03; that was dropped because
+  a plain-Maven reactor does not share a classpath across modules, so it needed a dependency on
+  the signed main jar, which broke tests with a signer-info SecurityException and broke a
+  release merge via the parent-version link. Older branches like 2024 may still have it.)
 - **`servoy_shared`**, **`servoy_base`** — upstream Servoy API (interfaces such as
   `IServerPlugin`, `IServerAccess`, `IDataNotifyService`, `IDataNotifyListener`,
   `BroadcastFilter`, `IDataSet`, `com.servoy.j2db.util.Debug`/`Utils`). **Read-only here** —
@@ -30,8 +36,11 @@ Workspace root: `servoy-extensions/`. Relevant projects (each an Eclipse `.proje
   jars, copies third-party jars into `target/plugins_beans/plugins/...`, and signs them). It
   is **not** a plain quick build: it pulls many third-party artifacts and signs jars, so a
   full local `mvn package` is heavy and usually unnecessary for a single-plugin change.
-- `com.servoy.extensions.test` is a lightweight Maven module: JUnit via surefire, depends on
-  `com.servoy.extensions`. Test includes pattern: `**/*Test.java`.
+- Tests run in `com.servoy.extensions`'s own `test` phase (surefire with the JUnit Platform
+  provider, include `**/*Test.java`), BEFORE `package`/`verify` sign the jar — so they always
+  run against the plain unsigned `target/classes`. JUnit 6 version via the parent property
+  `junit.jupiter.version`; JaCoCo (`jacoco.version`) prepare-agent runs in `test` and the report
+  in `verify` (`target/site/jacoco/jacoco.xml`, published to Jenkins via `recordCoverage`).
 - RabbitMQ client: `com.rabbitmq:amqp-client` version is the pom property **`amqp.version`**
   (currently `5.34.0`). The broadcaster plugin builds against this.
 
@@ -41,10 +50,10 @@ Use the **Eclipse MCP** against the live workspace rather than a Maven build whe
 possible — it is the source of truth for Java here and is always in sync with edits:
 
 - Compile check: `eclipse-ide` `buildWorkspace` (or rely on incremental) then
-  `getCompilationErrors` scoped to project `com.servoy.extensions` (and
-  `com.servoy.extensions.test` for tests). Clean markers = compiles.
-- Run tests: `eclipse-runner` to run the JUnit test class/method in
-  `com.servoy.extensions.test`.
+  `getCompilationErrors` scoped to project `com.servoy.extensions`. Clean markers = compiles.
+- Run tests: `eclipse-ide` `runJUnitTests` with `projectName: "com.servoy.extensions"` and
+  `junitVersion: "6"`. If it reports no tests / a missing `Testable`, the build path is stale
+  after a pom change: `updateMavenProject` + `buildWorkspace`, then re-run.
 - A full Tycho/Maven reactor build is generally **not** run locally for a single-plugin
   change (slow, needs signing material and many third-party jars); CI does that. Prefer
   "Eclipse compile check only" or "affected plugin + its tests" at the pre-commit gate and
@@ -62,8 +71,8 @@ possible — it is the source of truth for Java here and is always in sync with 
 - The Jupiter version is the parent pom property `junit.jupiter.version`; surefire runs the
   JUnit Platform provider (`surefire-junit-platform`).
 - Test class name ends in `Test` (surefire include `**/*Test.java`).
-- Place tests in `com.servoy.extensions.test` under the package of the class under test,
-  e.g. broadcaster tests → `src/test/java/com/servoy/extensions/plugins/broadcaster/`.
+- Place tests in `com.servoy.extensions/test` under the package of the class under test,
+  e.g. broadcaster tests → `com.servoy.extensions/test/com/servoy/extensions/plugins/broadcaster/`.
 - The RabbitMQ `Channel`/`Connection` are interfaces, so broadcaster logic can be tested
   with hand-written fakes (a fake `Channel` whose `basicPublish` throws / records sizes, a
   fake `Connection` toggling `isOpen()`), no live broker required. Keep unit tests broker-free.

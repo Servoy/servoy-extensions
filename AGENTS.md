@@ -11,32 +11,34 @@ against the shared Servoy runtime bundles (`servoy_base`, `servoy_shared`, …) 
 ## 1. Repository Structure
 
 This is a multi-module Maven project. Java 21 required. Since `2026.3.3` it is a **parent
-reactor** (`com.servoy.extensions.parent`, root `pom.xml`, packaging `pom`) over two modules:
+reactor** (`com.servoy.extensions.parent`, root `pom.xml`, packaging `pom`). The reactor
+currently has a single module:
 
 ### `com.servoy.extensions`
-- **Type:** Eclipse Plugin project, built with Maven (Tycho is used for the headless
-  doc-generator step, not for a normal OSGi/PDE assembly).
+- **Type:** plain Java/Maven project (NOT a PDE/OSGi plugin — its `.project` has only the
+  Maven + Java natures, there is no `MANIFEST.MF`/`build.properties`; the jar assembly and
+  signing are done in the `pom.xml`).
 - **Eclipse project name:** `com.servoy.extensions` (use this for the Eclipse MCP tools).
 - **Main Role:** All production plugin/bean code. Each plugin lives under
   `src/com/servoy/extensions/plugins/<pluginname>/`; the big `pom.xml` assembles the signed
   plugin/bean jars into `target/plugins_beans/plugins/...` and copies the third-party jars.
-- **Key detail:** this is a heavy build — it unpacks the doc-generator product, runs a Tycho
+- **Tests live in this same module**, in a separate `test/` source folder
+  (`<testSourceDirectory>test</testSourceDirectory>`), under
+  `test/com/servoy/extensions/plugins/<pluginname>/` — the **same package** as the code under
+  test, so tests get package-private access without any inter-module dependency. This is the
+  standard Maven layout (tests compiled and run in the `test` phase, which is **before**
+  `package`/`verify` sign the jar, so tests always run against the plain, unsigned
+  `target/classes` and never hit a signed-vs-unsigned split-package clash).
+  - Historical note: tests briefly lived in a separate `com.servoy.extensions.test` module.
+    That required a `<dependency>` on the main jar (plain Maven does not share a classpath
+    across reactor modules — only Tycho resolves sibling bundles via the manifest) and a
+    parent-version link that broke on a release merge, and it made the tests run against the
+    **signed** jar (java.lang.SecurityException: signer information does not match …). Moving
+    the tests into this module removed all three problems. From 2026.03 LTS up this is the
+    layout; older branches (e.g. 2024) may still have the separate test project.
+- **Key detail:** the build is heavy — it unpacks the doc-generator product, runs a Tycho
   `eclipse-run` doc-generation step, pulls many third-party artifacts and **signs** jars. A full
   local `mvn package` is rarely needed for a single-plugin change.
-
-### `com.servoy.extensions.test`
-- **Type:** Plain Maven module (NOT Tycho / NOT a PDE fragment).
-- **Main Role:** Unit tests for the plugins. Tests live under
-  `src/test/java/com/servoy/extensions/plugins/<pluginname>/`, mirroring the production package
-  so they get package-private access to the classes under test.
-- **Test framework:** **JUnit 6 (Jupiter)** — `org.junit.jupiter.api.Test`,
-  `org.junit.jupiter.api.Assertions.*`, `@BeforeEach`/`@AfterEach`. From Servoy 2026.03 LTS all
-  tests are on JUnit 6; do **not** add JUnit 4 or Mockito unless a test genuinely needs it (and
-  then add it to this module's `pom.xml`). The default is plain Jupiter with hand-written
-  fakes/stubs. Surefire runs the JUnit Platform provider (`surefire-junit-platform`); include
-  pattern `**/*Test.java`, so a test class name must end in `Test`. The Jupiter version is the
-  parent pom property `junit.jupiter.version`.
-- **Depends on** `com.servoy.extensions` (so it can reference the plugin classes).
 
 ### Shared servoy bundles (read-only here)
 `servoy_base`, `servoy_shared`, `servoy_headless_client`, `servoy_smart_client`,
@@ -62,19 +64,17 @@ Changes to shared classes must be coordinated across those repos.
 
 ## 3. Build & the parent reactor
 
-- **Build (CI / full):** `mvn -f pom.xml <goals>` from the repo root — builds the parent reactor
-  (main plugin + test module) in order. The Jenkins pipeline runs exactly this (`-f pom.xml`),
-  so the test module's surefire runs in CI and results are collected
-  (`**/target/surefire-reports/*.xml`).
-- **Build system:** Maven; Tycho 5.x only for the doc-generator `eclipse-run` step in the main
-  module. Java 21 (source + target), UTF-8.
-- **The `not_dev` profile** (both modules + the parent) is auto-activated when **not** running
-  under m2e/Eclipse (`<activation><property><name>!m2e.version</name></property></activation>`).
+- **Build (CI / full):** `mvn -f pom.xml <goals>` from the repo root (the Jenkins pipeline runs
+  exactly this). The unit tests run in `com.servoy.extensions`'s own `test` phase, and their
+  surefire results are collected in CI (`**/target/surefire-reports/*.xml`).
+- **Build system:** Maven; Tycho 5.x only for the doc-generator `eclipse-run` step in
+  `com.servoy.extensions`. Java 21 (source + target), UTF-8.
+- **The `not_dev` profile** (the parent + `com.servoy.extensions`) is auto-activated when **not**
+  running under m2e/Eclipse (`<activation><property><name>!m2e.version</name></property></activation>`).
   It supplies the servoy bundles as repository dependencies for the Maven CLI. Their **versions
-  are centralized** in the parent pom's `not_dev` `<dependencyManagement>`; each module's own
-  `not_dev` profile only lists the bundles it needs (versionless). The heavy docgen/unpack/
-  sign/toolchains build stays in the **main** module's `not_dev` profile — the parent only
-  centralizes the shared-bundle versions.
+  are centralized** in the parent pom's `not_dev` `<dependencyManagement>`; the module's `not_dev`
+  profile only lists the bundles it needs (versionless). The heavy docgen/unpack/sign/toolchains
+  build stays in `com.servoy.extensions`.
 
 ### ⚠️ Local `mvn` build caveat (version not yet published)
 
@@ -84,9 +84,9 @@ release has run, so a **local `mvn` CLI build cannot resolve the bundles and wil
 is expected, not a setup bug. Two consequences:
 
 - **Verify locally through the Eclipse workspace**, which resolves the bundles via project
-  references: `tools["eclipse-ide"].getCompilationErrors` (scoped to `com.servoy.extensions`
-  and/or `com.servoy.extensions.test`) and `tools["eclipse-ide"].runJUnitTests` (project
-  `com.servoy.extensions.test`). CI does the full reactor build.
+  references: `tools["eclipse-ide"].getCompilationErrors` (scoped to `com.servoy.extensions`)
+  and `tools["eclipse-ide"].runJUnitTests` (project `com.servoy.extensions`, passing
+  `junitVersion: "6"`). CI does the full reactor build.
 - If you need a quick CLI sanity build, point a **throwaway copy** at the last published
   version (e.g. `2026.3.2-SNAPSHOT`); never commit a downgraded version — the real poms stay at
   `${project.version}`.
@@ -156,10 +156,10 @@ editor, JDT model and undo history). This is a hard rule.
 
 The repo root itself is an Eclipse project (**`servoy-extensions`**, a plain project with no
 Java nature — it just holds the reactor `pom.xml`, `Jenkinsfile`, this file, `docs/`,
-`opencode.json` and `.opencode/`), and the two modules `com.servoy.extensions` /
-`com.servoy.extensions.test` are Eclipse projects too. So **every file in this checkout lives
-inside some Eclipse project** — edit through the `eclipse-coder` tools so the IDE stays in sync.
-For the root-level files use `projectName: "servoy-extensions"` (e.g.
+`opencode.json` and `.opencode/`), and `com.servoy.extensions` is imported as its own
+Eclipse project. So **every file in this checkout lives inside some Eclipse project** — edit
+through the `eclipse-coder` tools so the IDE stays in sync. For the root-level files use
+`projectName: "servoy-extensions"` (e.g.
 `readProjectResource`/`replaceString` on `AGENTS.md`, `pom.xml`, `Jenkinsfile`). The built-in
 `edit`/`write` are a last resort only for a path that is genuinely outside every imported
 project; when in doubt, use `eclipse-coder`.
@@ -181,16 +181,22 @@ After any code change via the Eclipse MCP tools, run a self-verification loop:
 
 ## Testing
 
-Unit tests live in **`com.servoy.extensions.test`** (plain Maven, JUnit 6 / Jupiter), under
-`src/test/java/com/servoy/extensions/plugins/<pluginname>/`, in the **same package** as the code
-under test for package-private access.
+Unit tests live **in the `com.servoy.extensions` module itself**, in its `test/` source folder
+(`<testSourceDirectory>test</testSourceDirectory>`), under
+`test/com/servoy/extensions/plugins/<pluginname>/`, in the **same package** as the code under
+test for package-private access. JUnit 6 / Jupiter; surefire runs the JUnit Platform provider
+(`surefire-junit-platform`), include pattern `**/*Test.java`, Jupiter version from the parent
+pom property `junit.jupiter.version`. They run in the module's `test` phase (before the jar is
+assembled/signed), so they always compile and run against the plain unsigned `target/classes`.
 
 - **Run locally:** `tools["eclipse-ide"].runJUnitTests` with `projectName =
-  "com.servoy.extensions.test"` and the test class/package. Use this, not `mvn` — see the §3
-  caveat (the `2026.3.x-SNAPSHOT` servoy bundles may not be published yet for a CLI build, but
-  Eclipse resolves them via project references).
-- **In CI:** the Jenkins reactor build (`mvn -f pom.xml …`) runs the test module's surefire;
-  results are collected from `**/target/surefire-reports/*.xml`.
+  "com.servoy.extensions"`, the test class/package, and `junitVersion: "6"`. Use this, not `mvn`
+  — see the §3 caveat (the `2026.3.x-SNAPSHOT` servoy bundles may not be published yet for a CLI
+  build, but Eclipse resolves them via project references). If a run reports no tests / a missing
+  `Testable`, the build path is stale: `updateMavenProject` + `buildWorkspace` on
+  `com.servoy.extensions`, then re-run.
+- **In CI:** the Jenkins build (`mvn -f pom.xml …`) runs the tests in the `test` phase; results
+  are collected from `**/target/surefire-reports/*.xml`.
 - **Broker-free fakes:** RabbitMQ `Channel`/`Connection`/`ShutdownListener` are interfaces, so
   the AMQP broadcaster is tested with hand-written fakes — no live broker. Keep unit tests
   broker-free and deterministic (drive async recovery via observable state, not wall-clock sleeps).
@@ -205,7 +211,7 @@ channel, which was never rebuilt, silently stopping pod-wide databroadcast until
 
 | Test class | Package | Type | Runner |
 |-----------|---------|------|--------|
-| `DataNotifyBroadCasterRecoveryTest` | `com.servoy.extensions.plugins.broadcaster` (`com.servoy.extensions.test`) | Plain JUnit 6 (Jupiter), broker-free (fakes `FakeChannel`/`FakeConnection`/`FakeServerAccess`) | CI: reactor surefire (`**/*Test.java`). Locally: `eclipse-ide_runJUnitTests` (project `com.servoy.extensions.test`) |
+| `DataNotifyBroadCasterRecoveryTest` | `com.servoy.extensions.plugins.broadcaster` (in `com.servoy.extensions/test`) | Plain JUnit 6 (Jupiter), broker-free (fakes `FakeChannel`/`FakeConnection`/`FakeServerAccess`) | CI: surefire in the `test` phase (`**/*Test.java`). Locally: `eclipse-ide_runJUnitTests` (project `com.servoy.extensions`, `junitVersion: "6"`) |
 
 Notes:
 - The test drives the real private `installShutdownListener` / `rebuildChannel` /

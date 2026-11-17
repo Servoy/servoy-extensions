@@ -12,7 +12,6 @@
 
     <modules>
         <module>com.servoy.extensions</module>
-        <module>com.servoy.extensions.test</module>
     </modules>
 
     <properties>
