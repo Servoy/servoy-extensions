@@ -16,10 +16,10 @@
  */
 package com.servoy.extensions.plugins.http;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -31,7 +31,7 @@ import org.apache.hc.core5.http.ContentType;
 import org.apache.hc.core5.http.Header;
 import org.apache.hc.core5.http.nio.DataStreamChannel;
 import org.apache.hc.core5.http.nio.entity.BasicAsyncEntityProducer;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * SVY-21518 - the http plugin's {@link MultiPartEntityProducer} must honour the httpcore5
@@ -67,7 +67,7 @@ public class MultiPartEntityProducerTest
 
 		byte[] body = drive(producer, new ShortWriteChannel(3, 7));
 
-		assertEquals("reassembled body length must equal the advertised Content-Length byte-for-byte", advertised, body.length);
+		assertEquals(advertised, body.length, "reassembled body length must equal the advertised Content-Length byte-for-byte");
 		assertWellFormed(body, producer.boundary);
 	}
 
@@ -84,7 +84,7 @@ public class MultiPartEntityProducerTest
 
 		byte[] body = drive(producer, new FullAcceptChannel());
 
-		assertEquals("full-accept path must also match the advertised Content-Length exactly", advertised, body.length);
+		assertEquals(advertised, body.length, "full-accept path must also match the advertised Content-Length exactly");
 		assertWellFormed(body, producer.boundary);
 	}
 
@@ -102,14 +102,14 @@ public class MultiPartEntityProducerTest
 
 		byte[] body = drive(producer, new ShortWriteChannel(1, 1));
 
-		assertEquals("one-byte-at-a-time path must still match the advertised Content-Length exactly", advertised, body.length);
+		assertEquals(advertised, body.length, "one-byte-at-a-time path must still match the advertised Content-Length exactly");
 		assertWellFormed(body, producer.boundary);
 
 		String text = new String(body, StandardCharsets.ISO_8859_1);
-		assertEquals("the string-parameter part header must appear exactly once (not duplicated by a resumed produce())", 1,
-			countOccurrences(text, "name=\"field\""));
-		assertEquals("the first file part header must appear exactly once", 1, countOccurrences(text, "filename=\"a.bin\""));
-		assertEquals("the second file part header must appear exactly once", 1, countOccurrences(text, "filename=\"b.txt\""));
+		assertEquals(1, countOccurrences(text, "name=\"field\""),
+			"the string-parameter part header must appear exactly once (not duplicated by a resumed produce())");
+		assertEquals(1, countOccurrences(text, "filename=\"a.bin\""), "the first file part header must appear exactly once");
+		assertEquals(1, countOccurrences(text, "filename=\"b.txt\""), "the second file part header must appear exactly once");
 	}
 
 	/**
@@ -127,16 +127,16 @@ public class MultiPartEntityProducerTest
 
 		int field = text.indexOf("name=\"field\"");
 		int firstFile = text.indexOf("filename=\"a.bin\"");
-		assertTrue("string-parameter part must come before the file part in this fixture", field >= 0 && firstFile > field);
+		assertTrue(field >= 0 && firstFile > field, "string-parameter part must come before the file part in this fixture");
 
 		String fieldPart = text.substring(field, firstFile);
-		assertFalse("a plain string parameter (writeContentType == false) must NOT emit a Content-Type header",
-			fieldPart.toLowerCase().contains("content-type:"));
+		assertFalse(fieldPart.toLowerCase().contains("content-type:"),
+			"a plain string parameter (writeContentType == false) must NOT emit a Content-Type header");
 
 		int firstFileHeaderEnd = text.indexOf("\r\n\r\n", firstFile);
 		String fileHeader = text.substring(firstFile, firstFileHeaderEnd);
-		assertTrue("a file part (writeContentType == true) must emit a Content-Type header",
-			fileHeader.toLowerCase().contains("content-type:"));
+		assertTrue(fileHeader.toLowerCase().contains("content-type:"),
+			"a file part (writeContentType == true) must emit a Content-Type header");
 	}
 
 	// ---- fixture ----------------------------------------------------------------------------------
@@ -195,26 +195,26 @@ public class MultiPartEntityProducerTest
 		String text = new String(body, StandardCharsets.ISO_8859_1);
 		String delimiter = "--" + boundary;
 
-		assertTrue("multipart body must start with the opening boundary --<boundary>CRLF", text.startsWith(delimiter + "\r\n"));
-		assertTrue("multipart body must end with the closing boundary --<boundary>--CRLF", text.endsWith(delimiter + "--\r\n"));
+		assertTrue(text.startsWith(delimiter + "\r\n"), "multipart body must start with the opening boundary --<boundary>CRLF");
+		assertTrue(text.endsWith(delimiter + "--\r\n"), "multipart body must end with the closing boundary --<boundary>--CRLF");
 
 		// a delimiter occurs once per part plus once for the closing boundary; the fixture has 3 parts
-		assertEquals("there must be exactly one boundary delimiter per part plus the closing one (no duplicated/dropped boundaries)", 4,
-			countOccurrences(text, delimiter));
+		assertEquals(4, countOccurrences(text, delimiter),
+			"there must be exactly one boundary delimiter per part plus the closing one (no duplicated/dropped boundaries)");
 
-		assertEquals("the string parameter part must have exactly one Content-Disposition header", 1,
-			countOccurrences(text, "Content-Disposition: form-data; name=\"field\"\r\n"));
-		assertEquals("the first file part must have exactly one Content-Disposition header with filename", 1,
-			countOccurrences(text, "Content-Disposition: form-data; name=\"file1\"; filename=\"a.bin\"\r\n"));
-		assertEquals("the second file part must have exactly one Content-Disposition header with filename", 1,
-			countOccurrences(text, "Content-Disposition: form-data; name=\"file2\"; filename=\"b.txt\"\r\n"));
+		assertEquals(1, countOccurrences(text, "Content-Disposition: form-data; name=\"field\"\r\n"),
+			"the string parameter part must have exactly one Content-Disposition header");
+		assertEquals(1, countOccurrences(text, "Content-Disposition: form-data; name=\"file1\"; filename=\"a.bin\"\r\n"),
+			"the first file part must have exactly one Content-Disposition header with filename");
+		assertEquals(1, countOccurrences(text, "Content-Disposition: form-data; name=\"file2\"; filename=\"b.txt\"\r\n"),
+			"the second file part must have exactly one Content-Disposition header with filename");
 
 		// every part header ends with a blank line (CRLF CRLF) before the part body
-		assertTrue("there must be a blank line separating headers from the part body", text.contains("\r\n\r\n"));
+		assertTrue(text.contains("\r\n\r\n"), "there must be a blank line separating headers from the part body");
 
 		// the actual body bytes must survive intact
-		assertTrue("string parameter value must be present intact", text.contains("hello world value"));
-		assertTrue("second file contents must be present intact", text.contains("second file contents, a bit longer than the first"));
+		assertTrue(text.contains("hello world value"), "string parameter value must be present intact");
+		assertTrue(text.contains("second file contents, a bit longer than the first"), "second file contents must be present intact");
 	}
 
 	private static int countOccurrences(String haystack, String needle)
