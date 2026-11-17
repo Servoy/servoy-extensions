@@ -56,6 +56,7 @@ import org.apache.hc.client5.http.impl.async.HttpAsyncClients;
 import org.apache.hc.client5.http.impl.cookie.BasicClientCookie;
 import org.apache.hc.client5.http.impl.nio.PoolingAsyncClientConnectionManagerBuilder;
 import org.apache.hc.client5.http.ssl.ClientTlsStrategyBuilder;
+import org.apache.hc.client5.http.ssl.HostnameVerificationPolicy;
 import org.apache.hc.client5.http.ssl.NoopHostnameVerifier;
 import org.apache.hc.client5.http.ssl.SSLConnectionSocketFactory;
 import org.apache.hc.core5.function.Factory;
@@ -271,6 +272,15 @@ public class HttpClient implements IScriptable, IJavaScriptType
 		if (hostnameVerifier != null)
 		{
 			tlsFactory.setHostnameVerifier(hostnameVerifier);
+		}
+
+		if (config != null && !config.hostValidation)
+		{
+			// When host validation is disabled, only run the (no-op) client verifier, not the JDK builtin hostname check.
+			// The default policy is BOTH, which also asks the JDK to verify the hostname against the certificate's SAN;
+			// for hostValidation=false we want to skip host verification entirely. Before HttpClient 5.6.4 the async client
+			// silently skipped the builtin check due to a bug, so this used to appear to work; 5.6.4 enforces it correctly.
+			tlsFactory.setHostVerificationPolicy(HostnameVerificationPolicy.CLIENT);
 		}
 
 		if (config != null && config.protocol != null)

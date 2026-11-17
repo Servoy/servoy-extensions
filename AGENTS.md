@@ -1,0 +1,230 @@
+# AGENTS.md — Servoy Extensions Repository
+
+This Git repository contains the **Servoy Extensions** — the server/client plugins and beans
+that ship with Servoy (mail, http, file, rest_ws, datanotifybroadcaster/AMQP, pdf_output,
+clientmanager, oauth, serial, spellcheck, amortization, workflows, …). The plugins build
+against the shared Servoy runtime bundles (`servoy_base`, `servoy_shared`, …) which live in the
+`servoy-client` / core checkout, not in this repo.
+
+---
+
+## 1. Repository Structure
+
+This is a multi-module Maven project. Java 21 required. Since `2026.3.3` it is a **parent
+reactor** (`com.servoy.extensions.parent`, root `pom.xml`, packaging `pom`) over two modules:
+
+### `com.servoy.extensions`
+- **Type:** Eclipse Plugin project, built with Maven (Tycho is used for the headless
+  doc-generator step, not for a normal OSGi/PDE assembly).
+- **Eclipse project name:** `com.servoy.extensions` (use this for the Eclipse MCP tools).
+- **Main Role:** All production plugin/bean code. Each plugin lives under
+  `src/com/servoy/extensions/plugins/<pluginname>/`; the big `pom.xml` assembles the signed
+  plugin/bean jars into `target/plugins_beans/plugins/...` and copies the third-party jars.
+- **Key detail:** this is a heavy build — it unpacks the doc-generator product, runs a Tycho
+  `eclipse-run` doc-generation step, pulls many third-party artifacts and **signs** jars. A full
+  local `mvn package` is rarely needed for a single-plugin change.
+
+### `com.servoy.extensions.test`
+- **Type:** Plain Maven module (NOT Tycho / NOT a PDE fragment).
+- **Main Role:** Unit tests for the plugins. Tests live under
+  `src/test/java/com/servoy/extensions/plugins/<pluginname>/`, mirroring the production package
+  so they get package-private access to the classes under test.
+- **Test framework:** **JUnit 6 (Jupiter)** — `org.junit.jupiter.api.Test`,
+  `org.junit.jupiter.api.Assertions.*`, `@BeforeEach`/`@AfterEach`. From Servoy 2026.03 LTS all
+  tests are on JUnit 6; do **not** add JUnit 4 or Mockito unless a test genuinely needs it (and
+  then add it to this module's `pom.xml`). The default is plain Jupiter with hand-written
+  fakes/stubs. Surefire runs the JUnit Platform provider (`surefire-junit-platform`); include
+  pattern `**/*Test.java`, so a test class name must end in `Test`. The Jupiter version is the
+  parent pom property `junit.jupiter.version`.
+- **Depends on** `com.servoy.extensions` (so it can reference the plugin classes).
+
+### Shared servoy bundles (read-only here)
+`servoy_base`, `servoy_shared`, `servoy_headless_client`, `servoy_smart_client`,
+`org.eclipse.dltk.javascript.rhino` and core classes such as `com.servoy.j2db.*` (e.g.
+`SQLEngine` in `j2db_server`) come from the separate core checkout. In Eclipse they resolve as
+**workspace project references** (see each module's `.classpath`); for the Maven CLI they are
+pulled from the repository by the `not_dev` profile (see §3). **Do not edit these from this
+repo** — a change there means a separate SVY case against the core repo.
+
+---
+
+## 2. Relationship to Other Repositories
+
+| Repository | Relationship |
+|-----------|-------------|
+| `servoy-client` | Provides `servoy_base`, `servoy_shared`, `servoy_headless_client`, `servoy_smart_client` — the extensions compile and run against those bundles |
+| `server` (`j2db_server`) | Server-side runtime (e.g. `SQLEngine`, databroadcast distribution) that the server plugins integrate with |
+| `servoy-eclipse` | The Servoy Developer IDE; consumes the built plugin jars |
+
+Changes to shared classes must be coordinated across those repos.
+
+---
+
+## 3. Build & the parent reactor
+
+- **Build (CI / full):** `mvn -f pom.xml <goals>` from the repo root — builds the parent reactor
+  (main plugin + test module) in order. The Jenkins pipeline runs exactly this (`-f pom.xml`),
+  so the test module's surefire runs in CI and results are collected
+  (`**/target/surefire-reports/*.xml`).
+- **Build system:** Maven; Tycho 5.x only for the doc-generator `eclipse-run` step in the main
+  module. Java 21 (source + target), UTF-8.
+- **The `not_dev` profile** (both modules + the parent) is auto-activated when **not** running
+  under m2e/Eclipse (`<activation><property><name>!m2e.version</name></property></activation>`).
+  It supplies the servoy bundles as repository dependencies for the Maven CLI. Their **versions
+  are centralized** in the parent pom's `not_dev` `<dependencyManagement>`; each module's own
+  `not_dev` profile only lists the bundles it needs (versionless). The heavy docgen/unpack/
+  sign/toolchains build stays in the **main** module's `not_dev` profile — the parent only
+  centralizes the shared-bundle versions.
+
+### ⚠️ Local `mvn` build caveat (version not yet published)
+
+The servoy bundle dependencies resolve to **`${project.version}`** (currently
+`2026.3.3-SNAPSHOT`). That snapshot is only published once a full Servoy core build for the
+release has run, so a **local `mvn` CLI build cannot resolve the bundles and will fail** — this
+is expected, not a setup bug. Two consequences:
+
+- **Verify locally through the Eclipse workspace**, which resolves the bundles via project
+  references: `tools["eclipse-ide"].getCompilationErrors` (scoped to `com.servoy.extensions`
+  and/or `com.servoy.extensions.test`) and `tools["eclipse-ide"].runJUnitTests` (project
+  `com.servoy.extensions.test`). CI does the full reactor build.
+- If you need a quick CLI sanity build, point a **throwaway copy** at the last published
+  version (e.g. `2026.3.2-SNAPSHOT`); never commit a downgraded version — the real poms stay at
+  `${project.version}`.
+
+- **No separate lint/typecheck** — compilation validates the code.
+
+---
+
+## 4. Commit Message Convention
+
+- Commits related to a Jira case must include the case number: `SVY-21803 short description`
+- AI-assisted commits must end with `[ai]`: `SVY-21803 short description [ai]`
+- Add a `Co-Authored-By: opencode <noreply@opencode.ai>` trailer on AI-assisted commits.
+- Never amend a commit that has already been pushed; prefer a new commit. Only amend a
+  **local-only** commit (verify with `git branch -r --contains <sha>` / `git log @{u}..HEAD`).
+- Keep comments that describe behaviour/intent; only remove clearly stale or trivial ones.
+
+---
+
+## 5. Prioritize Eclipse MCP Tools Over Standard Tools
+
+This workspace is a multi-project Eclipse environment, so **always prioritize Eclipse-specific
+MCP/PDE tools** over general-purpose command-line or filesystem tools, to keep the Eclipse
+index, builder and classpath in sync.
+
+### ⚠️ Everything runs through Code Mode — READ THIS FIRST
+
+The Eclipse MCP servers (`eclipse-coder`, `eclipse-ide`, `eclipse-git`, `eclipse-pde`,
+`eclipse-runner`, `eclipse-context`) and the other MCP tools (`memory`, `time`) are exposed
+**only through Code Mode**. There is **no direct top-level tool** for any of them.
+
+- To call any Eclipse/MCP tool you MUST write JavaScript inside the **`execute`** tool and call
+  it by its exact catalog `path`, using bracket notation:
+  `await tools["eclipse-coder"].replaceString({ ... })`,
+  `await tools["eclipse-ide"].getCompilationErrors({ ... })`,
+  `await tools["eclipse-git"].gitStatus({ ... })`.
+- **NEVER** call these as if they were plain tools (e.g. `eclipse-coder_replaceString` or
+  `tools.eclipse_ide.getCompilationErrors`). Those names do not exist in Code Mode; the call
+  fails with *"No tool named … is currently available."* When that happens, do **not** fall back
+  to the built-in `edit`/`write` — fix the call by wrapping it in `execute` with the bracket form.
+- The Code Mode catalog is **partial**. If a tool is not shown, find it with `search(...)`
+  **inside** an `execute` script (synchronous — call it without `await`), then call it by the
+  returned `path`. Do not guess tool names.
+- Throughout this document, a tool written as `eclipse-coder_replaceString` is shorthand for
+  `tools["eclipse-coder"].replaceString(...)` called via `execute`.
+
+**The only tools called directly (not through Code Mode):** the built-in `read`, `grep`, `glob`
+and `shell`. Everything else goes through `execute`.
+
+**Every file inside an Eclipse workspace project MUST be edited through the `eclipse-coder`
+tools**, never the built-in `edit`/`write` (they write behind Eclipse's back and desync the
+editor, JDT model and undo history). This is a hard rule.
+
+- **File Reading:** `tools["eclipse-ide"].readProjectResource` (plus `getSource`,
+  `getFilteredSource`, `getMethodSource`, `getClassOutline`) instead of the generic `read` tool.
+- **File Writing & Creating:** `tools["eclipse-coder"].createFile` / `replaceFileContent`
+  instead of the generic `write` tool.
+- **File Editing:** `tools["eclipse-coder"].applyPatch`, `insertIntoFile`, `replaceString`,
+  `applyTextEdits` or `deleteLinesInFile` instead of the generic `edit` tool.
+- **File / Class Searching:** `tools["eclipse-ide"].fileSearch`, `fileSearchRegExp`,
+  `searchTypes`, `searchMethods` instead of generic `grep`/`glob` for Java facts.
+- **Git Operations:** `tools["eclipse-git"]` (`gitStatus`, `gitDiff`, `gitCommit`, …) instead of
+  shell `git` where practical.
+- **Testing:** `tools["eclipse-ide"].runJUnitTests` (discover with `findTestClasses`) over shell
+  test commands. (The main module's `mvn` build is heavy and, see §3, often not resolvable
+  locally.)
+
+The repo root itself is an Eclipse project (**`servoy-extensions`**, a plain project with no
+Java nature — it just holds the reactor `pom.xml`, `Jenkinsfile`, this file, `docs/`,
+`opencode.json` and `.opencode/`), and the two modules `com.servoy.extensions` /
+`com.servoy.extensions.test` are Eclipse projects too. So **every file in this checkout lives
+inside some Eclipse project** — edit through the `eclipse-coder` tools so the IDE stays in sync.
+For the root-level files use `projectName: "servoy-extensions"` (e.g.
+`readProjectResource`/`replaceString` on `AGENTS.md`, `pom.xml`, `Jenkinsfile`). The built-in
+`edit`/`write` are a last resort only for a path that is genuinely outside every imported
+project; when in doubt, use `eclipse-coder`.
+
+---
+
+## 6. Post-Modification Compilation & Quick-Fix Loop
+
+After any code change via the Eclipse MCP tools, run a self-verification loop:
+
+1. **Check for errors:** `tools["eclipse-ide"].getCompilationErrors(...)` scoped to the touched
+   project(s).
+2. **Review quick fixes** on any reported marker.
+3. **Apply quick fixes** that are safe via `tools["eclipse-ide"].executeQuickFix` (`markerId` +
+   `proposalIndex`).
+4. **Re-check** until the workspace is clean. Zero compilation errors must remain.
+
+---
+
+## Testing
+
+Unit tests live in **`com.servoy.extensions.test`** (plain Maven, JUnit 6 / Jupiter), under
+`src/test/java/com/servoy/extensions/plugins/<pluginname>/`, in the **same package** as the code
+under test for package-private access.
+
+- **Run locally:** `tools["eclipse-ide"].runJUnitTests` with `projectName =
+  "com.servoy.extensions.test"` and the test class/package. Use this, not `mvn` — see the §3
+  caveat (the `2026.3.x-SNAPSHOT` servoy bundles may not be published yet for a CLI build, but
+  Eclipse resolves them via project references).
+- **In CI:** the Jenkins reactor build (`mvn -f pom.xml …`) runs the test module's surefire;
+  results are collected from `**/target/surefire-reports/*.xml`.
+- **Broker-free fakes:** RabbitMQ `Channel`/`Connection`/`ShutdownListener` are interfaces, so
+  the AMQP broadcaster is tested with hand-written fakes — no live broker. Keep unit tests
+  broker-free and deterministic (drive async recovery via observable state, not wall-clock sleeps).
+
+### SVY-21803 — AMQP databroadcaster channel recovery + payload size guard
+
+Covers the channel-level recovery and the serialized-payload size guard added to
+`DataNotifyBroadCaster` / `DataNotifyListener` (plugin
+`com.servoy.extensions.plugins.broadcaster`). Reported via support ticket SCS-3537: a
+broker `precondition_failed` on an oversized (~22 MB) databroadcast closed the single shared
+channel, which was never rebuilt, silently stopping pod-wide databroadcast until restart.
+
+| Test class | Package | Type | Runner |
+|-----------|---------|------|--------|
+| `DataNotifyBroadCasterRecoveryTest` | `com.servoy.extensions.plugins.broadcaster` (`com.servoy.extensions.test`) | Plain JUnit 6 (Jupiter), broker-free (fakes `FakeChannel`/`FakeConnection`/`FakeServerAccess`) | CI: reactor surefire (`**/*Test.java`). Locally: `eclipse-ide_runJUnitTests` (project `com.servoy.extensions.test`) |
+
+Notes:
+- The test drives the real private `installShutdownListener` / `rebuildChannel` /
+  `getEffectiveMaxMessageSize` paths through reflection and a same-thread executor, and asserts
+  on the `FakeChannel`/`FakeConnection` recordings — the fakes only record, the flush-vs-row
+  decision stays in production (`DataNotifyListener`).
+- Covers the 10 acceptance criteria of `docs/SVY-21803-amqp-channel-recovery-size-guard.spec.md`
+  plus the non-reentrant/FIFO `failedList` drain. The bounded-rebuild tests incur the production
+  2 s backoff (observable-state assertions, not timing).
+
+> The spec-driven-development pipeline this repo uses records its per-repo context in
+> `.opencode/sdd/project-context-java.md` (Java variant). Keep it in sync with this file.
+
+---
+
+## 7. Jira API
+
+For anything Jira — reading, creating, updating, commenting, linking, searching (JQL), assigning
+or transitioning issues — load the **`servoy-jira`** skill (global opencode skill) and follow its
+instructions. It holds the connection details (base URL, `ATLASSIAN_AUTH_BASIC` auth), the
+per-OS command recipes and the ADF templates. Always load the skill first rather than
+hand-rolling the REST calls.

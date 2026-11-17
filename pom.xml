@@ -1,0 +1,77 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <prerequisites>
+        <maven>3.9.0</maven>
+    </prerequisites>
+    <groupId>com.servoy</groupId>
+    <artifactId>com.servoy.extensions.parent</artifactId>
+    <version>2026.9.1-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>com.servoy.extensions</module>
+        <module>com.servoy.extensions.test</module>
+    </modules>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
+        <rhino.version>1.8.0.s13</rhino.version>
+        <!-- Servoy 2026.03 LTS standardises tests on JUnit 6 (Jupiter). The JUnit 6
+             platform-launcher shares the same version line as the Jupiter artifacts. -->
+        <junit.jupiter.version>6.1.3</junit.jupiter.version>
+        <junit.platform.version>6.1.3</junit.platform.version>
+        <jacoco.version>0.8.13</jacoco.version>
+    </properties>
+
+    <profiles>
+        <profile>
+            <id>not_dev</id>
+            <activation>
+                <property>
+                    <!-- this will automatically be enabled when not using m2e/eclipse -->
+                    <name>!m2e.version</name>
+                </property>
+            </activation>
+            <!--
+                The servoy bundles are not available from m2e/Eclipse (there they are
+                resolved as workspace project references). When building with the Maven
+                CLI (Jenkins or a local `mvn`) they have to come from the repository, so
+                their versions/activation are centralized here and each module's own
+                not_dev profile declares only the ones it needs.
+            -->
+            <dependencyManagement>
+                <dependencies>
+                    <dependency>
+                        <groupId>com.servoy</groupId>
+                        <artifactId>servoy_shared</artifactId>
+                        <version>${project.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>com.servoy</groupId>
+                        <artifactId>servoy_base</artifactId>
+                        <version>${project.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>com.servoy</groupId>
+                        <artifactId>org.eclipse.dltk.javascript.rhino</artifactId>
+                        <version>${rhino.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>com.servoy</groupId>
+                        <artifactId>servoy_headless_client</artifactId>
+                        <version>${project.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>com.servoy</groupId>
+                        <artifactId>servoy_smart_client</artifactId>
+                        <version>${project.version}</version>
+                    </dependency>
+                </dependencies>
+            </dependencyManagement>
+        </profile>
+    </profiles>
+</project>
