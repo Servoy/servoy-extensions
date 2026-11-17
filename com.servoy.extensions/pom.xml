@@ -285,6 +285,25 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.13.0</version>
             </plugin>
+            <!-- JaCoCo report for this module's classes. The runtime data (target/jacoco.exec)
+                 is written by the jacoco-prepare-agent in com.servoy.extensions.test, which runs
+                 its tests against these classes. jacoco:report can only analyse its own module's
+                 output, so it is run here (like Servoy-Copilot's host-bundle report). The report
+                 is produced as a SEPARATE Jenkins step after the test module has run
+                 (mvn ... org.jacoco:jacoco-maven-plugin:report -pl com.servoy.extensions); it is
+                 not bound to a phase, so a normal reactor build - where jacoco.exec does not yet
+                 exist when this module builds - is unaffected. Jenkins publishes
+                 target/site/jacoco/jacoco.xml via recordCoverage. -->
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>${jacoco.version}</version>
+                <configuration>
+                    <!-- the exec file written by the test module's agent -->
+                    <dataFile>${project.build.directory}/jacoco.exec</dataFile>
+                    <outputDirectory>${project.build.directory}/site/jacoco</outputDirectory>
+                </configuration>
+            </plugin>
             <plugin>
                 <artifactId>maven-antrun-plugin</artifactId>
                 <version>3.1.0</version>
