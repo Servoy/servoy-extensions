@@ -5,9 +5,12 @@
     <prerequisites>
         <maven>3.9.0</maven>
     </prerequisites>
-    <groupId>com.servoy</groupId>
+    <parent>
+        <groupId>com.servoy</groupId>
+        <artifactId>com.servoy.extensions.parent</artifactId>
+        <version>2026.3.3-SNAPSHOT</version>
+    </parent>
     <artifactId>com.servoy.extensions</artifactId>
-    <version>2026.3.3-SNAPSHOT</version>
     <repositories>
         <repository>
             <id>developer_repo</id>
@@ -79,31 +82,27 @@
                     <name>!m2e.version</name>
                 </property>
             </activation>
+            <!-- versions are managed by the parent pom's not_dev profile -->
             <dependencies>
                 <dependency>
                     <groupId>com.servoy</groupId>
                     <artifactId>servoy_shared</artifactId>
-                    <version>${project.version}</version>
                 </dependency>
                 <dependency>
                     <groupId>com.servoy</groupId>
                     <artifactId>servoy_base</artifactId>
-                    <version>${project.version}</version>
                 </dependency>
                 <dependency>
                     <groupId>com.servoy</groupId>
                     <artifactId>org.eclipse.dltk.javascript.rhino</artifactId>
-                    <version>${rhino.version}</version>
                 </dependency>
                 <dependency>
                     <groupId>com.servoy</groupId>
                     <artifactId>servoy_headless_client</artifactId>
-                    <version>${project.version}</version>
                 </dependency>
                 <dependency>
                     <groupId>com.servoy</groupId>
                     <artifactId>servoy_smart_client</artifactId>
-                    <version>${project.version}</version>
                 </dependency>
             </dependencies>
             <build>

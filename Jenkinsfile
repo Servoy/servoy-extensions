@@ -60,8 +60,8 @@ pipeline {
                     configFile(fileId: 'master_mvn_repo', variable: 'MAVEN_SETTINGS'),
                     configFile(fileId: 'maven_toolchain', variable: 'TOOLCHAIN')
                 ]) {
-                    // Via -f wijzen we direct naar de specifieke submap-POM uit de oude configuratie
-                    sh 'mvn -B -s "$MAVEN_SETTINGS" -t "$TOOLCHAIN" -f com.servoy.extensions/pom.xml $goals'
+                    // Build the parent reactor (main plugin + test module) so the tests also run in CI
+                    sh 'mvn -B -s "$MAVEN_SETTINGS" -t "$TOOLCHAIN" -f pom.xml $goals'
                 }
             }
         }
