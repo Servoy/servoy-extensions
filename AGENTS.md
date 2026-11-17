@@ -29,10 +29,13 @@ reactor** (`com.servoy.extensions.parent`, root `pom.xml`, packaging `pom`) over
 - **Main Role:** Unit tests for the plugins. Tests live under
   `src/test/java/com/servoy/extensions/plugins/<pluginname>/`, mirroring the production package
   so they get package-private access to the classes under test.
-- **Test framework:** **JUnit 4** (`org.junit.Test`, `org.junit.Assert.*`, `@Before`/`@After`).
-  Do **not** introduce JUnit 5/Jupiter or Mockito unless a test genuinely needs it and you add
-  the dependency to this module's `pom.xml`; the default is plain JUnit 4 with hand-written
-  fakes/stubs. Surefire include pattern: `**/*Test.java`, so a test class name must end in `Test`.
+- **Test framework:** **JUnit 6 (Jupiter)** — `org.junit.jupiter.api.Test`,
+  `org.junit.jupiter.api.Assertions.*`, `@BeforeEach`/`@AfterEach`. From Servoy 2026.03 LTS all
+  tests are on JUnit 6; do **not** add JUnit 4 or Mockito unless a test genuinely needs it (and
+  then add it to this module's `pom.xml`). The default is plain Jupiter with hand-written
+  fakes/stubs. Surefire runs the JUnit Platform provider (`surefire-junit-platform`); include
+  pattern `**/*Test.java`, so a test class name must end in `Test`. The Jupiter version is the
+  parent pom property `junit.jupiter.version`.
 - **Depends on** `com.servoy.extensions` (so it can reference the plugin classes).
 
 ### Shared servoy bundles (read-only here)
@@ -178,7 +181,7 @@ After any code change via the Eclipse MCP tools, run a self-verification loop:
 
 ## Testing
 
-Unit tests live in **`com.servoy.extensions.test`** (plain Maven, JUnit 4), under
+Unit tests live in **`com.servoy.extensions.test`** (plain Maven, JUnit 6 / Jupiter), under
 `src/test/java/com/servoy/extensions/plugins/<pluginname>/`, in the **same package** as the code
 under test for package-private access.
 
@@ -202,7 +205,7 @@ channel, which was never rebuilt, silently stopping pod-wide databroadcast until
 
 | Test class | Package | Type | Runner |
 |-----------|---------|------|--------|
-| `DataNotifyBroadCasterRecoveryTest` | `com.servoy.extensions.plugins.broadcaster` (`com.servoy.extensions.test`) | Plain JUnit 4, broker-free (fakes `FakeChannel`/`FakeConnection`/`FakeServerAccess`) | CI: reactor surefire (`**/*Test.java`). Locally: `eclipse-ide_runJUnitTests` (project `com.servoy.extensions.test`) |
+| `DataNotifyBroadCasterRecoveryTest` | `com.servoy.extensions.plugins.broadcaster` (`com.servoy.extensions.test`) | Plain JUnit 6 (Jupiter), broker-free (fakes `FakeChannel`/`FakeConnection`/`FakeServerAccess`) | CI: reactor surefire (`**/*Test.java`). Locally: `eclipse-ide_runJUnitTests` (project `com.servoy.extensions.test`) |
 
 Notes:
 - The test drives the real private `installShutdownListener` / `rebuildChannel` /

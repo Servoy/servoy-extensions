@@ -52,10 +52,15 @@ possible — it is the source of truth for Java here and is always in sync with 
 
 ## Testing conventions
 
-- **JUnit 4** (`org.junit.Test`, `org.junit.Assert.*`) — that is what the existing test
-  (`RestWSServletMultipartDetectionTest`) uses. Do not introduce JUnit 5 or Mockito unless a
-  test genuinely needs it and you note the new dependency in the test pom; default to plain
-  JUnit 4 with hand-written fakes/stubs.
+- **JUnit 6 (Jupiter)** — `org.junit.jupiter.api.Test`,
+  `org.junit.jupiter.api.Assertions.*`, `@BeforeEach`/`@AfterEach`. From Servoy 2026.03 LTS all
+  tests are on JUnit 6 (both `DataNotifyBroadCasterRecoveryTest` and the older
+  `RestWSServletMultipartDetectionTest` were migrated). Do not introduce JUnit 4 or Mockito
+  unless a test genuinely needs it (and then note the new dependency in the test pom); default
+  to plain Jupiter with hand-written fakes/stubs. Remember the Jupiter assertion-message order:
+  the message is the **last** argument (`assertEquals(expected, actual, "msg")`), unlike JUnit 4.
+- The Jupiter version is the parent pom property `junit.jupiter.version`; surefire runs the
+  JUnit Platform provider (`surefire-junit-platform`).
 - Test class name ends in `Test` (surefire include `**/*Test.java`).
 - Place tests in `com.servoy.extensions.test` under the package of the class under test,
   e.g. broadcaster tests → `src/test/java/com/servoy/extensions/plugins/broadcaster/`.

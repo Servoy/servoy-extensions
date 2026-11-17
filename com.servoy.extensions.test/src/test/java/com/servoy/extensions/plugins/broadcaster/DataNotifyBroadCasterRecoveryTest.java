@@ -16,12 +16,12 @@
  */
 package com.servoy.extensions.plugins.broadcaster;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -31,8 +31,8 @@ import java.util.Properties;
 import java.util.concurrent.AbstractExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.servoy.j2db.plugins.IDataNotifyService;
 import com.servoy.j2db.util.DataSourceUtils;
@@ -69,8 +69,8 @@ public class DataNotifyBroadCasterRecoveryTest {
 	private DataNotifyListener listener;
 	private RecordingDataNotifyService dataNotifyService;
 
-	@Before
-	public void setUp() throws Exception {
+	@BeforeEach
+	void setUp() throws Exception {
 		plugin = new DataNotifyBroadCaster();
 		// a generous 1 MB frame max -> ~1 MB-minus-margin effective limit for most
 		// tests
@@ -109,20 +109,20 @@ public class DataNotifyBroadCasterRecoveryTest {
 
 		channel.fireShutdown(shutdown(false));
 
-		assertEquals("a fresh channel must be created from the still-open connection", 1,
-				connection.createChannelCount);
-		assertSame("the holder must point at the rebuilt channel", rebuilt, holder.getChannel());
-		assertEquals("the fanout exchange must be re-declared on the new channel", 1, rebuilt.declaredExchanges.size());
+		assertEquals(1, connection.createChannelCount,
+				"a fresh channel must be created from the still-open connection");
+		assertSame(rebuilt, holder.getChannel(), "the holder must point at the rebuilt channel");
+		assertEquals(1, rebuilt.declaredExchanges.size(), "the fanout exchange must be re-declared on the new channel");
 		assertEquals("databroadcast", rebuilt.declaredExchanges.get(0));
-		assertEquals("the queue must be re-declared/bound on the new channel", 1, rebuilt.boundQueues.size());
-		assertEquals("the consumer must be re-registered on the new channel", 1, rebuilt.consumers.size());
-		assertFalse("a fresh shutdown listener must be installed on the new channel",
-				rebuilt.shutdownListeners.isEmpty());
+		assertEquals(1, rebuilt.boundQueues.size(), "the queue must be re-declared/bound on the new channel");
+		assertEquals(1, rebuilt.consumers.size(), "the consumer must be re-registered on the new channel");
+		assertFalse(rebuilt.shutdownListeners.isEmpty(),
+				"a fresh shutdown listener must be installed on the new channel");
 
 		// a publish after the rebuild lands on the NEW channel, not the dead one
 		listener.notifyDataChange("srv", "tab", null, 1, null, null);
-		assertEquals("nothing should be published on the dead channel after rebuild", 0, channel.publishCount());
-		assertEquals("the publish must land on the rebuilt channel", 1, rebuilt.publishCount());
+		assertEquals(0, channel.publishCount(), "nothing should be published on the dead channel after rebuild");
+		assertEquals(1, rebuilt.publishCount(), "the publish must land on the rebuilt channel");
 	}
 
 	// ---------------------------------------------------------------------------------------------
@@ -142,7 +142,7 @@ public class DataNotifyBroadCasterRecoveryTest {
 		listener.notifyDataChange("srv", "t", dataset(1), 1, null, null);
 		listener.notifyDataChange("srv", "t", dataset(2), 1, null, null);
 		listener.notifyDataChange("srv", "t", dataset(3), 1, null, null);
-		assertEquals("all three must be queued while the channel is closed", 3, failedListSize());
+		assertEquals(3, failedListSize(), "all three must be queued while the channel is closed");
 
 		FakeChannel rebuilt = new FakeChannel();
 		connection.enqueueChannel(rebuilt);
@@ -150,16 +150,16 @@ public class DataNotifyBroadCasterRecoveryTest {
 		holder.getChannel(); // dead channel still in holder
 		rebuildNow();
 
-		assertEquals("the whole failedList must drain onto the rebuilt channel", 3, rebuilt.publishCount());
-		assertEquals("the failedList must be emptied after draining", 0, failedListSize());
-		assertTrue("all drained bodies must be within the limit",
-				rebuilt.publishes.stream().allMatch(p -> p.size() <= effectiveLimit()));
-		// FIFO: the three notifies must drain in the order they were queued (pk 1, 2, 3)
+		assertEquals(3, rebuilt.publishCount(), "the whole failedList must drain onto the rebuilt channel");
+		assertEquals(0, failedListSize(), "the failedList must be emptied after draining");
+		assertTrue(rebuilt.publishes.stream().allMatch(p -> p.size() <= effectiveLimit()),
+				"all drained bodies must be within the limit");
+		// FIFO: the three notifies must drain in the order they were queued (pk 1, 2,
+		// 3)
 		for (int i = 0; i < 3; i++) {
 			NotifyData drained = deserialize(rebuilt.publishes.get(i).body);
 			assertNotNull(drained);
-			assertEquals("drained entries must preserve FIFO order", Integer.valueOf(i + 1),
-					drained.pks.getRow(0)[0]);
+			assertEquals(Integer.valueOf(i + 1), drained.pks.getRow(0)[0], "drained entries must preserve FIFO order");
 		}
 	}
 
@@ -174,8 +174,8 @@ public class DataNotifyBroadCasterRecoveryTest {
 
 		channel.fireShutdown(shutdown(true));
 
-		assertEquals("an application-initiated close must not create a new channel", 0, connection.createChannelCount);
-		assertSame("the holder must still point at the original channel", channel, holder.getChannel());
+		assertEquals(0, connection.createChannelCount, "an application-initiated close must not create a new channel");
+		assertSame(channel, holder.getChannel(), "the holder must still point at the original channel");
 	}
 
 	// ---------------------------------------------------------------------------------------------
@@ -190,8 +190,8 @@ public class DataNotifyBroadCasterRecoveryTest {
 
 		channel.fireShutdown(shutdown(false));
 
-		assertEquals("no rebuild when the connection itself is closing - the connection recovery path owns that", 0,
-				connection.createChannelCount);
+		assertEquals(0, connection.createChannelCount,
+				"no rebuild when the connection itself is closing - the connection recovery path owns that");
 		assertSame(channel, holder.getChannel());
 	}
 
@@ -203,7 +203,7 @@ public class DataNotifyBroadCasterRecoveryTest {
 
 		channel.fireShutdown(shutdown(false));
 
-		assertEquals("no rebuild while the plugin is unloading", 0, connection.createChannelCount);
+		assertEquals(0, connection.createChannelCount, "no rebuild while the plugin is unloading");
 	}
 
 	// ---------------------------------------------------------------------------------------------
@@ -222,8 +222,8 @@ public class DataNotifyBroadCasterRecoveryTest {
 
 		channel.fireShutdown(shutdown(false));
 
-		assertEquals("a shutdown while a rebuild is already in progress must not start another", 0,
-				connection.createChannelCount);
+		assertEquals(0, connection.createChannelCount,
+				"a shutdown while a rebuild is already in progress must not start another");
 	}
 
 	@Test
@@ -237,8 +237,8 @@ public class DataNotifyBroadCasterRecoveryTest {
 		// still bounded, never a tight loop.
 		rebuildNow();
 
-		assertEquals("rebuild must stop after MAX_REBUILD_ATTEMPTS (3) failures, not loop forever", 3,
-				connection.createChannelCount);
+		assertEquals(3, connection.createChannelCount,
+				"rebuild must stop after MAX_REBUILD_ATTEMPTS (3) failures, not loop forever");
 	}
 
 	// ---------------------------------------------------------------------------------------------
@@ -259,19 +259,19 @@ public class DataNotifyBroadCasterRecoveryTest {
 		Object[] big = new Object[] { new byte[8192] };
 		listener.notifyDataChange("srv", "tab", dataset(1), 1, big, filters);
 
-		assertEquals("exactly one body must be published", 1, channel.publishCount());
+		assertEquals(1, channel.publishCount(), "exactly one body must be published");
 		FakeChannel.Publish p = channel.lastPublish();
-		assertTrue("the published body must be within the limit (a small flush, not the oversized row)",
-				p.size() <= 2048);
+		assertTrue(p.size() <= 2048,
+				"the published body must be within the limit (a small flush, not the oversized row)");
 
 		// the published body must be a datasource FLUSH NotifyData for the correct
 		// datasource, filters preserved
 		NotifyData published = deserialize(p.body);
 		assertNotNull(published);
-		assertEquals("the flush must carry the db:/srv/tab datasource",
-				DataSourceUtils.createDBTableDataSource("srv", "tab"), published.dataSource);
-		assertNull("a flush carries no row data", published.pks);
-		assertNotNull("broadcastFilters must be preserved on the flush", published.broadcastFilters);
+		assertEquals(DataSourceUtils.createDBTableDataSource("srv", "tab"), published.dataSource,
+				"the flush must carry the db:/srv/tab datasource");
+		assertNull(published.pks, "a flush carries no row data");
+		assertNotNull(published.broadcastFilters, "broadcastFilters must be preserved on the flush");
 		assertEquals(1, published.broadcastFilters.length);
 	}
 
@@ -287,10 +287,10 @@ public class DataNotifyBroadCasterRecoveryTest {
 		assertEquals(1, channel.publishCount());
 		NotifyData published = deserialize(channel.lastPublish().body);
 		assertNotNull(published);
-		assertEquals("the raw row notify must be published unchanged", "srv", published.server_name);
-		assertEquals("tab", published.table_name);
-		assertNotNull("the pks (raw row data) must be present", published.pks);
-		assertNull("an in-limit row notify must not be converted to a flush", published.dataSource);
+		assertEquals("srv", published.server_name, "the raw row notify must be published unchanged");
+		assertEquals(published.table_name, "tab");
+		assertNotNull(published.pks, "the pks (raw row data) must be present");
+		assertNull(published.dataSource, "an in-limit row notify must not be converted to a flush");
 	}
 
 	// ---------------------------------------------------------------------------------------------
@@ -301,7 +301,7 @@ public class DataNotifyBroadCasterRecoveryTest {
 	@Test
 	public void maxMessageSizeSettingIsHonouredBelowFrameMax() throws Exception {
 		settings().setProperty("amqpbroadcaster.maxmessagesize", "1024");
-		assertEquals("the explicit setting must win", 1024L, invokeEffectiveMaxMessageSize());
+		assertEquals(1024L, invokeEffectiveMaxMessageSize(), "the explicit setting must win");
 	}
 
 	@Test
@@ -315,8 +315,8 @@ public class DataNotifyBroadCasterRecoveryTest {
 	public void unlimitedFrameMaxFallsBackToSafeDefault() throws Exception {
 		connection.setFrameMax(0);
 		long expected = (16L * 1024 * 1024) - (16 * 1024);
-		assertEquals("a 0/unlimited frame max must fall back to the 16 MB-minus-margin default", expected,
-				invokeEffectiveMaxMessageSize());
+		assertEquals(expected, invokeEffectiveMaxMessageSize(),
+				"a 0/unlimited frame max must fall back to the 16 MB-minus-margin default");
 	}
 
 	// ---------------------------------------------------------------------------------------------
@@ -328,16 +328,16 @@ public class DataNotifyBroadCasterRecoveryTest {
 		settings().setProperty("amqpbroadcaster.maxmessagesize", "256");
 		IBroadcastMessageSender sender = plugin.registerMessageBroadcastConsumer(message -> {
 			/* no-op consumer */});
-		assertNotNull("a sender must be returned when the holder is set", sender);
+		assertNotNull(sender, "a sender must be returned when the holder is set");
 
 		StringBuilder huge = new StringBuilder();
 		for (int i = 0; i < 2000; i++)
 			huge.append('x');
 		sender.sendMessage(new BroadcastMessage("other-origin", huge.toString(), "name", "channel"));
 
-		assertEquals("an oversized BroadcastMessage must never reach basicPublish (channel stays open)", 0,
-				channel.publishCount());
-		assertTrue("the channel must still be open after skipping the oversize", channel.isOpen());
+		assertEquals(0, channel.publishCount(),
+				"an oversized BroadcastMessage must never reach basicPublish (channel stays open)");
+		assertTrue(channel.isOpen(), "the channel must still be open after skipping the oversize");
 	}
 
 	@Test
@@ -345,7 +345,7 @@ public class DataNotifyBroadCasterRecoveryTest {
 		IBroadcastMessageSender sender = plugin.registerMessageBroadcastConsumer(message -> {
 			/* no-op */});
 		sender.sendMessage(new BroadcastMessage("other-origin", "hello", "name", "channel"));
-		assertEquals("a small message must be published normally", 1, channel.publishCount());
+		assertEquals(1, channel.publishCount(), "a small message must be published normally");
 	}
 
 	// ---------------------------------------------------------------------------------------------
@@ -374,13 +374,13 @@ public class DataNotifyBroadCasterRecoveryTest {
 
 		// every queued oversized entry must have been converted to a small flush on
 		// drain
-		assertEquals("all five must drain", 5, rebuilt.publishCount());
+		assertEquals(5, rebuilt.publishCount(), "all five must drain");
 		for (FakeChannel.Publish p : rebuilt.publishes) {
-			assertTrue("no raw oversized body may ever be handed to basicPublish (guards against the churn loop)",
-					p.size() <= 2048);
+			assertTrue(p.size() <= 2048,
+					"no raw oversized body may ever be handed to basicPublish (guards against the churn loop)");
 			NotifyData nd = deserialize(p.body);
 			assertNotNull(nd);
-			assertNull("each drained oversized entry must be a flush, not raw row data", nd.pks);
+			assertNull(nd.pks, "each drained oversized entry must be a flush, not raw row data");
 			assertEquals(DataSourceUtils.createDBTableDataSource("srv", "tab"), nd.dataSource);
 		}
 	}
@@ -407,8 +407,8 @@ public class DataNotifyBroadCasterRecoveryTest {
 
 		// first entry failed -> re-queued; second entry published. One body made it,
 		// one is back on the list.
-		assertEquals("the transiently failed entry must be re-queued", 1, failedListSize());
-		assertEquals("the other entry must have been published", 1, rebuilt.publishCount());
+		assertEquals(1, failedListSize(), "the transiently failed entry must be re-queued");
+		assertEquals(1, rebuilt.publishCount(), "the other entry must have been published");
 	}
 
 	// =============================================================================================
