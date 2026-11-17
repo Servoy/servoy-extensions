@@ -6,6 +6,13 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="src" output="target/test-classes" path="test">
+		<attributes>
+			<attribute name="test" value="true"/>
+			<attribute name="optional" value="true"/>
+			<attribute name="maven.pomderived" value="true"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry combineaccessrules="false" kind="src" path="/servoy_headless_client"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/servoy_shared"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/servoy_smart_client"/>

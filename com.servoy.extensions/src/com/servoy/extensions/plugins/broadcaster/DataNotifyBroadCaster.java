@@ -37,6 +37,7 @@ import java.util.Properties;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
@@ -88,13 +89,41 @@ public class DataNotifyBroadCaster implements IServerPlugin
 	private static final String ROUTING_KEY = "";
 	public static final String ORIGIN_SERVER_UUID = UUID.randomUUID().toString();
 
+	/**
+	 * Conservative safety margin (bytes) subtracted from the broker frame max to leave room for AMQP
+	 * frame/header overhead, so we never hand the broker a body that fills the whole frame.
+	 */
+	private static final int FRAME_SAFETY_MARGIN = 16 * 1024;
+
+	/**
+	 * Fallback maximum body size (16 MB minus the safety margin) used when neither
+	 * amqpbroadcaster.maxmessagesize nor a usable broker frame max is available. Matches the common
+	 * 16 MB broker default that triggered SCS-3537.
+	 */
+	private static final long DEFAULT_MAX_MESSAGE_SIZE = 16L * 1024 * 1024 - FRAME_SAFETY_MARGIN;
+
+	/** Maximum consecutive channel-rebuild attempts before auto-rebuild gives up until the next connection recovery. */
+	private static final int MAX_REBUILD_ATTEMPTS = 3;
+
+	/** Short backoff between channel-rebuild attempts (ms) so we never retry in a tight loop. */
+	private static final long REBUILD_BACKOFF_MS = 2000;
+
 	private Connection connection;
-	private Channel channel;
+	private ChannelHolder channelHolder;
+	private DataNotifyListener dataNotifyListener;
 	private ExecutorService sharedExecutor;
 	private ExecutorService shutdownExecutor;
 
 	private IBroadcastMessageConsumer messageConsumer;
 	private IServerAccess application;
+
+	private volatile boolean unloading = false;
+	private final AtomicBoolean rebuilding = new AtomicBoolean(false);
+	private volatile int rebuildAttempts = 0;
+
+	private String exchangeName;
+	private String routingKey;
+	private Map<String, Object> queueArgs;
 
 	@Override
 	public void load() throws PluginException
@@ -104,8 +133,10 @@ public class DataNotifyBroadCaster implements IServerPlugin
 	@Override
 	public void unload() throws PluginException
 	{
+		unloading = true;
 		try
 		{
+			Channel channel = channelHolder != null ? channelHolder.getChannel() : null;
 			if (channel != null && channel.isOpen()) channel.close();
 			if (connection != null && connection.isOpen()) connection.close();
 		}
@@ -225,8 +256,23 @@ public class DataNotifyBroadCaster implements IServerPlugin
 			}
 
 
-			String exchangeName = app.getSettings().getProperty("amqpbroadcaster.exchange", EXCHANGE_NAME);
-			String routingKey = app.getSettings().getProperty("amqpbroadcaster.routingkey", ROUTING_KEY);
+			this.exchangeName = app.getSettings().getProperty("amqpbroadcaster.exchange", EXCHANGE_NAME);
+			this.routingKey = app.getSettings().getProperty("amqpbroadcaster.routingkey", ROUTING_KEY);
+
+			String queuetype = app.getSettings().getProperty("amqpbroadcaster.queuetype", null);
+			String singleActiveConsumer = app.getSettings().getProperty("amqpbroadcaster.singleactiveconsumer", null);
+			if (queuetype != null || singleActiveConsumer != null)
+			{
+				this.queueArgs = new HashMap<>();
+				if (queuetype != null)
+				{
+					this.queueArgs.put("x-queue-type", queuetype);
+				}
+				if (singleActiveConsumer != null)
+				{
+					this.queueArgs.put("x-single-active-consumer", Boolean.valueOf(singleActiveConsumer));
+				}
+			}
 
 			try
 			{
@@ -248,6 +294,9 @@ public class DataNotifyBroadCaster implements IServerPlugin
 						{
 							Debug.log("RabbitMQ connection is in recovery mode," + exchangeName + " " + routingKey +
 								" for the datanotify listener, sending a flush all for all datasources");
+							// a genuine connection-level recovery window has opened again, so re-enable channel
+							// auto-rebuild that may have been locked out after MAX_REBUILD_ATTEMPTS
+							rebuildAttempts = 0;
 							// when a connection is recovered, we don't know what we missed so the only thing to do is a full flush
 							// of all the touched datasources.
 							String[] datasources = dataNotifyService.getUsedDataSources();
@@ -258,83 +307,15 @@ public class DataNotifyBroadCaster implements IServerPlugin
 						}
 					});
 				}
-				channel = connection.createChannel();
+				Channel channel = connection.createChannel();
+				this.channelHolder = new ChannelHolder(channel);
 
-				channel.exchangeDeclare(exchangeName, "fanout");
-				dataNotifyService.registerDataNotifyListener(new DataNotifyListener(ORIGIN_SERVER_UUID, channel, connection, exchangeName, routingKey));
+				declareExchange(channel);
+				this.dataNotifyListener = new DataNotifyListener(ORIGIN_SERVER_UUID, channelHolder, connection, exchangeName, routingKey, this);
+				dataNotifyService.registerDataNotifyListener(dataNotifyListener);
 
-				String queuetype = app.getSettings().getProperty("amqpbroadcaster.queuetype", null);
-				String singleActiveConsumer = app.getSettings().getProperty("amqpbroadcaster.singleactiveconsumer", null);
-				Map<String, Object> args = null;
-				if (queuetype != null || singleActiveConsumer != null)
-				{
-					args = new HashMap<>();
-					if (queuetype != null)
-					{
-						args.put("x-queue-type", queuetype);
-					}
-					if (singleActiveConsumer != null)
-					{
-						args.put("x-single-active-consumer", Boolean.valueOf(singleActiveConsumer));
-					}
-				}
-
-				String queueName = args != null ? channel.queueDeclare("", false, true, true, args).getQueue() : channel.queueDeclare().getQueue();
-				channel.queueBind(queueName, exchangeName, routingKey);
-
-				Consumer consumer = new DefaultConsumer(channel)
-				{
-
-					@Override
-					public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException
-					{
-						ByteArrayInputStream bais = new ByteArrayInputStream(body);
-						ObjectInputStream ois = new ObjectInputStream(bais);
-						try
-						{
-							Object readObject = ois.readObject();
-							if (readObject instanceof NotifyData)
-							{
-								NotifyData nd = (NotifyData)readObject;
-								if (!ORIGIN_SERVER_UUID.equals(nd.originServerUUID))
-								{
-									if (nd.dataSource != null)
-									{
-										dataNotifyService.flushCachedDatabaseData(nd.dataSource, nd.broadcastFilters);
-									}
-									else
-									{
-										dataNotifyService.notifyDataChange(nd.server_name, nd.table_name, nd.pks, nd.action, nd.insertColumnData,
-											nd.broadcastFilters);
-									}
-								}
-							}
-							else if (readObject instanceof BroadcastMessage)
-							{
-								if (DataNotifyBroadCaster.this.messageConsumer != null)
-								{
-									if (!ORIGIN_SERVER_UUID.equals(((BroadcastMessage)readObject).originServerUUID))
-									{
-										DataNotifyBroadCaster.this.messageConsumer.handleDelivery((BroadcastMessage)readObject);
-									}
-								}
-								else
-								{
-									Debug.error("a message came without messageConsumer being set: " + readObject);
-								}
-							}
-							else
-							{
-								Debug.error("an object get from the queue that was not an NotifyData: " + readObject);
-							}
-						}
-						catch (Exception e)
-						{
-							Debug.error(e);
-						}
-					}
-				};
-				channel.basicConsume(queueName, true, "", true, false, null, consumer);
+				declareAndConsume(channel, dataNotifyService);
+				installShutdownListener(channel, dataNotifyService);
 			}
 			catch (Exception e)
 			{
@@ -343,9 +324,218 @@ public class DataNotifyBroadCaster implements IServerPlugin
 		}
 	}
 
+	/**
+	 * Declares the fanout exchange on the given channel. Shared by the initial setup and the channel
+	 * rebuild path so both declare the exchange identically.
+	 */
+	private void declareExchange(Channel channel) throws IOException
+	{
+		channel.exchangeDeclare(exchangeName, "fanout");
+	}
+
+	/**
+	 * Declares and binds the consumer queue (with the same queuetype / singleactiveconsumer args as the
+	 * original declare) and registers the DefaultConsumer on the given channel. Shared by the initial
+	 * setup and the channel rebuild path.
+	 */
+	private void declareAndConsume(Channel channel, final IDataNotifyService dataNotifyService) throws IOException
+	{
+		String queueName = queueArgs != null ? channel.queueDeclare("", false, true, true, queueArgs).getQueue() : channel.queueDeclare().getQueue();
+		channel.queueBind(queueName, exchangeName, routingKey);
+
+		Consumer consumer = new DefaultConsumer(channel)
+		{
+
+			@Override
+			public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException
+			{
+				ByteArrayInputStream bais = new ByteArrayInputStream(body);
+				ObjectInputStream ois = new ObjectInputStream(bais);
+				try
+				{
+					Object readObject = ois.readObject();
+					if (readObject instanceof NotifyData)
+					{
+						NotifyData nd = (NotifyData)readObject;
+						if (!ORIGIN_SERVER_UUID.equals(nd.originServerUUID))
+						{
+							if (nd.dataSource != null)
+							{
+								dataNotifyService.flushCachedDatabaseData(nd.dataSource, nd.broadcastFilters);
+							}
+							else
+							{
+								dataNotifyService.notifyDataChange(nd.server_name, nd.table_name, nd.pks, nd.action, nd.insertColumnData,
+									nd.broadcastFilters);
+							}
+						}
+					}
+					else if (readObject instanceof BroadcastMessage)
+					{
+						if (DataNotifyBroadCaster.this.messageConsumer != null)
+						{
+							if (!ORIGIN_SERVER_UUID.equals(((BroadcastMessage)readObject).originServerUUID))
+							{
+								DataNotifyBroadCaster.this.messageConsumer.handleDelivery((BroadcastMessage)readObject);
+							}
+						}
+						else
+						{
+							Debug.error("a message came without messageConsumer being set: " + readObject);
+						}
+					}
+					else
+					{
+						Debug.error("an object get from the queue that was not an NotifyData: " + readObject);
+					}
+				}
+				catch (Exception e)
+				{
+					Debug.error(e);
+				}
+			}
+		};
+		channel.basicConsume(queueName, true, "", true, false, null, consumer);
+	}
+
+	/**
+	 * Installs a channel-level ShutdownListener that rebuilds the channel when the broker closes it for
+	 * a channel-level protocol error (e.g. precondition_failed, reply-code 406) while the TCP connection
+	 * stays open. Application-initiated closes (our own unload()/channel.close()) and closes that happen
+	 * because the connection itself is going down are left to the connection-level recovery path.
+	 */
+	private void installShutdownListener(final Channel channel, final IDataNotifyService dataNotifyService)
+	{
+		channel.addShutdownListener(cause -> {
+			boolean appInitiated = cause.isInitiatedByApplication();
+			Debug.warn("RabbitMQ databroadcast channel was shut down (" + (appInitiated ? "application-initiated" : "broker-initiated") + "), reason: " +
+				cause.getReason() + ", exchange " + exchangeName + " routingKey " + routingKey);
+			if (unloading)
+			{
+				Debug.log("RabbitMQ databroadcast channel shutdown ignored, the plugin is unloading");
+				return;
+			}
+			if (appInitiated)
+			{
+				// our own close() / channel.close(); nothing to rebuild
+				return;
+			}
+			if (connection == null || !connection.isOpen())
+			{
+				// the connection itself is closing/closed; the connection RecoveryListener owns that and
+				// will re-flush, so a channel rebuild here would race it
+				Debug.log("RabbitMQ databroadcast channel shutdown while the connection is also closing, leaving recovery to the connection recovery path");
+				return;
+			}
+			if (!rebuilding.compareAndSet(false, true))
+			{
+				// a rebuild is already in progress; do not start another
+				Debug.log("RabbitMQ databroadcast channel rebuild already in progress, ignoring this shutdown signal");
+				return;
+			}
+			// never block the RabbitMQ shutdown dispatch thread - run the rebuild on the plugin executor
+			ExecutorService executor = shutdownExecutor != null ? shutdownExecutor : sharedExecutor;
+			if (executor == null)
+			{
+				rebuilding.set(false);
+				Debug.error("RabbitMQ databroadcast channel cannot be rebuilt, no executor available");
+				return;
+			}
+			executor.submit(() -> {
+				try
+				{
+					rebuildChannel(dataNotifyService);
+				}
+				finally
+				{
+					rebuilding.set(false);
+				}
+			});
+		});
+	}
+
+	/**
+	 * Rebuilds the single shared channel from the still-open connection after a broker-initiated channel
+	 * close: creates a fresh channel, re-declares the exchange, re-declares/binds the queue and
+	 * re-registers the consumer, installs a fresh ShutdownListener, publishes the new channel into the
+	 * holder and drains the publisher's failedList through the guarded publish path. Bounded by
+	 * {@link #MAX_REBUILD_ATTEMPTS} with a short backoff so it never retries in a tight loop.
+	 */
+	private void rebuildChannel(IDataNotifyService dataNotifyService)
+	{
+		while (rebuildAttempts < MAX_REBUILD_ATTEMPTS)
+		{
+			if (unloading || connection == null || !connection.isOpen())
+			{
+				return;
+			}
+			rebuildAttempts++;
+			Debug.warn("RabbitMQ databroadcast channel rebuild started (attempt " + rebuildAttempts + " of " + MAX_REBUILD_ATTEMPTS + "), exchange " +
+				exchangeName + " routingKey " + routingKey);
+			try
+			{
+				Channel newChannel = connection.createChannel();
+				declareExchange(newChannel);
+				declareAndConsume(newChannel, dataNotifyService);
+				installShutdownListener(newChannel, dataNotifyService);
+				channelHolder.setChannel(newChannel);
+				if (dataNotifyListener != null) dataNotifyListener.drainFailedList();
+				rebuildAttempts = 0;
+				Debug.warn("RabbitMQ databroadcast channel rebuild succeeded, exchange/queue re-declared and consumer re-registered, failedList drained");
+				return;
+			}
+			catch (Exception e)
+			{
+				Debug.error("RabbitMQ databroadcast channel rebuild failed (attempt " + rebuildAttempts + " of " + MAX_REBUILD_ATTEMPTS + ")", e);
+				if (rebuildAttempts >= MAX_REBUILD_ATTEMPTS)
+				{
+					Debug.error("RabbitMQ databroadcast channel rebuild giving up after " + MAX_REBUILD_ATTEMPTS +
+						" attempts, auto-rebuild stops until the next connection-level recovery");
+					return;
+				}
+				try
+				{
+					Thread.sleep(REBUILD_BACKOFF_MS);
+				}
+				catch (InterruptedException ie)
+				{
+					Thread.currentThread().interrupt();
+					return;
+				}
+			}
+		}
+	}
+
+	/**
+	 * Computes the effective maximum serialized databroadcast body size in bytes: the
+	 * amqpbroadcaster.maxmessagesize setting when set, else the broker frame max minus a safety margin,
+	 * else a safe 16 MB-minus-margin default when the frame max is 0/unlimited or unavailable.
+	 */
+	long getEffectiveMaxMessageSize(Connection conn)
+	{
+		if (application != null)
+		{
+			String configured = application.getSettings().getProperty("amqpbroadcaster.maxmessagesize");
+			if (!Utils.stringIsEmpty(configured))
+			{
+				long value = Utils.getAsLong(configured);
+				if (value > 0) return value;
+			}
+		}
+		if (conn != null)
+		{
+			int frameMax = conn.getFrameMax();
+			if (frameMax > FRAME_SAFETY_MARGIN)
+			{
+				return frameMax - FRAME_SAFETY_MARGIN;
+			}
+		}
+		return DEFAULT_MAX_MESSAGE_SIZE;
+	}
+
 	public IBroadcastMessageSender registerMessageBroadcastConsumer(IBroadcastMessageConsumer mc)
 	{
-		if (this.channel != null)
+		if (this.channelHolder != null)
 		{
 			final String exchange = application.getSettings().getProperty("amqpbroadcaster.exchange", EXCHANGE_NAME);
 			final String routing = application.getSettings().getProperty("amqpbroadcaster.routingkey", ROUTING_KEY);
@@ -368,12 +558,24 @@ public class DataNotifyBroadCaster implements IServerPlugin
 				{
 					if (baos != null)
 					{
-						if (!connection.isOpen() || !channel.isOpen())
+						// read the current (possibly rebuilt) channel from the holder so we publish on a live channel
+						Channel channel = channelHolder.getChannel();
+						if (!connection.isOpen() || channel == null || !channel.isOpen())
 						{
 							Debug.warn("RabbitMQ message broadcast skipped, connection or channel is not open");
 							return;
 						}
-						channel.basicPublish(exchange, routing, null, baos.toByteArray());
+						byte[] bytes = baos.toByteArray();
+						long maxSize = getEffectiveMaxMessageSize(connection);
+						if (bytes.length > maxSize)
+						{
+							// a BroadcastMessage is opaque so there is no flush fallback; skip it and keep the channel
+							// alive rather than letting the broker close it for an oversize (precondition_failed)
+							Debug.error("RabbitMQ message broadcast skipped, serialized message is oversized (" + bytes.length + " bytes, limit " + maxSize +
+								" bytes): " + message);
+							return;
+						}
+						channel.basicPublish(exchange, routing, null, bytes);
 					}
 				}
 				catch (Exception e)
@@ -416,6 +618,8 @@ public class DataNotifyBroadCaster implements IServerPlugin
 			"Set the thread pool size for the shared executor used by the RabbitMQ client for consumer dispatch and error handling (default 4)");
 		req.put("amqpbroadcaster.shutdownexecutor.poolsize",
 			"Set the thread pool size for the shutdown executor used to process connection/channel shutdown signals (default 2)");
+		req.put("amqpbroadcaster.maxmessagesize",
+			"Maximum serialized databroadcast payload size in bytes before falling back to a datasource flush instead of the raw row data (default: derived from the broker frame max with a safety margin, or 16MB minus margin when unlimited)");
 		return req;
 	}
 

@@ -5,9 +5,12 @@
     <prerequisites>
         <maven>3.9.0</maven>
     </prerequisites>
-    <groupId>com.servoy</groupId>
+    <parent>
+        <groupId>com.servoy</groupId>
+        <artifactId>com.servoy.extensions.parent</artifactId>
+        <version>2026.9.1-SNAPSHOT</version>
+    </parent>
     <artifactId>com.servoy.extensions</artifactId>
-    <version>2026.12.0-SNAPSHOT</version>
     <repositories>
         <repository>
             <id>developer_repo</id>
@@ -79,31 +82,27 @@
                     <name>!m2e.version</name>
                 </property>
             </activation>
+            <!-- versions are managed by the parent pom's not_dev profile -->
             <dependencies>
                 <dependency>
                     <groupId>com.servoy</groupId>
                     <artifactId>servoy_shared</artifactId>
-                    <version>${project.version}</version>
                 </dependency>
                 <dependency>
                     <groupId>com.servoy</groupId>
                     <artifactId>servoy_base</artifactId>
-                    <version>${project.version}</version>
                 </dependency>
                 <dependency>
                     <groupId>com.servoy</groupId>
                     <artifactId>org.eclipse.dltk.javascript.rhino</artifactId>
-                    <version>${rhino.version}</version>
                 </dependency>
                 <dependency>
                     <groupId>com.servoy</groupId>
                     <artifactId>servoy_headless_client</artifactId>
-                    <version>${project.version}</version>
                 </dependency>
                 <dependency>
                     <groupId>com.servoy</groupId>
                     <artifactId>servoy_smart_client</artifactId>
-                    <version>${project.version}</version>
                 </dependency>
             </dependencies>
             <build>
@@ -260,6 +259,10 @@
     </profiles>
     <build>
         <sourceDirectory>src</sourceDirectory>
+        <!-- tests live in this same module (standard Maven: compiled and run in the test phase,
+             against target/classes - the plain, unsigned classes - BEFORE package/verify sign
+             the jar, so there is no signed-vs-unsigned split-package clash) -->
+        <testSourceDirectory>test</testSourceDirectory>
         <resources>
             <resource>
                 <directory>src</directory>
@@ -285,6 +288,54 @@
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.13.0</version>
+            </plugin>
+            <!-- Run the unit tests (JUnit 6 / Jupiter) in this module's test phase, which is
+                 BEFORE package/verify sign the jar, so the tests run against the plain unsigned
+                 target/classes - no signed-vs-unsigned split-package SecurityException. -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.5.2</version>
+                <configuration>
+                    <includes>
+                        <include>**/*Test.java</include>
+                    </includes>
+                </configuration>
+                <!-- JUnit Platform (Jupiter / JUnit 6) provider -->
+                <dependencies>
+                    <dependency>
+                        <groupId>org.apache.maven.surefire</groupId>
+                        <artifactId>surefire-junit-platform</artifactId>
+                        <version>3.5.2</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+            <!-- JaCoCo: agent records runtime coverage in the test phase; the report (bound to
+                 verify, after the tests) analyses this module's own classes. Jenkins publishes
+                 target/site/jacoco/jacoco.xml via recordCoverage. -->
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>${jacoco.version}</version>
+                <configuration>
+                    <dataFile>${project.build.directory}/jacoco.exec</dataFile>
+                    <outputDirectory>${project.build.directory}/site/jacoco</outputDirectory>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>jacoco-prepare-agent</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>jacoco-report</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <artifactId>maven-antrun-plugin</artifactId>
@@ -2454,12 +2505,46 @@
             </plugin>
         </plugins>
     </build>
+    <dependencyManagement>
+        <dependencies>
+            <!-- keep all JUnit 6 artifacts (api/params/engine/platform-launcher) aligned -->
+            <dependency>
+                <groupId>org.junit</groupId>
+                <artifactId>junit-bom</artifactId>
+                <version>${junit.jupiter.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
     <dependencies>
         <dependency>
             <groupId>jakarta.servlet</groupId>
             <artifactId>jakarta.servlet-api</artifactId>
             <version>6.1.0</version>
             <scope>provided</scope>
+        </dependency>
+        <!-- test-only: JUnit 6 (Jupiter). The platform-launcher must be aligned with the engine
+             (via the bom) or surefire injects its own older launcher and discovery fails. -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-params</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.platform</groupId>
+            <artifactId>junit-platform-launcher</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents.client5</groupId>

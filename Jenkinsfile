@@ -60,8 +60,25 @@ pipeline {
                     configFile(fileId: 'master_mvn_repo', variable: 'MAVEN_SETTINGS'),
                     configFile(fileId: 'maven_toolchain', variable: 'TOOLCHAIN')
                 ]) {
-                    // Via -f wijzen we direct naar de specifieke submap-POM uit de oude configuratie
-                    sh 'mvn -B -s "$MAVEN_SETTINGS" -t "$TOOLCHAIN" -f com.servoy.extensions/pom.xml $goals'
+                    // Build com.servoy.extensions. The unit tests run in the test phase against the
+                    // plain (unsigned) target/classes, and the jacoco agent + report (bound to verify)
+                    // produce target/site/jacoco/jacoco.xml in the same build.
+                    sh 'mvn -B -s "$MAVEN_SETTINGS" -t "$TOOLCHAIN" -f pom.xml $goals'
+                }
+            }
+            post {
+                always {
+                    // JaCoCo coverage of the unit tests. sourceCodeRetention EVERY_BUILD keeps the
+                    // checked-out sources per build so the Coverage view can show covered/missed lines.
+                    recordCoverage(
+                        tools: [[parser: 'JACOCO', pattern: '**/target/site/jacoco/jacoco.xml']],
+                        id: 'jacoco-java',
+                        name: 'JaCoCo Coverage - Java',
+                        // the sources are not under the default src/main/java; point the coverage
+                        // plugin at this module's actual source folders so the line view works
+                        sourceDirectories: [[path: 'com.servoy.extensions/src'], [path: 'com.servoy.extensions/test']],
+                        sourceCodeRetention: 'EVERY_BUILD'
+                    )
                 }
             }
         }
