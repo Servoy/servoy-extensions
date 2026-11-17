@@ -74,6 +74,9 @@ pipeline {
                         tools: [[parser: 'JACOCO', pattern: '**/target/site/jacoco/jacoco.xml']],
                         id: 'jacoco-java',
                         name: 'JaCoCo Coverage - Java',
+                        // the sources are not under the default src/main/java; point the coverage
+                        // plugin at this module's actual source folders so the line view works
+                        sourceDirectories: [[path: 'com.servoy.extensions/src'], [path: 'com.servoy.extensions/test']],
                         sourceCodeRetention: 'EVERY_BUILD'
                     )
                 }
