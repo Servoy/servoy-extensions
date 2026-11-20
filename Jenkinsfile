@@ -79,6 +79,10 @@ pipeline {
                         sourceDirectories: [[path: 'com.servoy.extensions/src'], [path: 'com.servoy.extensions/test']],
                         sourceCodeRetention: 'EVERY_BUILD'
                     )
+                    // Archive the raw coverage data so it can be inspected/downloaded per build:
+                    // jacoco.xml = the report that recordCoverage reads, jacoco.exec = the raw
+                    // execution data, site/jacoco = the browsable HTML report.
+                    archiveArtifacts artifacts: '**/target/site/jacoco/**, **/target/jacoco.exec', allowEmptyArchive: true, fingerprint: false
                 }
             }
         }
