@@ -20,14 +20,18 @@ import java.io.ByteArrayInputStream;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.eclipse.angus.mail.auth.OAuth2SaslClientFactory;
@@ -44,6 +48,7 @@ import com.servoy.j2db.util.Text;
 import com.servoy.j2db.util.UUID;
 
 import jakarta.activation.DataHandler;
+import jakarta.mail.Address;
 import jakarta.mail.FetchProfile;
 import jakarta.mail.Flags;
 import jakarta.mail.Folder;
@@ -51,6 +56,7 @@ import jakarta.mail.Message;
 import jakarta.mail.MessagingException;
 import jakarta.mail.Part;
 import jakarta.mail.PasswordAuthentication;
+import jakarta.mail.SendFailedException;
 import jakarta.mail.Session;
 import jakarta.mail.Store;
 import jakarta.mail.Transport;
@@ -161,8 +167,9 @@ public class MailServer implements IMailService, IServerPlugin
 		}
 		catch (Exception ex)
 		{
-			Debug.error("sendBulkMail " + ex.getMessage(), ex);
-			throw new Exception(ex.getMessage()); //not all exceptions are serializable
+			String fullMessage = getFullMessage(ex);
+			Debug.error("sendBulkMail " + fullMessage, ex);
+			throw new Exception(fullMessage); //not all exceptions are serializable
 		}
 		finally
 		{
@@ -185,13 +192,54 @@ public class MailServer implements IMailService, IServerPlugin
 		}
 		catch (Exception ex)
 		{
-			Debug.error("sendMail " + ex.getMessage(), ex);
-			throw new Exception(ex.getMessage()); //not all exceptions are serializable
+			String fullMessage = getFullMessage(ex);
+			Debug.error("sendMail " + fullMessage, ex);
+			throw new Exception(fullMessage); //not all exceptions are serializable
 		}
 		finally
 		{
 			Thread.currentThread().setContextClassLoader(saveCl);
 		}
+	}
+
+	/**
+	 * Flattens the message of an exception and its JavaMail next-exception / cause chain into one string,
+	 * so the real SMTP reply (for example a 550 rejection) is not lost when rethrowing a plain Exception.
+	 */
+	private static String getFullMessage(Exception ex)
+	{
+		StringBuilder sb = new StringBuilder();
+		Set<Throwable> visited = Collections.newSetFromMap(new IdentityHashMap<>());
+		Throwable current = ex;
+		int depth = 0;
+		while (current != null && depth < 10 && visited.add(current))
+		{
+			appendUnique(sb, current.getMessage());
+			if (current instanceof SendFailedException)
+			{
+				Address[] invalid = ((SendFailedException)current).getInvalidAddresses();
+				if (invalid != null && invalid.length > 0)
+				{
+					appendUnique(sb, "invalid addresses: " + Arrays.stream(invalid).map(Address::toString).collect(Collectors.joining(", ")));
+				}
+			}
+			Throwable next = null;
+			if (current instanceof MessagingException)
+			{
+				next = ((MessagingException)current).getNextException();
+			}
+			if (next == null) next = current.getCause();
+			current = next;
+			depth++;
+		}
+		return sb.length() > 0 ? sb.toString() : ex.toString();
+	}
+
+	private static void appendUnique(StringBuilder sb, String msg)
+	{
+		if (msg == null || msg.isEmpty() || sb.indexOf(msg) >= 0) return;
+		if (sb.length() > 0) sb.append("; ");
+		sb.append(msg);
 	}
 
 	private MimeMessage createMessage(String to, String from, String subject, String rawMsgText, String cc, String bcc, Attachment[] attachments,

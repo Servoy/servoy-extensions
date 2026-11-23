@@ -114,11 +114,17 @@ part of the fix.
   not apply), plus a **payload-size guard** that degrades gracefully instead of killing the
   channel. Raising the broker frame limit is a band-aid: any larger payload would re-trigger
   it, and giant databroadcast frames are undesirable regardless.
-- **Is any of it a core (`j2db_server`) responsibility?** Partly. The plugin fix stands on
-  its own and fixes the outage. The **uncapped large String / large pk-set** behaviour in
-  `SQLEngine.DistributeDataChange` is a separate, arguably-core improvement (cap or
-  blob-marker large non-byte[] values, and/or fall back to a table flush when a payload would
-  be oversized). That is read-only from this repo and belongs in a **separate SVY case**.
+- **Is any of it a core (`j2db_server`) responsibility?** No — resolved, no core change needed.
+  The uncapped size in `SQLEngine.DistributeDataChange` is **not** a core bug, because the
+  payload size only matters for *this* transport. Every other consumer of that notify is
+  **in-VM**: the NG/headless clients (via `ClientProxy`) and the old smart client (via RMI)
+  all receive the full Java object with no byte-frame limit, and handle it fine. The AMQP
+  broadcaster is the only route that crosses to another server and the only one RabbitMQ's
+  `frame_max` applies to. So the limit is a property of this transport, not of the data core
+  produces — the guard belongs in the plugin (which knows the limit), and it only degrades
+  **its own** branch to a datasource flush while all in-VM consumers keep the precise row
+  data. Capping in core would needlessly coarsen those in-VM notifies. **Decision: no core
+  follow-up case.**
 
 ## Approaches considered
 
@@ -153,12 +159,13 @@ state to manage. Reasonable as a follow-up hardening, not required for the fix.
 bigger payload; large databroadcast frames remain undesirable. **Rejected as a solution**
 (acceptable only as a temporary mitigation alongside a real fix).
 
-**E. Core-side PK/String capping in `SQLEngine.DistributeDataChange` (separate SVY case).**
-Extend the strip logic beyond single-row-insert `byte[]` to cap large String/CLOB values and
-large pk datasets (or fall back to a table flush). *Pros:* removes the oversize payload at
-the source for all broadcasters. *Cons:* core change, read-only from this repo, broader blast
-radius; must not change single-pod (non-AMQP) semantics. **Track as a follow-up**, not part
-of the plugin case.
+**E. Core-side PK/String capping in `SQLEngine.DistributeDataChange`.** Considered and
+**rejected** — no core change, no follow-up case. The uncapped size only matters for the AMQP
+transport; every other consumer of that notify is in-VM (NG/headless via `ClientProxy`, old
+smart client via RMI) with no byte-frame limit and handles the full payload fine. Capping in
+core would needlessly coarsen those in-VM notifies while only the AMQP route actually has a
+limit. The size guard therefore belongs in the plugin (approach B), degrading only its own
+branch. See the Ticket-premise-check note "Is any of it a core responsibility?".
 
 ## Recommendation
 
@@ -177,9 +184,16 @@ in the first place and provides the diagnostics the customer needs):
    that identify channel shutdown vs. recovery vs. oversize, so a recurrence is diagnosable
    from logs.
 
-Keep **C** (split channels) as optional hardening and open a **separate SVY case** for
-**E** (core `SQLEngine` capping of large String/pk payloads) linked to this one. Do **not**
-pursue **D** as the solution.
+Keep **C** (split channels) as optional hardening if ever needed. Do **not** pursue **D** as
+the solution, and do **not** open a core follow-up for **E** — the size guard is a transport
+concern that belongs in the plugin (see approach E and the ticket-premise-check note).
+
+**Update (implemented):** done on `lts_2026` and merged to release/master as **SVY-21803**
+(A + B + diagnostics). The `BroadcastMessage` path from `registerMessageBroadcastConsumer`
+has no datasource-flush fallback, so an oversized application broadcast there is skipped and
+logged rather than published (a deliberate, documented limitation — it keeps the channel
+alive; an application should not broadcast an oversized custom message). No core follow-up was
+opened, per approach E.
 
 All of this is testable without a live broker: `Channel`/`Connection` are interfaces and can
 be driven with hand-written fakes (per project context) to simulate a `precondition_failed`
