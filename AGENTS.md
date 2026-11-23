@@ -201,6 +201,43 @@ assembled/signed), so they always compile and run against the plain unsigned `ta
   the AMQP broadcaster is tested with hand-written fakes — no live broker. Keep unit tests
   broker-free and deterministic (drive async recovery via observable state, not wall-clock sleeps).
 
+### Test rules: real unit tests, no integration tests
+
+We want **pure JUnit 6 unit tests**, not integration tests. They must be fast and deterministic and
+must run in CI without any external service. The goal is a high coverage number that is cheap to
+keep green.
+
+- **Real I/O is fine when it is cheap.** Time is not lost on the file system, so plugins like
+  `file` should be tested against real files and folders created in a `@TempDir`. Do not mock
+  `java.io`/`java.nio` just to avoid touching disk. The same goes for in-memory work such as
+  parsing, serialization, converters, validators, XML/JSON, excel/pdf/tab export into a temp folder.
+- **Mock or fake everything that needs a network, a broker or a running service.** That means
+  RabbitMQ/AMQP (broadcaster), SMTP/IMAP/POP (mail), HTTP endpoints (http, oauth, openid, jwt key
+  fetches), LDAP, UDP/serial sockets, databases and any Servoy server/client runtime
+  (`IServerAccess`, `IClientPluginAccess`, `IApplication`, ...). Never open a real connection
+  from a test and never depend on a service being reachable.
+- **Prefer Mockito for interfaces.** For types where a fake reads clearer (RabbitMQ
+  `Channel`/`Connection`), write a small hand-written fake that only **records** calls, like the
+  `Fake*` classes in the broadcaster tests. The decision logic must stay in production code, the
+  fake must not re-implement it.
+- **Test the plugin's own logic, not the library.** Assert on our branching, validation, error
+  handling and mapping. Do not re-test Apache HttpClient, Jackson, POI, etc.
+- **No `Thread.sleep` or wall-clock timing.** Drive async work through observable state, a
+  same-thread executor, or an injectable clock/backoff. If production code hard-codes a delay that
+  makes a test slow, add a small package-private seam (setter/constructor) instead of waiting.
+- **Package-private access instead of public API changes.** Tests live in the same package as the
+  code under test, so use package-private seams or reflection for private paths rather than
+  widening production visibility without need.
+- **If a class cannot be mocked** (final type or static call inside a shared Servoy core bundle),
+  do not fall back to an integration test. Wrap it behind a small seam in this repo, or when the
+  blocker is in core, raise a separate SVY case against the core repo.
+- **Naming and layout:** `test/com/servoy/extensions/plugins/<plugin>/<ClassUnderTest>Test.java`,
+  JUnit Jupiter, one behaviour per test method with a descriptive name.
+- **Coverage is reported per build.** JaCoCo runs in the module's `test`/`verify` phases and
+  Jenkins shows it through `recordCoverage`. The raw data is archived as build artifacts:
+  `**/target/site/jacoco/**` (jacoco.xml + HTML report) and `**/target/jacoco.exec`. When you
+  add tests, check the coverage of the touched plugin in the Jenkins build.
+
 ### SVY-21803 — AMQP databroadcaster channel recovery + payload size guard
 
 Covers the channel-level recovery and the serialized-payload size guard added to
