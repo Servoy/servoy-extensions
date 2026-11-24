@@ -255,6 +255,31 @@ public class RemoteFileTest
 	}
 
 	@Test
+	public void extensionFilterIsCaseInsensitive() throws Exception
+	{
+		write("a.txt", new byte[0]);
+		write("b.pdf", new byte[0]);
+		write("c.TXT", new byte[0]);
+
+		RemoteFile[] txt = new RemoteFile(main, main, null).getFolderContent(new String[] { ".TXT" }, AbstractFile.ALL, AbstractFile.ALL,
+			AbstractFile.ALL);
+
+		String[] names = Arrays.stream(txt).map(RemoteFile::getName).sorted().toArray(String[]::new);
+		assertArrayEquals(new String[] { "a.txt", "c.TXT" }, names);
+	}
+
+	@Test
+	public void nullEntriesInTheExtensionFilterMatchNothing() throws Exception
+	{
+		write("a.txt", new byte[0]);
+
+		RemoteFile root = new RemoteFile(main, main, null);
+
+		assertEquals(0, root.getFolderContent(new String[] { null }, AbstractFile.ALL, AbstractFile.ALL, AbstractFile.ALL).length);
+		assertEquals(1, root.getFolderContent(new String[] { null, ".txt" }, AbstractFile.ALL, AbstractFile.ALL, AbstractFile.ALL).length);
+	}
+
+	@Test
 	public void folderContentCanBeFilteredOnFilesOrFolders() throws Exception
 	{
 		write("a.txt", new byte[0]);
@@ -368,11 +393,24 @@ public class RemoteFileTest
 	}
 
 	@Test
-	public void equalsComparesWithTheWrappedFile()
+	public void remoteFilesOfTheSameServerFileAreEqual()
 	{
 		RemoteFile f = remote("a.txt");
-		// current behaviour, same pattern as LocalFile had: equal to the java.io.File, not to another RemoteFile
-		assertTrue(f.equals(new File(main, "a.txt")));
-		assertFalse(f.equals(remote("a.txt")));
+		RemoteFile same = remote("a.txt");
+
+		assertTrue(f.equals(f));
+		assertTrue(f.equals(same));
+		assertTrue(same.equals(f));
+		assertEquals(f.hashCode(), same.hashCode());
+		assertFalse(f.equals(remote("b.txt")));
+	}
+
+	@Test
+	public void remoteFileIsNotEqualToOtherTypes()
+	{
+		RemoteFile f = remote("a.txt");
+		assertFalse(f.equals(new File(main, "a.txt")));
+		assertFalse(f.equals(new LocalFile(new File(main, "a.txt"), null)));
+		assertFalse(f.equals(null));
 	}
 }

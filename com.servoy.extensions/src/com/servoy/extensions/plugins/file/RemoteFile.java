@@ -248,7 +248,9 @@ public class RemoteFile extends AbstractFile
 	@Override
 	public boolean equals(Object obj)
 	{
-		return file.equals(obj);
+		if (this == obj) return true;
+		if (!(obj instanceof RemoteFile)) return false;
+		return file.equals(((RemoteFile)obj).file);
 	}
 
 	@Override
@@ -361,7 +363,7 @@ public class RemoteFile extends AbstractFile
 						String name = pathname.getName().toLowerCase();
 						for (String element : fileFilter)
 						{
-							retVal = name.endsWith(element);
+							retVal = element != null && name.endsWith(element.toLowerCase());
 							if (retVal) break;
 						}
 					}
