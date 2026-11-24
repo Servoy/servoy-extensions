@@ -104,6 +104,16 @@ public class JWTProviderJwksTest
 	}
 
 	@Test
+	public void aTokenWithoutKidIsRejectedBeforeTheJwksIsRead() throws Exception
+	{
+		// the url does not exist: a read would fail with a different error, the missing kid must stop the verification first
+		Algorithm jwk = provider.JWK(tempDir.resolve("never-read.json").toUri().toURL().toString()).kid("key-1");
+
+		assertNull(provider.verify(rsaToken("RS256", null), jwk));
+		assertNull(jwk.getAlgorithm());
+	}
+
+	@Test
 	public void aTokenSignedWithAnotherKeyIsNotVerified() throws Exception
 	{
 		Algorithm jwk = provider.JWK(jwksUrl(JwtTestKeys.rsaJwks("ec-1", "RS256")));
@@ -144,14 +154,37 @@ public class JWTProviderJwksTest
 	}
 
 	@Test
-	public void aReusedJwkAlgorithmKeepsTheFirstTokensAlgorithm() throws Exception
+	public void aJwkAlgorithmCanBeReusedForTokensWithDifferentAlgorithms() throws Exception
 	{
 		Algorithm jwk = provider.JWK(jwksUrl(JwtTestKeys.rsaJwks("key-1", null)));
 
 		assertNotNull(provider.verify(rsaToken("RS256", "key-1"), jwk));
-		// current behaviour (bug): verify() stores the first token's alg in the shared Algorithm, so a valid RS384 token
-		// for the same key fails with the same JWK algorithm object
-		assertNull(provider.verify(rsaToken("RS384", "key-1"), jwk));
-		assertNotNull(provider.verify(rsaToken("RS384", "key-1"), provider.JWK(jwksUrl(JwtTestKeys.rsaJwks("key-1", null)))));
+		assertNotNull(provider.verify(rsaToken("RS384", "key-1"), jwk));
+		assertNotNull(provider.verify(rsaToken("RS512", "key-1"), jwk));
+	}
+
+	@Test
+	public void verifyDoesNotChangeTheGivenJwkAlgorithm() throws Exception
+	{
+		Algorithm jwk = provider.JWK(jwksUrl(JwtTestKeys.rsaJwks("key-1", null)));
+
+		provider.verify(rsaToken("RS384", "key-1"), jwk);
+
+		assertNull(jwk.getAlgorithm());
+		// without a kid of its own it still cannot sign or build
+		assertNull(jwk.build());
+	}
+
+	@Test
+	public void theCopyKeepsTheConfiguration()
+	{
+		Algorithm original = provider.RSA256(JwtTestKeys.publicBase64(RSA), JwtTestKeys.privateBase64(RSA)).kid("key-1");
+
+		Algorithm copy = original.copy();
+
+		assertEquals("RS256", copy.getAlgorithm());
+		String token = provider.builder().withClaim("a", "b").sign(copy);
+		assertEquals("key-1", com.auth0.jwt.JWT.decode(token).getKeyId());
+		assertNotNull(provider.verify(token, original));
 	}
 }

@@ -17,6 +17,8 @@
 
 package com.servoy.extensions.plugins.jwt.client;
 
+import java.math.BigInteger;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -24,7 +26,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.mozilla.javascript.NativeArray;
-import org.mozilla.javascript.NativeObject;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.annotations.JSFunction;
 
@@ -97,64 +98,81 @@ public class Builder implements IScriptable, IJavaScriptType
 	 * @return the jwt builder for method chaining
 	 */
 	@JSFunction
+	@SuppressWarnings("unchecked")
 	public Builder withClaim(String key, Object value)
 	{
+		if (value == null) return this;
 		if (value instanceof Boolean) builder.withClaim(key, (Boolean)value);
-		if (value instanceof Date) builder.withClaim(key, (Date)value);
-		if (value instanceof Double) builder.withClaim(key, (Double)value);
-		if (value instanceof Integer) builder.withClaim(key, (Integer)value);
-		if (value instanceof Long) builder.withClaim(key, (Long)value);
-		if (value instanceof String) builder.withClaim(key, (String)value);
-		if (value instanceof NativeArray)
+		else if (value instanceof Date) builder.withClaim(key, (Date)value);
+		else if (value instanceof String) builder.withClaim(key, (String)value);
+		else if (value instanceof Number) addNumberClaim(key, (Number)value);
+		else if (value instanceof NativeArray || value instanceof Object[] || value instanceof Collection)
 		{
-			value = ((NativeArray)value).unwrap();
-		}
-
-		if (value instanceof Object[])
-		{
-			if (isNumbersArray((Object[])value))
+			Object[] array = toArray(value);
+			if (isNumbersArray(array))
 			{
-				builder.withArrayClaim(key, convertToLongArray((Object[])value));
+				builder.withArrayClaim(key, convertToLongArray(array));
 			}
 			else
 			{
-				builder.withArrayClaim(key, convertToStringArray((Object[])value));
+				builder.withArrayClaim(key, convertToStringArray(array));
 			}
 		}
-		if (value instanceof NativeObject)
+		else if (value instanceof Map)
 		{
+			// a NativeObject is a Map too
 			builder.withClaim(key, convertMap((Map<String, Object>)value));
+		}
+		else
+		{
+			JWTProvider.log.warn("Claim '" + key + "' is not added to the token, values of type " + value.getClass().getName() + " are not supported."); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		return this;
 	}
 
+	private void addNumberClaim(String key, Number value)
+	{
+		if (value instanceof Integer || value instanceof Short || value instanceof Byte) builder.withClaim(key, Integer.valueOf(value.intValue()));
+		else if (value instanceof Long || value instanceof BigInteger) builder.withClaim(key, Long.valueOf(value.longValue()));
+		else builder.withClaim(key, Double.valueOf(value.doubleValue()));
+	}
+
+	private static Object[] toArray(Object value)
+	{
+		if (value instanceof NativeArray) return (Object[])((NativeArray)value).unwrap();
+		if (value instanceof Collection) return ((Collection< ? >)value).toArray();
+		return (Object[])value;
+	}
+
+	@SuppressWarnings("unchecked")
 	private Map<String, Object> convertMap(Map<String, Object> value)
 	{
 		Map<String, Object> result = new LinkedHashMap<>();
 		for (Entry<String, Object> pair : value.entrySet())
 		{
 			Object val = pair.getValue();
-			if (val instanceof NativeArray)
+			if (val instanceof NativeArray || val instanceof Object[] || val instanceof Collection)
 			{
-				val = ((NativeArray)val).unwrap();
+				Object[] array = toArray(val);
+				val = isNumbersArray(array) ? convertToLongArray(array) : convertToStringArray(array);
 			}
-			if (val instanceof Object[])
-			{
-				if (isNumbersArray((Object[])val))
-				{
-					val = convertToLongArray((Object[])val);
-				}
-				else
-				{
-					val = convertToStringArray((Object[])val);
-				}
-			}
-			if (val instanceof NativeObject)
+			else if (val instanceof Map)
 			{
 				val = convertMap((Map<String, Object>)val);
 			}
-
-			result.put(pair.getKey(), val);
+			else if (val instanceof Short || val instanceof Byte)
+			{
+				val = Integer.valueOf(((Number)val).intValue());
+			}
+			else if (val instanceof BigInteger)
+			{
+				val = Long.valueOf(((Number)val).longValue());
+			}
+			else if (val instanceof Number && !(val instanceof Integer) && !(val instanceof Long) && !(val instanceof Double))
+			{
+				val = Double.valueOf(((Number)val).doubleValue());
+			}
+			result.put(String.valueOf(pair.getKey()), val);
 		}
 		return result;
 	}

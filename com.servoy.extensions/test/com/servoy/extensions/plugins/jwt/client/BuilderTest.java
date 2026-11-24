@@ -69,6 +69,39 @@ public class BuilderTest
 	}
 
 	@Test
+	public void otherNumberTypesAreAddedAsIntegerLongOrDouble()
+	{
+		DecodedJWT jwt = signAndDecode(new Builder().withClaim("short", Short.valueOf((short)3)).withClaim("byte", Byte.valueOf((byte)4))
+			.withClaim("float", Float.valueOf(2.5f)).withClaim("big", new java.math.BigDecimal("12.25"))
+			.withClaim("bigint", java.math.BigInteger.valueOf(9_000_000_000L)));
+
+		assertEquals(3, jwt.getClaim("short").asInt().intValue());
+		assertEquals(4, jwt.getClaim("byte").asInt().intValue());
+		assertEquals(2.5, jwt.getClaim("float").asDouble().doubleValue());
+		assertEquals(12.25, jwt.getClaim("big").asDouble().doubleValue());
+		assertEquals(9_000_000_000L, jwt.getClaim("bigint").asLong().longValue());
+	}
+
+	@Test
+	public void javaMapsAndListsAreAddedLikeTheirJavascriptCounterparts()
+	{
+		Map<String, Object> inner = new java.util.LinkedHashMap<>();
+		inner.put("float", Float.valueOf(1.5f));
+		inner.put("short", Short.valueOf((short)2));
+		inner.put("list", List.of("x", "y"));
+		inner.put("nested", Map.of("k", "v"));
+
+		DecodedJWT jwt = signAndDecode(new Builder().withClaim("map", inner).withClaim("list", List.of(Integer.valueOf(1), Integer.valueOf(2))));
+
+		Map<String, Object> claim = jwt.getClaim("map").asMap();
+		assertEquals(1.5, ((Number)claim.get("float")).doubleValue());
+		assertEquals(2, claim.get("short"));
+		assertEquals(List.of("x", "y"), claim.get("list"));
+		assertEquals(Map.of("k", "v"), claim.get("nested"));
+		assertEquals(List.of(1L, 2L), jwt.getClaim("list").asList(Long.class));
+	}
+
+	@Test
 	public void numberArraysBecomeLongArraysAndOthersStringArrays()
 	{
 		DecodedJWT jwt = signAndDecode(new Builder().withClaim("nums", new Object[] { Integer.valueOf(1), Double.valueOf(2.0), null })
