@@ -18,7 +18,6 @@ package com.servoy.extensions.plugins.file;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -70,10 +69,11 @@ public class FilePluginTest
 		assertEquals(plugin.getIconUrl() == null, plugin.getImage() == null);
 	}
 
-	@Test
-	public void smartClientGetsTheLocalFileProvider() throws Exception
+	@ParameterizedTest
+	@ValueSource(ints = { IClientPluginAccess.CLIENT, IClientPluginAccess.WEB_CLIENT, IClientPluginAccess.NG_CLIENT, IClientPluginAccess.HEADLESS_CLIENT })
+	public void everyClientGetsTheSameFileProvider(int applicationType) throws Exception
 	{
-		IClientPluginAccess access = access(IClientPluginAccess.CLIENT);
+		IClientPluginAccess access = access(applicationType);
 		plugin.initialize(access);
 
 		Object provider = plugin.getScriptObject();
@@ -81,14 +81,6 @@ public class FilePluginTest
 		assertSame(FileProvider.class, provider.getClass());
 		assertSame(provider, plugin.getScriptObject());
 		assertSame(access, plugin.getClientPluginAccess());
-	}
-
-	@ParameterizedTest
-	@ValueSource(ints = { IClientPluginAccess.WEB_CLIENT, IClientPluginAccess.NG_CLIENT, IClientPluginAccess.HEADLESS_CLIENT })
-	public void webNgAndHeadlessClientsGetTheWebFileProvider(int applicationType) throws Exception
-	{
-		plugin.initialize(access(applicationType));
-		assertInstanceOf(WebFileProvider.class, plugin.getScriptObject());
 	}
 
 	@Test

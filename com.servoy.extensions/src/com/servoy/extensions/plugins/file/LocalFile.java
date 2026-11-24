@@ -30,7 +30,7 @@ import java.io.OutputStream;
 import com.servoy.j2db.plugins.IAllWebClientPluginAccess;
 import com.servoy.j2db.plugins.IClientPluginAccess;
 import com.servoy.j2db.util.Debug;
-import com.servoy.j2db.util.FileChooserUtils;
+import com.servoy.j2db.util.Utils;
 
 /**
  * Implementation of an {@link IAbstractFile} for local (client-side) files
@@ -59,7 +59,7 @@ public class LocalFile implements IAbstractFile
 	{
 		try
 		{
-			if (file.exists() && !file.isDirectory()) return FileChooserUtils.readFile(file);
+			if (file.exists() && !file.isDirectory()) return Utils.getFileContent(file);
 		}
 		catch (Exception e)
 		{

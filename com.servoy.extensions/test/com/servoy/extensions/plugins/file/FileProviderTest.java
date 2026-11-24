@@ -318,11 +318,12 @@ public class FileProviderTest
 	}
 
 	@Test
-	public void deleteFolderWithWarningOnlyAsksInTheSmartClient() throws Exception
+	public void deleteFolderIgnoresTheWarningFlag() throws Exception
 	{
 		write("tree/a.txt", "a");
-		when(Integer.valueOf(access.getApplicationType())).thenReturn(Integer.valueOf(IClientPluginAccess.NG_CLIENT));
+		when(Integer.valueOf(access.getApplicationType())).thenReturn(Integer.valueOf(IClientPluginAccess.CLIENT));
 
+		// the confirm dialog only existed in the smart client
 		assertTrue(provider.js_deleteFolder(file("tree").getPath(), true));
 		assertFalse(file("tree").exists());
 	}
@@ -781,6 +782,96 @@ public class FileProviderTest
 	public void tempFileWithInvalidSuffixReturnsNull()
 	{
 		assertNull(provider.js_createTempFile("svytest", "/\u0000"));
+	}
+
+	// --- former smart client dialogs (SVY-21330): no Swing dialog, same API ---
+
+	@Test
+	public void modalFileOpenDialogIsNotSupported()
+	{
+		assertThrows(UnsupportedMethodException.class, () -> provider.js_showFileOpenDialog());
+		assertThrows(UnsupportedMethodException.class, () -> provider.js_showFileOpenDialog(Integer.valueOf(1)));
+		assertThrows(UnsupportedMethodException.class, () -> provider.js_showFileOpenDialog(Integer.valueOf(2), file("x").getPath(), Boolean.TRUE));
+	}
+
+	@Test
+	public void fileSaveAndDirectorySelectDialogsAreNotSupported()
+	{
+		assertThrows(UnsupportedMethodException.class, () -> provider.js_showFileSaveDialog());
+		assertThrows(UnsupportedMethodException.class, () -> provider.js_showFileSaveDialog(file("x.txt").getPath(), "title"));
+		assertThrows(UnsupportedMethodException.class, () -> provider.js_showDirectorySelectDialog());
+		assertThrows(UnsupportedMethodException.class, () -> provider.js_showDirectorySelectDialog(new JSFile(file("x"), access), "title"));
+	}
+
+	@Test
+	public void fileOpenDialogWithCallbackUsesTheClientDialogWithTheSelectionMode() throws Exception
+	{
+		when(access.getRuntimeProperties()).thenReturn(new java.util.HashMap<>());
+		org.mozilla.javascript.Function callback = mock(org.mozilla.javascript.Function.class);
+		when(callback.get("_methodname_", callback)).thenReturn("onFile");
+		when(callback.get("_scopename_", callback)).thenReturn("globals");
+
+		provider.js_showFileOpenDialog(Integer.valueOf(0), callback);
+		provider.js_showFileOpenDialog(Integer.valueOf(1), callback);
+		provider.js_showFileOpenDialog(Integer.valueOf(2), callback);
+
+		// values of JFileChooser.FILES_AND_DIRECTORIES, FILES_ONLY and DIRECTORIES_ONLY
+		org.mockito.Mockito.verify(access).showFileOpenDialog(any(), org.mockito.ArgumentMatchers.isNull(), org.mockito.ArgumentMatchers.eq(false),
+			org.mockito.ArgumentMatchers.isNull(), org.mockito.ArgumentMatchers.eq(2), org.mockito.ArgumentMatchers.isNull());
+		org.mockito.Mockito.verify(access).showFileOpenDialog(any(), org.mockito.ArgumentMatchers.isNull(), org.mockito.ArgumentMatchers.eq(false),
+			org.mockito.ArgumentMatchers.isNull(), org.mockito.ArgumentMatchers.eq(0), org.mockito.ArgumentMatchers.isNull());
+		org.mockito.Mockito.verify(access).showFileOpenDialog(any(), org.mockito.ArgumentMatchers.isNull(), org.mockito.ArgumentMatchers.eq(false),
+			org.mockito.ArgumentMatchers.isNull(), org.mockito.ArgumentMatchers.eq(1), org.mockito.ArgumentMatchers.isNull());
+	}
+
+	@Test
+	public void readingWithoutAnExistingFileReturnsNull()
+	{
+		assertNull(provider.js_readTXTFile());
+		assertNull(provider.js_readTXTFile(file("missing.txt").getPath()));
+		assertNull(provider.js_readTXTFile(tempDir.toFile().getPath()));
+		assertNull(provider.js_readFile());
+		assertNull(provider.js_readFile(file("missing.bin").getPath()));
+		assertNull(provider.js_readFile(tempDir.toFile().getPath(), 10));
+	}
+
+	@Test
+	public void readingAnUploadWithoutBackingFileReturnsNullOutsideABrowserClient()
+	{
+		// uploads only come from a browser client; outside of one only the backing file is read
+		IUploadData upload = mock(IUploadData.class);
+		when(upload.getBytes()).thenReturn("up".getBytes(StandardCharsets.UTF_8));
+		JSFile f = new JSFile(upload, access);
+
+		assertNull(provider.js_readTXTFile(f, "UTF-8"));
+		assertNull(provider.js_readFile(f));
+	}
+
+	@Test
+	public void readingAJSFileOutsideABrowserClientHonoursTheSize() throws Exception
+	{
+		File f = file("sized.bin");
+		Files.write(f.toPath(), new byte[] { 1, 2, 3, 4, 5 });
+
+		assertArrayEquals(new byte[] { 1, 2 }, provider.js_readFile(new JSFile(f, access), 2));
+	}
+
+	@Test
+	public void writingWithoutAFileFailsOutsideABrowserClient()
+	{
+		assertFalse(provider.js_writeTXTFile((JSFile)null, "x"));
+		assertFalse(provider.js_writeFile((JSFile)null, new byte[] { 1 }));
+		assertFalse(provider.js_appendToTXTFile((JSFile)null, "x"));
+	}
+
+	@Test
+	public void desktopFolderIsUnderTheUserHome()
+	{
+		JSFile desktop = provider.js_getDesktopFolder();
+		File expected = new File(System.getProperty("user.home"), "Desktop");
+
+		if (expected.isDirectory()) assertEquals(expected, desktop.getFile());
+		else assertNull(desktop);
 	}
 
 	// --- remote (server) files through a mocked file service ---

@@ -20,7 +20,7 @@ package com.servoy.extensions.plugins.file;
 import java.io.File;
 
 /**
- * Utility class holding methods used by {@link FileServerPlugin} and {@link WebFileProvider}
+ * Utility class holding methods used by {@link FileServerPlugin} and {@link FileProvider}
  *
  * @author Servoy Stuff
  *

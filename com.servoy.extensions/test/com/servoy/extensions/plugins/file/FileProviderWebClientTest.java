@@ -50,10 +50,10 @@ import com.servoy.j2db.plugins.IAllWebClientPluginAccess;
 import com.servoy.j2db.plugins.IUploadData;
 
 /**
- * Unit tests for {@link WebFileProvider}: downloads through the (mocked) web client, reads/writes of server side
- * JSFiles and streaming uploads into a temp folder that acts as the default upload folder of the server.
+ * Unit tests for {@link FileProvider} in a browser client (web/NG, mocked {@link IAllWebClientPluginAccess}): downloads, open in the
+ * browser, reads/writes of server side JSFiles and streaming uploads into a temp folder that acts as the default upload folder.
  */
-public class WebFileProviderTest
+public class FileProviderWebClientTest
 {
 	private static final byte[] PDF = "%PDF-1.4 body".getBytes(StandardCharsets.US_ASCII);
 
@@ -61,7 +61,7 @@ public class WebFileProviderTest
 	Path tempDir;
 
 	private IAllWebClientPluginAccess web;
-	private WebFileProvider provider;
+	private FileProvider provider;
 	private File serverFolder;
 
 	@BeforeEach
@@ -79,7 +79,7 @@ public class WebFileProviderTest
 
 		FilePlugin plugin = new FilePlugin();
 		plugin.initialize(web);
-		provider = new WebFileProvider(plugin);
+		provider = new FileProvider(plugin);
 	}
 
 	@AfterEach
