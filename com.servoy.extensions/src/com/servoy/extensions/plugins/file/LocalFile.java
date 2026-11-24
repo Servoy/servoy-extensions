@@ -204,13 +204,16 @@ public class LocalFile implements IAbstractFile
 	@Override
 	public boolean equals(Object obj)
 	{
-		return file.equals(obj);
+		if (this == obj) return true;
+		if (!(obj instanceof LocalFile)) return false;
+		File other = ((LocalFile)obj).file;
+		return file == null ? other == null : file.equals(other);
 	}
 
 	@Override
 	public int hashCode()
 	{
-		return file.hashCode();
+		return file == null ? 0 : file.hashCode();
 	}
 
 	@Override

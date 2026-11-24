@@ -212,12 +212,33 @@ public class LocalFileTest
 	}
 
 	@Test
-	public void equalsComparesWithTheWrappedFile()
+	public void localFilesOfTheSameFileAreEqual()
 	{
 		LocalFile f = local("k.txt");
-		// current behaviour: equal to the java.io.File, not to another LocalFile of the same file
-		assertTrue(f.equals(tempDir.resolve("k.txt").toFile()));
-		assertFalse(f.equals(local("k.txt")));
+		LocalFile same = local("k.txt");
+
+		assertTrue(f.equals(f));
+		assertTrue(f.equals(same));
+		assertTrue(same.equals(f));
+		assertEquals(f.hashCode(), same.hashCode());
+		assertFalse(f.equals(local("other.txt")));
+	}
+
+	@Test
+	public void localFileIsNotEqualToOtherTypes()
+	{
+		LocalFile f = local("k.txt");
+		assertFalse(f.equals(tempDir.resolve("k.txt").toFile()));
+		assertFalse(f.equals(null));
+	}
+
+	@Test
+	public void localFilesWithoutAFileAreEqual()
+	{
+		assertTrue(new LocalFile(null, null).equals(new LocalFile(null, null)));
+		assertFalse(new LocalFile(null, null).equals(local("k.txt")));
+		assertFalse(local("k.txt").equals(new LocalFile(null, null)));
+		assertEquals(0, new LocalFile(null, null).hashCode());
 	}
 
 	@Test

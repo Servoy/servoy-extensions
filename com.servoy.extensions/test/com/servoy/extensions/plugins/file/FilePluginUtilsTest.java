@@ -67,4 +67,11 @@ public class FilePluginUtilsTest
 		assertDoesNotThrow(() -> FilePluginUtils.filePathCheck("/folder/file.txt"));
 		assertThrows(IllegalArgumentException.class, () -> FilePluginUtils.filePathCheck("folder/file.txt"));
 	}
+
+	@Test
+	public void emptyOrNullRemotePathIsRejected()
+	{
+		assertThrows(IllegalArgumentException.class, () -> FilePluginUtils.filePathCheck(""));
+		assertThrows(IllegalArgumentException.class, () -> FilePluginUtils.filePathCheck(null));
+	}
 }
