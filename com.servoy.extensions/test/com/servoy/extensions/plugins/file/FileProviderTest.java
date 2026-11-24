@@ -237,13 +237,45 @@ public class FileProviderTest
 	}
 
 	@Test
-	public void moveFileOntoItselfDeletesTheFile() throws Exception
+	public void moveFileOntoItselfFailsAndKeepsTheFile() throws Exception
 	{
 		File src = write("self.txt", "data");
 
-		// current behaviour (bug): the destination is deleted before the source==destination check
 		assertFalse(provider.js_moveFile(src, src));
-		assertFalse(src.exists());
+		assertEquals("data", read(src));
+	}
+
+	@Test
+	public void moveFileOntoTheSameFileUnderAnotherPathKeepsTheFile() throws Exception
+	{
+		File src = write("self.txt", "data");
+		File samePath = new File(tempDir.resolve("sub").toFile(), "../self.txt");
+
+		assertFalse(provider.js_moveFile(src, samePath));
+		assertEquals("data", read(src));
+	}
+
+	@Test
+	public void copyFileOntoTheSameFileUnderAnotherPathKeepsTheFile() throws Exception
+	{
+		File src = write("self.txt", "data");
+		Files.createDirectory(tempDir.resolve("sub"));
+		File samePath = new File(tempDir.resolve("sub").toFile(), "../self.txt");
+
+		assertFalse(provider.js_copyFile(src, samePath));
+		assertEquals("data", read(src));
+	}
+
+	@Test
+	public void sameFileDetectionComparesNormalizedPaths() throws Exception
+	{
+		File f = write("same.txt", "x");
+		Files.createDirectory(tempDir.resolve("dir"));
+
+		assertTrue(FileProvider.isSameFile(f, f));
+		assertTrue(FileProvider.isSameFile(f, new File(tempDir.resolve("dir").toFile(), "../same.txt")));
+		assertTrue(FileProvider.isSameFile(file("missing.txt"), new File(tempDir.resolve("dir").toFile(), "../missing.txt")));
+		assertFalse(FileProvider.isSameFile(f, file("other.txt")));
 	}
 
 	// --- create / delete ---
@@ -447,13 +479,39 @@ public class FileProviderTest
 	}
 
 	@Test
-	public void readingWithAnUnknownEncodingReturnsNull() throws Exception
+	public void readingWithAnUnknownEncodingReturnsNullAndReleasesTheFile() throws Exception
 	{
-		// tested on the stream level: through js_readTXTFile the FileInputStream is not closed for an unknown
-		// encoding, which keeps the file locked on Windows (and would break the @TempDir cleanup)
-		assertNull(provider.readTXTFile("no-such-charset", new java.io.ByteArrayInputStream(new byte[] { 'x' })));
-		assertEquals("x", provider.readTXTFile(null, new java.io.ByteArrayInputStream(new byte[] { 'x' })));
-		assertEquals("", provider.readTXTFile("UTF-8", new java.io.ByteArrayInputStream(new byte[0])));
+		File f = write("u.txt", "x");
+
+		assertNull(provider.js_readTXTFile(f.getPath(), "no-such-charset"));
+		assertNull(provider.js_readTXTFile(new JSFile(f, access), "illegal charset name"));
+		// the stream must be closed, else the file stays locked on Windows and cannot be deleted
+		assertTrue(f.delete());
+	}
+
+	@Test
+	public void readTxtFromAStreamClosesTheStream() throws Exception
+	{
+		java.util.concurrent.atomic.AtomicInteger closed = new java.util.concurrent.atomic.AtomicInteger();
+		class TrackingStream extends java.io.ByteArrayInputStream
+		{
+			TrackingStream(byte[] buf)
+			{
+				super(buf);
+			}
+
+			@Override
+			public void close() throws java.io.IOException
+			{
+				closed.incrementAndGet();
+				super.close();
+			}
+		}
+
+		assertNull(provider.readTXTFile("no-such-charset", new TrackingStream(new byte[] { 'x' })));
+		assertEquals("x", provider.readTXTFile(null, new TrackingStream(new byte[] { 'x' })));
+		assertEquals("", provider.readTXTFile("UTF-8", new TrackingStream(new byte[0])));
+		assertEquals(3, closed.get());
 	}
 
 	@Test
@@ -478,13 +536,55 @@ public class FileProviderTest
 	}
 
 	@Test
-	public void writingWithAnUnknownEncodingFailsButTruncatesTheFile() throws Exception
+	public void writingWithAnUnknownEncodingFailsAndKeepsTheFile() throws Exception
 	{
 		File f = write("trunc.txt", "important");
 
-		// current behaviour (bug): the file is opened (and truncated) before the encoding is checked
 		assertFalse(provider.js_writeTXTFile(f.getPath(), "new", "no-such-charset"));
-		assertEquals("", read(f));
+		assertFalse(provider.js_writeTXTFile(f.getPath(), "new", "illegal charset name"));
+		assertEquals("important", read(f));
+	}
+
+	@Test
+	public void writingWithAnUnknownEncodingDoesNotCreateTheFile()
+	{
+		File f = file("not-created.txt");
+
+		assertFalse(provider.js_writeTXTFile(f.getPath(), "new", "no-such-charset"));
+		assertFalse(provider.js_writeXMLFile(f.getPath(), "<a/>", "no-such-charset"));
+		assertFalse(f.exists());
+	}
+
+	@Test
+	public void appendingWithAnUnknownEncodingFailsAndDoesNotCreateTheFile() throws Exception
+	{
+		File existing = write("keep.txt", "keep");
+		File missing = file("append-missing.txt");
+
+		assertFalse(provider.js_appendToTXTFile(existing.getPath(), "more", "no-such-charset"));
+		assertFalse(provider.js_appendToTXTFile(missing.getPath(), "more", "no-such-charset"));
+		assertEquals("keep", read(existing));
+		assertFalse(missing.exists());
+	}
+
+	@Test
+	public void supportedEncodingCheck()
+	{
+		assertTrue(FileProvider.isSupportedEncoding(null));
+		assertTrue(FileProvider.isSupportedEncoding("UTF-8"));
+		assertFalse(FileProvider.isSupportedEncoding("no-such-charset"));
+		assertFalse(FileProvider.isSupportedEncoding("illegal charset name"));
+	}
+
+	@Test
+	public void writeToOutputStreamRejectsAnUnknownEncodingWithoutWriting() throws Exception
+	{
+		java.io.ByteArrayOutputStream out = new java.io.ByteArrayOutputStream();
+
+		assertFalse(provider.writeToOutputStream(out, "x", "no-such-charset"));
+		assertEquals(0, out.size());
+		assertTrue(provider.writeToOutputStream(out, "x", null));
+		assertEquals("x", out.toString(java.nio.charset.Charset.defaultCharset()));
 	}
 
 	@Test
@@ -538,16 +638,42 @@ public class FileProviderTest
 	}
 
 	@Test
-	public void writeXmlIgnoresADeclarationWithOnlyOneQuoteType() throws Exception
+	public void writeXmlUsesADoubleQuotedDeclaredEncoding() throws Exception
 	{
 		File dq = file("dq.xml");
+
+		assertTrue(provider.js_writeXMLFile(new JSFile(dq, access), "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?><a>caf\u00e9</a>"));
+		assertEquals((byte)0xe9, eAcuteByte(dq));
+	}
+
+	@Test
+	public void writeXmlUsesASingleQuotedDeclaredEncoding() throws Exception
+	{
 		File sq = file("sq.xml");
 
-		// current behaviour (bug): Math.min(-1, idx) makes the parse fail unless both ' and " occur after encoding=
-		assertTrue(provider.js_writeXMLFile(new JSFile(dq, access), "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?><a>caf\u00e9</a>"));
 		assertTrue(provider.js_writeXMLFile(sq.getPath(), "<?xml version='1.0' encoding='ISO-8859-1'?><a>caf\u00e9</a>"));
-		assertEquals((byte)0xa9, eAcuteByte(dq)); // second byte of the UTF-8 encoding C3 A9
-		assertEquals((byte)0xa9, eAcuteByte(sq));
+		assertEquals((byte)0xe9, eAcuteByte(sq));
+	}
+
+	@Test
+	public void writeXmlFallsBackToUtf8ForAnUnquotedOrUnterminatedEncoding() throws Exception
+	{
+		File unquoted = file("unquoted.xml");
+		File unterminated = file("unterminated.xml");
+
+		assertTrue(provider.js_writeXMLFile(unquoted.getPath(), "<?xml encoding=ISO-8859-1?><a>caf\u00e9</a>"));
+		assertTrue(provider.js_writeXMLFile(unterminated.getPath(), "<?xml encoding='ISO-8859-1<a>caf\u00e9</a>"));
+		assertEquals((byte)0xa9, eAcuteByte(unquoted)); // second byte of the UTF-8 encoding C3 A9
+		assertEquals((byte)0xa9, eAcuteByte(unterminated));
+	}
+
+	@Test
+	public void writeXmlWithAnUnknownDeclaredEncodingFailsAndKeepsTheFile() throws Exception
+	{
+		File f = write("keep.xml", "<old/>");
+
+		assertFalse(provider.js_writeXMLFile(f.getPath(), "<?xml version='1.0' encoding='no-such-charset'?><a/>"));
+		assertEquals("<old/>", read(f));
 	}
 
 	@Test

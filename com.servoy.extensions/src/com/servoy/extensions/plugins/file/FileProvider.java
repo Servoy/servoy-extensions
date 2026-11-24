@@ -916,6 +916,9 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 		File destFile = convertToFile(destination);
 		if (sourceFile == null || destFile == null) return false;
 
+		// check before deleting the destination, else moving a file onto itself deletes it
+		if (isSameFile(sourceFile, destFile)) return false;
+
 		if (destFile.exists())
 		{
 			destFile.delete();
@@ -924,8 +927,6 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 		{
 			destFile.getAbsoluteFile().getParentFile().mkdirs();
 		}
-
-		if (sourceFile.equals(destFile)) return false;
 
 		if (!sourceFile.renameTo(destFile))
 		{
@@ -971,6 +972,39 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 		if (file instanceof IUploadData) return new JSFile((IUploadData)file, plugin.getClientPluginAccess());
 		if (file != null) return new JSFile(new File(file.toString()), plugin.getClientPluginAccess());
 		return null;
+	}
+
+	/**
+	 * True if both point to the same file, also when spelled differently (relative vs absolute, "./", "..", case on Windows).
+	 */
+	static boolean isSameFile(File a, File b)
+	{
+		if (a.equals(b)) return true;
+		try
+		{
+			if (a.exists() && b.exists()) return java.nio.file.Files.isSameFile(a.toPath(), b.toPath());
+		}
+		catch (IOException | SecurityException e)
+		{
+			// fall back to comparing the normalized paths
+		}
+		return a.toPath().toAbsolutePath().normalize().equals(b.toPath().toAbsolutePath().normalize());
+	}
+
+	/**
+	 * True for null (platform default) or a charset this JVM supports; false for unknown or illegal names.
+	 */
+	static boolean isSupportedEncoding(String encoding)
+	{
+		if (encoding == null) return true;
+		try
+		{
+			return Charset.isSupported(encoding);
+		}
+		catch (IllegalArgumentException e)
+		{
+			return false;
+		}
 	}
 
 	private File convertToFile(Object source)
@@ -1074,7 +1108,8 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 		File destFile = convertToFile(destination);
 		if (sourceFile == null || destFile == null) return false;
 
-		if (sourceFile.equals(destFile)) return false;
+		// the destination is deleted below, so also catch the same file under another path spelling
+		if (isSameFile(sourceFile, destFile)) return false;
 
 		try
 		{
@@ -1480,6 +1515,8 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 */
 	protected boolean writeTXT(Object f, String data, String encoding, @SuppressWarnings("unused") String contentType)
 	{
+		// check before the file is opened, opening it truncates the current content
+		if (!isSupportedEncoding(encoding)) return false;
 		try
 		{
 			IClientPluginAccess access = plugin.getClientPluginAccess();
@@ -1522,18 +1559,8 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 */
 	protected boolean writeToOutputStream(OutputStream os, String data, String encoding) throws FileNotFoundException, IOException
 	{
-		Charset cs = null;
-		if (encoding != null)
-		{
-			if (Charset.isSupported(encoding))
-			{
-				cs = Charset.forName(encoding);
-			}
-			else
-			{
-				return false;//unknown encoding
-			}
-		}
+		if (!isSupportedEncoding(encoding)) return false;//unknown encoding
+		Charset cs = encoding != null ? Charset.forName(encoding) : null;
 
 		OutputStreamWriter writer = null;
 		if (cs != null)
@@ -1629,12 +1656,15 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 		int idx1 = xml_data.indexOf("encoding=");
 		if (idx1 != -1 && xml_data.length() > idx1 + 10)
 		{
-			int idx2 = xml_data.indexOf('"', idx1 + 10);
-			int idx3 = xml_data.indexOf('\'', idx1 + 10);
-			int idx4 = Math.min(idx2, idx3);
-			if (idx4 != -1)
+			// the value is quoted with ' or ", read up to the matching closing quote
+			char quote = xml_data.charAt(idx1 + 9);
+			if (quote == '"' || quote == '\'')
 			{
-				encoding = xml_data.substring(idx1 + 10, idx4);
+				int end = xml_data.indexOf(quote, idx1 + 10);
+				if (end != -1)
+				{
+					encoding = xml_data.substring(idx1 + 10, end);
+				}
 			}
 		}
 		return writeTXT(file == null ? "file.xml" : file, xml_data, encoding, "text/xml");
@@ -2003,40 +2033,25 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 */
 	protected String readTXTFile(String encoding, InputStream file) throws FileNotFoundException, IOException
 	{
-		Charset cs = null;
-		if (encoding != null)
+		// the stream is always closed, also for an unknown encoding (an open file stays locked on Windows)
+		try (InputStream in = file)
 		{
-			if (Charset.isSupported(encoding))
-			{
-				cs = Charset.forName(encoding);
-			}
-			else
-			{
-				return null;//unknown enc.
-			}
-		}
+			if (!isSupportedEncoding(encoding)) return null;//unknown enc.
 
-		InputStreamReader reader = null;
-		if (cs != null)
-		{
-			reader = new InputStreamReader(file, cs);
-		}
-		else
-		{
-			reader = new InputStreamReader(file);//default char encoding
-		}
+			InputStreamReader reader = encoding != null ? new InputStreamReader(in, Charset.forName(encoding))
+				: new InputStreamReader(in);//default char encoding
 
-		StringBuffer sb = new StringBuffer();
-		BufferedReader br = new BufferedReader(reader);
-		String line;
-		while ((line = br.readLine()) != null)
-		{
-			sb.append(line);
-			sb.append('\n');
+			StringBuilder sb = new StringBuilder();
+			BufferedReader br = new BufferedReader(reader);
+			String line;
+			while ((line = br.readLine()) != null)
+			{
+				sb.append(line);
+				sb.append('\n');
+			}
+			if (sb.length() > 0) sb.setLength(sb.length() - 1); // remove newline
+			return sb.toString();
 		}
-		if (sb.length() > 0) sb.setLength(sb.length() - 1); // remove newline
-		br.close();
-		return sb.toString();
 	}
 
 	/**
@@ -2420,7 +2435,8 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	@SuppressWarnings("nls")
 	private boolean appendToTXTFile(Object file, String text, String encoding)
 	{
-		if (text != null)
+		// check before the file is opened, opening it creates a missing file
+		if (text != null && isSupportedEncoding(encoding))
 		{
 			try
 			{
