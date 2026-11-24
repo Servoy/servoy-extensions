@@ -19,7 +19,6 @@ package com.servoy.extensions.plugins.xmlreader;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.io.StringReader;
 
@@ -129,11 +128,17 @@ public class XmlNodeTest
 	}
 
 	@Test
-	public void missingAttributeThrowsNullPointerException() throws Exception
+	public void missingAttributeReturnsNull() throws Exception
 	{
-		// current behaviour: the javadoc promises null, the implementation throws
 		XmlNode node = new XmlNode(root("<root attr1='value1'/>"));
-		assertThrows(NullPointerException.class, () -> node.js_getAttributeValue("missing"));
+		assertNull(node.js_getAttributeValue("missing"));
+	}
+
+	@Test
+	public void attributeValueOfATextNodeIsNull() throws Exception
+	{
+		XmlNode text = new XmlNode(root("<a>x</a>")).js_getChildNodes()[0];
+		assertNull(text.js_getAttributeValue("any"));
 	}
 
 	@Test

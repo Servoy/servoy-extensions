@@ -133,7 +133,9 @@ public class XmlNode implements IScriptable
 	 */
 	public String js_getAttributeValue(String attributeName)
 	{
-		return node.getAttributes().getNamedItem(attributeName).getNodeValue();
+		NamedNodeMap attributes = node.getAttributes();
+		Node attribute = attributes != null ? attributes.getNamedItem(attributeName) : null;
+		return attribute != null ? attribute.getNodeValue() : null;
 	}
 
 	/**

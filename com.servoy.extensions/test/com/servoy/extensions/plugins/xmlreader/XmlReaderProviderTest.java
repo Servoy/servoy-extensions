@@ -93,6 +93,12 @@ public class XmlReaderProviderTest
 	}
 
 	@Test
+	public void nullStringReturnsNull()
+	{
+		assertNull(provider.js_readXmlDocumentFromString(null));
+	}
+
+	@Test
 	public void readsDocumentFromFile() throws Exception
 	{
 		assertBooks(provider.js_readXmlDocumentFromFile(writeXml(BOOKS)));

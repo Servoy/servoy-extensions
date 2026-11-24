@@ -92,6 +92,10 @@ public class XmlReaderProvider implements IScriptable, IReturnedTypesProvider
 	 */
 	public XmlNode[] js_readXmlDocumentFromString(String argument)
 	{
+		if (argument == null)
+		{
+			return null;
+		}
 		DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
 		try
 		{
