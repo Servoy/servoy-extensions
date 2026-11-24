@@ -30,7 +30,7 @@ import java.io.OutputStream;
 import com.servoy.j2db.plugins.IAllWebClientPluginAccess;
 import com.servoy.j2db.plugins.IClientPluginAccess;
 import com.servoy.j2db.util.Debug;
-import com.servoy.j2db.util.FileChooserUtils;
+import com.servoy.j2db.util.Utils;
 
 /**
  * Implementation of an {@link IAbstractFile} for local (client-side) files
@@ -59,7 +59,7 @@ public class LocalFile implements IAbstractFile
 	{
 		try
 		{
-			if (file.exists() && !file.isDirectory()) return FileChooserUtils.readFile(file);
+			if (file.exists() && !file.isDirectory()) return Utils.getFileContent(file);
 		}
 		catch (Exception e)
 		{
@@ -204,13 +204,16 @@ public class LocalFile implements IAbstractFile
 	@Override
 	public boolean equals(Object obj)
 	{
-		return file.equals(obj);
+		if (this == obj) return true;
+		if (!(obj instanceof LocalFile)) return false;
+		File other = ((LocalFile)obj).file;
+		return file == null ? other == null : file.equals(other);
 	}
 
 	@Override
 	public int hashCode()
 	{
-		return file.hashCode();
+		return file == null ? 0 : file.hashCode();
 	}
 
 	@Override

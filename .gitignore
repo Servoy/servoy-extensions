@@ -2,3 +2,5 @@
 /servoy_base/
 /servoy_shared/
 /org.eclipse.dltk.javascript.rhino/
+# local opencode codebase index (generated, machine specific)
+/.opencode/index/
