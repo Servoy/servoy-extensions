@@ -449,7 +449,7 @@ public class JSFile implements IScriptable, IJavaScriptType, IFile
 	/**
 	 * Return a new JSFile instance that contains a remote file with the content of current JSFile.
 	 * @param fileName
-	 * @return A new JSFile instance representing a remote file with the content of the current JSFile.
+	 * @return A new JSFile instance representing a remote file with the content of the current JSFile, or null if the file server is not available.
 	 */
 	public JSFile js_convertToRemote(String fileName)
 	{
@@ -463,30 +463,29 @@ public class JSFile implements IScriptable, IJavaScriptType, IFile
 		{
 			Debug.error(e);
 		}
-		File destFile = new File(mainFolder, fileName);
-		if (!file.exists())
+		if (mainFolder == null)
 		{
-			try
+			// without the server folder the file would end up relative to the working directory
+			Debug.error("Cannot convert '" + this + "' to a remote file, the default folder of the file server is not available"); //$NON-NLS-1$ //$NON-NLS-2$
+			return null;
+		}
+		File destFile = new File(mainFolder, fileName);
+
+		// a missing source results in an empty remote file, the source itself is not created
+		InputStream is = file.exists() ? getInputStream() : null;
+		try (OutputStream os = new FileOutputStream(destFile))
+		{
+			if (is != null)
 			{
-				file.createNewFile();
-			}
-			catch (IOException e)
-			{
-				Debug.error(e);
+				try (is)
+				{
+					IOUtils.copyLarge(is, os);
+				}
 			}
 		}
-
-		InputStream is = getInputStream();
-		if (is != null)
+		catch (final IOException e)
 		{
-			try (is; OutputStream os = new FileOutputStream(destFile))
-			{
-				IOUtils.copyLarge(is, os);
-			}
-			catch (final IOException e)
-			{
-				Debug.error(e);
-			}
+			Debug.error(e);
 		}
 
 

@@ -322,26 +322,66 @@ public class JSFileTest
 		JSFile local = new JSFile(Files.write(tempDir.resolve("n.txt"), "content".getBytes(StandardCharsets.UTF_8)).toFile(), access);
 
 		JSFile remote = local.js_convertToRemote("copy.txt");
+		assertNotNull(remote);
 
 		assertInstanceOf(RemoteFile.class, remote.getAbstractFile());
 		assertEquals("/copy.txt", remote.js_getAbsolutePath());
 		assertEquals("content", Files.readString(main.toPath().resolve("copy.txt")));
 	}
 
-	@Test
-	public void convertToRemoteCreatesAMissingSourceFileFirst() throws Exception
+	private IClientPluginAccess accessWithServerFolder(File main) throws Exception
 	{
-		File main = Files.createDirectory(tempDir.resolve("server")).toFile();
 		IFileService service = mock(IFileService.class);
 		when(service.getDefaultFolder(any())).thenReturn(main);
 		IClientPluginAccess access = mock(IClientPluginAccess.class);
 		when(access.getRemoteService(IFileService.class.getName())).thenReturn(service);
-		JSFile local = new JSFile(tempDir.resolve("new.txt").toFile(), access);
+		return access;
+	}
+
+	@Test
+	public void convertToRemoteOfAMissingSourceGivesAnEmptyRemoteFileWithoutCreatingTheSource() throws Exception
+	{
+		File main = Files.createDirectory(tempDir.resolve("server")).toFile();
+		JSFile local = new JSFile(tempDir.resolve("new.txt").toFile(), accessWithServerFolder(main));
 
 		JSFile remote = local.js_convertToRemote("empty.txt");
 
-		assertTrue(local.js_exists());
+		assertFalse(local.js_exists());
 		assertTrue(remote.js_exists());
 		assertEquals(0, remote.js_size());
+	}
+
+	@Test
+	public void convertToRemoteOfAMissingSourceEmptiesAnExistingRemoteFile() throws Exception
+	{
+		File main = Files.createDirectory(tempDir.resolve("server")).toFile();
+		Files.writeString(main.toPath().resolve("old.txt"), "old content");
+		JSFile local = new JSFile(tempDir.resolve("new.txt").toFile(), accessWithServerFolder(main));
+
+		JSFile remote = local.js_convertToRemote("old.txt");
+
+		assertEquals(0, remote.js_size());
+	}
+
+	@Test
+	public void convertToRemoteWithoutServerFolderReturnsNullAndWritesNothing() throws Exception
+	{
+		JSFile local = existing("o.txt", "content".getBytes(StandardCharsets.UTF_8));
+		JSFile withoutFolder = new JSFile(local.getFile(), accessWithServerFolder(null));
+		String fileName = "svy21823-" + System.nanoTime() + ".txt";
+
+		assertNull(withoutFolder.js_convertToRemote(fileName));
+		// before the fix the copy ended up relative to the working directory
+		assertFalse(new File(fileName).exists());
+	}
+
+	@Test
+	public void convertToRemoteReturnsNullWhenTheRemoteServiceFails() throws Exception
+	{
+		IClientPluginAccess access = mock(IClientPluginAccess.class);
+		when(access.getRemoteService(IFileService.class.getName())).thenThrow(new IllegalStateException("no server"));
+		JSFile local = new JSFile(existing("p.txt", new byte[] { 1 }).getFile(), access);
+
+		assertNull(local.js_convertToRemote("p.txt"));
 	}
 }
