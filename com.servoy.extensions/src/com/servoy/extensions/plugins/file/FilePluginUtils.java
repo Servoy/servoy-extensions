@@ -20,7 +20,7 @@ package com.servoy.extensions.plugins.file;
 import java.io.File;
 
 /**
- * Utility class holding methods used by {@link FileServerPlugin} and {@link WebFileProvider}
+ * Utility class holding methods used by {@link FileServerPlugin} and {@link FileProvider}
  *
  * @author Servoy Stuff
  *
@@ -60,7 +60,7 @@ public class FilePluginUtils
 	 */
 	public static void filePathCheck(final String filePath) throws IllegalArgumentException
 	{
-		if (filePath.charAt(0) != '/')
+		if (filePath == null || filePath.isEmpty() || filePath.charAt(0) != '/')
 		{
 			throw new IllegalArgumentException("Remote path should start with '/'"); //$NON-NLS-1$
 		}

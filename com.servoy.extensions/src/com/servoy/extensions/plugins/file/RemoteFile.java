@@ -34,7 +34,7 @@ import java.util.List;
 
 import com.servoy.j2db.plugins.IClientPluginAccess;
 import com.servoy.j2db.util.Debug;
-import com.servoy.j2db.util.FileChooserUtils;
+import com.servoy.j2db.util.Utils;
 
 /**
  * Implementation of an {@link IAbstractFile} for remote (server-side) files<br/>
@@ -186,7 +186,7 @@ public class RemoteFile extends AbstractFile
 	{
 		try
 		{
-			if (file.exists() && !file.isDirectory()) return FileChooserUtils.readFile(file);
+			if (file.exists() && !file.isDirectory()) return Utils.getFileContent(file);
 		}
 		catch (Exception e)
 		{
@@ -248,7 +248,9 @@ public class RemoteFile extends AbstractFile
 	@Override
 	public boolean equals(Object obj)
 	{
-		return file.equals(obj);
+		if (this == obj) return true;
+		if (!(obj instanceof RemoteFile)) return false;
+		return file.equals(((RemoteFile)obj).file);
 	}
 
 	@Override
@@ -361,7 +363,7 @@ public class RemoteFile extends AbstractFile
 						String name = pathname.getName().toLowerCase();
 						for (String element : fileFilter)
 						{
-							retVal = name.endsWith(element);
+							retVal = element != null && name.endsWith(element.toLowerCase());
 							if (retVal) break;
 						}
 					}

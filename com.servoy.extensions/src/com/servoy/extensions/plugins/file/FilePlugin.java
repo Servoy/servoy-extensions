@@ -75,16 +75,7 @@ public class FilePlugin implements IClientPlugin, IIconProvider
 	{
 		if (fileProvider == null)
 		{
-			if (access != null &&
-				(access.getApplicationType() == IClientPluginAccess.WEB_CLIENT || access.getApplicationType() == IClientPluginAccess.NG_CLIENT ||
-					access.getApplicationType() == IClientPluginAccess.HEADLESS_CLIENT))
-			{
-				fileProvider = new WebFileProvider(this);
-			}
-			else
-			{
-				fileProvider = new FileProvider(this);
-			}
+			fileProvider = new FileProvider(this);
 		}
 		return fileProvider;
 	}

@@ -17,9 +17,10 @@
 package com.servoy.extensions.plugins.file;
 
 import java.awt.Desktop;
-import java.awt.Window;
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
@@ -44,11 +45,6 @@ import java.util.Set;
 import java.util.Timer;
 import java.util.UUID;
 
-import javax.swing.JFileChooser;
-import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
-import javax.swing.filechooser.FileSystemView;
-
 import org.apache.commons.io.ByteOrderMark;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.input.BOMInputStream;
@@ -57,20 +53,17 @@ import org.mozilla.javascript.NativeArray;
 import org.mozilla.javascript.annotations.JSFunction;
 
 import com.servoy.base.scripting.annotations.ServoyClientSupport;
-import com.servoy.j2db.IApplication;
-import com.servoy.j2db.Messages;
 import com.servoy.j2db.documentation.ServoyDocumented;
+import com.servoy.j2db.plugins.IAllWebClientPluginAccess;
 import com.servoy.j2db.plugins.IClientPluginAccess;
 import com.servoy.j2db.plugins.IFile;
 import com.servoy.j2db.plugins.IMediaUploadCallback;
-import com.servoy.j2db.plugins.IRuntimeWindow;
-import com.servoy.j2db.plugins.ISmartRuntimeWindow;
 import com.servoy.j2db.plugins.IUploadData;
 import com.servoy.j2db.scripting.FunctionDefinition;
 import com.servoy.j2db.scripting.IReturnedTypesProvider;
 import com.servoy.j2db.scripting.IScriptable;
 import com.servoy.j2db.util.Debug;
-import com.servoy.j2db.util.FileChooserUtils;
+import com.servoy.j2db.util.MimeTypes;
 import com.servoy.j2db.util.Settings;
 import com.servoy.j2db.util.Utils;
 
@@ -122,6 +115,13 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 */
 	static final int CHUNK_BUFFER_SIZE = 64 * 1024;
 
+	/**
+	 * File selection modes for {@link IClientPluginAccess#showFileOpenDialog}, the values of the javax.swing.JFileChooser constants it expects.
+	 */
+	private static final int SELECTION_FILES_ONLY = 0;
+	private static final int SELECTION_DIRECTORIES_ONLY = 1;
+	private static final int SELECTION_FILES_AND_DIRECTORIES = 2;
+
 	public FileProvider(FilePlugin plugin)
 	{
 		this.plugin = plugin;
@@ -146,28 +146,13 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	@Deprecated
 	public JSFile js_getDesktopFolder()
 	{
-		FileSystemView fsf = FileSystemView.getFileSystemView();
-		// in Unix-based systems, the root directory is "/", not ~<user>/Desktop => old implementation not correct
-		// in Windows the root directory is indeed the desktop directory, but it's also <user.home>\Desktop
-		File homeDir = fsf.getHomeDirectory();
-		File desktopDir = new File(homeDir.getAbsolutePath() + File.separator + "Desktop"); //$NON-NLS-1$
-		if (desktopDir != null && desktopDir.isDirectory())
+		// <user.home>/Desktop of the process running the client (the server for web/NG/headless clients)
+		File desktopDir = new File(System.getProperty("user.home"), "Desktop"); //$NON-NLS-1$ //$NON-NLS-2$
+		if (desktopDir.isDirectory())
 		{
 			return new JSFile(desktopDir, plugin.getClientPluginAccess());
 		}
-		else
-		{
-			//the old implementation - shouldn't normally reach this piece of code
-			File[] roots = fsf.getRoots();
-			for (File element : roots)
-			{
-				if (fsf.isRoot(element))
-				{
-					return new JSFile(element, plugin.getClientPluginAccess());
-				}
-			}
-			return null;
-		}
+		return null;
 	}
 
 	/**
@@ -533,17 +518,18 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 		int _selectionMode = getNumberAsInt(selectionMode, 1);
 		boolean _multiselect = getBooleanAsbool(multiselect, false);
 
-		int selection = 1;
+		// values of the javax.swing.JFileChooser selection modes, as expected by IClientPluginAccess.showFileOpenDialog
+		int selection;
 		switch (_selectionMode)
 		{
 			case 0 :
-				selection = JFileChooser.FILES_AND_DIRECTORIES;
+				selection = SELECTION_FILES_AND_DIRECTORIES;
 				break;
 			case 2 :
-				selection = JFileChooser.DIRECTORIES_ONLY;
+				selection = SELECTION_DIRECTORIES_ONLY;
 				break;
 			default :
-				selection = JFileChooser.FILES_ONLY;
+				selection = SELECTION_FILES_ONLY;
 		}
 		IClientPluginAccess access = plugin.getClientPluginAccess();
 		File file = startDirectory != null ? getFileFromArg(startDirectory, true) : null;
@@ -622,29 +608,8 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 		}
 		else
 		{
-			if (access.getApplicationType() == IClientPluginAccess.WEB_CLIENT || access.getApplicationType() == IClientPluginAccess.NG_CLIENT)
-			{
-				throw new RuntimeException("Function callback not set for webclient/ngclient"); //$NON-NLS-1$
-			}
-
-			IRuntimeWindow runtimeWindow = access.getCurrentRuntimeWindow();
-			Window currentWindow = null;
-			if (runtimeWindow instanceof ISmartRuntimeWindow) currentWindow = ((ISmartRuntimeWindow)runtimeWindow).getWindow();
-
-			if (_multiselect)
-			{
-				File[] files = FileChooserUtils.getFiles(currentWindow, file, selection, filterA, title);
-				JSFile[] convertedFiles = convertToJSFiles(files);
-				return convertedFiles;
-			}
-			else
-			{
-				File f = FileChooserUtils.getAReadFile(currentWindow, file, selection, filterA, title);
-				if (f != null)
-				{
-					return new JSFile(f, plugin.getClientPluginAccess());
-				}
-			}
+			// a modal (blocking) file dialog only existed in the smart client
+			throw new UnsupportedMethodException("showFileOpenDialog requires a callback function (the modal file dialog was only supported in the SmartClient)"); //$NON-NLS-1$
 		}
 		return null;
 	}
@@ -916,6 +881,9 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 		File destFile = convertToFile(destination);
 		if (sourceFile == null || destFile == null) return false;
 
+		// check before deleting the destination, else moving a file onto itself deletes it
+		if (isSameFile(sourceFile, destFile)) return false;
+
 		if (destFile.exists())
 		{
 			destFile.delete();
@@ -924,8 +892,6 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 		{
 			destFile.getAbsoluteFile().getParentFile().mkdirs();
 		}
-
-		if (sourceFile.equals(destFile)) return false;
 
 		if (!sourceFile.renameTo(destFile))
 		{
@@ -971,6 +937,39 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 		if (file instanceof IUploadData) return new JSFile((IUploadData)file, plugin.getClientPluginAccess());
 		if (file != null) return new JSFile(new File(file.toString()), plugin.getClientPluginAccess());
 		return null;
+	}
+
+	/**
+	 * True if both point to the same file, also when spelled differently (relative vs absolute, "./", "..", case on Windows).
+	 */
+	static boolean isSameFile(File a, File b)
+	{
+		if (a.equals(b)) return true;
+		try
+		{
+			if (a.exists() && b.exists()) return java.nio.file.Files.isSameFile(a.toPath(), b.toPath());
+		}
+		catch (IOException | SecurityException e)
+		{
+			// fall back to comparing the normalized paths
+		}
+		return a.toPath().toAbsolutePath().normalize().equals(b.toPath().toAbsolutePath().normalize());
+	}
+
+	/**
+	 * True for null (platform default) or a charset this JVM supports; false for unknown or illegal names.
+	 */
+	static boolean isSupportedEncoding(String encoding)
+	{
+		if (encoding == null) return true;
+		try
+		{
+			return Charset.isSupported(encoding);
+		}
+		catch (IllegalArgumentException e)
+		{
+			return false;
+		}
 	}
 
 	private File convertToFile(Object source)
@@ -1074,7 +1073,8 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 		File destFile = convertToFile(destination);
 		if (sourceFile == null || destFile == null) return false;
 
-		if (sourceFile.equals(destFile)) return false;
+		// the destination is deleted below, so also catch the same file under another path spelling
+		if (isSameFile(sourceFile, destFile)) return false;
 
 		try
 		{
@@ -1223,17 +1223,7 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 
 		if (destFile.isDirectory())
 		{
-			if (showWarning && plugin.getClientPluginAccess().getApplicationType() == IApplication.CLIENT)
-			{
-				IClientPluginAccess access = plugin.getClientPluginAccess();
-				IRuntimeWindow runtimeWindow = access.getCurrentRuntimeWindow();
-				Window currentWindow = null;
-				if (runtimeWindow instanceof ISmartRuntimeWindow) currentWindow = ((ISmartRuntimeWindow)runtimeWindow).getWindow();
-				int option = JOptionPane.showConfirmDialog(currentWindow,
-					Messages.getString("servoy.plugin.file.folderDelete.warning") + destFile.getAbsolutePath(), //$NON-NLS-1$
-					Messages.getString("servoy.plugin.file.folderDelete.title"), JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE); //$NON-NLS-1$
-				if (option != JOptionPane.YES_OPTION) return false;
-			}
+			// showWarning only showed a confirm dialog in the smart client, it is ignored in the other clients
 			File[] files = destFile.listFiles();
 			for (File element : files)
 			{
@@ -1478,20 +1468,35 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 * @param encoding
 	 * @return
 	 */
-	protected boolean writeTXT(Object f, String data, String encoding, @SuppressWarnings("unused") String contentType)
+	@SuppressWarnings("nls")
+	protected boolean writeTXT(Object f, String data, String encoding, String contentType)
 	{
+		// check before the file is opened, opening it truncates the current content
+		if (!isSupportedEncoding(encoding)) return false;
 		try
 		{
 			IClientPluginAccess access = plugin.getClientPluginAccess();
-			File file = getFileFromArg(f, true);
-			if (file == null)
+			if ((f == null || getFileFromArg(f, false) == null) && access instanceof IAllWebClientPluginAccess webAccess)
 			{
-				IRuntimeWindow runtimeWindow = access.getCurrentRuntimeWindow();
-				Window currentWindow = null;
-				if (runtimeWindow instanceof ISmartRuntimeWindow) currentWindow = ((ISmartRuntimeWindow)runtimeWindow).getWindow();
-				file = FileChooserUtils.getAWriteFile(currentWindow, file, false);
+				// no file on the server side: send the data as a download to the browser
+				ByteArrayOutputStream baos = new ByteArrayOutputStream(data.length());
+				if (writeToOutputStream(baos, data, encoding))
+				{
+					String mimeType = contentType;
+					if (encoding != null)
+					{
+						mimeType += "; charset=\"" + encoding + "\"";
+					}
+					String name = f == null ? "file.txt" : f instanceof JSFile ? ((JSFile)f).js_getName() : f.toString();
+					String url = webAccess.serveResource(name, baos.toByteArray(), mimeType);
+					webAccess.showURL(url, "_self", null, 0, false);
+					return true;
+				}
+				return false;
 			}
 
+			// without a file there is nothing to write to (the smart client showed a file save dialog here)
+			File file = getFileFromArg(f, true);
 			if (file != null)
 			{
 				FileOutputStream fos = new FileOutputStream(file);
@@ -1522,18 +1527,8 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 */
 	protected boolean writeToOutputStream(OutputStream os, String data, String encoding) throws FileNotFoundException, IOException
 	{
-		Charset cs = null;
-		if (encoding != null)
-		{
-			if (Charset.isSupported(encoding))
-			{
-				cs = Charset.forName(encoding);
-			}
-			else
-			{
-				return false;//unknown encoding
-			}
-		}
+		if (!isSupportedEncoding(encoding)) return false;//unknown encoding
+		Charset cs = encoding != null ? Charset.forName(encoding) : null;
 
 		OutputStreamWriter writer = null;
 		if (cs != null)
@@ -1629,12 +1624,15 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 		int idx1 = xml_data.indexOf("encoding=");
 		if (idx1 != -1 && xml_data.length() > idx1 + 10)
 		{
-			int idx2 = xml_data.indexOf('"', idx1 + 10);
-			int idx3 = xml_data.indexOf('\'', idx1 + 10);
-			int idx4 = Math.min(idx2, idx3);
-			if (idx4 != -1)
+			// the value is quoted with ' or ", read up to the matching closing quote
+			char quote = xml_data.charAt(idx1 + 9);
+			if (quote == '"' || quote == '\'')
 			{
-				encoding = xml_data.substring(idx1 + 10, idx4);
+				int end = xml_data.indexOf(quote, idx1 + 10);
+				if (end != -1)
+				{
+					encoding = xml_data.substring(idx1 + 10, end);
+				}
 			}
 		}
 		return writeTXT(file == null ? "file.xml" : file, xml_data, encoding, "text/xml");
@@ -1714,20 +1712,26 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 		return writeFile(file, data, mimeType);
 	}
 
-	protected boolean writeFile(Object f, byte[] data, @SuppressWarnings("unused") String mimeType)
+	@SuppressWarnings("nls")
+	protected boolean writeFile(Object f, byte[] data, String mimeType)
 	{
 		if (data == null) return false;
+		IClientPluginAccess access = plugin.getClientPluginAccess();
+		if ((f == null || getFileFromArg(f, false) == null) && access instanceof IAllWebClientPluginAccess webAccess)
+		{
+			// no file on the server side: send the data as a download to the browser
+			String name = "file.bin";
+			if (f instanceof JSFile) name = ((JSFile)f).js_getName();
+			else if (f != null) name = f.toString();
+			String type = (mimeType == null) ? MimeTypes.getContentType(data, name) : mimeType.trim();
+			String url = webAccess.serveResource(name, data, type);
+			webAccess.showURL(url, "_self", null, 0, false);
+			return true;
+		}
 		try
 		{
+			// without a file there is nothing to write to (the smart client showed a file save dialog here)
 			File file = getFileFromArg(f, true);
-			if (file == null)
-			{
-				IClientPluginAccess access = plugin.getClientPluginAccess();
-				IRuntimeWindow runtimeWindow = access.getCurrentRuntimeWindow();
-				Window currentWindow = null;
-				if (runtimeWindow instanceof ISmartRuntimeWindow) currentWindow = ((ISmartRuntimeWindow)runtimeWindow).getWindow();
-				file = FileChooserUtils.getAWriteFile(currentWindow, file, false);
-			}
 			if (file != null && !file.isDirectory())
 			{
 				FileUtils.writeByteArrayToFile(file, data);
@@ -1780,6 +1784,16 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 */
 	public boolean js_openFile(JSFile file, String webClientTarget, String webClientTargetOptions)
 	{
+		IClientPluginAccess access = plugin.getClientPluginAccess();
+		if (access instanceof IAllWebClientPluginAccess webAccess)
+		{
+			String fileName = file.js_getName();
+			byte[] data = file.jsFunction_getBytes();
+			String url = webAccess.serveResource(fileName, data, MimeTypes.getContentType(data, fileName), "inline"); //$NON-NLS-1$
+			webAccess.showURL(url, webClientTarget != null ? webClientTarget : "_blank", webClientTargetOptions, 0, true); //$NON-NLS-1$
+			return true;
+		}
+		// not a browser client (headless): open it with the application of the operating system
 		try
 		{
 			Desktop.getDesktop().open(file.getFile());
@@ -1851,6 +1865,16 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 */
 	public boolean js_openFile(String fileName, byte[] data, String mimeType, String webClientTarget, String webClientTargetOptions)
 	{
+		IClientPluginAccess access = plugin.getClientPluginAccess();
+		if (access instanceof IAllWebClientPluginAccess webAccess)
+		{
+			String name = (fileName == null ? "file.bin" : fileName); //$NON-NLS-1$
+			String type = (mimeType == null) ? MimeTypes.getContentType(data, name) : mimeType.trim();
+			String url = webAccess.serveResource(name, data, type, "inline"); //$NON-NLS-1$
+			webAccess.showURL(url, webClientTarget != null ? webClientTarget : "_blank", webClientTargetOptions, 0, true); //$NON-NLS-1$
+			return true;
+		}
+		// not a browser client (headless): write a temp file and open it with the application of the operating system
 		try
 		{
 			String suffix, prefix;
@@ -1962,30 +1986,26 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	{
 		try
 		{
-			File f = null;
-			if (file != null)
+			InputStream is;
+			if (file instanceof JSFile && plugin.getClientPluginAccess() instanceof IAllWebClientPluginAccess)
 			{
-				f = getFileFromArg(file, true);
+				// browser client: local, remote or uploaded file
+				is = ((JSFile)file).getInputStream();
+				if (is == null) return ""; //$NON-NLS-1$
 			}
-			IClientPluginAccess access = plugin.getClientPluginAccess();
-			IRuntimeWindow runtimeWindow = access.getCurrentRuntimeWindow();
-			Window currentWindow = null;
-			if (runtimeWindow instanceof ISmartRuntimeWindow) currentWindow = ((ISmartRuntimeWindow)runtimeWindow).getWindow();
-			File fileObj = FileChooserUtils.getAReadFile(currentWindow, f, JFileChooser.FILES_ONLY, null);
-
-			if (fileObj != null) // !cancelled
+			else
 			{
-				if (charsetname != null && charsetname.contains("UTF")) //$NON-NLS-1$
-				{
-					BOMInputStream bomIn = new BOMInputStream(new FileInputStream(fileObj), false,
-						ByteOrderMark.UTF_8,
-						ByteOrderMark.UTF_16LE, ByteOrderMark.UTF_16BE,
-						ByteOrderMark.UTF_32LE, ByteOrderMark.UTF_32BE);
-					return readTXTFile(charsetname, bomIn);
-				}
-				return readTXTFile(charsetname, new FileInputStream(fileObj));
+				// without an existing file there is nothing to read (the smart client showed a file open dialog here)
+				File f = file != null ? getFileFromArg(file, true) : null;
+				if (f == null || !f.isFile()) return null;
+				is = new FileInputStream(f);
 			}
-			return null;
+			if (charsetname != null && charsetname.contains("UTF")) //$NON-NLS-1$
+			{
+				is = new BOMInputStream(is, false, ByteOrderMark.UTF_8, ByteOrderMark.UTF_16LE, ByteOrderMark.UTF_16BE, ByteOrderMark.UTF_32LE,
+					ByteOrderMark.UTF_32BE);
+			}
+			return readTXTFile(charsetname, is);
 		}
 		catch (Exception e)
 		{
@@ -2003,40 +2023,25 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 */
 	protected String readTXTFile(String encoding, InputStream file) throws FileNotFoundException, IOException
 	{
-		Charset cs = null;
-		if (encoding != null)
+		// the stream is always closed, also for an unknown encoding (an open file stays locked on Windows)
+		try (InputStream in = file)
 		{
-			if (Charset.isSupported(encoding))
-			{
-				cs = Charset.forName(encoding);
-			}
-			else
-			{
-				return null;//unknown enc.
-			}
-		}
+			if (!isSupportedEncoding(encoding)) return null;//unknown enc.
 
-		InputStreamReader reader = null;
-		if (cs != null)
-		{
-			reader = new InputStreamReader(file, cs);
-		}
-		else
-		{
-			reader = new InputStreamReader(file);//default char encoding
-		}
+			InputStreamReader reader = encoding != null ? new InputStreamReader(in, Charset.forName(encoding))
+				: new InputStreamReader(in);//default char encoding
 
-		StringBuffer sb = new StringBuffer();
-		BufferedReader br = new BufferedReader(reader);
-		String line;
-		while ((line = br.readLine()) != null)
-		{
-			sb.append(line);
-			sb.append('\n');
+			StringBuilder sb = new StringBuilder();
+			BufferedReader br = new BufferedReader(reader);
+			String line;
+			while ((line = br.readLine()) != null)
+			{
+				sb.append(line);
+				sb.append('\n');
+			}
+			if (sb.length() > 0) sb.setLength(sb.length() - 1); // remove newline
+			return sb.toString();
 		}
-		if (sb.length() > 0) sb.setLength(sb.length() - 1); // remove newline
-		br.close();
-		return sb.toString();
 	}
 
 	/**
@@ -2117,24 +2122,8 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 
 	private JSFile showFileSaveDialog(Object fileNameDir, String title)
 	{
-		File file = null;
-		if (fileNameDir != null)
-		{
-			file = getFileFromArg(fileNameDir, true);
-		}
-
-		IClientPluginAccess access = plugin.getClientPluginAccess();
-		if (access.getApplicationType() != IClientPluginAccess.CLIENT && access.getApplicationType() != IClientPluginAccess.RUNTIME)
-			throw new UnsupportedMethodException("File save is only supported in the SmartClient (not in web or headless client)"); //$NON-NLS-1$
-		IRuntimeWindow runtimeWindow = access.getCurrentRuntimeWindow();
-		Window currentWindow = null;
-		if (runtimeWindow instanceof ISmartRuntimeWindow) currentWindow = ((ISmartRuntimeWindow)runtimeWindow).getWindow();
-		File f = FileChooserUtils.getAWriteFile(currentWindow, file, true, title);
-		if (f != null)
-		{
-			return new JSFile(f, plugin.getClientPluginAccess());
-		}
-		return null;
+		// a modal file save dialog only existed in the smart client
+		throw new UnsupportedMethodException("File save is only supported in the SmartClient (not in web or headless client)"); //$NON-NLS-1$
 	}
 
 	/**
@@ -2212,24 +2201,8 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 
 	private JSFile showDirectorySelectDialog(Object directory, String title)
 	{
-		File f = null;
-		if (directory != null)
-		{
-			f = getFileFromArg(directory, true);
-		}
-
-		IClientPluginAccess access = plugin.getClientPluginAccess();
-		if (access.getApplicationType() != IClientPluginAccess.CLIENT && access.getApplicationType() != IClientPluginAccess.RUNTIME)
-			throw new UnsupportedMethodException("Directory selection is only supported in the SmartClient (not in web or headless client)"); //$NON-NLS-1$
-		IRuntimeWindow runtimeWindow = access.getCurrentRuntimeWindow();
-		Window currentWindow = null;
-		if (runtimeWindow instanceof ISmartRuntimeWindow) currentWindow = ((ISmartRuntimeWindow)runtimeWindow).getWindow();
-		File retval = FileChooserUtils.getAReadFile(currentWindow, f, JFileChooser.DIRECTORIES_ONLY, null, title);
-		if (retval != null)
-		{
-			return new JSFile(retval, plugin.getClientPluginAccess());
-		}
-		return null;
+		// a modal directory selection dialog only existed in the smart client
+		throw new UnsupportedMethodException("Directory selection is only supported in the SmartClient (not in web or headless client)"); //$NON-NLS-1$
 	}
 
 	/**
@@ -2310,39 +2283,16 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 
 	private byte[] readFile(Object file, long size)
 	{
-		try
+		// browser client: local, remote or uploaded file; the size is not used for a JSFile there (SVY-21865)
+		if (file instanceof JSFile && plugin.getClientPluginAccess() instanceof IAllWebClientPluginAccess)
 		{
-			File f = null;
-			if (file != null)
-			{
-				f = getFileFromArg(file, true);
-			}
-
-			IClientPluginAccess access = plugin.getClientPluginAccess();
-			IRuntimeWindow runtimeWindow = access.getCurrentRuntimeWindow();
-			Window currentWindow = null;
-			if (runtimeWindow instanceof ISmartRuntimeWindow) currentWindow = ((ISmartRuntimeWindow)runtimeWindow).getWindow();
-			File fileObj = FileChooserUtils.getAReadFile(currentWindow, f, JFileChooser.FILES_ONLY, null);
-
-			byte[] retval = null;
-			if (fileObj != null && fileObj.exists() && !fileObj.isDirectory()) // !cancelled
-			{
-				if (SwingUtilities.isEventDispatchThread())
-				{
-					retval = FileChooserUtils.paintingReadFile(access.getExecutor(), access, fileObj, size);
-				}
-				else
-				{
-					retval = FileChooserUtils.readFile(fileObj, size);
-				}
-			}
-			return retval;
+			return ((JSFile)file).jsFunction_getBytes();
 		}
-		catch (Exception e)
-		{
-			Debug.error(e);
-			return null;
-		}
+
+		// without an existing file there is nothing to read (the smart client showed a file open dialog here)
+		File f = file != null ? getFileFromArg(file, true) : null;
+		if (f == null || !f.isFile()) return null;
+		return Utils.readFile(f, size);
 	}
 
 	public Class< ? >[] getAllReturnedTypes()
@@ -2420,19 +2370,14 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	@SuppressWarnings("nls")
 	private boolean appendToTXTFile(Object file, String text, String encoding)
 	{
-		if (text != null)
+		// check before the file is opened, opening it creates a missing file
+		if (text != null && isSupportedEncoding(encoding))
 		{
 			try
 			{
-				final IClientPluginAccess access = plugin.getClientPluginAccess();
 				File f = getFileFromArg(file, true);
-				if (f == null)
-				{
-					IRuntimeWindow runtimeWindow = access.getCurrentRuntimeWindow();
-					Window currentWindow = null;
-					if (runtimeWindow instanceof ISmartRuntimeWindow) currentWindow = ((ISmartRuntimeWindow)runtimeWindow).getWindow();
-					f = FileChooserUtils.getAWriteFile(currentWindow, f, false);
-				}
+				// without a file there is nothing to append to (the smart client showed a file save dialog here)
+				if (f == null) return false;
 				FileOutputStream fos = new FileOutputStream(f, true);
 				try
 				{
@@ -2826,53 +2771,145 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 	 * @return a {@link JSProgressMonitor} object to allow client to subscribe to progress notifications
 	 */
 	@Deprecated
+	@SuppressWarnings("nls")
 	public JSProgressMonitor js_streamFilesToServer(final Object files, final Object serverFiles, final Function callback)
 	{
+		// the client code already runs on the server: the files are copied into the default upload folder right away
 		if (files != null)
 		{
-			final Object[] fileObjects = unwrap(files);
-			final Object[] serverObjects = unwrap(serverFiles);
-			if (fileObjects != null)
+			// first get the default upload location (canonical path on the server):
+			final String defaultLocation = js_getDefaultUploadLocation();
+			if (defaultLocation != null)
 			{
-				// the FunctionDefinition is only created once for all files:
+				final File serverFolder = new File(defaultLocation);
 				final FunctionDefinition function = (callback == null) ? null : new FunctionDefinition(callback);
-				final File[] filesToBeStreamed = new File[fileObjects.length];
-				long totalBytes = 0;
-				for (int i = 0; i < fileObjects.length; i++)
+
+				final Object[] fileObjects = unwrap(files);
+				final Object[] serverObjects = unwrap(serverFiles);
+
+				if (fileObjects != null)
 				{
-					final File file = getFileFromArg(fileObjects[i], true);
-					if (file != null && file.canRead())
+					for (int i = 0; i < fileObjects.length; i++)
 					{
-						totalBytes += file.length();
-						filesToBeStreamed[i] = file;
-					}
-					else if (fileObjects[i] instanceof JSFile)
-					{
-						IAbstractFile af = ((JSFile)fileObjects[i]).getAbstractFile();
-						if (af instanceof UploadData)
+						InputStream is = null;
+						OutputStream os = null;
+						Exception ex = null;
+						File dest = null;
+						try
 						{
-							throw new RuntimeException(
-								"Using streamFilesToServer with an uploadData in the web client makes no sense since the process is already on the server-side, consider using writeFile(), writeTXTFile() or writeXMLFile() instead!"); //$NON-NLS-1$
+							// tries to retrieve an inputStream from the IUploadData:
+							is = ((JSFile)fileObjects[i]).getAbstractFile().getInputStream();
+							if (is != null)
+							{
+								String serverFileName = null;
+								if (serverObjects != null && i < serverObjects.length)
+								{
+									if (serverObjects[i] instanceof JSFile)
+									{
+										JSFile jsFile = (JSFile)serverObjects[i];
+										IAbstractFile abstractFile = jsFile.getAbstractFile();
+										if (abstractFile instanceof RemoteFile)
+										{
+											serverFileName = extractName(((RemoteFile)abstractFile).getAbsolutePath());
+										}
+										else
+										{
+											serverFileName = extractName(abstractFile.getName());
+										}
+									}
+									else
+									{
+										serverFileName = serverObjects[i].toString();
+										FilePluginUtils.filePathCheck(serverFileName);
+									}
+								}
+								else
+								{
+									// no server file or server file name was provided, so create a default one:
+									serverFileName = "/" + extractName(((JSFile)fileObjects[i]).getAbstractFile().getName());
+								}
+								// serverFileName can point to a folder or a file:
+								String clientFileName = extractName(serverFileName);
+								if (clientFileName.indexOf('.') < 0)
+								{ // no extension, we assume it's a folder:
+									if (serverFileName.charAt(serverFileName.length() - 1) != '/')
+									{
+										serverFileName += "/";
+									}
+									serverFileName += extractName(((JSFile)fileObjects[i]).getAbstractFile().getName());
+								}
+								dest = new File(serverFolder, serverFileName);
+								if (!FilePluginUtils.checkParentFile(dest, serverFolder))
+								{
+									// prevents case where serverFileName contains "../" in its path (SVY-21860: it does not)
+									throw new SecurityException("Browsing on the server out of the defaultFolder is not allowed");
+								}
+								if (!dest.exists())
+								{
+									// doesn't exist? try creating the folder hierarchy:
+									dest.getParentFile().mkdirs();
+								}
+								if ((dest.exists() && dest.canWrite()) || dest.createNewFile())
+								{
+									os = new BufferedOutputStream(new FileOutputStream(dest));
+
+									final byte[] buffer = new byte[CHUNK_BUFFER_SIZE];
+									int read;
+									while ((read = is.read(buffer)) != -1)
+									{
+										os.write(buffer, 0, read);
+									}
+									os.flush();
+								}
+							}
 						}
-						filesToBeStreamed[i] = null;
+						catch (final IOException e)
+						{
+							Debug.error(e);
+							ex = e;
+						}
+						finally
+						{
+							if (is != null)
+							{
+								try
+								{
+									is.close();
+								}
+								catch (final IOException e)
+								{
+								}
+							}
+							if (os != null)
+							{
+								try
+								{
+									os.close();
+								}
+								catch (final IOException e)
+								{
+								}
+							}
+							if (function != null)
+							{
+								try
+								{
+									final JSFile returnedFile = (dest == null) ? null
+										: new JSFile(new RemoteFile(dest, getDefaultFolder(plugin.getClientPluginAccess().getClientID()),
+											plugin.getClientPluginAccess()), plugin.getClientPluginAccess());
+									function.execute(plugin.getClientPluginAccess(), new Object[] { returnedFile, ex }, true);
+								}
+								catch (final Exception e)
+								{
+									Debug.error(e);
+								}
+							}
+						}
 					}
 				}
-				final JSProgressMonitor progressMonitor = new JSProgressMonitor(this, totalBytes, filesToBeStreamed.length);
-				try
-				{
-					plugin.getClientPluginAccess().getExecutor().execute(
-						new ToServerWorker(filesToBeStreamed, serverObjects, function, progressMonitor));
-
-					return progressMonitor;
-				}
-				catch (Exception ex)
-				{
-					Debug.error(ex);
-				}
-
 			}
 		}
-		return null;
+		return null; // no JSProgressMonitor since there will be no Thread
 	}
 
 	/**
@@ -3010,6 +3047,21 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 			}
 		}
 		return null;
+	}
+
+	/**
+	 * The name of a path (its last part), for both / and \\ separators.
+	 */
+	private static String extractName(String path)
+	{
+		String out = path;
+		if (out != null)
+		{
+			out = out.replace('\\', '/');
+			String[] tokens = out.split("/"); //$NON-NLS-1$
+			out = tokens[tokens.length - 1];
+		}
+		return out;
 	}
 
 	protected File getDefaultFolder(String clientID) throws Exception
@@ -3417,157 +3469,6 @@ public class FileProvider implements IReturnedTypesProvider, IScriptable
 							if (progressMonitor.js_isCanceled())
 							{
 								file.delete();
-								progressMonitor.run();
-								break;
-							}
-						}
-					}
-				}
-			}
-			finally
-			{
-				if (!progressMonitor.js_isCanceled())
-				{
-					progressMonitor.setFinished(true);
-					progressMonitor.run();
-				}
-				progressMonitor.cancel(); // stops the TimerTask
-			}
-		}
-	}
-
-	private final class ToServerWorker implements Runnable
-	{
-
-		private final File[] files;
-		private final Object[] serverFiles;
-		private final FunctionDefinition function;
-		private final JSProgressMonitor progressMonitor;
-
-		/**
-		 * @param files
-		 * @param serverFiles
-		 * @param function
-		 * @param progressMonitor
-		 * @param service
-		 */
-		public ToServerWorker(final File[] files, final Object[] serverFiles, final FunctionDefinition function, final JSProgressMonitor progressMonitor)
-		{
-			this.files = files;
-			this.serverFiles = serverFiles;
-			this.function = function;
-			this.progressMonitor = progressMonitor;
-		}
-
-		public void run()
-		{
-			try
-			{
-				long totalTransfered = 0L;
-				for (int i = 0; i < files.length; i++)
-				{
-					final File file = files[i];
-					if (file != null)
-					{
-						// the serverName can be derived from an Array of String, at the same index as the file
-						String serverFileName = null;
-						if (serverFiles != null && i < serverFiles.length)
-						{
-							if (serverFiles[i] instanceof JSFile)
-							{
-								JSFile jsFile = (JSFile)serverFiles[i];
-								IAbstractFile abstractFile = jsFile.getAbstractFile();
-								if (abstractFile instanceof RemoteFile)
-								{
-									serverFileName = ((RemoteFile)abstractFile).getAbsolutePath();
-								}
-								else
-								{
-									serverFileName = abstractFile.getName();
-								}
-							}
-							else
-							{
-								serverFileName = serverFiles[i].toString();
-							}
-						}
-						else
-						{
-							serverFileName = "/" + file.getName(); //$NON-NLS-1$
-						}
-
-						long currentTransferred = 0L;
-						progressMonitor.setCurrentFileName(file.getAbsolutePath());
-						progressMonitor.setCurrentBytes(file.length());
-						progressMonitor.setCurrentFileIndex(i + 1);
-						progressMonitor.setCurrentTransferred(0L);
-
-						final String clientId = plugin.getClientPluginAccess().getClientID();
-						File mainFolder = null;
-						try
-						{
-							mainFolder = getDefaultFolder(plugin.getClientPluginAccess().getClientID());
-						}
-						catch (Exception e)
-						{
-							Debug.error(e);
-						}
-						File remoteFile = new File(mainFolder, serverFileName);
-						InputStream is = null;
-						OutputStream os = null;
-						Exception ex = null;
-						try
-						{
-							is = new FileInputStream(file);
-							os = new FileOutputStream(remoteFile);
-							byte[] buffer = new byte[CHUNK_BUFFER_SIZE];
-							int read = is.read(buffer);
-							while (read > -1 && !progressMonitor.js_isCanceled())
-							{
-								os.write(buffer);
-								totalTransfered += read;
-								currentTransferred += read;
-								progressMonitor.setTotalTransferred(totalTransfered);
-								progressMonitor.setCurrentTransferred(currentTransferred);
-
-								if (progressMonitor.getDelay() > 0)
-								{
-									Thread.sleep(progressMonitor.getDelay()); // to test the process
-								}
-
-								read = is.read(buffer);
-							}
-						}
-						catch (final Exception e)
-						{
-							Debug.error(e);
-							ex = e;
-						}
-						finally
-						{
-							try
-							{
-								if (os != null) os.close();
-							}
-							catch (final IOException ignore)
-							{
-							}
-							try
-							{
-								if (is != null) is.close();
-							}
-							catch (final IOException ignore)
-							{
-							}
-							if (function != null && !progressMonitor.js_isCanceled())
-							{
-								final JSFile returnedFile = (remoteFile == null) ? null
-									: new JSFile(new RemoteFile(remoteFile, mainFolder, plugin.getClientPluginAccess()), plugin.getClientPluginAccess());
-								function.executeAsync(plugin.getClientPluginAccess(), new Object[] { returnedFile, ex });
-							}
-							if (progressMonitor.js_isCanceled())
-							{
-								remoteFile.delete();
 								progressMonitor.run();
 								break;
 							}
