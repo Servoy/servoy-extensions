@@ -163,7 +163,7 @@ public class MailServer implements IMailService, IServerPlugin
 
 			MimeMessage message = createMessage(to, from, subject, rawMsgText, cc, bcc, attachments, overrideProperties);
 			message.setHeader("Precedence", "bulk");
-			Transport.send(message);
+			send(message);
 		}
 		catch (Exception ex)
 		{
@@ -188,7 +188,7 @@ public class MailServer implements IMailService, IServerPlugin
 			Thread.currentThread().setContextClassLoader(MailServer.class.getClassLoader());
 
 			MimeMessage message = createMessage(to, from, subject, rawMsgText, cc, bcc, attachments, overrideProperties);
-			Transport.send(message);
+			send(message);
 		}
 		catch (Exception ex)
 		{
@@ -200,6 +200,22 @@ public class MailServer implements IMailService, IServerPlugin
 		{
 			Thread.currentThread().setContextClassLoader(saveCl);
 		}
+	}
+
+	/**
+	 * Sends the message over SMTP. Package-private seam so unit tests can record the message instead of sending it.
+	 */
+	void send(MimeMessage message) throws MessagingException
+	{
+		Transport.send(message);
+	}
+
+	/**
+	 * The POP3 store to receive mail from. Package-private seam so unit tests can use a fake store instead of a server.
+	 */
+	Store getStore(Session session) throws MessagingException
+	{
+		return session.getStore("pop3");
 	}
 
 	/**
@@ -486,7 +502,7 @@ public class MailServer implements IMailService, IServerPlugin
 			Session session = Session.getDefaultInstance(properties, null);
 			session.setDebug(Boolean.valueOf(settings.getProperty("mail.pop3.debug", "false")).booleanValue());
 			// -- Get hold of a POP3 message store, and connect to it --
-			store = session.getStore("pop3");
+			store = getStore(session);
 			String host = properties.getProperty("mail.pop3.host");
 			Debug.trace("receiveMail: host=" + host + ", user=" + userName);
 			store.connect(host, userName, password);
