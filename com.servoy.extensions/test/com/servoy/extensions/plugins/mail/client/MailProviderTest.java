@@ -83,7 +83,7 @@ public class MailProviderTest
 		assertNotNull(plugin.getProperties().get(IClientPlugin.DISPLAY_NAME));
 		assertNull(plugin.getPreferencePanels());
 		assertNotNull(plugin.getIconUrl());
-		assertNotNull(plugin.getImage());
+		assertNull(plugin.getImage());
 		assertSame(provider, plugin.getScriptObject());
 		plugin.propertyChange(null);
 		assertEquals(List.of(MailMessage.class, Attachment.class, SMTPService.class, MessageBuilder.class), List.of(provider.getAllReturnedTypes()));

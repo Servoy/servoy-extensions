@@ -113,7 +113,7 @@ public class SchedulerProviderTest
 		assertNull(plugin.getProperties());
 		assertNull(plugin.getPreferencePanels());
 		assertNotNull(plugin.getIconUrl());
-		assertNotNull(plugin.getImage());
+		assertNull(plugin.getImage());
 		assertSame(provider, plugin.getScriptObject());
 		assertSame(access, plugin.getClientPluginAccess());
 	}
@@ -341,16 +341,23 @@ public class SchedulerProviderTest
 	}
 
 	@Test
-	public void aSmartClientShutsTheWholeSchedulerDown() throws Exception
+	public void everyClientTypeOnlyRemovesItsOwnJobs() throws Exception
 	{
+		// also the former smart client types keep the shared scheduler running
 		when(Integer.valueOf(access.getApplicationType())).thenReturn(Integer.valueOf(IClientPluginAccess.CLIENT));
 		provider.js_addJob("mine", FUTURE, method("globals", "run"));
 
 		provider.stopScheduler();
 
-		assertNull(scheduler());
-		// without scheduler stopping does nothing
+		assertNotNull(scheduler());
+		assertTrue(scheduler().getJobKeys(groupEquals("client-1")).isEmpty());
+	}
+
+	@Test
+	public void stoppingWithoutSchedulerDoesNothing()
+	{
+		SchedulerProvider.shutdown();
+
 		provider.stopScheduler();
-		plugin.unload();
 	}
 }

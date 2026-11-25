@@ -40,7 +40,6 @@ import org.quartz.TriggerBuilder;
 
 import com.servoy.j2db.Messages;
 import com.servoy.j2db.documentation.ServoyDocumented;
-import com.servoy.j2db.plugins.IClientPluginAccess;
 import com.servoy.j2db.scripting.FunctionDefinition;
 import com.servoy.j2db.scripting.IScriptable;
 import com.servoy.j2db.util.Debug;
@@ -90,17 +89,10 @@ public class SchedulerProvider implements IScriptable
 		{
 			try
 			{
-				int type = plugin.getClientPluginAccess().getApplicationType();
-				if (type == IClientPluginAccess.CLIENT || type == IClientPluginAccess.RUNTIME)
-				{
-					scheduler.shutdown(false);
-					scheduler = null;
-				}
-				else
-				{
-					String id = plugin.getClientPluginAccess().getClientID();
-					scheduler.deleteJobs(new ArrayList<>(scheduler.getJobKeys(groupEquals(id))));
-				}
+				// the scheduler is shared by all clients of the server, only remove the jobs of this client;
+				// the server plugin shuts the scheduler down when the server stops
+				String id = plugin.getClientPluginAccess().getClientID();
+				scheduler.deleteJobs(new ArrayList<>(scheduler.getJobKeys(groupEquals(id))));
 			}
 			catch (SchedulerException e)
 			{

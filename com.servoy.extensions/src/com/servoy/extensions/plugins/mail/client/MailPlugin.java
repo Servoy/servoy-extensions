@@ -21,7 +21,6 @@ import java.net.URL;
 import java.util.Properties;
 
 import javax.swing.Icon;
-import javax.swing.ImageIcon;
 
 import com.servoy.j2db.Messages;
 import com.servoy.j2db.plugins.IClientPlugin;
@@ -65,15 +64,8 @@ public class MailPlugin implements IClientPlugin, IIconProvider
 
 	public Icon getImage()
 	{
-		java.net.URL iconUrl = this.getClass().getResource("images/mail.png"); //$NON-NLS-1$
-		if (iconUrl != null)
-		{
-			return new ImageIcon(iconUrl);
-		}
-		else
-		{
-			return null;
-		}
+		// deprecated Swing icon, only used by the smart client: the icon is given by getIconUrl()
+		return null;
 	}
 
 	public IScriptable getScriptObject()

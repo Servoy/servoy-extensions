@@ -131,7 +131,7 @@ public class MailServer implements IMailService, IServerPlugin
 	public Map<String, String> getRequiredPropertyNames()
 	{
 		Map<String, String> req = new LinkedHashMap<String, String>();
-		req.put("mail.server.allowUnauthenticatedRMIAccess", "Allow mailserver access for unauthenticated smart (rmi) client (true/false), defaults to false");
+		req.put("mail.server.allowUnauthenticatedRMIAccess", "Allow mailserver access for clients that are not authenticated (true/false), defaults to false");
 		req.put("mail.pop3.host", "The name of POP3 server to recieve mails from");
 		req.put("mail.pop3.apop.enable", "Whether or not to use APOP for authentication (true/false), defaults to false.");
 		req.put("mail.smtp.host", "The name of SMTP server to deliver the mails to");
@@ -569,7 +569,8 @@ public class MailServer implements IMailService, IServerPlugin
 	 */
 	public PreferencePanel[] getPreferencePanels()
 	{
-		return new PreferencePanel[] { new MailPreferencePanel(application) };
+		// the Swing preference panel was only shown by the smart client
+		return null;
 	}
 
 	private class SMTPAuthenticator extends jakarta.mail.Authenticator

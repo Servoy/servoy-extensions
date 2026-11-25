@@ -86,6 +86,9 @@ public class MailServerTest
 
 		verify(access).registerRemoteService(IMailService.class.getName(), server);
 		assertEquals("Mail Server Plugin", server.getProperties().get(IServerPlugin.DISPLAY_NAME));
+		assertNull(server.getPreferencePanels());
+		assertEquals("Allow mailserver access for clients that are not authenticated (true/false), defaults to false",
+			server.getRequiredPropertyNames().get("mail.server.allowUnauthenticatedRMIAccess"));
 		assertTrue(server.getRequiredPropertyNames().containsKey("mail.smtp.host"));
 		assertEquals(15, server.getRequiredPropertyNames().size());
 	}

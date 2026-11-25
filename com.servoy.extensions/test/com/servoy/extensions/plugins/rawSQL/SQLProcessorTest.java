@@ -101,7 +101,7 @@ public class SQLProcessorTest
 	@Test
 	public void pluginDescription() throws Exception
 	{
-		verify(access).registerRMIService("servoy.ISQLService", processor);
+		verify(access).registerRemoteService("servoy.ISQLService", processor);
 		assertEquals("Raw SQL Plugin", processor.getProperties().get(IServerPlugin.DISPLAY_NAME));
 		assertNull(processor.getPreferencePanels());
 		assertTrue(processor.getRequiredPropertyNames().containsKey("servoy.rawSQL.allowClientCacheFlushes"));
@@ -111,7 +111,7 @@ public class SQLProcessorTest
 	public void aFailingRegistrationIsOnlyLogged() throws Exception
 	{
 		IServerAccess failing = mock(IServerAccess.class);
-		doThrow(new RemoteException("no rmi")).when(failing).registerRMIService(anyString(), any());
+		doThrow(new RemoteException("no rmi")).when(failing).registerRemoteService(anyString(), any());
 
 		new SQLProcessor().initialize(failing);
 	}

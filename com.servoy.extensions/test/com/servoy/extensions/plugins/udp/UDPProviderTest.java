@@ -108,7 +108,7 @@ public class UDPProviderTest
 		assertEquals("UDP packets plugin", plugin.getProperties().get(IClientPlugin.DISPLAY_NAME));
 		assertNull(plugin.getPreferencePanels());
 		assertNotNull(plugin.getIconUrl());
-		assertNotNull(plugin.getImage());
+		assertNull(plugin.getImage());
 		assertSame(provider, plugin.getScriptObject());
 		assertEquals(List.of(JSPacket.class, UDPSocket.class), List.of(provider.getAllReturnedTypes()));
 		assertNotNull(new UDPProvider());
