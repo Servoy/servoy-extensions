@@ -401,11 +401,8 @@ public class RestWSServletTest
 
 		call("GET", "/rest_ws/sol/api");
 
-		assertTrue(body().startsWith("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"), body());
+		assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<id>1</id>", body());
 		verify(response).setHeader("Content-Type", "application/xml;charset=UTF-8");
-		// current behaviour (bug): a JSONObject result is passed to XML.toString as a String, so the JSON text is
-		// escaped into the xml instead of being converted to <id>1</id>
-		assertTrue(body().contains("{&quot;id&quot;:1}"), body());
 	}
 
 	@Test
@@ -773,10 +770,14 @@ public class RestWSServletTest
 		method("ws_read", "x");
 		when(access.getPluginManager().getPlugin(IClientPlugin.class, "rest_ws")).thenReturn(null);
 
+		userProperties.put("lang", "nl");
+
 		call("GET", "/rest_ws/sol/api");
 
-		// current behaviour (bug): the missing client plugin is logged, but then isSendUserPropertiesHeaders() is called on null
-		verify(response).setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+		assertEquals("\"x\"", body());
+		verify(response, never()).setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+		// the server setting (default true) decides
+		verify(response).setHeader("servoy.userproperties", "{\"lang\":\"nl\"}");
 	}
 
 	// --- DELETE ---
