@@ -18,12 +18,9 @@
 package com.servoy.extensions.plugins.http;
 
 import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 
@@ -94,34 +91,6 @@ class AllowedCertTrustStrategy implements TrustStrategy
 			if (holder == null) holder = new CertificatesHolder();
 		}
 		return holder;
-	}
-
-	public void add(X509Certificate[] certificates)
-	{
-		getCertificatesHolder();
-		holder.add(certificates);
-		File file = new File(System.getProperty("user.home"), J2DBGlobals.CLIENT_LOCAL_DIR + "servoy.ks"); //$NON-NLS-1$//$NON-NLS-2$
-		if (!file.getParentFile().exists()) file.getParentFile().mkdirs();
-		ObjectOutputStream oos = null;
-		try
-		{
-			oos = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(file)));
-			oos.writeObject(holder);
-		}
-		catch (Exception e)
-		{
-			Debug.error(e);
-		}
-		finally
-		{
-			try
-			{
-				if (oos != null) oos.close();
-			}
-			catch (Exception e)
-			{
-			}
-		}
 	}
 
 }
