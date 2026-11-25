@@ -245,6 +245,11 @@ public class SMTPService implements IScriptable
 
 	private void setupOAuth(Properties props) throws Exception
 	{
+		// with XOAUTH2 the from address is the smtp user the token belongs to
+		if (_from == null || _from.trim().isEmpty())
+		{
+			throw new IllegalStateException("SMTPService with an OAuth service needs a from address (withFrom), it is used as the smtp user name");
+		}
 		props.put("mail.smtp.username", _from);
 		props.put("mail.smtp.starttls.enable", "true");
 		props.put("mail.smtp.sasl.enable", "true");
@@ -256,9 +261,14 @@ public class SMTPService implements IScriptable
 		String token = _oauthService.getAccessToken();
 		if ((token == null || _oauthService.isAccessTokenExpired()) && _oauthService.getRefreshToken() != null)
 		{
-			token = _oauthService.refreshToken();
+			_oauthService.refreshToken();
+			token = _oauthService.getAccessToken();
 		}
-		props.put("mail.smtp.password", _oauthService.getAccessToken());
+		if (token == null)
+		{
+			throw new IllegalStateException("SMTPService: the OAuth service has no access token (and no refresh token), log in first");
+		}
+		props.put("mail.smtp.password", token);
 	}
 
 	private Properties createProperties(String[] overrideProperties)

@@ -21,7 +21,6 @@ import java.net.URL;
 import java.util.Properties;
 
 import javax.swing.Icon;
-import javax.swing.ImageIcon;
 
 import com.servoy.j2db.plugins.IClientPlugin;
 import com.servoy.j2db.plugins.IClientPluginAccess;
@@ -78,15 +77,8 @@ public class SchedulerPlugin implements IClientPlugin, IIconProvider
 	 */
 	public Icon getImage()
 	{
-		java.net.URL iconUrl = this.getClass().getResource("images/scheduler.png"); //$NON-NLS-1$
-		if (iconUrl != null)
-		{
-			return new ImageIcon(iconUrl);
-		}
-		else
-		{
-			return null;
-		}
+		// deprecated Swing icon, only used by the smart client: the icon is given by getIconUrl()
+		return null;
 	}
 
 	/*

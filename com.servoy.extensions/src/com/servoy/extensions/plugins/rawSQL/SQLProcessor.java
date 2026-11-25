@@ -68,7 +68,7 @@ public class SQLProcessor implements ISQLService, IServerPlugin
 		application = app;
 		try
 		{
-			app.registerRMIService("servoy.ISQLService", this); //$NON-NLS-1$
+			app.registerRemoteService("servoy.ISQLService", this); //$NON-NLS-1$
 		}
 		catch (Exception e)
 		{
