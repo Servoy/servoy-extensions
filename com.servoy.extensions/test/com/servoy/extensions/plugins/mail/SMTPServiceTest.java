@@ -142,6 +142,7 @@ public class SMTPServiceTest
 	public void anExpiredTokenIsRefreshed() throws Exception
 	{
 		OAuthService oauth = mock(OAuthService.class);
+		// the token before and after the refresh
 		when(oauth.getAccessToken()).thenReturn("old", "new");
 		when(Boolean.valueOf(oauth.isAccessTokenExpired())).thenReturn(Boolean.TRUE);
 		when(oauth.getRefreshToken()).thenReturn("refresh-1");
@@ -170,10 +171,11 @@ public class SMTPServiceTest
 	{
 		OAuthService oauth = mock(OAuthService.class);
 
-		// current behaviour (bug): without an access token (and no refresh token) the null password is put in the
-		// Properties, which throws a NullPointerException instead of a clear "not logged in" error
-		assertThrows(NullPointerException.class,
+		IllegalStateException e = assertThrows(IllegalStateException.class,
 			() -> provider.createSMTPService().withFrom("me@x.com").withOAuthService(oauth).sendMail("to@x.com", "Hi", "text"));
+
+		assertTrue(e.getMessage().contains("no access token"), e.getMessage());
+		verify(service, never()).sendMail(anyString(), anyString(), any(), anyString(), anyString(), any(), any(), any(), any());
 	}
 
 	@Test
@@ -181,9 +183,10 @@ public class SMTPServiceTest
 	{
 		OAuthService oauth = mock(OAuthService.class);
 
-		// current behaviour (bug): the from address is the smtp user name, without withFrom it is null and
-		// Properties.put throws a NullPointerException
-		assertThrows(NullPointerException.class, () -> provider.createSMTPService().withOAuthService(oauth).sendMail("to@x.com", "Hi", "text"));
+		IllegalStateException e = assertThrows(IllegalStateException.class,
+			() -> provider.createSMTPService().withOAuthService(oauth).sendMail("to@x.com", "Hi", "text"));
+		assertTrue(e.getMessage().contains("withFrom"), e.getMessage());
+		assertThrows(IllegalStateException.class, () -> provider.createSMTPService().withFrom(" ").withOAuthService(oauth).sendMail("to@x.com", "Hi", "text"));
 	}
 
 	@Test

@@ -179,15 +179,18 @@ public class MailProviderTest
 	}
 
 	@Test
-	public void aCauseWithoutMessageIsAddedAsNull() throws Exception
+	public void aCauseWithoutMessageIsNotAdded() throws Exception
 	{
 		doThrow(new Exception("failed", new RuntimeException())).when(service).sendMail(anyString(), anyString(), any(), anyString(), anyString(),
 			any(), any(), any(), any());
+		doThrow(new Exception("bulk failed", new RuntimeException(""))).when(service).sendBulkMail(anyString(), anyString(), any(), anyString(),
+			anyString(), any(), any(), any(), any());
 
 		assertFalse(provider.js_sendMail("t@x.com", null, "s", "m"));
+		assertEquals("failed", provider.js_getLastSendMailExceptionMsg());
 
-		// current behaviour (bug): only an empty cause message is skipped, a null one is appended as "null"
-		assertEquals("failed; null", provider.js_getLastSendMailExceptionMsg());
+		assertFalse(provider.js_sendBulkMail("t@x.com", null, "s", "m"));
+		assertEquals("bulk failed", provider.js_getLastSendMailExceptionMsg());
 	}
 
 	@Test

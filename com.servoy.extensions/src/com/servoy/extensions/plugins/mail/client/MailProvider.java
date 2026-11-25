@@ -1162,7 +1162,7 @@ public class MailProvider implements IReturnedTypesProvider, IScriptable, IJavaS
 				if (mex.getCause() != null)
 				{
 					String nested = mex.getCause().getMessage();
-					if (!("".equals(nested))) sendMailException = sendMailException + "; " + nested; //$NON-NLS-1$ //$NON-NLS-2$
+					if (nested != null && !nested.isEmpty()) sendMailException = sendMailException + "; " + nested; //$NON-NLS-1$
 				}
 				return false;
 			}
@@ -1199,7 +1199,7 @@ public class MailProvider implements IReturnedTypesProvider, IScriptable, IJavaS
 				if (mex.getCause() != null)
 				{
 					String nested = mex.getCause().getMessage();
-					if (!("".equals(nested))) sendMailException = sendMailException + "; " + nested; //$NON-NLS-1$ //$NON-NLS-2$
+					if (nested != null && !nested.isEmpty()) sendMailException = sendMailException + "; " + nested; //$NON-NLS-1$
 				}
 				return false;
 			}
