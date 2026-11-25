@@ -438,6 +438,15 @@ public class OAuthServiceBuilder implements IScriptable, IJavaScriptType
 		return _callback != null ? buildWithCallback(generateGlobalMethods, deeplink_name, service) : service;
 	}
 
+	/**
+	 * Test seam: the http transport scribejava uses for the token requests, so unit tests do not need a network.
+	 */
+	OAuthServiceBuilder httpClientForTest(com.github.scribejava.core.httpclient.HttpClient httpClient)
+	{
+		builder.httpClient(httpClient);
+		return this;
+	}
+
 	boolean isFragmentResponse()
 	{
 		return responseType != null && responseType.contains("token") || "fragment".equalsIgnoreCase(responseMode);
