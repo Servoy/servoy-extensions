@@ -439,15 +439,16 @@ public class RestWSPluginTest
 		plugin.beforeShutdown();
 
 		assertFalse(plugin.isAcceptingRequests());
-		// current behaviour (bug): the condition is inverted (clientPool == null && ...), so the pool is never closed
-		assertFalse(pool.isClosed());
+		assertTrue(pool.isClosed());
+		// a second shutdown call leaves the closed pool alone
+		plugin.beforeShutdown();
 	}
 
 	@Test
-	public void beforeShutdownWithoutPoolFails()
+	public void beforeShutdownWithoutPool()
 	{
-		// current behaviour (bug): with no pool created yet the inverted condition dereferences null
-		assertThrows(NullPointerException.class, plugin::beforeShutdown);
+		plugin.beforeShutdown();
+
 		assertFalse(plugin.isAcceptingRequests());
 	}
 
