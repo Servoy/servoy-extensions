@@ -307,6 +307,11 @@ public class Response implements IScriptable, IJavaScriptType
 	 */
 	public boolean js_close()
 	{
+		if (response == null)
+		{
+			// nothing to release, the request failed: see getException()
+			return true;
+		}
 		if (response.getFile() != null)
 		{
 			return response.getFile().delete();
@@ -337,6 +342,11 @@ public class Response implements IScriptable, IJavaScriptType
 	 */
 	public JSFileUpload js_getFileUpload()
 	{
+		if (response == null)
+		{
+			Debug.error("response.getFileUpload API was called while response is null due to request exception: " + exceptionMessage);
+			return null;
+		}
 		if (response.getFile() != null)
 		{
 			return new JSFileUpload(response.getFile(), response.getContentType() != null ? response.getContentType().getMimeType() : null);

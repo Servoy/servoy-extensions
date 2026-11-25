@@ -238,14 +238,14 @@ public class HttpRequestsTest
 	}
 
 	@Test
-	public void closingAFailedResponseFails()
+	public void closingAFailedResponseIsSafe()
 	{
 		http.fail(new IOException("down"));
 		Response response = get().js_executeRequest();
 
-		// current behaviour (bug): close() and getFileUpload() do not check for a missing response
-		org.junit.jupiter.api.Assertions.assertThrows(NullPointerException.class, response::js_close);
-		org.junit.jupiter.api.Assertions.assertThrows(NullPointerException.class, response::js_getFileUpload);
+		assertTrue(response.js_close());
+		assertNull(response.js_getFileUpload());
+		assertTrue(new Response().js_close());
 	}
 
 	// --- authentication and proxy ---
