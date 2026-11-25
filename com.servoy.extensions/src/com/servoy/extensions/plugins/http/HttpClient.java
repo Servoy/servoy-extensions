@@ -227,8 +227,7 @@ public class HttpClient implements IScriptable, IJavaScriptType
 		keyManagerFactory.init(keyStore, config.certPassword != null ? config.certPassword.toCharArray() : null);
 
 		KeyStore trustStore = KeyStore.getInstance("JKS");
-		String relativeCacertsPath = "/lib/security/cacerts/".replace("/", File.separator);
-		String cacerts = System.getProperty("java.home") + relativeCacertsPath;
+		File cacerts = new File(System.getProperty("java.home"), "lib" + File.separator + "security" + File.separator + "cacerts");
 		try (InputStream trustInput = new FileInputStream(cacerts))
 		{
 			String password = config.trustStorePassword != null ? config.trustStorePassword : "changeit";
@@ -441,18 +440,17 @@ public class HttpClient implements IScriptable, IJavaScriptType
 		{
 			return false;
 		}
-		int age = maxAge;
-		if (maxAge == 0)
-		{
-			age = -1;
-		}
-
 		BasicClientCookie cookie;
 		cookie = new BasicClientCookie(cookieName, cookieValue);
 		if (!Utils.stringIsEmpty(path))
 		{
 			cookie.setPath(path);
-			cookie.setExpiryDate(new Date(System.currentTimeMillis() + age));
+			// maxAge 0 or negative (the default -1) means a session cookie without expiry; an expiry of now - 1 ms
+			// would make the cookie store drop the cookie right away
+			if (maxAge > 0)
+			{
+				cookie.setExpiryDate(new Date(System.currentTimeMillis() + maxAge));
+			}
 			cookie.setSecure(secure);
 		}
 		cookie.setDomain(domain);

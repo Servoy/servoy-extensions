@@ -190,6 +190,8 @@ public class HttpProvider implements IReturnedTypesProvider, IScriptable
 		}
 		else
 		{
+			// the builder is shared by the requests of a client, so clear a proxy server that was set before
+			if (requestConfigBuilder != null) requestConfigBuilder.setProxy(null);
 			try
 			{
 				System.setProperty("java.net.useSystemProxies", "true");

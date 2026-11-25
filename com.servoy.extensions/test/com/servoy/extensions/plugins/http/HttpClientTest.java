@@ -210,17 +210,8 @@ public class HttpClientTest
 		HttpClient client = client(config);
 
 		assertNotNull(client.client);
-		// the java cacerts path is built with a trailing separator ("lib/security/cacerts/"); Windows accepts that,
-		// on Linux/macOS opening the truststore fails (possible bug), so both outcomes are accepted here
-		try
-		{
-			assertInstanceOf(SSLContext.class, invoke(client, "createSSLContextWithCert", new Class[] { HttpClientConfig.class }, config));
-		}
-		catch (java.lang.reflect.InvocationTargetException e)
-		{
-			assertFalse(System.getProperty("os.name").toLowerCase().contains("win"), e.getCause().toString());
-			assertInstanceOf(java.io.FileNotFoundException.class, e.getCause());
-		}
+		// the keystore and the java cacerts truststore are both loaded
+		assertInstanceOf(SSLContext.class, invoke(client, "createSSLContextWithCert", new Class[] { HttpClientConfig.class }, config));
 	}
 
 	@Test
@@ -261,16 +252,16 @@ public class HttpClientTest
 	}
 
 	@Test
-	public void aCookieWithPathAndDefaultMaxAgeIsNotKept()
+	public void aCookieWithPathAndDefaultMaxAgeIsASessionCookie()
 	{
 		HttpClient client = client(null);
 
-		// current behaviour (bug): with a path the expiry is now + maxAge milliseconds; the default maxAge -1 (and 0)
-		// give an already expired cookie, which the cookie store silently drops while setCookie returns true
 		assertTrue(client.js_setCookie("JSESSIONID", "abc", "localhost", "/"));
 		assertTrue(client.js_setCookie("zero", "abc", "localhost", "/", 0));
 
-		assertEquals(0, client.js_getCookies().length);
+		assertEquals(2, client.js_getCookies().length);
+		assertEquals("/", client.js_getCookie("JSESSIONID").js_getPath());
+		assertFalse(client.js_getCookie("zero").js_getSecure());
 	}
 
 	@Test
@@ -348,7 +339,7 @@ public class HttpClientTest
 	}
 
 	@Test
-	public void clearingTheProxyServerDoesNotClearItFromTheRequests()
+	public void clearingTheProxyServerClearsItFromNewRequests()
 	{
 		HttpClient client = client(null);
 		client.js_setClientProxyServer("proxy.local", Integer.valueOf(3128));
@@ -357,10 +348,8 @@ public class HttpClientTest
 		client.js_setClientProxyServer(null, null);
 		HttpHost proxy = client.js_createGetRequest("http://localhost/").js_getRequestConfig().getProxy();
 
-		// current behaviour (bug): the proxy is set on the request config builder that all requests of the client
-		// share, so a cleared proxy server stays in use
-		assertNotNull(proxy);
-		assertEquals("proxy.local", proxy.getHostName());
+		// no explicit proxy anymore; only a system proxy (none for localhost) could be used
+		assertTrue(proxy == null || !"proxy.local".equals(proxy.getHostName()), String.valueOf(proxy));
 	}
 
 	@Test
