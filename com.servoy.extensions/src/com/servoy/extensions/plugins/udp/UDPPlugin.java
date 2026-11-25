@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.Properties;
 
 import javax.swing.Icon;
-import javax.swing.ImageIcon;
 
 import com.servoy.j2db.plugins.IClientPlugin;
 import com.servoy.j2db.plugins.IClientPluginAccess;
@@ -38,7 +37,6 @@ public class UDPPlugin implements IClientPlugin, IIconProvider
 
 	private IClientPluginAccess access;
 	private UDPProvider impl;
-	private URL iconUrl;
 	private final List<UDPSocket> sockets = new ArrayList<>();
 
 	/*
@@ -111,15 +109,8 @@ public class UDPPlugin implements IClientPlugin, IIconProvider
 	 */
 	public Icon getImage()
 	{
-		iconUrl = this.getClass().getResource("images/udp.png"); //$NON-NLS-1$
-		if (iconUrl != null)
-		{
-			return new ImageIcon(iconUrl);
-		}
-		else
-		{
-			return null;
-		}
+		// deprecated Swing icon, only used by the smart client: the icon is given by getIconUrl()
+		return null;
 	}
 
 	/*
