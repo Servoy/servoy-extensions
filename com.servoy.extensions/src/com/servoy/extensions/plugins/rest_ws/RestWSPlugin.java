@@ -486,7 +486,7 @@ public class RestWSPlugin implements IServerPlugin, IPreShutdownListener
 	public void beforeShutdown()
 	{
 		acceptingRequests = false;
-		if (clientPool == null && !clientPool.isClosed())
+		if (clientPool != null && !clientPool.isClosed())
 		{
 			clientPool.close();
 		}

@@ -196,8 +196,10 @@ public class JWTProvider implements IScriptable, IReturnedTypesProvider
 					if (decoded.getKeyId() == null)
 					{
 						log.error("Cannot verify the token with jwks '" + alg.jwks_url + "' because the key id is not present in the token header.");
+						return null;
 					}
-					alg = alg.kid(decoded.getKeyId());
+					// work on a copy: the kid and alg of this token must not stick to the algorithm the script reuses for other tokens
+					alg = alg.copy().kid(decoded.getKeyId());
 					if (alg.getAlgorithm() == null)
 					{
 						alg.setAlgorithm(decoded.getAlgorithm());

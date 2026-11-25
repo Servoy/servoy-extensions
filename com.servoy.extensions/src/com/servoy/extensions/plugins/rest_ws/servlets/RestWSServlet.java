@@ -811,8 +811,9 @@ public class RestWSServlet extends HttpServlet
 		if (plugin.log.isDebugEnabled()) plugin.log.debug("result = " + (result == null ? "<NULL>" : ("'" + result + '\'')));
 		// flush updated cookies from the application
 
-		boolean shouldSendUserProperties = clientPlugin.isSendUserPropertiesHeaders() != null ? clientPlugin.isSendUserPropertiesHeaders().booleanValue()
-			: plugin.isSendUserPropertiesHeaders();
+		// the script setting (plugins.rest_ws.sendResponseUserPropertiesHeaders) wins; without client plugin use the server setting
+		Boolean scriptSetting = clientPlugin != null ? clientPlugin.isSendUserPropertiesHeaders() : null;
+		boolean shouldSendUserProperties = scriptSetting != null ? scriptSetting.booleanValue() : plugin.isSendUserPropertiesHeaders();
 		if (shouldSendUserProperties) setResponseUserProperties(request, response, client.getPluginAccess());
 		return result;
 	}
@@ -1656,7 +1657,8 @@ public class RestWSServlet extends HttpServlet
 		{
 			if (result instanceof JSONObject || result instanceof JSONArray)
 			{
-				return XML.toString(result.toString(), null);
+				// pass the json structure itself, a String would be escaped as text instead of converted to elements
+				return XML.toString(result, null);
 			}
 			Object json = plugin.getJSONSerializer().toJSON(result);
 			return XML.toString(json, null);

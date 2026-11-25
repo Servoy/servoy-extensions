@@ -446,6 +446,21 @@ public class Algorithm implements IScriptable, IJavaScriptType
 		return alg;
 	}
 
+	/**
+	 * A copy with the same configuration, for one verification: verify() sets the key id and algorithm of the token on it,
+	 * so the algorithm object given by the script is not changed and can be reused for other tokens.
+	 */
+	Algorithm copy()
+	{
+		Algorithm copy = new Algorithm(provider, alg);
+		copy.pwd = pwd;
+		copy.pubKey = pubKey;
+		copy.privKey = privKey;
+		copy.keyId = keyId;
+		copy.jwks_url = jwks_url;
+		return copy;
+	}
+
 	void setAlgorithm(String algorithm)
 	{
 		alg = algorithm;

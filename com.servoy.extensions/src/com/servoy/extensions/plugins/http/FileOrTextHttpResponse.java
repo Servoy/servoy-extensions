@@ -25,7 +25,7 @@ import org.apache.hc.core5.http.ContentType;
 import org.apache.hc.core5.http.message.BasicHttpResponse;
 
 import com.servoy.j2db.util.Debug;
-import com.servoy.j2db.util.FileChooserUtils;
+import com.servoy.j2db.util.Utils;
 
 /**
  * Contains a response either as bytes or as a file (in order to avoid loading everything in memory)
@@ -53,7 +53,7 @@ public class FileOrTextHttpResponse extends BasicHttpResponse
 		{
 			try
 			{
-				return FileChooserUtils.readFile(file);
+				return Utils.getFileContent(file);
 			}
 			catch (Exception e)
 			{
@@ -74,7 +74,7 @@ public class FileOrTextHttpResponse extends BasicHttpResponse
 		{
 			try
 			{
-				return new String(FileChooserUtils.readFile(file), charset != null ? charset : StandardCharsets.ISO_8859_1);
+				return new String(Utils.getFileContent(file), charset != null ? charset : StandardCharsets.ISO_8859_1);
 			}
 			catch (Exception e)
 			{

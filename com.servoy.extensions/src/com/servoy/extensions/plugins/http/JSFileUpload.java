@@ -27,7 +27,7 @@ import com.servoy.j2db.documentation.ServoyDocumented;
 import com.servoy.j2db.plugins.IFile;
 import com.servoy.j2db.plugins.IUploadData;
 import com.servoy.j2db.scripting.IJavaScriptType;
-import com.servoy.j2db.util.FileChooserUtils;
+import com.servoy.j2db.util.Utils;
 
 /**
  * <p>The <code>JSFileUpload</code> class is designed to represent and manage files in the context of an upload process.
@@ -76,7 +76,7 @@ public class JSFileUpload implements IUploadData, IJavaScriptType, IFile
 	{
 		try
 		{
-			if (file.exists() && !file.isDirectory()) return FileChooserUtils.readFile(file);
+			if (file.exists() && !file.isDirectory()) return Utils.getFileContent(file);
 		}
 		catch (Exception e)
 		{
