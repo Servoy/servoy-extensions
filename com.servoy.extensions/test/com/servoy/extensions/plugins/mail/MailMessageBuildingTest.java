@@ -273,12 +273,16 @@ public class MailMessageBuildingTest
 	}
 
 	@Test
-	public void aNullAttachmentWithHtmlFails()
+	public void aNullAttachmentWithHtmlIsSkipped() throws Exception
 	{
-		// current behaviour (bug): the embedded image resolver reads the name of every attachment, also a null one,
-		// while the attachment loop skips null attachments
-		assertThrows(NullPointerException.class,
-			() -> build("a@example.com", null, "s", "<html>x</html>", null, null, new Attachment[] { null }));
+		Attachment logo = new Attachment("logo.png", PNG);
+
+		MimeMessage message = build("a@example.com", null, "s", "<html><img src=\"%%logo.png%%\"></html>", null, null,
+			new Attachment[] { null, logo });
+
+		assertTrue(logo.isEmbedded());
+		assertEquals(1, roundTrip(message).getAttachments().length);
+		assertEquals("<html>x</html>\n", roundTrip(build("a@example.com", null, "s", "<html>x</html>", null, null, new Attachment[] { null })).getHtmlMsg());
 	}
 
 	// --- attachments ---

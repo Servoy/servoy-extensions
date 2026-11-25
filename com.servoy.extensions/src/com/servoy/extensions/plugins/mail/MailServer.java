@@ -622,7 +622,8 @@ public class MailServer implements IMailService, IServerPlugin
 			attachmentMap = new HashMap<String, Attachment>();
 			for (Attachment element : attachments)
 			{
-				attachmentMap.put(element.getName(), element);
+				// null entries are skipped, like the attachment loop in createMessage does
+				if (element != null) attachmentMap.put(element.getName(), element);
 			}
 		}
 
