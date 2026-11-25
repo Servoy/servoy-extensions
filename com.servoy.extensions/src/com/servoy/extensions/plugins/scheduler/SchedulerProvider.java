@@ -237,7 +237,8 @@ public class SchedulerProvider implements IScriptable
 			catch (SchedulerException e)
 			{
 				Debug.error(e);
-				throw new RuntimeException(Messages.getString("servoy.plugin.scheduler.cannotStart") + e.getMessage()); //$NON-NLS-1$
+				// the scheduler is running here, so report that the job could not be scheduled (like addCronJob)
+				throw new RuntimeException(Messages.getString("servoy.plugin.scheduler.cannotScheduleJob", new Object[] { jobname, e.getMessage() })); //$NON-NLS-1$
 			}
 		}
 	}

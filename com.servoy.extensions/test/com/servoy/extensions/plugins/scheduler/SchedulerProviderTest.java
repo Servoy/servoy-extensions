@@ -215,9 +215,9 @@ public class SchedulerProviderTest
 	{
 		provider.js_addJob("dup", FUTURE, method("globals", "run"));
 
-		// the message starts with the generic "cannot start" text, followed by the quartz duplicate name error
 		RuntimeException e = assertThrows(RuntimeException.class, () -> provider.js_addJob("dup", FUTURE, method("globals", "run")));
-		assertTrue(e.getMessage().contains("dup"), e.getMessage());
+		// the same "could not schedule job" message as addCronJob, not "could not start the scheduler"
+		assertTrue(e.getMessage().startsWith("Couldn't schedule job dup error: "), e.getMessage());
 	}
 
 	// --- cron jobs ---
@@ -248,7 +248,8 @@ public class SchedulerProviderTest
 	{
 		provider.js_addCronJob("cron", "0 0 12 * * ?", method("globals", "noon"), FUTURE);
 
-		assertThrows(RuntimeException.class, () -> provider.js_addCronJob("cron", "0 0 12 * * ?", method("globals", "noon"), FUTURE));
+		RuntimeException e = assertThrows(RuntimeException.class, () -> provider.js_addCronJob("cron", "0 0 12 * * ?", method("globals", "noon"), FUTURE));
+		assertTrue(e.getMessage().startsWith("Couldn't schedule job cron error: "), e.getMessage());
 	}
 
 	// --- job names and removal ---
