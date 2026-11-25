@@ -23,8 +23,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.net.InetSocketAddress;
-import java.net.Socket;
 import java.security.KeyStore;
 import java.security.SecureRandom;
 import java.security.cert.CertificateException;
@@ -40,7 +38,6 @@ import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
-import javax.net.ssl.SSLPeerUnverifiedException;
 import javax.net.ssl.TrustManagerFactory;
 
 import org.apache.hc.client5.http.ConnectionKeepAliveStrategy;
@@ -58,9 +55,7 @@ import org.apache.hc.client5.http.impl.nio.PoolingAsyncClientConnectionManagerBu
 import org.apache.hc.client5.http.ssl.ClientTlsStrategyBuilder;
 import org.apache.hc.client5.http.ssl.HostnameVerificationPolicy;
 import org.apache.hc.client5.http.ssl.NoopHostnameVerifier;
-import org.apache.hc.client5.http.ssl.SSLConnectionSocketFactory;
 import org.apache.hc.core5.function.Factory;
-import org.apache.hc.core5.http.HttpHost;
 import org.apache.hc.core5.http.HttpResponse;
 import org.apache.hc.core5.http.config.Http1Config;
 import org.apache.hc.core5.http.protocol.HttpContext;
@@ -74,8 +69,6 @@ import org.mozilla.javascript.NativePromise;
 import org.mozilla.javascript.annotations.JSFunction;
 
 import com.servoy.j2db.documentation.ServoyDocumented;
-import com.servoy.j2db.plugins.IClientPluginAccess;
-import com.servoy.j2db.plugins.ISmartRuntimeWindow;
 import com.servoy.j2db.scripting.Deferred;
 import com.servoy.j2db.scripting.IJavaScriptType;
 import com.servoy.j2db.scripting.IScriptable;
@@ -227,8 +220,7 @@ public class HttpClient implements IScriptable, IJavaScriptType
 		keyManagerFactory.init(keyStore, config.certPassword != null ? config.certPassword.toCharArray() : null);
 
 		KeyStore trustStore = KeyStore.getInstance("JKS");
-		String relativeCacertsPath = "/lib/security/cacerts/".replace("/", File.separator);
-		String cacerts = System.getProperty("java.home") + relativeCacertsPath;
+		File cacerts = new File(System.getProperty("java.home"), "lib" + File.separator + "security" + File.separator + "cacerts");
 		try (InputStream trustInput = new FileInputStream(cacerts))
 		{
 			String password = config.trustStorePassword != null ? config.trustStorePassword : "changeit";
@@ -441,18 +433,17 @@ public class HttpClient implements IScriptable, IJavaScriptType
 		{
 			return false;
 		}
-		int age = maxAge;
-		if (maxAge == 0)
-		{
-			age = -1;
-		}
-
 		BasicClientCookie cookie;
 		cookie = new BasicClientCookie(cookieName, cookieValue);
 		if (!Utils.stringIsEmpty(path))
 		{
 			cookie.setPath(path);
-			cookie.setExpiryDate(new Date(System.currentTimeMillis() + age));
+			// maxAge 0 or negative (the default -1) means a session cookie without expiry; an expiry of now - 1 ms
+			// would make the cookie store drop the cookie right away
+			if (maxAge > 0)
+			{
+				cookie.setExpiryDate(new Date(System.currentTimeMillis() + maxAge));
+			}
 			cookie.setSecure(secure);
 		}
 		cookie.setDomain(domain);
@@ -831,72 +822,5 @@ public class HttpClient implements IScriptable, IJavaScriptType
 			this.proxyPort = 8080;
 		}
 	}
-
-	private static final class CertificateSSLSocketFactoryHandler extends SSLConnectionSocketFactory
-	{
-		private final AllowedCertTrustStrategy allowedCertTrustStrategy;
-		private final HttpPlugin httpPlugin;
-
-		/**
-		 * @param sslContext
-		 * @param allowedCertTrustStrategy
-		 */
-		private CertificateSSLSocketFactoryHandler(SSLContext sslContext, AllowedCertTrustStrategy allowedCertTrustStrategy, HttpPlugin httpPlugin)
-		{
-			super(sslContext);
-			this.allowedCertTrustStrategy = allowedCertTrustStrategy;
-			this.httpPlugin = httpPlugin;
-		}
-
-		@Override
-		public Socket connectSocket(final TimeValue connectTimeout,
-			final Socket socket,
-			final HttpHost host,
-			final InetSocketAddress remoteAddress,
-			final InetSocketAddress localAddress,
-			final HttpContext context) throws IOException
-		{
-			try
-			{
-				return super.connectSocket(connectTimeout, socket, host, remoteAddress, localAddress, context);
-			}
-			catch (SSLPeerUnverifiedException ex)
-			{
-				X509Certificate[] lastCertificates = allowedCertTrustStrategy.getAndClearLastCertificates();
-				if (lastCertificates != null)
-				{
-					// allow for next time
-					if (httpPlugin.getClientPluginAccess().getApplicationType() == IClientPluginAccess.CLIENT ||
-						httpPlugin.getClientPluginAccess().getApplicationType() == IClientPluginAccess.RUNTIME)
-					{
-						// show dialog
-						CertificateDialog dialog = new CertificateDialog(
-							((ISmartRuntimeWindow)this.httpPlugin.getClientPluginAccess().getCurrentRuntimeWindow()).getWindow(), remoteAddress,
-							lastCertificates);
-						if (dialog.shouldAccept())
-						{
-							allowedCertTrustStrategy.add(lastCertificates);
-							// try it again now with the new chain.
-							return super.connectSocket(connectTimeout, socket, host, remoteAddress, localAddress, context);
-						}
-					}
-					else
-					{
-						Debug.error("Couldn't connect to " + remoteAddress +
-							", please make sure that the ssl certificates of that site are added to the java keystore." +
-							"Download the keystore in the browser and update the java cacerts file in jre/lib/security: " +
-							"keytool -import -file downloaded.crt -keystore cacerts");
-					}
-				}
-				throw ex;
-			}
-			finally
-			{
-				// always just clear the last request.
-				allowedCertTrustStrategy.getAndClearLastCertificates();
-			}
-		}
-	}
-
 
 }
