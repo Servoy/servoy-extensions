@@ -110,7 +110,6 @@ public class ClientManagerProviderTest
 	public void plugin()
 	{
 		assertEquals("clientmanager", plugin.getName());
-		assertNull(plugin.getPreferencePanels());
 		assertNull(plugin.getProperties());
 		assertNotNull(plugin.getIconUrl());
 		assertNotNull(plugin.getImage());

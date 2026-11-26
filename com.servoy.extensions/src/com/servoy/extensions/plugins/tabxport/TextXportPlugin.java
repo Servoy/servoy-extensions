@@ -30,7 +30,6 @@ import com.servoy.j2db.plugins.IClientPlugin;
 import com.servoy.j2db.plugins.IClientPluginAccess;
 import com.servoy.j2db.plugins.IIconProvider;
 import com.servoy.j2db.plugins.PluginException;
-import com.servoy.j2db.preference.PreferencePanel;
 import com.servoy.j2db.scripting.IScriptable;
 
 /**
@@ -74,14 +73,6 @@ public class TextXportPlugin implements IClientPlugin, IIconProvider
 	public void unload() throws PluginException
 	{
 		application = null;
-	}
-
-	/*
-	 * @see IPlugin#getPreferencePanels()
-	 */
-	public PreferencePanel[] getPreferencePanels()
-	{
-		return null;
 	}
 
 	/*

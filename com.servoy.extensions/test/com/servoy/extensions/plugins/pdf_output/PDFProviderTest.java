@@ -91,7 +91,6 @@ public class PDFProviderTest
 	{
 		assertEquals("pdf_output", plugin.getName());
 		assertNotNull(plugin.getProperties().get(IClientPlugin.DISPLAY_NAME));
-		assertNull(plugin.getPreferencePanels());
 		assertNotNull(plugin.getIconUrl());
 		assertNotNull(plugin.getImage());
 		assertSame(provider, plugin.getScriptObject());

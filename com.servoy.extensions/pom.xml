@@ -100,10 +100,6 @@
                     <groupId>com.servoy</groupId>
                     <artifactId>servoy_headless_client</artifactId>
                 </dependency>
-                <dependency>
-                    <groupId>com.servoy</groupId>
-                    <artifactId>servoy_smart_client</artifactId>
-                </dependency>
             </dependencies>
             <build>
                 <plugins>

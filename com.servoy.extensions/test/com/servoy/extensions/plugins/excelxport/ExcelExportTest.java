@@ -101,7 +101,6 @@ public class ExcelExportTest
 	{
 		assertEquals("excelxport", plugin.getName());
 		assertNotNull(plugin.getProperties().get(IClientPlugin.DISPLAY_NAME));
-		assertNull(plugin.getPreferencePanels());
 		assertNotNull(plugin.getIconUrl());
 		assertNotNull(plugin.getImage());
 		plugin.propertyChange(new java.beans.PropertyChangeEvent(this, "solution", null, "x"));

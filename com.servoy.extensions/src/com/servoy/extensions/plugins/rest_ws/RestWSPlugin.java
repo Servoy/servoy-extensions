@@ -37,7 +37,6 @@ import com.servoy.j2db.plugins.IPreShutdownListener;
 import com.servoy.j2db.plugins.IServerAccess;
 import com.servoy.j2db.plugins.IServerPlugin;
 import com.servoy.j2db.plugins.PluginException;
-import com.servoy.j2db.preference.PreferencePanel;
 import com.servoy.j2db.server.headlessclient.HeadlessClientFactory;
 import com.servoy.j2db.server.shared.ApplicationServerRegistry;
 import com.servoy.j2db.server.shared.IHeadlessClient;
@@ -93,11 +92,6 @@ public class RestWSPlugin implements IServerPlugin, IPreShutdownListener
 	{
 		this.application = app;
 		app.registerWebService(WEBSERVICE_NAME, new RestWSServlet(WEBSERVICE_NAME, this));
-	}
-
-	public PreferencePanel[] getPreferencePanels()
-	{
-		return null;
 	}
 
 	public Map<String, String> getRequiredPropertyNames()

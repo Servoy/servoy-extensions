@@ -29,7 +29,6 @@ import com.servoy.j2db.plugins.IClientPluginAccess;
 import com.servoy.j2db.plugins.IColumnValidatorProvider;
 import com.servoy.j2db.plugins.IIconProvider;
 import com.servoy.j2db.plugins.PluginException;
-import com.servoy.j2db.preference.PreferencePanel;
 import com.servoy.j2db.scripting.IScriptable;
 
 public class ValidatorPlugin implements IClientPlugin, IColumnValidatorProvider, IIconProvider
@@ -63,11 +62,6 @@ public class ValidatorPlugin implements IClientPlugin, IColumnValidatorProvider,
 	public String getName()
 	{
 		return "servoy_default_validators";
-	}
-
-	public PreferencePanel[] getPreferencePanels()
-	{
-		return null;
 	}
 
 	public IScriptable getScriptObject()

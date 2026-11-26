@@ -27,7 +27,6 @@ import com.servoy.j2db.plugins.IClientPlugin;
 import com.servoy.j2db.plugins.IClientPluginAccess;
 import com.servoy.j2db.plugins.IIconProvider;
 import com.servoy.j2db.plugins.PluginException;
-import com.servoy.j2db.preference.PreferencePanel;
 import com.servoy.j2db.scripting.IScriptable;
 
 /**
@@ -51,14 +50,6 @@ public class ImagePlugin implements IClientPlugin, IIconProvider
 	public void initialize(IClientPluginAccess app) throws PluginException
 	{
 		this.access = app;
-	}
-
-	/**
-	 * @see com.servoy.j2db.plugins.IClientPlugin#getPreferencePanels()
-	 */
-	public PreferencePanel[] getPreferencePanels()
-	{
-		return null;
 	}
 
 	/**

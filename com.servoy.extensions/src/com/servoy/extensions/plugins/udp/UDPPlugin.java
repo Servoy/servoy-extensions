@@ -28,7 +28,6 @@ import com.servoy.j2db.plugins.IClientPlugin;
 import com.servoy.j2db.plugins.IClientPluginAccess;
 import com.servoy.j2db.plugins.IIconProvider;
 import com.servoy.j2db.plugins.PluginException;
-import com.servoy.j2db.preference.PreferencePanel;
 import com.servoy.j2db.scripting.IScriptable;
 
 public class UDPPlugin implements IClientPlugin, IIconProvider
@@ -70,14 +69,6 @@ public class UDPPlugin implements IClientPlugin, IIconProvider
 		Properties props = new Properties();
 		props.put(DISPLAY_NAME, "UDP packets plugin"); //$NON-NLS-1$
 		return props;
-	}
-
-	/*
-	 * @see IPlugin#getPreferencePanels()
-	 */
-	public PreferencePanel[] getPreferencePanels()
-	{
-		return null;
 	}
 
 	/*

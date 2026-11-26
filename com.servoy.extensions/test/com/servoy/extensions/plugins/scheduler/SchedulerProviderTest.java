@@ -111,7 +111,6 @@ public class SchedulerProviderTest
 	{
 		assertEquals("scheduler", plugin.getName());
 		assertNull(plugin.getProperties());
-		assertNull(plugin.getPreferencePanels());
 		assertNotNull(plugin.getIconUrl());
 		assertNull(plugin.getImage());
 		assertSame(provider, plugin.getScriptObject());

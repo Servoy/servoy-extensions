@@ -118,7 +118,6 @@ public class HeadlessClientProviderTest
 	public void plugin() throws Exception
 	{
 		assertEquals("headlessclient", plugin.getName());
-		assertNull(plugin.getPreferencePanels());
 		assertNull(plugin.getProperties());
 		assertNotNull(plugin.getIconUrl());
 		assertNotNull(plugin.getImage());

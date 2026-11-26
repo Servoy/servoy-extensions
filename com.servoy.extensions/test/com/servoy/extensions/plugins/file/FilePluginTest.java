@@ -64,7 +64,6 @@ public class FilePluginTest
 	{
 		plugin.load();
 		assertEquals("file", plugin.getName());
-		assertNull(plugin.getPreferencePanels());
 		assertNotNull(plugin.getProperties().get(IClientPlugin.DISPLAY_NAME));
 		assertEquals(plugin.getIconUrl() == null, plugin.getImage() == null);
 	}

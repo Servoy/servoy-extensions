@@ -98,7 +98,6 @@ public class HeadlessServerPluginTest
 		verify(access).registerRemoteService(IHeadlessServer.class.getName(), server);
 		assertEquals("HeadlessServerPlugin", server.getProperties().get(IServerPlugin.DISPLAY_NAME));
 		assertTrue(server.getRequiredPropertyNames().isEmpty());
-		assertNull(server.getPreferencePanels());
 		server.unload();
 
 		IServerAccess failing = mock(IServerAccess.class);

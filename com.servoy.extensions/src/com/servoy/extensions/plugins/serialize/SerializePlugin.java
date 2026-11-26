@@ -29,7 +29,6 @@ import com.servoy.j2db.plugins.IClientPluginAccess;
 import com.servoy.j2db.plugins.IColumnConverterProvider;
 import com.servoy.j2db.plugins.IIconProvider;
 import com.servoy.j2db.plugins.PluginException;
-import com.servoy.j2db.preference.PreferencePanel;
 import com.servoy.j2db.scripting.IScriptable;
 import com.servoy.j2db.util.serialize.JSONSerializerWrapper;
 
@@ -79,14 +78,6 @@ public class SerializePlugin implements IClientPlugin, IColumnConverterProvider,
 		return props;
 	}
 
-
-	/*
-	 * @see IPlugin#getPreferencePanels()
-	 */
-	public PreferencePanel[] getPreferencePanels()
-	{
-		return null;
-	}
 
 	/*
 	 * @see IPlugin#getName()

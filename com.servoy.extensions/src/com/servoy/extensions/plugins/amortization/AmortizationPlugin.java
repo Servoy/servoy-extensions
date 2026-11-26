@@ -27,7 +27,6 @@ import com.servoy.j2db.plugins.IClientPlugin;
 import com.servoy.j2db.plugins.IClientPluginAccess;
 import com.servoy.j2db.plugins.IIconProvider;
 import com.servoy.j2db.plugins.PluginException;
-import com.servoy.j2db.preference.PreferencePanel;
 import com.servoy.j2db.scripting.IScriptable;
 
 /**
@@ -42,12 +41,6 @@ public class AmortizationPlugin implements IClientPlugin, IIconProvider
 	public void initialize(IClientPluginAccess app) throws PluginException
 	{
 		// Empty.
-	}
-
-	public PreferencePanel[] getPreferencePanels()
-	{
-		// No preference panel.
-		return null;
 	}
 
 	public String getName()

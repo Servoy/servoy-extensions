@@ -42,7 +42,6 @@ import com.servoy.extensions.plugins.mail.client.MailMessage;
 import com.servoy.j2db.Messages;
 import com.servoy.j2db.plugins.IServerAccess;
 import com.servoy.j2db.plugins.IServerPlugin;
-import com.servoy.j2db.preference.PreferencePanel;
 import com.servoy.j2db.util.Debug;
 import com.servoy.j2db.util.Text;
 import com.servoy.j2db.util.UUID;
@@ -561,15 +560,6 @@ public class MailServer implements IMailService, IServerPlugin
 				Debug.error(ex2);
 			}
 		}
-		return null;
-	}
-
-	/*
-	 * @see IPlugin#getPreferencePanels()
-	 */
-	public PreferencePanel[] getPreferencePanels()
-	{
-		// the Swing preference panel was only shown by the smart client
 		return null;
 	}
 

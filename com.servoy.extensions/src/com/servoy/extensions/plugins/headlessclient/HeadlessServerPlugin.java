@@ -33,7 +33,6 @@ import com.servoy.j2db.IServiceProvider;
 import com.servoy.j2db.persistence.Solution;
 import com.servoy.j2db.plugins.IServerAccess;
 import com.servoy.j2db.plugins.IServerPlugin;
-import com.servoy.j2db.preference.PreferencePanel;
 import com.servoy.j2db.server.headlessclient.HeadlessClientFactory;
 import com.servoy.j2db.server.shared.IHeadlessClient;
 import com.servoy.j2db.util.Debug;
@@ -87,11 +86,6 @@ public class HeadlessServerPlugin implements IHeadlessServer, IServerPlugin
 	public Map<String, String> getRequiredPropertyNames()
 	{
 		return Collections.emptyMap();
-	}
-
-	public PreferencePanel[] getPreferencePanels()
-	{
-		return null;
 	}
 
 	public String createClient(String solutionname, String username, String password, Object[] solutionOpenMethodArgs, String callingClientId) throws Exception
