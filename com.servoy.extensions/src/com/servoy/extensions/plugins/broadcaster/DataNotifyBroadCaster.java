@@ -166,7 +166,7 @@ public class DataNotifyBroadCaster implements IServerPlugin
 		String hostname = app.getSettings().getProperty("amqpbroadcaster.hostname");
 		if (hostname != null && !hostname.trim().equals(""))
 		{
-			ConnectionFactory factory = new ConnectionFactory();
+			ConnectionFactory factory = createConnectionFactory();
 			factory.setHost(hostname);
 			String username = app.getSettings().getProperty("amqpbroadcaster.username");
 			if (username != null) factory.setUsername(username);
@@ -322,6 +322,15 @@ public class DataNotifyBroadCaster implements IServerPlugin
 				Debug.error("Error in databroadcaster plugin, can't initialize a connection, please check hostname/username/password", e);
 			}
 		}
+	}
+
+	/**
+	 * Creates the RabbitMQ connection factory (package-private so a test can hand out a fake connection instead of
+	 * connecting to a broker).
+	 */
+	ConnectionFactory createConnectionFactory()
+	{
+		return new ConnectionFactory();
 	}
 
 	/**
