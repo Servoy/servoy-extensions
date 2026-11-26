@@ -116,12 +116,19 @@ public class JSImageTest
 	@Test
 	public void toStringOfAnImageThatWasNotReadYet() throws Exception
 	{
-		JSImage image = new JSImage(Files.write(tmp.resolve("a.png"), png()).toFile());
+		byte[] data = png();
+		JSImage image = new JSImage(Files.write(tmp.resolve("a.png"), data).toFile());
 
-		// current behaviour (bug): toString uses imageData.length, which is only loaded by getData
-		assertThrows(NullPointerException.class, image::toString);
+		// the size is the file length, the data is not read for it
+		assertEquals("JSImage[dimensions:java.awt.Dimension[width=40,height=20],size:" + data.length + ",contenttype:image/png]", image.toString());
 		image.js_getData();
-		assertTrue(image.toString().startsWith("JSImage[dimensions:"));
+		assertEquals("JSImage[dimensions:java.awt.Dimension[width=40,height=20],size:" + data.length + ",contenttype:image/png]", image.toString());
+	}
+
+	@Test
+	public void toStringOfAnEmptyImage()
+	{
+		assertEquals("JSImage[dimensions:java.awt.Dimension[width=0,height=0],size:0,contenttype:null]", new JSImage().toString());
 	}
 
 	@Test
