@@ -98,6 +98,14 @@ public class HeadlessClientPlugin implements IClientPlugin, IIconProvider
 		return access;
 	}
 
+	/**
+	 * Runs the task on a new (named) thread (package-private so a test can run it on the calling thread).
+	 */
+	void runInBackground(Runnable task, String threadName)
+	{
+		new Thread(task, threadName).start();
+	}
+
 	public JSONConverter getJSONConverter()
 	{
 		if (jsonConverter == null)

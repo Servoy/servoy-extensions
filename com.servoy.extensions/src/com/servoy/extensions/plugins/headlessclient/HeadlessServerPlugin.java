@@ -133,10 +133,18 @@ public class HeadlessServerPlugin implements IHeadlessServer, IServerPlugin
 		}
 		if (createNewClient)
 		{
-			IHeadlessClient c = HeadlessClientFactory.createHeadlessClient(solutionname, username, password, solutionOpenMethodArgs);
+			IHeadlessClient c = createHeadlessClient(solutionname, username, password, solutionOpenMethodArgs);
 			clients.put(clientKey, c);
 		}
 		return clientKey;
+	}
+
+	/**
+	 * Creates the headless client that opens the solution (package-private so a test can provide its own client).
+	 */
+	IHeadlessClient createHeadlessClient(String solutionname, String username, String password, Object[] solutionOpenMethodArgs) throws Exception
+	{
+		return HeadlessClientFactory.createHeadlessClient(solutionname, username, password, solutionOpenMethodArgs);
 	}
 
 	private void clearInvalidClients()
