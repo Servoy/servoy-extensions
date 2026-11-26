@@ -131,15 +131,25 @@ public class PDFFormsAndPrintingTest
 		byte[] fromBytes = provider.js_convertPDFFormToPDFDocument(form(), fdf.getBytes(StandardCharsets.ISO_8859_1), true);
 		byte[] fromFile = provider.js_convertPDFFormToPDFDocument(form(), fdfFile.toString());
 
-		com.lowagie.text.pdf.FdfReader parsed = new com.lowagie.text.pdf.FdfReader(fdf.getBytes(StandardCharsets.ISO_8859_1));
-		// current behaviour (bug): the OpenPDF FdfReader names top level fields ".name" and ".city" (with a leading
-		// dot), so AcroFields.setFields does not find the form fields and no value is filled in
-		assertEquals(Set.of(".name", ".city"), parsed.getFields().keySet());
-		assertFalse(text(fromBytes, 1).contains("FromFdf"));
-		assertFalse(text(fromFile, 1).contains("Utrecht"));
-		// no partial flattening name matches a form field, so the whole form is flattened (empty) in both cases
+		// the OpenPDF FdfReader names top level fields ".name" and ".city", they are matched without the dot
+		assertEquals(Set.of(".name", ".city"), new com.lowagie.text.pdf.FdfReader(fdf.getBytes(StandardCharsets.ISO_8859_1)).getFields().keySet());
+		assertTrue(text(fromBytes, 1).contains("FromFdf"), text(fromBytes, 1));
+		assertTrue(text(fromBytes, 1).contains("Utrecht"), text(fromBytes, 1));
+		assertTrue(text(fromFile, 1).contains("Utrecht"), text(fromFile, 1));
 		assertTrue(fields(fromBytes).getFields().isEmpty());
 		assertTrue(fields(fromFile).getFields().isEmpty());
+	}
+
+	@Test
+	public void partialFlatteningWithFdfKeepsTheFieldsThatWereNotFilled() throws Exception
+	{
+		String fdf = "%FDF-1.2\n1 0 obj\n<< /FDF << /Fields [ << /T (name) /V (OnlyName) >> << /T (unknown) /V (x) >> ] >> >>\nendobj\ntrailer\n<< /Root 1 0 R >>\n%%EOF\n";
+
+		byte[] filled = provider.js_convertPDFFormToPDFDocument(form(), fdf.getBytes(StandardCharsets.ISO_8859_1), true);
+
+		assertTrue(text(filled, 1).contains("OnlyName"), text(filled, 1));
+		// only the filled field is flattened, a value for a field the form does not have is ignored
+		assertEquals(Set.of("city"), fields(filled).getFields().keySet());
 	}
 
 	@Test
@@ -163,11 +173,12 @@ public class PDFFormsAndPrintingTest
 	}
 
 	@Test
-	public void aStringValueWithoutEqualsSignFails()
+	public void aStringValueWithoutEqualsSignIsSkipped() throws Exception
 	{
-		// current behaviour (bug): a "field=value" string without '=' gives substring(0, -1), reported as a generic
-		// conversion error
-		assertThrows(RuntimeException.class, () -> provider.js_convertPDFFormToPDFDocument(form(), new Object[] { "name" }));
+		byte[] filled = provider.js_convertPDFFormToPDFDocument(form(), new Object[] { "name", "=nameless", "city=Amersfoort" }, true);
+
+		assertTrue(text(filled, 1).contains("Amersfoort"));
+		assertEquals(Set.of("name"), fields(filled).getFields().keySet());
 	}
 
 	@Test
