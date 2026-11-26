@@ -49,7 +49,6 @@ public class AmortizationProviderTest
 
 		assertEquals("amortization", plugin.getName());
 		assertEquals("", plugin.getProperties().get(IClientPlugin.DISPLAY_NAME));
-		assertNull(plugin.getPreferencePanels());
 		assertNotNull(plugin.getIconUrl());
 		assertNotNull(plugin.getImage());
 		assertSame(plugin.getScriptObject(), plugin.getScriptObject());

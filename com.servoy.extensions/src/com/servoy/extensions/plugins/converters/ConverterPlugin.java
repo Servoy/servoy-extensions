@@ -31,7 +31,6 @@ import com.servoy.j2db.plugins.IColumnConverterProvider;
 import com.servoy.j2db.plugins.IIconProvider;
 import com.servoy.j2db.plugins.IUIConverterProvider;
 import com.servoy.j2db.plugins.PluginException;
-import com.servoy.j2db.preference.PreferencePanel;
 import com.servoy.j2db.scripting.IScriptable;
 
 /**
@@ -67,11 +66,6 @@ public class ConverterPlugin implements IClientPlugin, IColumnConverterProvider,
 	public String getName()
 	{
 		return getClass().getSimpleName();
-	}
-
-	public PreferencePanel[] getPreferencePanels()
-	{
-		return null;
 	}
 
 	public IScriptable getScriptObject()

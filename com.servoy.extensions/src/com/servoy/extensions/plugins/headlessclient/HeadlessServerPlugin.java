@@ -33,7 +33,6 @@ import com.servoy.j2db.IServiceProvider;
 import com.servoy.j2db.persistence.Solution;
 import com.servoy.j2db.plugins.IServerAccess;
 import com.servoy.j2db.plugins.IServerPlugin;
-import com.servoy.j2db.preference.PreferencePanel;
 import com.servoy.j2db.server.headlessclient.HeadlessClientFactory;
 import com.servoy.j2db.server.shared.IHeadlessClient;
 import com.servoy.j2db.util.Debug;
@@ -89,11 +88,6 @@ public class HeadlessServerPlugin implements IHeadlessServer, IServerPlugin
 		return Collections.emptyMap();
 	}
 
-	public PreferencePanel[] getPreferencePanels()
-	{
-		return null;
-	}
-
 	public String createClient(String solutionname, String username, String password, Object[] solutionOpenMethodArgs, String callingClientId) throws Exception
 	{
 		String newClientKey = UUID.randomUUID().toString();
@@ -133,10 +127,18 @@ public class HeadlessServerPlugin implements IHeadlessServer, IServerPlugin
 		}
 		if (createNewClient)
 		{
-			IHeadlessClient c = HeadlessClientFactory.createHeadlessClient(solutionname, username, password, solutionOpenMethodArgs);
+			IHeadlessClient c = createHeadlessClient(solutionname, username, password, solutionOpenMethodArgs);
 			clients.put(clientKey, c);
 		}
 		return clientKey;
+	}
+
+	/**
+	 * Creates the headless client that opens the solution (package-private so a test can provide its own client).
+	 */
+	IHeadlessClient createHeadlessClient(String solutionname, String username, String password, Object[] solutionOpenMethodArgs) throws Exception
+	{
+		return HeadlessClientFactory.createHeadlessClient(solutionname, username, password, solutionOpenMethodArgs);
 	}
 
 	private void clearInvalidClients()

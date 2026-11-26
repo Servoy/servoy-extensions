@@ -46,7 +46,6 @@ public class PDFFormsPluginTest
 		plugin.initialize(access);
 
 		verify(access).registerWebService(eq("pdf_forms"), any(PDFServlet.class));
-		assertNull(plugin.getPreferencePanels());
 		assertEquals("PDF Forms Plugin", plugin.getProperties().get(IServerPlugin.DISPLAY_NAME));
 		assertTrue(plugin.getRequiredPropertyNames().containsKey(PDFServlet.SERVER_NAME_PROPERTY));
 		assertTrue(plugin.getRequiredPropertyNames().containsKey(PDFServlet.TEMPLATE_LOCATION_PROPERTY));

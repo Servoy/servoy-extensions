@@ -39,7 +39,6 @@ public class SerializePluginTest
 	{
 		assertEquals("serialize", plugin.getName());
 		assertEquals("Serialize Plugin", plugin.getProperties().get(IClientPlugin.DISPLAY_NAME));
-		assertNull(plugin.getPreferencePanels());
 	}
 
 	@Test

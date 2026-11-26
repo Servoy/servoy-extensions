@@ -25,7 +25,6 @@ import com.servoy.j2db.documentation.ServoyDocumented;
 import com.servoy.j2db.plugins.IServerAccess;
 import com.servoy.j2db.plugins.IServerPlugin;
 import com.servoy.j2db.plugins.PluginException;
-import com.servoy.j2db.preference.PreferencePanel;
 
 /**
  * <p>The <code>PDFFormsPlugin</code> is a server plugin designed to handle PDF forms in the Servoy
@@ -51,11 +50,6 @@ public class PDFFormsPlugin implements IServerPlugin
 	public void initialize(IServerAccess app) throws PluginException
 	{
 		app.registerWebService("pdf_forms", new PDFServlet(app)); //$NON-NLS-1$
-	}
-
-	public PreferencePanel[] getPreferencePanels()
-	{
-		return null;
 	}
 
 	public Map getRequiredPropertyNames()

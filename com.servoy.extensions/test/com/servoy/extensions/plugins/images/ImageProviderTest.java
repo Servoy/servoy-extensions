@@ -64,7 +64,6 @@ public class ImageProviderTest
 	{
 		assertEquals("images", plugin.getName());
 		assertNull(plugin.getProperties());
-		assertNull(plugin.getPreferencePanels());
 		assertNotNull(plugin.getIconUrl());
 		assertNotNull(plugin.getImage());
 		assertSame(provider, plugin.getScriptObject());

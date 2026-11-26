@@ -91,7 +91,6 @@ public class TextExportTest
 	{
 		assertEquals("textxport", plugin.getName());
 		assertNotNull(plugin.getProperties().get(IClientPlugin.DISPLAY_NAME));
-		assertNull(plugin.getPreferencePanels());
 		assertNotNull(plugin.getIconUrl());
 		assertNotNull(plugin.getImage());
 		assertSame(enabler, plugin.getScriptObject());

@@ -103,7 +103,6 @@ public class SQLProcessorTest
 	{
 		verify(access).registerRemoteService("servoy.ISQLService", processor);
 		assertEquals("Raw SQL Plugin", processor.getProperties().get(IServerPlugin.DISPLAY_NAME));
-		assertNull(processor.getPreferencePanels());
 		assertTrue(processor.getRequiredPropertyNames().containsKey("servoy.rawSQL.allowClientCacheFlushes"));
 	}
 

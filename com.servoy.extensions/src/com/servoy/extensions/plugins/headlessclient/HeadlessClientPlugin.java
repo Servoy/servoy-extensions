@@ -27,7 +27,6 @@ import com.servoy.j2db.plugins.IClientPlugin;
 import com.servoy.j2db.plugins.IClientPluginAccess;
 import com.servoy.j2db.plugins.IIconProvider;
 import com.servoy.j2db.plugins.PluginException;
-import com.servoy.j2db.preference.PreferencePanel;
 import com.servoy.j2db.scripting.IScriptable;
 import com.servoy.j2db.util.serialize.JSONConverter;
 
@@ -38,11 +37,6 @@ public class HeadlessClientPlugin implements IClientPlugin, IIconProvider
 	private IClientPluginAccess access;
 	private HeadlessClientProvider impl;
 	private JSONConverter jsonConverter;
-
-	public PreferencePanel[] getPreferencePanels()
-	{
-		return null;//none
-	}
 
 	public String getName()
 	{
@@ -96,6 +90,14 @@ public class HeadlessClientPlugin implements IClientPlugin, IIconProvider
 	public IClientPluginAccess getPluginAccess()
 	{
 		return access;
+	}
+
+	/**
+	 * Runs the task on a new (named) thread (package-private so a test can run it on the calling thread).
+	 */
+	void runInBackground(Runnable task, String threadName)
+	{
+		new Thread(task, threadName).start();
 	}
 
 	public JSONConverter getJSONConverter()

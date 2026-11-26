@@ -30,7 +30,6 @@ import com.servoy.j2db.plugins.IClientPlugin;
 import com.servoy.j2db.plugins.IClientPluginAccess;
 import com.servoy.j2db.plugins.IIconProvider;
 import com.servoy.j2db.plugins.PluginException;
-import com.servoy.j2db.preference.PreferencePanel;
 import com.servoy.j2db.scripting.IScriptable;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -71,11 +70,6 @@ public class RestWSClientPlugin implements IClientPlugin, IIconProvider
 		Properties props = new Properties();
 		props.put(DISPLAY_NAME, "Servoy REST-WS client plugin");
 		return props;
-	}
-
-	public PreferencePanel[] getPreferencePanels()
-	{
-		return null;
 	}
 
 	public String getName()

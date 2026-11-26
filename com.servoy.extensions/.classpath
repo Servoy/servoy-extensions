@@ -15,7 +15,6 @@
 	</classpathentry>
 	<classpathentry combineaccessrules="false" kind="src" path="/servoy_headless_client"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/servoy_shared"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/servoy_smart_client"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.eclipse.dltk.javascript.rhino"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/servoy_base"/>
 	<classpathentry kind="lib" path="lib/jfxrt.jar"/>

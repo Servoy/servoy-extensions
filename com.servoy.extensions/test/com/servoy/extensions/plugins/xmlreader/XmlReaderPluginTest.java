@@ -31,7 +31,6 @@ public class XmlReaderPluginTest
 	{
 		plugin.initialize(null);
 		assertEquals("XmlReader", plugin.getName());
-		assertNull(plugin.getPreferencePanels());
 		assertNull(plugin.getProperties());
 	}
 

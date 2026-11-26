@@ -87,7 +87,6 @@ public class HttpPluginTest
 	{
 		assertEquals("http", plugin.getName());
 		assertEquals("HTTP Plugin", plugin.getProperties().get(com.servoy.j2db.plugins.IClientPlugin.DISPLAY_NAME));
-		assertNull(plugin.getPreferencePanels());
 		assertNotNull(plugin.getIconUrl());
 		assertNotNull(plugin.getImage());
 		assertNotNull(plugin.getExecutor());

@@ -64,11 +64,6 @@
                         <artifactId>servoy_headless_client</artifactId>
                         <version>${project.version}</version>
                     </dependency>
-                    <dependency>
-                        <groupId>com.servoy</groupId>
-                        <artifactId>servoy_smart_client</artifactId>
-                        <version>${project.version}</version>
-                    </dependency>
                 </dependencies>
             </dependencyManagement>
         </profile>

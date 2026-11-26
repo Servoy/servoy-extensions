@@ -144,7 +144,6 @@ public class RestWSPluginTest
 	{
 		verify(access).registerWebService(eq("rest_ws"), any(RestWSServlet.class));
 		assertSame(access, plugin.getServerAccess());
-		assertNull(plugin.getPreferencePanels());
 		assertEquals("RESTful Web Services Plugin", plugin.getProperties().get(IServerPlugin.DISPLAY_NAME));
 		assertEquals(6, plugin.getRequiredPropertyNames().size());
 		assertNotNull(plugin.getJSONSerializer());

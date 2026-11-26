@@ -88,7 +88,6 @@ public class ValidatorPluginTest
 	public void exposesPluginMetadata()
 	{
 		assertEquals("servoy_default_validators", plugin.getName());
-		assertNull(plugin.getPreferencePanels());
 		assertNull(plugin.getScriptObject());
 		assertNull(plugin.getProperties());
 	}
