@@ -16,16 +16,12 @@
  */
 package com.servoy.extensions.plugins.tabxport;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.net.URL;
 import java.util.Properties;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
 
 import com.servoy.j2db.IApplication;
 import com.servoy.j2db.Messages;
@@ -36,12 +32,11 @@ import com.servoy.j2db.plugins.IIconProvider;
 import com.servoy.j2db.plugins.PluginException;
 import com.servoy.j2db.preference.PreferencePanel;
 import com.servoy.j2db.scripting.IScriptable;
-import com.servoy.j2db.smart.ISmartClientPluginAccess;
 
 /**
  * @author jblok
  */
-public class TextXportPlugin implements IClientPlugin, ActionListener, IIconProvider
+public class TextXportPlugin implements IClientPlugin, IIconProvider
 {
 	public static final String PLUGIN_NAME = "textxport"; //$NON-NLS-1$
 
@@ -61,34 +56,7 @@ public class TextXportPlugin implements IClientPlugin, ActionListener, IIconProv
 	public void initialize(IClientPluginAccess app) throws PluginException
 	{
 		application = ((ClientPluginAccessProvider)app).getApplication();
-
-		if (app instanceof ISmartClientPluginAccess)
-		{
-			JMenu export_Menu = ((ISmartClientPluginAccess)app).getExportMenu();
-			JMenuItem exp = null;
-			if (export_Menu != null)
-			{
-				exp = new JMenuItem(Messages.getString("servoy.plugin.tabxport.menuitem.toTextFile")); //$NON-NLS-1$
-				exp.addActionListener(this);
-				exp.setActionCommand("export_tab_file"); //$NON-NLS-1$
-				export_Menu.add(exp);
-			}
-
-			JMenu import_Menu = ((ISmartClientPluginAccess)app).getImportMenu();
-			JMenuItem imp = null;
-			if (import_Menu != null)
-			{
-				imp = new JMenuItem(Messages.getString("servoy.plugin.tabxport.menuitem.fromTextFile")); //$NON-NLS-1$
-				imp.setActionCommand("import_tab_file"); //$NON-NLS-1$
-				imp.addActionListener(this);
-				import_Menu.add(imp);
-			}
-			en = new Enabler(imp, exp, application);
-		}
-		else
-		{
-			en = new Enabler(null, null, application);
-		}
+		en = new Enabler(application);
 	}
 
 	public Properties getProperties()
@@ -98,34 +66,6 @@ public class TextXportPlugin implements IClientPlugin, ActionListener, IIconProv
 		return props;
 	}
 
-	public void actionPerformed(ActionEvent e)
-	{
-		String cmd = e.getActionCommand();
-		if ("export_tab_file".equals(cmd)) //$NON-NLS-1$
-		{
-			try
-			{
-				TextExport export = new TextExport(application);
-				export.showFrame();
-			}
-			catch (Exception ex)
-			{
-				application.reportError(Messages.getString("servoy.plugin.export.exception"), ex); //$NON-NLS-1$
-			}
-		}
-		else if ("import_tab_file".equals(cmd)) //$NON-NLS-1$
-		{
-			try
-			{
-				TextImport importer = new TextImport(application);
-				importer.showFrame();
-			}
-			catch (Exception ex)
-			{
-				application.reportError(Messages.getString("servoy.plugin.import.exception"), ex); //$NON-NLS-1$
-			}
-		}
-	}
 
 
 	/*
@@ -181,10 +121,7 @@ public class TextXportPlugin implements IClientPlugin, ActionListener, IIconProv
 
 	public void propertyChange(PropertyChangeEvent evt)
 	{
-		if (en != null && "solution".equals(evt.getPropertyName())) //$NON-NLS-1$
-		{
-			en.setEnabled(true);//restore for new solution
-		}
+		// nothing to restore: the import/export menu items only existed in the smart client
 	}
 
 

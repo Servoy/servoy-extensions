@@ -208,7 +208,7 @@ public class TextExportTest
 	@Test
 	public void theHeaderHelper()
 	{
-		assertEquals("\"a\"|\"b\"\n", ExportSpecifyFilePanel.createHeader(new String[] { "a", "b" }, "|").toString());
-		assertEquals("\n", ExportSpecifyFilePanel.createHeader(new String[0], "|").toString());
+		assertEquals("\"a\"|\"b\"\n", TextExportUtil.createHeader(new String[] { "a", "b" }, "|").toString());
+		assertEquals("\n", TextExportUtil.createHeader(new String[0], "|").toString());
 	}
 }

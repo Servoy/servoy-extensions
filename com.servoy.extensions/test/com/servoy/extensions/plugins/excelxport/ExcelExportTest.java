@@ -105,13 +105,13 @@ public class ExcelExportTest
 		assertNotNull(plugin.getIconUrl());
 		assertNotNull(plugin.getImage());
 		plugin.propertyChange(new java.beans.PropertyChangeEvent(this, "solution", null, "x"));
-		// outside the smart client a new (menu less) scripting object is returned every time
-		assertFalse(enabler == plugin.getScriptObject());
+		// one scripting object per client; without the (smart client) menu items import/export is never enabled
+		assertSame(enabler, plugin.getScriptObject());
 		assertFalse(enabler.js_getExportEnabled());
 		assertFalse(enabler.js_getImportEnabled());
 		enabler.js_setExportEnabled(true);
 		enabler.js_setImportEnabled(true);
-		enabler.setEnabled(true);
+		assertFalse(enabler.js_getExportEnabled());
 		assertFalse(enabler.js_getImportEnabled());
 		plugin.unload();
 	}
@@ -199,7 +199,7 @@ public class ExcelExportTest
 	@Test
 	public void withoutSheetNameTheDefaultNameIsUsed() throws Exception
 	{
-		HSSFWorkbook workbook = ExportSpecifyFilePanel.populateWb(people(), new String[] { "id" }, null, null, null, 0, 0);
+		HSSFWorkbook workbook = ExcelExportUtil.populateWb(people(), new String[] { "id" }, null, null, null, 0, 0);
 
 		// current behaviour: the default sheet name of populateWb ("Servoy Data") differs in case from the one of
 		// excelExport ("Servoy data")

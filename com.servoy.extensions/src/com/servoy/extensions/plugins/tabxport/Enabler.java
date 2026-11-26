@@ -16,8 +16,6 @@
  */
 package com.servoy.extensions.plugins.tabxport;
 
-import javax.swing.JMenuItem;
-
 import com.servoy.base.scripting.annotations.ServoyClientSupport;
 import com.servoy.j2db.IApplication;
 import com.servoy.j2db.dataprocessing.IFoundSet;
@@ -48,8 +46,6 @@ import com.servoy.j2db.scripting.IScriptable;
 @ServoyClientSupport(ng = true, wc = true, sc = true)
 public class Enabler implements IReturnedTypesProvider, IScriptable
 {
-	private JMenuItem imp;
-	private JMenuItem exp;
 	private IApplication application;
 
 	public Enabler()
@@ -57,10 +53,8 @@ public class Enabler implements IReturnedTypesProvider, IScriptable
 		// only used in eclipse and when docs want to look at IReturnedTypesProvider.getAllReturnedTypes()
 	}
 
-	Enabler(JMenuItem imp, JMenuItem exp, IApplication application)
+	Enabler(IApplication application)
 	{
-		this.imp = imp;
-		this.exp = exp;
 		this.application = application;
 	}
 
@@ -73,7 +67,7 @@ public class Enabler implements IReturnedTypesProvider, IScriptable
 	@ServoyClientSupport(ng = false, wc = false, sc = true)
 	public void js_setExportEnabled(boolean b)
 	{
-		if (exp != null) exp.setEnabled(b);
+		// the import/export menu items only existed in the smart client, which is removed: nothing to enable
 	}
 
 	/**
@@ -88,23 +82,13 @@ public class Enabler implements IReturnedTypesProvider, IScriptable
 	@ServoyClientSupport(ng = false, wc = false, sc = true)
 	public boolean js_getExportEnabled()
 	{
-		if (exp != null)
-		{
-			return exp.isEnabled();
-		}
-		else
-		{
-			return false;
-		}
+		return false;
 	}
 
 	@ServoyClientSupport(ng = false, wc = false, sc = true)
 	public void js_setImportEnabled(boolean b)
 	{
-		if (imp != null)
-		{
-			imp.setEnabled(b);
-		}
+		// the import/export menu items only existed in the smart client, which is removed: nothing to enable
 	}
 
 	/**
@@ -119,26 +103,7 @@ public class Enabler implements IReturnedTypesProvider, IScriptable
 	@ServoyClientSupport(ng = false, wc = false, sc = true)
 	public boolean js_getImportEnabled()
 	{
-		if (imp != null)
-		{
-			return imp.isEnabled();
-		}
-		else
-		{
-			return false;
-		}
-	}
-
-	public void setEnabled(boolean b)
-	{
-		if (exp != null)
-		{
-			exp.setEnabled(b);
-		}
-		if (imp != null)
-		{
-			imp.setEnabled(b);
-		}
+		return false;
 	}
 
 	/**
@@ -200,8 +165,8 @@ public class Enabler implements IReturnedTypesProvider, IScriptable
 		if (foundSet != null && dataProviderIds != null && dataProviderIds.length > 0)
 		{
 			StringBuffer fileData = new StringBuffer();
-			if (exportHeader) fileData.insert(0, ExportSpecifyFilePanel.createHeader(dataProviderIds, separator));
-			fileData.append(ExportSpecifyFilePanel.populateFileData(application, foundSet, dataProviderIds, separator, null, null));
+			if (exportHeader) fileData.insert(0, TextExportUtil.createHeader(dataProviderIds, separator));
+			fileData.append(TextExportUtil.populateFileData(application, foundSet, dataProviderIds, separator, null, null));
 
 			return fileData.toString();
 		}
