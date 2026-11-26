@@ -19,8 +19,6 @@ package com.servoy.extensions.plugins.excelxport;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-import javax.swing.JMenuItem;
-
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 
 import com.servoy.j2db.dataprocessing.IFoundSet;
@@ -53,23 +51,13 @@ import com.servoy.j2db.scripting.IScriptable;
 @ServoyDocumented(publicName = ExcelXportPlugin.PLUGIN_NAME, scriptingName = "plugins." + ExcelXportPlugin.PLUGIN_NAME)
 public class Enabler implements IScriptable
 {
-	private JMenuItem imp;
-	private JMenuItem exp;
-
 	Enabler()
 	{
-		//only for use in eclipse
-	}
-
-	Enabler(JMenuItem imp, JMenuItem exp)
-	{
-		this.imp = imp;
-		this.exp = exp;
 	}
 
 	public void js_setExportEnabled(boolean b)
 	{
-		if (exp != null) exp.setEnabled(b);
+		// the import/export menu items only existed in the smart client, which is removed: nothing to enable
 	}
 
 	/**
@@ -83,22 +71,12 @@ public class Enabler implements IScriptable
 	 */
 	public boolean js_getExportEnabled()
 	{
-		if (exp != null)
-		{
-			return exp.isEnabled();
-		}
-		else
-		{
-			return false;
-		}
+		return false;
 	}
 
 	public void js_setImportEnabled(boolean b)
 	{
-		if (imp != null)
-		{
-			imp.setEnabled(b);
-		}
+		// the import/export menu items only existed in the smart client, which is removed: nothing to enable
 	}
 
 	/**
@@ -112,26 +90,7 @@ public class Enabler implements IScriptable
 	 */
 	public boolean js_getImportEnabled()
 	{
-		if (imp != null)
-		{
-			return imp.isEnabled();
-		}
-		else
-		{
-			return false;
-		}
-	}
-
-	public void setEnabled(boolean b)
-	{
-		if (exp != null)
-		{
-			exp.setEnabled(b);
-		}
-		if (imp != null)
-		{
-			imp.setEnabled(b);
-		}
+		return false;
 	}
 
 	/**
@@ -284,7 +243,7 @@ public class Enabler implements IScriptable
 		if (foundSet != null && dataProviderIds != null && dataProviderIds.length > 0)
 		{
 			ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-			HSSFWorkbook wb = ExportSpecifyFilePanel.populateWb(foundSet, dataProviderIds, templateXLS, outputColumnNames, sheetName, _startRow - 1,
+			HSSFWorkbook wb = ExcelExportUtil.populateWb(foundSet, dataProviderIds, templateXLS, outputColumnNames, sheetName, _startRow - 1,
 				_startColumn - 1);
 			wb.write(buffer);
 			return buffer.toByteArray();

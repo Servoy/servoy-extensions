@@ -110,7 +110,9 @@ public class JSImage implements IScriptable, Wrapper
 	@Override
 	public String toString()
 	{
-		return "JSImage[dimensions:" + getSize() + ",size:" + imageData.length + ",contenttype:" + js_getContentType() + "]";
+		// the data of a file is only read on demand, use the file length then
+		long size = imageData != null ? imageData.length : (file != null ? file.length() : 0);
+		return "JSImage[dimensions:" + getSize() + ",size:" + size + ",contenttype:" + js_getContentType() + "]";
 	}
 
 	private Dimension getSize()

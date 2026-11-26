@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.Writer;
-import java.net.URLEncoder;
 import java.nio.file.Paths;
 import java.rmi.RemoteException;
 import java.sql.Connection;
@@ -119,7 +118,7 @@ public class PDFServlet extends HttpServlet
 			// Determine target page.
 			if (path == null)
 			{
-				response.sendRedirect(URLEncoder.encode(request.getRequestURI(), "UTF-8") + "/");
+				response.sendRedirect(request.getRequestURI() + "/");
 				return;
 			}
 			else if ("/".equals(path))
@@ -392,7 +391,7 @@ public class PDFServlet extends HttpServlet
 		{
 			if (path == null)
 			{
-				response.sendRedirect(URLEncoder.encode(request.getRequestURI(), "UTF-8") + "/");
+				response.sendRedirect(request.getRequestURI() + "/");
 				return;
 			}
 			else if ("/".equals(path))
@@ -431,7 +430,18 @@ public class PDFServlet extends HttpServlet
 
 				String s_action_id = request.getParameter("action_id");
 
-				if (s_action_id == null || s_action_id.length() == 0) s_action_id = FdfInput.GetValue(ACTION_PROPERTY);
+				if ((s_action_id == null || s_action_id.length() == 0) && FdfInput != null)
+				{
+					try
+					{
+						s_action_id = FdfInput.GetValue(ACTION_PROPERTY);
+					}
+					catch (Exception ex)
+					{
+						// the FDF has no (value for the) action id field, answered below as "action_id not found"
+						s_action_id = null;
+					}
+				}
 
 				int action_id = Utils.getAsInteger(s_action_id);
 				if (action_id > 0)
@@ -442,7 +452,9 @@ public class PDFServlet extends HttpServlet
 					String sql = "select form_id,template_id,closed,redirect_url from pdf_actions where action_id = ?";
 					IDataSet rs = ds.performQuery(ApplicationServerRegistry.get().getClientId(), PDF_SERVER, "pdf_actions", null, sql,
 						new Object[] { new Integer(action_id) }, 0, -1);
-					for (int r = 0; r < rs.getRowCount(); r++)//normally just one (or zero)
+					boolean actionFound = rs != null && rs.getRowCount() > 0;
+					boolean refused = false;
+					for (int r = 0; actionFound && r < rs.getRowCount(); r++)//normally just one (or zero)
 					{
 						Object[] row = rs.getRow(r);
 						int form_id = Utils.getAsInteger(row[0]);
@@ -579,15 +591,27 @@ public class PDFServlet extends HttpServlet
 						}
 						else
 						{
+							refused = true;
 							response.setContentType("text/html");
 							out = response.getWriter();
 							out.println("<html><head><title></title></head><body>Security violation, use the pdf system to edit pdfs</body></html>");
 						}
 					}
 
-					if (redirect_url != null)
+					if (refused)
 					{
-						response.sendRedirect(URLEncoder.encode(redirect_url, "UTF-8"));
+						// the security violation page is the answer, no redirect or success message after it
+					}
+					else if (!actionFound)
+					{
+						response.setContentType("text/html");
+						out = response.getWriter();
+						out.println("<html><head><title></title></head><body>Error could not process data (action_id not found)</body></html>");
+					}
+					else if (redirect_url != null && redirect_url.trim().length() > 0)
+					{
+						// the redirect url comes from the pdf_actions/pdf_templates tables; it is a complete url, it must not be url-encoded
+						response.sendRedirect(redirect_url.trim());
 					}
 					else
 					{
