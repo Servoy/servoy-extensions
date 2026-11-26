@@ -300,9 +300,8 @@ public class DataNotifyBroadCasterInitializeTest
 
 		initialize();
 
-		// current behaviour (bug): the SSLContext is built from the keystore but never given to the factory, so the
-		// connection does not use TLS
-		assertFalse(factory.isSSL());
+		// the SSLContext built from the keystore is used for the connection
+		assertTrue(factory.isSSL());
 		assertEquals(1, channel.consumers.size());
 	}
 
@@ -316,6 +315,7 @@ public class DataNotifyBroadCasterInitializeTest
 
 		initialize();
 
+		assertTrue(factory.isSSL());
 		assertEquals(1, channel.consumers.size());
 	}
 
@@ -378,17 +378,18 @@ public class DataNotifyBroadCasterInitializeTest
 	}
 
 	@Test
-	public void aBodyThatIsNotAJavaObjectFailsTheConsumer() throws Exception
+	public void aBodyThatIsNotAJavaObjectIsSkipped() throws Exception
 	{
 		initialize();
 
-		// current behaviour (bug): the ObjectInputStream is created outside the try, so a body that is no serialized
-		// java object throws out of handleDelivery (the RabbitMQ client then closes the channel)
-		assertThrows(IOException.class, () -> channel.consumers.get(0).handleDelivery("tag", null, null, "plain text".getBytes()));
+		// a body that is no serialized java object is only logged, the consumer (and so the channel) keeps working
+		channel.consumers.get(0).handleDelivery("tag", null, null, "plain text".getBytes());
+		deliver(new NotifyData("other-server", "db:/crm/customers", null));
+		verify(dataNotifyService).flushCachedDatabaseData("db:/crm/customers", null);
 		// a stream that breaks while reading the object is only logged
 		byte[] truncated = serialize(new NotifyData("other-server", "db:/crm/orders", null));
 		channel.consumers.get(0).handleDelivery("tag", null, null, java.util.Arrays.copyOf(truncated, truncated.length - 5));
-		verify(dataNotifyService, never()).flushCachedDatabaseData(anyString(), any());
+		verify(dataNotifyService, never()).flushCachedDatabaseData(org.mockito.ArgumentMatchers.eq("db:/crm/orders"), any());
 	}
 
 	// --- message broadcast between servers ---

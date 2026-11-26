@@ -215,6 +215,8 @@ public class DataNotifyBroadCaster implements IServerPlugin
 							sslKeyStore.load(is, keystorePassword.toCharArray());
 							kmf.init(sslKeyStore, keystorePassword.toCharArray());
 							ctx.init(kmf.getKeyManagers(), null, null);
+							// use the keystore based context for the connection, else the connection would not use TLS at all
+							factory.useSslProtocol(ctx);
 
 							if (Boolean.valueOf(app.getSettings().getProperty("amqpbroadcaster.hostnameverification", "false")).booleanValue())
 							{
@@ -358,9 +360,9 @@ public class DataNotifyBroadCaster implements IServerPlugin
 			@Override
 			public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException
 			{
-				ByteArrayInputStream bais = new ByteArrayInputStream(body);
-				ObjectInputStream ois = new ObjectInputStream(bais);
-				try
+				// the stream is opened inside the try: a body that is no serialized java object is logged and skipped,
+				// it must not throw out of the consumer (the RabbitMQ client would close the channel)
+				try (ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(body)))
 				{
 					Object readObject = ois.readObject();
 					if (readObject instanceof NotifyData)
