@@ -544,16 +544,4 @@ public class JSPacket implements IScriptable, IJavaScriptType
 	{
 		return enclosed.getPort();
 	}
-
-	public static void main(String[] args)
-	{
-		JSPacket p = new JSPacket();
-		System.out.println(p.index);
-		p.enclosed.getData()[0] = (byte)-1;
-		p.enclosed.getData()[1] = (byte)0;
-		p.enclosed.getData()[2] = (byte)-1;
-		p.enclosed.getData()[3] = (byte)-1;
-		System.out.println(p.readInt());
-		System.out.println(p.index);
-	}
 }
