@@ -633,36 +633,4 @@ public class DataNotifyBroadCaster implements IServerPlugin
 			"Maximum serialized databroadcast payload size in bytes before falling back to a datasource flush instead of the raw row data (default: derived from the broker frame max with a safety margin, or 16MB minus margin when unlimited)");
 		return req;
 	}
-
-	public static void main(String[] args) throws Exception
-	{
-		ConnectionFactory factory = new ConnectionFactory();
-		factory.setHost("localhost");
-		Connection connection = factory.newConnection();
-		Channel channel = connection.createChannel();
-		channel.exchangeDeclare(EXCHANGE_NAME, "fanout");
-
-		String queueName = channel.queueDeclare().getQueue();
-		channel.queueBind(queueName, EXCHANGE_NAME, "");
-
-		Consumer consumer = new DefaultConsumer(channel)
-		{
-			@Override
-			public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException
-			{
-				ByteArrayInputStream bais = new ByteArrayInputStream(body);
-				ObjectInputStream ois = new ObjectInputStream(bais);
-				try
-				{
-					Object readObject = ois.readObject();
-					System.err.println("delivery in reader of " + readObject);
-				}
-				catch (Exception e)
-				{
-					Debug.error(e);
-				}
-			}
-		};
-		channel.basicConsume(queueName, consumer);
-	}
 }
