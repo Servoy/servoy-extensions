@@ -41,7 +41,7 @@ currently has a single module:
   local `mvn package` is rarely needed for a single-plugin change.
 
 ### Shared servoy bundles (read-only here)
-`servoy_base`, `servoy_shared`, `servoy_headless_client`, `servoy_smart_client`,
+`servoy_base`, `servoy_shared`, `servoy_headless_client`,
 `org.eclipse.dltk.javascript.rhino` and core classes such as `com.servoy.j2db.*` (e.g.
 `SQLEngine` in `j2db_server`) come from the separate core checkout. In Eclipse they resolve as
 **workspace project references** (see each module's `.classpath`); for the Maven CLI they are
@@ -54,7 +54,7 @@ repo** — a change there means a separate SVY case against the core repo.
 
 | Repository | Relationship |
 |-----------|-------------|
-| `servoy-client` | Provides `servoy_base`, `servoy_shared`, `servoy_headless_client`, `servoy_smart_client` — the extensions compile and run against those bundles |
+| `servoy-client` | Provides `servoy_base`, `servoy_shared`, `servoy_headless_client` — the extensions compile and run against those bundles (not against `servoy_smart_client` any more, see SVY-21330) |
 | `server` (`j2db_server`) | Server-side runtime (e.g. `SQLEngine`, databroadcast distribution) that the server plugins integrate with |
 | `servoy-eclipse` | The Servoy Developer IDE; consumes the built plugin jars |
 

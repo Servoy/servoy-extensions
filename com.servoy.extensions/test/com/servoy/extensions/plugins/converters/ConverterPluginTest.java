@@ -36,7 +36,6 @@ public class ConverterPluginTest
 	public void exposesPluginMetadata()
 	{
 		assertEquals("ConverterPlugin", plugin.getName());
-		assertNull(plugin.getPreferencePanels());
 		assertNull(plugin.getScriptObject());
 		assertNull(plugin.getProperties());
 	}

@@ -93,6 +93,7 @@ public class FakeChannel implements Channel {
 	final List<String> boundQueues = new ArrayList<>();
 	final List<Consumer> consumers = new ArrayList<>();
 	final List<ShutdownListener> shutdownListeners = new ArrayList<>();
+	final List<Map<String, Object>> queueArguments = new ArrayList<>();
 
 	/**
 	 * When set, basicPublish throws this once, simulating a transient publish
@@ -165,6 +166,7 @@ public class FakeChannel implements Channel {
 	@Override
 	public AMQP.Queue.DeclareOk queueDeclare(String queue, boolean durable, boolean exclusive, boolean autoDelete,
 			Map<String, Object> arguments) throws IOException {
+		queueArguments.add(arguments);
 		return new FakeDeclareOk("amq.gen-fake" + channelNumber);
 	}
 

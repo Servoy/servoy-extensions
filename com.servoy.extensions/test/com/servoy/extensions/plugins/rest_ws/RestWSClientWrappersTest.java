@@ -91,7 +91,6 @@ public class RestWSClientWrappersTest
 	{
 		assertEquals("rest_ws", plugin.getName());
 		assertEquals("Servoy REST-WS client plugin", plugin.getProperties().get(IClientPlugin.DISPLAY_NAME));
-		assertNull(plugin.getPreferencePanels());
 		assertNotNull(plugin.getImage());
 		assertNotNull(plugin.getIconUrl());
 		assertSame(provider, plugin.getScriptObject());

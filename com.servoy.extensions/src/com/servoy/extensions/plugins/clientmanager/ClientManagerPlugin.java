@@ -13,7 +13,6 @@ import com.servoy.j2db.plugins.IClientPlugin;
 import com.servoy.j2db.plugins.IClientPluginAccess;
 import com.servoy.j2db.plugins.IIconProvider;
 import com.servoy.j2db.plugins.PluginException;
-import com.servoy.j2db.preference.PreferencePanel;
 import com.servoy.j2db.scripting.IScriptable;
 import com.servoy.j2db.util.Debug;
 
@@ -36,11 +35,6 @@ public class ClientManagerPlugin implements IClientPlugin, IIconProvider
 	public String getName()
 	{
 		return PLUGIN_NAME;
-	}
-
-	public PreferencePanel[] getPreferencePanels()
-	{
-		return null;
 	}
 
 	public IScriptable getScriptObject()

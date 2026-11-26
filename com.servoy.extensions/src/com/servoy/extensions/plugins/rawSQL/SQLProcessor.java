@@ -32,7 +32,6 @@ import com.servoy.j2db.persistence.RepositoryException;
 import com.servoy.j2db.plugins.IServerAccess;
 import com.servoy.j2db.plugins.IServerPlugin;
 import com.servoy.j2db.plugins.PluginException;
-import com.servoy.j2db.preference.PreferencePanel;
 import com.servoy.j2db.server.shared.ApplicationServerRegistry;
 import com.servoy.j2db.util.Debug;
 import com.servoy.j2db.util.ServoyException;
@@ -78,14 +77,6 @@ public class SQLProcessor implements ISQLService, IServerPlugin
 
 	public void unload() throws PluginException
 	{
-	}
-
-	/*
-	 * @see IPlugin#getPreferencePanels()
-	 */
-	public PreferencePanel[] getPreferencePanels()
-	{
-		return null;
 	}
 
 	public Map<String, String> getRequiredPropertyNames()

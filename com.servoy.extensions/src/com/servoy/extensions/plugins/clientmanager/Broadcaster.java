@@ -18,7 +18,6 @@
 package com.servoy.extensions.plugins.clientmanager;
 
 import java.rmi.RemoteException;
-import java.rmi.server.UnicastRemoteObject;
 
 import org.mozilla.javascript.Function;
 
@@ -26,7 +25,6 @@ import com.servoy.base.scripting.annotations.ServoyClientSupport;
 import com.servoy.j2db.documentation.ServoyDocumented;
 import com.servoy.j2db.scripting.FunctionDefinition;
 import com.servoy.j2db.scripting.IJavaScriptType;
-import com.servoy.j2db.smart.ISmartClientPluginAccess;
 import com.servoy.j2db.util.Debug;
 
 /**
@@ -84,17 +82,6 @@ public class Broadcaster implements IBroadcaster, IJavaScriptType
 
 	public void registerOnServer()
 	{
-		if (plugin.getClientPluginAccess() instanceof ISmartClientPluginAccess)
-		{
-			try
-			{
-				((ISmartClientPluginAccess)plugin.getClientPluginAccess()).exportObject(this);
-			}
-			catch (Exception e)
-			{
-				Debug.error("Couldn't export object for the broadcaster", e); //$NON-NLS-1$
-			}
-		}
 		try
 		{
 			plugin.getClientService().registerChannelListener(bci);
@@ -143,10 +130,6 @@ public class Broadcaster implements IBroadcaster, IJavaScriptType
 		try
 		{
 			plugin.getClientService().deregisterChannelListener(bci);
-			if (plugin.getClientPluginAccess() instanceof ISmartClientPluginAccess && !plugin.getClientPluginAccess().isInDeveloper())
-			{
-				UnicastRemoteObject.unexportObject(this, true);
-			}
 		}
 		catch (RemoteException e)
 		{

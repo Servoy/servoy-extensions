@@ -17,7 +17,6 @@
 package com.servoy.extensions.plugins.pdf_output;
 
 import java.awt.Color;
-import java.awt.Window;
 import java.awt.image.BufferedImage;
 import java.awt.print.PrinterJob;
 import java.io.ByteArrayInputStream;
@@ -52,12 +51,8 @@ import com.lowagie.text.pdf.PdfWriter;
 import com.lowagie.text.pdf.SimpleBookmark;
 import com.servoy.base.scripting.annotations.ServoyClientSupport;
 import com.servoy.j2db.documentation.ServoyDocumented;
-import com.servoy.j2db.plugins.IClientPluginAccess;
-import com.servoy.j2db.plugins.IRuntimeWindow;
-import com.servoy.j2db.plugins.ISmartRuntimeWindow;
 import com.servoy.j2db.scripting.IScriptable;
 import com.servoy.j2db.util.Debug;
-import com.servoy.j2db.util.FileChooserUtils;
 
 /**
  * <p>The <code>PDF Output</code> plugin allows for creating, manipulating, and enhancing
@@ -120,12 +115,8 @@ public class PDFProvider implements IScriptable
 		{
 			if (filename != null)
 			{
-				File f = new File(filename);
-				IClientPluginAccess access = plugin.getClientPluginAccess();
-				IRuntimeWindow runtimeWindow = access.getCurrentRuntimeWindow();
-				Window currentWindow = null;
-				if (runtimeWindow instanceof ISmartRuntimeWindow) currentWindow = ((ISmartRuntimeWindow)runtimeWindow).getWindow();
-				pdfFile = FileChooserUtils.getAWriteFile(currentWindow, f, false);
+				// the (smart client) save dialog for a directory is gone, the pdf is written to the given file
+				pdfFile = new File(filename);
 				FileOutputStream os = new FileOutputStream(pdfFile);
 				return new PDFPrinterJob(os, false);
 			}
@@ -172,12 +163,8 @@ public class PDFProvider implements IScriptable
 			OutputStream os = null;
 			if (filename != null)
 			{
-				File f = new File(filename.toString());
-				IClientPluginAccess access = plugin.getClientPluginAccess();
-				IRuntimeWindow runtimeWindow = access.getCurrentRuntimeWindow();
-				Window currentWindow = null;
-				if (runtimeWindow instanceof ISmartRuntimeWindow) currentWindow = ((ISmartRuntimeWindow)runtimeWindow).getWindow();
-				pdfFile = FileChooserUtils.getAWriteFile(currentWindow, f, false);
+				// the (smart client) save dialog for a directory is gone, the pdf is written to the given file
+				pdfFile = new File(filename);
 				os = new FileOutputStream(pdfFile);
 			}
 			else
