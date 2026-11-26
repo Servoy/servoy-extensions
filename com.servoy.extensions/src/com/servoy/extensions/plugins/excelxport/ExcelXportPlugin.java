@@ -16,36 +16,28 @@
  */
 package com.servoy.extensions.plugins.excelxport;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.net.URL;
 import java.util.Properties;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
 
-import com.servoy.j2db.IApplication;
 import com.servoy.j2db.Messages;
-import com.servoy.j2db.plugins.ClientPluginAccessProvider;
 import com.servoy.j2db.plugins.IClientPlugin;
 import com.servoy.j2db.plugins.IClientPluginAccess;
 import com.servoy.j2db.plugins.IIconProvider;
 import com.servoy.j2db.plugins.PluginException;
 import com.servoy.j2db.preference.PreferencePanel;
 import com.servoy.j2db.scripting.IScriptable;
-import com.servoy.j2db.smart.ISmartClientPluginAccess;
 
 /**
  * @author jblok
  */
-public class ExcelXportPlugin implements IClientPlugin, ActionListener, IIconProvider
+public class ExcelXportPlugin implements IClientPlugin, IIconProvider
 {
 	public static final String PLUGIN_NAME = "excelxport"; //$NON-NLS-1$
 
-	private IApplication application;
 	private Enabler en;
 
 	/*
@@ -60,31 +52,7 @@ public class ExcelXportPlugin implements IClientPlugin, ActionListener, IIconPro
 	 */
 	public void initialize(IClientPluginAccess app) throws PluginException
 	{
-		application = ((ClientPluginAccessProvider)app).getApplication();
-
-		if (app instanceof ISmartClientPluginAccess)
-		{
-			JMenu export_Menu = ((ISmartClientPluginAccess)app).getExportMenu();
-			JMenuItem exp = null;
-			if (export_Menu != null)
-			{
-				exp = new JMenuItem(Messages.getString("servoy.plugin.excel.toExcel")); //$NON-NLS-1$
-				exp.addActionListener(this);
-				exp.setActionCommand("export_excel_file"); //$NON-NLS-1$
-				export_Menu.add(exp);
-			}
-
-			JMenu import_Menu = ((ISmartClientPluginAccess)app).getImportMenu();
-			JMenuItem imp = null;
-			if (import_Menu != null)
-			{
-				imp = new JMenuItem(Messages.getString("servoy.plugin.excel.fromExcel")); //$NON-NLS-1$
-				imp.setActionCommand("import_excel_file"); //$NON-NLS-1$
-				imp.addActionListener(this);
-				import_Menu.add(imp);
-			}
-			en = new Enabler(imp, exp);
-		}
+		en = new Enabler();
 	}
 
 	public Properties getProperties()
@@ -94,42 +62,13 @@ public class ExcelXportPlugin implements IClientPlugin, ActionListener, IIconPro
 		return props;
 	}
 
-	public void actionPerformed(ActionEvent e)
-	{
-		String cmd = e.getActionCommand();
-		if ("export_excel_file".equals(cmd)) //$NON-NLS-1$
-		{
-			try
-			{
-				ExcelExport export = new ExcelExport(application);
-				export.showFrame();
-			}
-			catch (Exception ex)
-			{
-				application.reportError(Messages.getString("servoy.plugin.export.exception"), ex); //$NON-NLS-1$
-			}
-		}
-		else if ("import_excel_file".equals(cmd)) //$NON-NLS-1$
-		{
-			try
-			{
-				ExcelImport importer = new ExcelImport(application);
-				importer.showFrame();
-			}
-			catch (Exception ex)
-			{
-				application.reportError(Messages.getString("servoy.plugin.import.exception"), ex); //$NON-NLS-1$
-			}
-		}
-	}
-
 
 	/*
 	 * @see IPlugin#unload()
 	 */
 	public void unload() throws PluginException
 	{
-		application = null;
+		en = null;
 	}
 
 	/*
@@ -174,10 +113,7 @@ public class ExcelXportPlugin implements IClientPlugin, ActionListener, IIconPro
 
 	public void propertyChange(PropertyChangeEvent evt)
 	{
-		if (en != null && "solution".equals(evt.getPropertyName())) //$NON-NLS-1$
-		{
-			en.setEnabled(true);//restore for new solution
-		}
+		// nothing to restore: the import/export menu items only existed in the smart client
 	}
 
 	/*

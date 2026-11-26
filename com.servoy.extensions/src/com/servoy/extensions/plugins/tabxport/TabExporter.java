@@ -112,7 +112,7 @@ public class TabExporter implements IScriptable
 						headers[i] = dataproviders.get(i).dataprovider;
 					}
 				}
-				fileData.insert(0, ExportSpecifyFilePanel.createHeader(headers, separator));
+				fileData.insert(0, TextExportUtil.createHeader(headers, separator));
 			}
 			String[] dataProviderIds = new String[dataproviders.size()];
 			String[] formats = new String[dataproviders.size()];
@@ -124,7 +124,7 @@ public class TabExporter implements IScriptable
 				formats[i] = dpExport.format;
 				valuelists[i] = dpExport.valuelistName;
 			}
-			fileData.append(ExportSpecifyFilePanel.populateFileData(application, foundSet, dataProviderIds, separator, formats, valuelists));
+			fileData.append(TextExportUtil.populateFileData(application, foundSet, dataProviderIds, separator, formats, valuelists));
 
 			return fileData.toString();
 		}

@@ -38,6 +38,7 @@ import org.apache.pdfbox.rendering.PDFRenderer;
 import org.mozilla.javascript.Scriptable;
 
 import com.lowagie.text.Document;
+import com.lowagie.text.DocumentException;
 import com.lowagie.text.Image;
 import com.lowagie.text.pdf.AcroFields;
 import com.lowagie.text.pdf.BaseFont;
@@ -415,6 +416,7 @@ public class PDFProvider implements IScriptable
 					{
 						fieldNames.addAll(fdf.getAllFields().keySet());
 					}
+					setFdfFieldsWithoutLeadingDot(form, fdf, partialFlattening ? fieldNames : null);
 				}
 				else if (field_values instanceof byte[])
 				{
@@ -424,6 +426,7 @@ public class PDFProvider implements IScriptable
 					{
 						fieldNames.addAll(fdf.getAllFields().keySet());
 					}
+					setFdfFieldsWithoutLeadingDot(form, fdf, partialFlattening ? fieldNames : null);
 				}
 				else if (field_values instanceof Object[])
 				{
@@ -455,6 +458,12 @@ public class PDFProvider implements IScriptable
 						{
 							String s = (String)obj;
 							int idx = s.indexOf('=');
+							if (idx <= 0)
+							{
+								// not a "field=value" pair, skip it instead of failing the whole conversion
+								Debug.warn("Skipping form value '" + s + "', expected 'field=value'"); //$NON-NLS-1$ //$NON-NLS-2$
+								continue;
+							}
 							String key = s.substring(0, idx);
 							form.setField(key, s.substring(idx + 1));
 							if (partialFlattening)
@@ -568,6 +577,26 @@ public class PDFProvider implements IScriptable
 	public byte[] js_convertPDFFormToPDFDocument(byte[] pdf_form, Object field_values, boolean partialFlattening)
 	{
 		return js_convertProtectedPDFFormToPDFDocument(pdf_form, null, field_values, partialFlattening);
+	}
+
+	/**
+	 * The FDF reader names top level fields with a leading dot (".name"), so AcroFields.setFields(fdf) does not find
+	 * them in the form. Also set those values under the name without the dot, when the form has such a field and
+	 * the dotted name did not match. Fields that setFields already filled are left as they are.
+	 */
+	private static void setFdfFieldsWithoutLeadingDot(AcroFields form, FdfReader fdf, List<String> fieldNames) throws IOException, DocumentException
+	{
+		Map<String, ? > formFields = form.getFields();
+		for (String name : fdf.getFields().keySet())
+		{
+			if (name == null || name.length() < 2 || name.charAt(0) != '.' || formFields.containsKey(name)) continue;
+			String fieldName = name.substring(1);
+			if (!formFields.containsKey(fieldName)) continue;
+			String value = fdf.getFieldValue(name);
+			if (value == null) continue;
+			form.setField(fieldName, value);
+			if (fieldNames != null) fieldNames.add(fieldName);
+		}
 	}
 
 	/**
