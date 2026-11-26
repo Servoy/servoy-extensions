@@ -278,15 +278,9 @@ public class ExportSpecifyFilePanel extends JPanel implements ActionListener, IW
 						obj = runtimeValuelists[k].getElementAt(index);
 					}
 				}
-				if (obj instanceof String && ((String)obj).length() != 0)
-				{
-					fData.append("\""); //$NON-NLS-1$
-					obj = Utils.stringReplace((String)obj, "\"", "\"\""); //$NON-NLS-1$
-				}
-				if (obj instanceof Date)
-				{
-					fData.append("\""); //$NON-NLS-1$
-				}
+				// strings and dates are quoted; decide that after formatting, so the opening and closing quote always match
+				// (a formatted number becomes a string and is quoted on both sides, it may contain the separator)
+				boolean isDate = obj instanceof Date;
 				if (obj != null)
 				{
 					if (formats != null && formats[k] != null)
@@ -309,16 +303,12 @@ public class ExportSpecifyFilePanel extends JPanel implements ActionListener, IW
 							Debug.error(ex);
 						}
 					}
-					fData.append(obj);
 				}
-				if (obj instanceof String && ((String)obj).length() != 0)
-				{
-					fData.append("\""); //$NON-NLS-1$
-				}
-				if (obj instanceof Date)
-				{
-					fData.append("\""); //$NON-NLS-1$
-				}
+				boolean quote = isDate || (obj instanceof String && ((String)obj).length() != 0);
+				if (quote) fData.append("\""); //$NON-NLS-1$
+				if (obj instanceof String) obj = Utils.stringReplace((String)obj, "\"", "\"\""); //$NON-NLS-1$ //$NON-NLS-2$
+				if (obj != null) fData.append(obj);
+				if (quote) fData.append("\""); //$NON-NLS-1$
 				if (k < dataProviders.length - 1) fData.append(sep);
 			}
 			fData.append("\n"); //$NON-NLS-1$

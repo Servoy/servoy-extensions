@@ -162,11 +162,10 @@ public class TextExportTest
 		// the number format uses the default locale
 		String salary = new java.text.DecimalFormat("#,##0.00").format(new BigDecimal("1234.5"));
 		String smallSalary = new java.text.DecimalFormat("#,##0.00").format(99.25);
-		// current behaviour (bug): the opening quote is decided before formatting and the closing quote after it,
-		// so a formatted number gets only a closing quote; a formatted date is quoted on both sides
-		assertEquals("001\",\"1980-01-02\"," + salary + "\",\"Ann\"", lines[1]);
-		assertEquals("002\",," + smallSalary + "\",\"Bob \"\"B\"\" Brown\"", lines[2]);
-		assertEquals("003\",,,", lines[3]);
+		// formatted values are strings and quoted on both sides, unformatted numbers stay unquoted
+		assertEquals("\"001\",\"1980-01-02\",\"" + salary + "\",\"Ann\"", lines[1]);
+		assertEquals("\"002\",,\"" + smallSalary + "\",\"Bob \"\"B\"\" Brown\"", lines[2]);
+		assertEquals("\"003\",,,", lines[3]);
 	}
 
 	@Test
