@@ -230,7 +230,7 @@ public class PDFServletTest
 	{
 		get(null);
 
-		verify(response).sendRedirect("%2Fservoy-service%2Fpdf_forms/");
+		verify(response).sendRedirect("/servoy-service/pdf_forms/");
 	}
 
 	// --- GET: pdf form ---
@@ -496,7 +496,9 @@ public class PDFServletTest
 
 		post("/pdf_forms/pdf_process_data", submitted("name", "x"));
 
-		verify(response).sendRedirect("https%3A%2F%2Fapp.example%2Fthanks");
+		// the redirect url is used as it is, not url-encoded
+		verify(response).sendRedirect("https://app.example/thanks");
+		assertEquals("", writer.toString());
 	}
 
 	@Test
@@ -522,6 +524,22 @@ public class PDFServletTest
 		post("/pdf_forms/pdf_process_data", submitted("servoy_action_id", "7", "name", "x"));
 
 		assertTrue(writer.toString().contains("Security violation"), writer.toString());
+		// the violation is the only answer: no redirect and no success message after it
+		assertFalse(writer.toString().contains("successfully"), writer.toString());
+		verify(response, never()).sendRedirect(anyString());
+		verify(dataServer, never()).performUpdates(anyString(), any());
+	}
+
+	@Test
+	public void anUnknownActionIsNotFound() throws Exception
+	{
+		when(dataServer.performQuery(anyString(), anyString(), eq("pdf_actions"), isNull(), anyString(), any(), eq(0), eq(-1)))
+			.thenReturn(new BufferedDataSet(new String[] { "form_id", "template_id", "closed", "redirect_url" }, List.<Object[]> of()));
+
+		post("/pdf_forms/pdf_process_data", submitted("servoy_action_id", "8", "name", "x"));
+
+		assertTrue(writer.toString().contains("action_id not found"), writer.toString());
+		assertFalse(writer.toString().contains("successfully"), writer.toString());
 		verify(dataServer, never()).performUpdates(anyString(), any());
 	}
 
@@ -530,21 +548,18 @@ public class PDFServletTest
 	{
 		post("/pdf_forms/pdf_process_data", submitted("name", "x"));
 
-		// current behaviour (bug): the FDF toolkit throws for the missing servoy_action_id field, that is only logged and
-		// the client gets no answer instead of the "action_id not found" page
-		assertEquals("", writer.toString());
+		assertTrue(writer.toString().contains("action_id not found"), writer.toString());
 		verify(dataServer, never()).performUpdates(anyString(), any());
 	}
 
 	@Test
 	public void anXmlSubmissionWithoutActionIdParameterFails() throws Exception
 	{
-		// current behaviour (bug): without the action_id parameter the id is read from the FDF, which is null for an
-		// xml (XFA) submission, the NullPointerException is only logged and the client gets no answer
+		// an xml (XFA) submission has no FDF to read the action id from
 		post("/pdf_forms/pdf_process_data", "<form><name>x</name></form>".getBytes(StandardCharsets.UTF_8));
 
-		assertEquals("", writer.toString());
-		verify(response, never()).setContentType(anyString());
+		assertTrue(writer.toString().contains("action_id not found"), writer.toString());
+		verify(dataServer, never()).performUpdates(anyString(), any());
 	}
 
 	@Test
@@ -554,7 +569,7 @@ public class PDFServletTest
 		post("/", new byte[0]);
 		post("/other", new byte[0]);
 
-		verify(response).sendRedirect("%2Fservoy-service%2Fpdf_forms/");
+		verify(response).sendRedirect("/servoy-service/pdf_forms/");
 		verify(response, times(2)).sendError(404);
 	}
 
@@ -569,6 +584,6 @@ public class PDFServletTest
 		post("/pdf_forms/pdf_process_data", submitted("servoy_action_id", "7"));
 
 		verify(response).sendRedirect(redirect.capture());
-		assertEquals("https%3A%2F%2Fapp.example%2Ftemplate", redirect.getValue());
+		assertEquals("https://app.example/template", redirect.getValue());
 	}
 }
