@@ -37,6 +37,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -123,7 +124,7 @@ import com.servoy.j2db.util.Utils;
 @SuppressWarnings("nls")
 public class RestWSServlet extends HttpServlet
 {
-	private enum ContentType
+	enum ContentType
 	{
 		OTHER,
 		JSON,
@@ -248,7 +249,7 @@ public class RestWSServlet extends HttpServlet
 		{
 			plugin.log.trace("GET");
 			client = getClient(request);
-			Object result = wsService(WS_READ, null, emptyList(), request, response, client.getLeft());
+			Object result = wsService(WS_READ, null, request, response, client.getLeft());
 			if (result == null)
 			{
 				sendError(response, HttpServletResponse.SC_NOT_FOUND);
@@ -376,7 +377,7 @@ public class RestWSServlet extends HttpServlet
 		{
 			client = getClient(request);
 
-			Object result = wsService(WS_DELETE, null, emptyList(), request, response, client.getLeft());
+			Object result = wsService(WS_DELETE, null, request, response, client.getLeft());
 
 			if (Boolean.FALSE.equals(result))
 			{
@@ -417,20 +418,16 @@ public class RestWSServlet extends HttpServlet
 		boolean reloadSolution = plugin.shouldReloadSolutionAfterRequest();
 		try
 		{
-			Pair<List<FileItem>, ContentType> contents = getContents(request);
-			if (contents == null)
-			{
-				sendError(response, HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
-				return;
-			}
+			// header-only check, the body is not touched here
+			checkRequestCharset(request);
 
+			AtomicReference<Pair<List<FileItem>, ContentType>> contents = new AtomicReference<>();
 			client = getClient(request);
-			Object result = wsService(WS_CREATE, new Object[] { decodeContent(contents.getRight(), contents.getLeft(), request) }, contents.getLeft(),
-				request, response, client.getLeft());
+			Object result = wsService(WS_CREATE, createBodyDecoder(request, response, contents, false), request, response, client.getLeft());
 			HTTPUtils.setNoCacheHeaders(response);
 			if (result != null && result != Undefined.instance)
 			{
-				sendResult(request, response, result, contents.getRight());
+				sendResult(request, response, result, contents.get().getRight());
 			}
 		}
 		catch (ExecFailedException e)
@@ -459,28 +456,19 @@ public class RestWSServlet extends HttpServlet
 		boolean reloadSolution = plugin.shouldReloadSolutionAfterRequest();
 		try
 		{
-			Pair<List<FileItem>, ContentType> contents = getContents(request);
-			if (contents == null)
-			{
-				sendError(response, HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
-				return;
-			}
-			if (contents.getLeft().isEmpty())
-			{
-				sendError(response, HttpServletResponse.SC_NO_CONTENT);
-				return;
-			}
+			// header-only check, the body is not touched here
+			checkRequestCharset(request);
 
+			AtomicReference<Pair<List<FileItem>, ContentType>> contents = new AtomicReference<>();
 			client = getClient(request);
-			Object result = wsService(WS_UPDATE, new Object[] { decodeContent(contents.getRight(), contents.getLeft(), request) }, contents.getLeft(),
-				request, response, client.getLeft());
+			Object result = wsService(WS_UPDATE, createBodyDecoder(request, response, contents, true), request, response, client.getLeft());
 			if (Boolean.FALSE.equals(result))
 			{
 				sendError(response, HttpServletResponse.SC_NOT_FOUND);
 			}
 			else
 			{
-				sendResult(request, response, result, contents.getRight());
+				sendResult(request, response, result, contents.get().getRight());
 			}
 			HTTPUtils.setNoCacheHeaders(response);
 		}
@@ -509,28 +497,19 @@ public class RestWSServlet extends HttpServlet
 		boolean reloadSolution = plugin.shouldReloadSolutionAfterRequest();
 		try
 		{
-			Pair<List<FileItem>, ContentType> contents = getContents(request);
-			if (contents == null)
-			{
-				sendError(response, HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
-				return;
-			}
-			if (contents.getLeft().isEmpty())
-			{
-				sendError(response, HttpServletResponse.SC_NO_CONTENT);
-				return;
-			}
+			// header-only check, the body is not touched here
+			checkRequestCharset(request);
 
+			AtomicReference<Pair<List<FileItem>, ContentType>> contents = new AtomicReference<>();
 			client = getClient(request);
-			Object result = wsService(WS_PATCH, new Object[] { decodeContent(contents.getRight(), contents.getLeft(), request) }, contents.getLeft(),
-				request, response, client.getLeft());
+			Object result = wsService(WS_PATCH, createBodyDecoder(request, response, contents, true), request, response, client.getLeft());
 			if (Boolean.FALSE.equals(result))
 			{
 				sendError(response, HttpServletResponse.SC_NOT_FOUND);
 			}
 			else
 			{
-				sendResult(request, response, result, contents.getRight());
+				sendResult(request, response, result, contents.get().getRight());
 			}
 			HTTPUtils.setNoCacheHeaders(response);
 		}
@@ -691,17 +670,18 @@ public class RestWSServlet extends HttpServlet
 	 * call the service method, make the request and response available for the client-plugin.
 	 * Throws {@link NoClientsException} when no license is available
 	 * @param wsMethod
-	 * @param fixedArgs
-	 * @param contents
+	 * @param bodyDecoder deferred reading/decoding of the request body (null for requests without body), only invoked after authorization succeeded
 	 * @param request
 	 * @param response
 	 * @return
 	 * @throws Exception
 	 */
-	private Object wsService(String wsMethod, Object[] fixedArgs, List<FileItem> contents, HttpServletRequest request, HttpServletResponse response,
+	private Object wsService(String wsMethod, BodyDecoder bodyDecoder, HttpServletRequest request, HttpServletResponse response,
 		IHeadlessClient client)
 		throws Exception
 	{
+		// the request body is not read before authorization, so no contents are available yet (the body decoder sets them after authorization)
+		List<FileItem> contents = emptyList();
 		RestWSClientPlugin clientPlugin = (RestWSClientPlugin)client.getPluginAccess().getPluginManager().getPlugin(IClientPlugin.class,
 			RestWSClientPlugin.PLUGIN_NAME);
 		try
@@ -714,7 +694,7 @@ public class RestWSServlet extends HttpServlet
 			{
 				clientPlugin.setRequestResponseContents(request, response, contents);
 			}
-			return doWsService(wsMethod, fixedArgs, request, response, client, clientPlugin);
+			return doWsService(wsMethod, bodyDecoder, request, response, client, clientPlugin);
 		}
 		finally
 		{
@@ -725,7 +705,7 @@ public class RestWSServlet extends HttpServlet
 		}
 	}
 
-	private Object doWsService(String wsMethod, Object[] fixedArgs, HttpServletRequest request, HttpServletResponse response, IHeadlessClient client,
+	private Object doWsService(String wsMethod, BodyDecoder bodyDecoder, HttpServletRequest request, HttpServletResponse response, IHeadlessClient client,
 		RestWSClientPlugin clientPlugin)
 		throws Exception
 	{
@@ -738,6 +718,11 @@ public class RestWSServlet extends HttpServlet
 		WsRequestPath wsRequestPath = parsePath(request);
 
 		Object ws_authenticate_result = checkAuthorization(request, client, wsRequestPath.solutionName, wsRequestPath.scope_or_form);
+
+		// The request body must not be read, buffered or deserialized before authorization succeeded, so this is the earliest allowed point.
+		// Behavior note: errors caused by the body (unsupported media type, invalid content, malformed json/xml, ...) are reported after the
+		// authorization check, an unauthenticated or unauthorized caller gets 401/403 instead of those errors.
+		Object[] fixedArgs = bodyDecoder != null ? bodyDecoder.decode(clientPlugin) : null;
 
 		String context = getContext(client, wsRequestPath.scope_or_form);
 
@@ -902,7 +887,7 @@ public class RestWSServlet extends HttpServlet
 				headerItem + "'. Solution/form/scope: " + wsRequestPath.solutionName + " -> " + wsRequestPath.scope_or_form);
 	}
 
-	private Object checkAuthorization(HttpServletRequest request, IHeadlessClient client, String solutionName, String scope_or_form) throws Exception
+	Object checkAuthorization(HttpServletRequest request, IHeadlessClient client, String solutionName, String scope_or_form) throws Exception
 	{
 		String context = getContext(client, scope_or_form);
 
@@ -1052,20 +1037,21 @@ public class RestWSServlet extends HttpServlet
 	}
 
 	private ContentType getRequestContentType(HttpServletRequest request, String header, FileItem body, ContentType defaultContentType)
+		throws WebServiceException
 	{
 		String contentTypeHeaderValue = request.getHeader(header);
 		ContentType contentType = getContentType(contentTypeHeaderValue);
 		if (contentType != ContentType.OTHER) return contentType;
 		if (body != null)
 		{
+			// a disallowed charset is rejected here, it must not end up in the generic exception handling below
+			Charset cs = Charset.forName(checkCharset(getHeaderKey(request.getHeader("Content-Type"), "charset", CHARSET_DEFAULT)));
 			String stringContent = "";
 			try (InputStream inputStream = body.getInputStream())
 			{
 				// only read in the first 512 bytes.
 				byte[] bytes = new byte[512];
 				inputStream.read(bytes);
-				String charset = getHeaderKey(request.getHeader("Content-Type"), "charset", CHARSET_DEFAULT);
-				Charset cs = Charset.forName(charset);
 				CharBuffer cb = CharBuffer.allocate(512);
 				CoderResult decode = cs.newDecoder().decode(ByteBuffer.wrap(bytes), cb, false);
 				if (decode == CoderResult.OVERFLOW || decode == CoderResult.UNDERFLOW)
@@ -1216,11 +1202,92 @@ public class RestWSServlet extends HttpServlet
 		}
 	}
 
-	private Object decodeContent(ContentType contentType, List<FileItem> contents, HttpServletRequest request) throws Exception
+	/**
+	 * Deferred reading and decoding of the request body. It is only invoked after authorization succeeded.
+	 */
+	@FunctionalInterface
+	private interface BodyDecoder
+	{
+		Object[] decode(RestWSClientPlugin clientPlugin) throws Exception;
+	}
+
+	/**
+	 * Creates the deferred decoder for requests with a body (POST, PUT, PATCH). The body is read/parsed (getContents), made available to the
+	 * client plugin and decoded only when the decoder is invoked, which happens after checkAuthorization succeeded.
+	 */
+	private BodyDecoder createBodyDecoder(HttpServletRequest request, HttpServletResponse response,
+		AtomicReference<Pair<List<FileItem>, ContentType>> contentsHolder, boolean rejectEmptyContent)
+	{
+		return clientPlugin -> {
+			Pair<List<FileItem>, ContentType> contents = getContents(request);
+			if (contents == null)
+			{
+				throw new WebServiceException("Unsupported media type", HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
+			}
+			if (rejectEmptyContent && contents.getLeft().isEmpty())
+			{
+				throw new WebServiceException("No content", HttpServletResponse.SC_NO_CONTENT);
+			}
+			contentsHolder.set(contents);
+			if (clientPlugin != null)
+			{
+				// the parsed contents are available for solution code, same as before
+				clientPlugin.setRequestResponseContents(request, response, contents.getLeft());
+			}
+			return new Object[] { decodeContent(contents.getRight(), contents.getLeft(), request) };
+		};
+	}
+
+	/**
+	 * Allowed charsets (canonical java names) for request bodies.
+	 */
+	private static final List<String> ALLOWED_CHARSETS = asList("UTF-8", "US-ASCII", "ISO-8859-1", "UTF-16", "UTF-16BE", "UTF-16LE", "windows-1252");
+
+	/**
+	 * Checks the charset name from a request or part header against the allowlist and returns the canonical charset name (aliases like utf8 are resolved).
+	 * The (untrusted) value is never sent back to the client.
+	 *
+	 * @throws WebServiceException with status 415 when the charset is not allowed
+	 */
+	static String checkCharset(String charset) throws WebServiceException
+	{
+		if (charset != null)
+		{
+			String name = charset.trim();
+			if (name.length() > 1 && name.charAt(0) == '"' && name.charAt(name.length() - 1) == '"')
+			{
+				name = name.substring(1, name.length() - 1).trim();
+			}
+			try
+			{
+				String canonical = Charset.forName(name).name();
+				if (ALLOWED_CHARSETS.contains(canonical)) return canonical;
+			}
+			catch (IllegalArgumentException e)
+			{
+				// illegal or unsupported charset name, rejected below
+			}
+		}
+		String logValue = charset == null ? "<null>" : charset.replaceAll("[^\\x20-\\x7E]", "?");
+		if (logValue.length() > 40) logValue = logValue.substring(0, 40) + "...";
+		Debug.log("rest_ws: rejected request charset '" + logValue + '\'');
+		throw new WebServiceException("Unsupported charset", HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
+	}
+
+	/**
+	 * Header-only validation of the charset of the request Content-Type, does not touch the request body.
+	 */
+	private void checkRequestCharset(HttpServletRequest request) throws WebServiceException
+	{
+		checkCharset(getHeaderKey(request.getHeader("Content-Type"), "charset", CHARSET_DEFAULT));
+	}
+
+	Object decodeContent(ContentType contentType, List<FileItem> contents, HttpServletRequest request) throws Exception
 	{
 		if (contentType == ContentType.MULTIPART)
 		{
-			return getMultipartContent(contents, getHeaderKey(request.getContentType(), "charset", null));
+			String requestCharset = getHeaderKey(request.getContentType(), "charset", null);
+			return getMultipartContent(contents, requestCharset == null ? null : checkCharset(requestCharset));
 		}
 
 		if (contents.isEmpty())
@@ -1229,7 +1296,7 @@ public class RestWSServlet extends HttpServlet
 		}
 
 		FileItem body = contents.get(0);
-		String charset = getHeaderKey(request.getHeader("Content-Type"), "charset", CHARSET_DEFAULT);
+		String charset = checkCharset(getHeaderKey(request.getHeader("Content-Type"), "charset", CHARSET_DEFAULT));
 
 		return decode(contentType, body, charset);
 	}
@@ -1242,8 +1309,10 @@ public class RestWSServlet extends HttpServlet
 	 * @throws UnmarshallException
 	 * @throws UnsupportedEncodingException
 	 */
-	private Object decode(ContentType contentType, FileItem body, String charset) throws UnmarshallException, UnsupportedEncodingException
+	Object decode(ContentType contentType, FileItem body, String charset) throws UnmarshallException, UnsupportedEncodingException, WebServiceException
 	{
+		// defensive, callers already checked it; every charset used to decode a body must be on the allowlist
+		charset = checkCharset(charset);
 		switch (contentType)
 		{
 			case JSON :
@@ -1272,7 +1341,7 @@ public class RestWSServlet extends HttpServlet
 		throw new IllegalStateException();
 	}
 
-	private Pair<List<FileItem>, ContentType> getContents(HttpServletRequest request) throws FileUploadException, IOException
+	private Pair<List<FileItem>, ContentType> getContents(HttpServletRequest request) throws FileUploadException, IOException, WebServiceException
 	{
 		if (ServletFileUpload.isMultipartContent(request))
 		{
@@ -1302,7 +1371,8 @@ public class RestWSServlet extends HttpServlet
 		return upload.parseRequest(request);
 	}
 
-	private Object[] getMultipartContent(List<FileItem> contents, String requestCharset) throws UnsupportedEncodingException, UnmarshallException
+	private Object[] getMultipartContent(List<FileItem> contents, String requestCharset)
+		throws UnsupportedEncodingException, UnmarshallException, WebServiceException
 	{
 		Map<String, String> formFields = new JSMap<>();
 
@@ -1320,14 +1390,8 @@ public class RestWSServlet extends HttpServlet
 						String charset = getHeaderKey(item.getContentType(), "charset", requestCharset);
 						if (charset != null)
 						{
-							try
-							{
-								formFields.put(item.getFieldName(), item.getString(charset));
-							}
-							catch (UnsupportedEncodingException e)
-							{
-								formFields.put(item.getFieldName(), item.getString());
-							}
+							// a disallowed charset is rejected, no silent fallback to another charset
+							formFields.put(item.getFieldName(), item.getString(checkCharset(charset)));
 						}
 						else
 						{
@@ -1359,6 +1423,7 @@ public class RestWSServlet extends HttpServlet
 				}
 				if (charset.length() > 0)
 				{
+					checkCharset(charset);
 					partObj.put("charset", charset);
 				}
 				else
